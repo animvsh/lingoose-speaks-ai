@@ -1,50 +1,81 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Phone, CheckCircle, Clock, Home } from "lucide-react";
+import { Phone, CheckCircle, Clock, Home, BarChart3, Settings, User } from "lucide-react";
 import DuckMascot from "@/components/DuckMascot";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
 import ProgressCard from "@/components/ProgressCard";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
+import OnboardingFlow from "@/components/OnboardingFlow";
+import SettingsCard from "@/components/SettingsCard";
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState("welcome");
+  const [currentView, setCurrentView] = useState("add-to-home");
   const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
+  const [hasOnboarded, setHasOnboarded] = useState(false);
 
   useEffect(() => {
+    // Check if user has already onboarded
+    const onboardingComplete = localStorage.getItem('lingooseOnboardingComplete');
+    const addToHomeScreenDismissed = localStorage.getItem('addToHomeScreenDismissed');
+    
+    if (onboardingComplete) {
+      setHasOnboarded(true);
+    }
+
     // Check if it's a mobile device and not already added to home screen
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                         (window.navigator as any).standalone === true;
     
-    // Show add to home screen prompt on mobile if not standalone and not shown before
-    if (isMobile && !isStandalone && !localStorage.getItem('addToHomeScreenDismissed')) {
-      const timer = setTimeout(() => {
-        setShowAddToHomeScreen(true);
-      }, 2000); // Show after 2 seconds
-      
-      return () => clearTimeout(timer);
+    // Show add to home screen prompt first if conditions are met
+    if (isMobile && !isStandalone && !addToHomeScreenDismissed) {
+      setCurrentView("add-to-home");
+      setShowAddToHomeScreen(true);
+    } else if (onboardingComplete) {
+      setCurrentView("home");
+    } else {
+      setCurrentView("onboarding");
     }
   }, []);
 
   const handleDismissAddToHomeScreen = () => {
     setShowAddToHomeScreen(false);
     localStorage.setItem('addToHomeScreenDismissed', 'true');
+    
+    if (hasOnboarded) {
+      setCurrentView("home");
+    } else {
+      setCurrentView("onboarding");
+    }
+  };
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('lingooseOnboardingComplete', 'true');
+    setHasOnboarded(true);
+    setCurrentView("home");
   };
 
   const renderView = () => {
     switch (currentView) {
-      case "welcome":
-        return <WelcomeView onNavigate={setCurrentView} />;
+      case "add-to-home":
+        return null; // AddToHomeScreen overlay handles this
+      case "onboarding":
+        return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+      case "home":
+        return <HomeView onNavigate={setCurrentView} />;
       case "activity":
         return <ActivityView onNavigate={setCurrentView} />;
       case "progress":
         return <ProgressView onNavigate={setCurrentView} />;
       case "curriculum":
         return <CurriculumView onNavigate={setCurrentView} />;
+      case "settings":
+        return <SettingsView onNavigate={setCurrentView} />;
       default:
-        return <WelcomeView onNavigate={setCurrentView} />;
+        return <HomeView onNavigate={setCurrentView} />;
     }
   };
 
@@ -86,53 +117,75 @@ const Index = () => {
   );
 };
 
-const WelcomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
-  <Card className="bg-white p-8 rounded-3xl shadow-lg border-4 border-black">
-    <div className="text-center space-y-6">
+const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+  <div className="bg-white p-8 rounded-3xl shadow-lg w-full h-full flex flex-col">
+    <div className="text-center space-y-6 flex-1">
       <DuckMascot className="mx-auto" />
-      <h1 className="text-4xl font-bold text-slate-800">Welcome!</h1>
+      <div>
+        <h1 className="text-3xl font-bold text-slate-800 mb-2">Hello from Lingoose!</h1>
+        <p className="text-slate-600">"Bonjour, but make it chaotic"</p>
+      </div>
       
       <div className="space-y-4">
-        <div className="text-left">
-          <p className="text-slate-600 font-medium mb-2">Today's Activity</p>
-          <Button 
-            onClick={() => onNavigate("activity")}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-2xl flex items-center gap-3 text-lg transition-all duration-200 hover:scale-105"
-          >
-            <div className="w-8 h-8 bg-orange-400 rounded-lg flex items-center justify-center">
-              <Phone className="w-4 h-4" />
-            </div>
-            Evening Date Idea
-          </Button>
+        <div className="bg-orange-50 p-4 rounded-2xl">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-slate-600 font-medium">Today's Fluency</span>
+            <span className="text-orange-500 font-bold">67%</span>
+          </div>
+          <div className="w-full bg-orange-200 h-2 rounded-full">
+            <div className="bg-orange-500 h-2 rounded-full w-2/3"></div>
+          </div>
+        </div>
+
+        <Button 
+          onClick={() => onNavigate("activity")}
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-6 rounded-2xl text-xl transition-all duration-200 hover:scale-105"
+        >
+          <Phone className="w-6 h-6 mr-3" />
+          Call Me Now
+        </Button>
+
+        <div className="text-sm text-slate-500">
+          🔥 Day 7 streak • Next unlock in 2 calls
         </div>
       </div>
-
-      <div className="flex justify-center space-x-8 pt-4">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={() => onNavigate("welcome")}
-          className="w-10 h-10 bg-orange-500 hover:bg-orange-600 rounded-xl text-white"
-        >
-          <Home className="w-5 h-5" />
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          className="w-10 h-10 rounded-xl text-slate-400"
-        >
-          <Clock className="w-5 h-5" />
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          className="w-10 h-10 rounded-xl text-slate-400"
-        >
-          <CheckCircle className="w-5 h-5" />
-        </Button>
-      </div>
     </div>
-  </Card>
+
+    <div className="flex justify-center space-x-8 pt-4 border-t border-slate-100">
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={() => onNavigate("home")}
+        className="w-12 h-12 bg-orange-500 hover:bg-orange-600 rounded-xl text-white"
+      >
+        <Home className="w-5 h-5" />
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={() => onNavigate("progress")}
+        className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100"
+      >
+        <BarChart3 className="w-5 h-5" />
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={() => onNavigate("curriculum")}
+        className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100"
+      >
+        <CheckCircle className="w-5 h-5" />
+      </Button>
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={() => onNavigate("settings")}
+        className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100"
+      >
+        <Settings className="w-5 h-5" />
+      </Button>
+    </div>
+  </div>
 );
 
 const ActivityView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
@@ -145,6 +198,10 @@ const ProgressView = ({ onNavigate }: { onNavigate: (view: string) => void }) =>
 
 const CurriculumView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
   <CurriculumCard onNavigate={onNavigate} />
+);
+
+const SettingsView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+  <SettingsCard onNavigate={onNavigate} />
 );
 
 export default Index;

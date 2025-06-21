@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Home, Clock, CheckCircle, User } from "lucide-react";
+import { Home, Clock, CheckCircle, User, BarChart3, Settings, Star, Trophy } from "lucide-react";
 
 interface ProgressCardProps {
   onNavigate: (view: string) => void;
@@ -9,25 +8,43 @@ interface ProgressCardProps {
 
 const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
   return (
-    <Card className="bg-white p-8 rounded-3xl shadow-lg border-4 border-black">
-      <div className="text-center space-y-6">
-        <h1 className="text-4xl font-bold text-slate-800">Great job!</h1>
+    <div className="bg-white p-8 rounded-3xl shadow-lg w-full h-full flex flex-col">
+      <div className="text-center space-y-6 flex-1">
+        <div className="flex items-center justify-center space-x-2">
+          <Star className="w-8 h-8 text-yellow-500 fill-current" />
+          <h1 className="text-4xl font-bold text-slate-800">Great job!</h1>
+          <Star className="w-8 h-8 text-yellow-500 fill-current" />
+        </div>
         
-        <div className="space-y-4 text-left">
-          <p className="text-slate-700">
-            We've already discussed this once, but 'rencontrer' means to meet someone by chance.
-          </p>
-          <p className="text-slate-700">
-            Use the phrase 'retrouver quelqu'un' instead.
-          </p>
+        <div className="bg-green-50 p-4 rounded-2xl">
+          <div className="flex items-center justify-center space-x-2 mb-2">
+            <Trophy className="w-5 h-5 text-green-600" />
+            <span className="font-semibold text-green-800">Call Completed!</span>
+          </div>
+          <div className="text-sm text-green-600">8 minutes • 89% engagement</div>
         </div>
 
-        <div className="flex items-center space-x-3 bg-gray-50 p-4 rounded-2xl">
-          <User className="w-6 h-6 text-orange-500" />
-          <div className="text-left flex-1">
-            <p className="text-orange-500 font-bold">On peut se rencontrer devant le cinema...</p>
-            <div className="w-full bg-orange-200 h-2 rounded-full mt-2">
-              <div className="bg-orange-500 h-2 rounded-full w-3/4"></div>
+        <div className="space-y-4 text-left">
+          <div className="bg-orange-50 p-4 rounded-2xl">
+            <h3 className="font-semibold text-orange-800 mb-2">🦆 Goose Feedback</h3>
+            <p className="text-orange-700 text-sm mb-2">
+              We've already discussed this once, but 'rencontrer' means to meet someone by chance.
+            </p>
+            <p className="text-orange-700 text-sm">
+              Use the phrase 'retrouver quelqu'un' instead when planning to meet!
+            </p>
+          </div>
+
+          <div className="bg-slate-50 p-4 rounded-2xl">
+            <h3 className="font-semibold text-slate-800 mb-2">📝 What you said:</h3>
+            <div className="flex items-center space-x-3">
+              <User className="w-6 h-6 text-orange-500" />
+              <div className="flex-1">
+                <p className="text-orange-500 font-medium text-sm">"On peut se rencontrer devant le cinema..."</p>
+                <div className="w-full bg-orange-200 h-2 rounded-full mt-2">
+                  <div className="bg-orange-500 h-2 rounded-full w-3/4"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -36,35 +53,44 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
           onClick={() => onNavigate("curriculum")}
           className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-2xl text-xl transition-all duration-200 hover:scale-105"
         >
-          Continue
+          Continue Learning
         </Button>
-
-        <div className="flex justify-center space-x-8 pt-4">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => onNavigate("welcome")}
-            className="w-10 h-10 bg-orange-500 hover:bg-orange-600 rounded-xl text-white"
-          >
-            <Home className="w-5 h-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="w-10 h-10 rounded-xl text-slate-400"
-          >
-            <Clock className="w-5 h-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="w-10 h-10 rounded-xl text-slate-400"
-          >
-            <CheckCircle className="w-5 h-5" />
-          </Button>
-        </div>
       </div>
-    </Card>
+
+      <div className="flex justify-center space-x-8 pt-4 border-t border-slate-100">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => onNavigate("home")}
+          className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100"
+        >
+          <Home className="w-5 h-5" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="w-12 h-12 bg-orange-500 hover:bg-orange-600 rounded-xl text-white"
+        >
+          <BarChart3 className="w-5 h-5" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => onNavigate("curriculum")}
+          className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100"
+        >
+          <CheckCircle className="w-5 h-5" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => onNavigate("settings")}
+          className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100"
+        >
+          <Settings className="w-5 h-5" />
+        </Button>
+      </div>
+    </div>
   );
 };
 
