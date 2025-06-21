@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Phone, CheckCircle, Clock, Home } from "lucide-react";
@@ -7,9 +6,32 @@ import DuckMascot from "@/components/DuckMascot";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
 import ProgressCard from "@/components/ProgressCard";
+import AddToHomeScreen from "@/components/AddToHomeScreen";
 
 const Index = () => {
   const [currentView, setCurrentView] = useState("welcome");
+  const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
+
+  useEffect(() => {
+    // Check if it's a mobile device and not already added to home screen
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        (window.navigator as any).standalone === true;
+    
+    // Show add to home screen prompt on mobile if not standalone and not shown before
+    if (isMobile && !isStandalone && !localStorage.getItem('addToHomeScreenDismissed')) {
+      const timer = setTimeout(() => {
+        setShowAddToHomeScreen(true);
+      }, 2000); // Show after 2 seconds
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleDismissAddToHomeScreen = () => {
+    setShowAddToHomeScreen(false);
+    localStorage.setItem('addToHomeScreenDismissed', 'true');
+  };
 
   const renderView = () => {
     switch (currentView) {
@@ -27,10 +49,17 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2E8] flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        {renderView()}
+    <div className="min-h-screen bg-[#F5F2E8] flex items-center justify-center relative">
+      {/* Mobile App Container */}
+      <div className="w-full max-w-sm min-h-screen flex items-center justify-center p-4 md:min-h-0 md:py-8">
+        <div className="w-full max-w-sm">
+          {renderView()}
+        </div>
       </div>
+      
+      {showAddToHomeScreen && (
+        <AddToHomeScreen onDismiss={handleDismissAddToHomeScreen} />
+      )}
     </div>
   );
 };
