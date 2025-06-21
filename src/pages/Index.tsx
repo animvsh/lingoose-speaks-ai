@@ -9,46 +9,45 @@ import ProgressCard from "@/components/ProgressCard";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import SettingsCard from "@/components/SettingsCard";
+import WelcomeScreen from "@/components/WelcomeScreen";
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState("add-to-home");
+  const [currentView, setCurrentView] = useState("welcome");
   const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(false);
 
   useEffect(() => {
     // Check if user has already onboarded
     const onboardingComplete = localStorage.getItem('lingooseOnboardingComplete');
-    const addToHomeScreenDismissed = localStorage.getItem('addToHomeScreenDismissed');
     
     if (onboardingComplete) {
       setHasOnboarded(true);
+      setCurrentView("home");
+    } else {
+      setCurrentView("welcome");
     }
+  }, []);
 
+  const handleWelcomeComplete = () => {
     // Check if it's a mobile device and not already added to home screen
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                         (window.navigator as any).standalone === true;
+    const addToHomeScreenDismissed = localStorage.getItem('addToHomeScreenDismissed');
     
-    // Show add to home screen prompt first if conditions are met
+    // Show add to home screen prompt if conditions are met
     if (isMobile && !isStandalone && !addToHomeScreenDismissed) {
       setCurrentView("add-to-home");
       setShowAddToHomeScreen(true);
-    } else if (onboardingComplete) {
-      setCurrentView("home");
     } else {
       setCurrentView("onboarding");
     }
-  }, []);
+  };
 
   const handleDismissAddToHomeScreen = () => {
     setShowAddToHomeScreen(false);
     localStorage.setItem('addToHomeScreenDismissed', 'true');
-    
-    if (hasOnboarded) {
-      setCurrentView("home");
-    } else {
-      setCurrentView("onboarding");
-    }
+    setCurrentView("onboarding");
   };
 
   const handleOnboardingComplete = () => {
@@ -59,6 +58,8 @@ const Index = () => {
 
   const renderView = () => {
     switch (currentView) {
+      case "welcome":
+        return <WelcomeScreen onComplete={handleWelcomeComplete} />;
       case "add-to-home":
         return null; // AddToHomeScreen overlay handles this
       case "onboarding":
@@ -74,7 +75,7 @@ const Index = () => {
       case "settings":
         return <SettingsView onNavigate={setCurrentView} />;
       default:
-        return <HomeView onNavigate={setCurrentView} />;
+        return <WelcomeScreen onComplete={handleWelcomeComplete} />;
     }
   };
 
