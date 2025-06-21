@@ -8,7 +8,7 @@ interface WelcomeScreenProps {
 
 const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-lg w-full h-full flex flex-col">
+    <div className="bg-white p-8 rounded-3xl shadow-lg w-full min-h-full flex flex-col overflow-y-auto">
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center space-y-8">
           <DuckMascot className="mx-auto" />

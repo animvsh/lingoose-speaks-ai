@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -82,8 +83,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#F5F2E8] flex items-center justify-center p-4">
       {/* Fullscreen App Content */}
-      <div className="w-full max-w-md h-screen flex items-center justify-center">
-        <div className="w-full h-full max-h-[667px] flex items-center justify-center">
+      <div className="w-full max-w-md min-h-screen flex items-center justify-center">
+        <div className="w-full min-h-full flex items-center justify-center overflow-y-auto">
           {renderView()}
         </div>
       </div>
@@ -96,7 +97,7 @@ const Index = () => {
 };
 
 const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
-  <div className="bg-white p-8 rounded-3xl shadow-lg w-full h-full flex flex-col">
+  <div className="bg-white p-8 rounded-3xl shadow-lg w-full min-h-full flex flex-col overflow-y-auto">
     <div className="text-center space-y-6 flex-1">
       <DuckMascot className="mx-auto" />
       <div>
