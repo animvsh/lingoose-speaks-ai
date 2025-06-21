@@ -15,26 +15,26 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   const [selectedTone, setSelectedTone] = useState("");
 
   const languages = [
+    { code: "hi", name: "हिंदी", emoji: "🇮🇳", comment: "नमस्ते!" },
     { code: "fr", name: "French", emoji: "🇫🇷", comment: "Oui oui baguette!" },
     { code: "es", name: "Spanish", emoji: "🇪🇸", comment: "¡Hola amigo!" },
     { code: "de", name: "German", emoji: "🇩🇪", comment: "Guten Tag!" },
-    { code: "it", name: "Italian", emoji: "🇮🇹", comment: "Ciao bella!" },
-    { code: "pt", name: "Portuguese", emoji: "🇵🇹", comment: "Olá!" }
+    { code: "it", name: "Italian", emoji: "🇮🇹", comment: "Ciao bella!" }
   ];
 
   const goals = [
-    { id: "light", title: "Light & Breezy", desc: "5 min calls, 3x/week", emoji: "🌸" },
-    { id: "medium", title: "Steady Progress", desc: "10 min calls, daily", emoji: "🚀" },
-    { id: "intense", title: "Goose Mode", desc: "15 min calls, daily + extras", emoji: "🔥" }
+    { id: "light", title: "हल्का और आसान", desc: "5 मिनट कॉल, 3 बार/सप्ताह", emoji: "🌸" },
+    { id: "medium", title: "स्थिर प्रगति", desc: "10 मिनट कॉल, रोज़ाना", emoji: "🚀" },
+    { id: "intense", title: "गूज़ मोड", desc: "15 मिनट कॉल, रोज़ाना + अतिरिक्त", emoji: "🔥" }
   ];
 
   const tones = [
-    { id: "chaotic", title: "Chaotic", desc: "Unpredictable & wild", emoji: "🌪️" },
-    { id: "flirty", title: "Flirty", desc: "Smooth & charming", emoji: "😘" },
-    { id: "calm", title: "Calm", desc: "Zen & peaceful", emoji: "🧘" },
-    { id: "strict", title: "Strict", desc: "No nonsense teacher", emoji: "👩‍🏫" },
-    { id: "grandma", title: "Soft Grandma", desc: "Sweet & encouraging", emoji: "👵" },
-    { id: "sadboi", title: "Sadboi", desc: "Melancholic but wise", emoji: "😔" }
+    { id: "chaotic", title: "अराजक", desc: "अप्रत्याशित और जंगली", emoji: "🌪️" },
+    { id: "flirty", title: "फ्लर्टी", desc: "चिकना और आकर्षक", emoji: "😘" },
+    { id: "calm", title: "शांत", desc: "ज़ेन और शांतिपूर्ण", emoji: "🧘" },
+    { id: "strict", title: "सख्त", desc: "बकवास नहीं शिक्षक", emoji: "👩‍🏫" },
+    { id: "grandma", title: "नरम दादी", desc: "मधुर और प्रोत्साहनकारी", emoji: "👵" },
+    { id: "sadboi", title: "उदास लड़का", desc: "उदासीन लेकिन बुद्धिमान", emoji: "😔" }
   ];
 
   const nextStep = () => {
@@ -58,14 +58,14 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
           <div className="text-center space-y-6">
             <DuckMascot className="mx-auto" />
             <div>
-              <h1 className="text-4xl font-bold text-slate-800 mb-4">Welcome!</h1>
-              <p className="text-xl text-slate-600">Ready to get fluent the goose way?</p>
+              <h1 className="text-4xl font-bold text-slate-800 mb-4">आपका स्वागत है!</h1>
+              <p className="text-xl text-slate-600">गूज़ तरीके से धाराप्रवाह बनने के लिए तैयार हैं?</p>
             </div>
             <Button 
               onClick={nextStep}
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-2xl text-xl"
             >
-              Let's Goose! <ChevronRight className="w-5 h-5 ml-2" />
+              चलो गूज़ करते हैं! <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
         );
@@ -74,8 +74,8 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-slate-800 mb-2">Choose Your Language</h2>
-              <p className="text-slate-600">Which language are we goosin' today?</p>
+              <h2 className="text-3xl font-bold text-slate-800 mb-2">अपनी भाषा चुनें</h2>
+              <p className="text-slate-600">आज हम कौन सी भाषा में गूज़िंग कर रहे हैं?</p>
             </div>
             
             <div className="space-y-3">
@@ -106,8 +106,8 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-slate-800 mb-2">Set Your Goal</h2>
-              <p className="text-slate-600">How intense should we get?</p>
+              <h2 className="text-3xl font-bold text-slate-800 mb-2">अपना लक्ष्य निर्धारित करें</h2>
+              <p className="text-slate-600">हमें कितनी तीव्रता से करना चाहिए?</p>
             </div>
             
             <div className="space-y-3">
@@ -138,8 +138,8 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-slate-800 mb-2">Choose Your Goose's Tone</h2>
-              <p className="text-slate-600">How should I talk to you?</p>
+              <h2 className="text-3xl font-bold text-slate-800 mb-2">अपने गूज़ का टोन चुनें</h2>
+              <p className="text-slate-600">मुझे आपसे कैसे बात करनी चाहिए?</p>
             </div>
             
             <div className="space-y-3">
@@ -174,20 +174,20 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
           <div className="text-center space-y-6">
             <DuckMascot className="mx-auto" />
             <div>
-              <h2 className="text-3xl font-bold text-slate-800 mb-4">All Set!</h2>
+              <h2 className="text-3xl font-bold text-slate-800 mb-4">सभी तैयार!</h2>
               <p className="text-slate-600 mb-4">
-                I'll call you for quick {selectedLanguage.toUpperCase()} practice sessions with a {selectedTone} vibe.
+                मैं आपको {selectedLanguage === "hi" ? "हिंदी" : selectedLanguage.toUpperCase()} अभ्यास सत्रों के लिए {selectedTone} वाइब के साथ कॉल करूंगा।
               </p>
               <div className="bg-orange-50 p-4 rounded-2xl text-left">
-                <p className="text-sm text-slate-600 mb-2">Sample scenario:</p>
-                <p className="font-medium text-slate-800">"Let's plan a robbery in Rome... but in Italian!"</p>
+                <p className="text-sm text-slate-600 mb-2">नमूना परिदृश्य:</p>
+                <p className="font-medium text-slate-800">"आइए रोम में डकैती की योजना बनाते हैं... लेकिन हिंदी में!"</p>
               </div>
             </div>
             <Button 
               onClick={nextStep}
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-2xl text-xl"
             >
-              Start Learning!
+              सीखना शुरू करें!
             </Button>
           </div>
         );
@@ -212,7 +212,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             onClick={prevStep}
             className="text-slate-400 hover:text-slate-600"
           >
-            <ChevronLeft className="w-4 h-4 mr-1" /> Back
+            <ChevronLeft className="w-4 h-4 mr-1" /> वापस
           </Button>
           
           <div className="flex space-x-2">
@@ -235,7 +235,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             }
             className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl disabled:opacity-50"
           >
-            Next <ChevronRight className="w-4 h-4 ml-1" />
+            आगे <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
       )}

@@ -10,32 +10,32 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   const settingsItems = [
     { 
       icon: <User className="w-5 h-5" />, 
-      title: "Change Language", 
-      subtitle: "Currently: French",
+      title: "भाषा बदलें", 
+      subtitle: "वर्तमान में: हिंदी",
       action: () => console.log("Change language")
     },
     { 
       icon: <User className="w-5 h-5" />, 
-      title: "Change Goose Tone", 
-      subtitle: "Currently: Chaotic",
+      title: "गूज़ टोन बदलें", 
+      subtitle: "वर्तमान में: अराजक",
       action: () => console.log("Change tone")
     },
     { 
       icon: <Bell className="w-5 h-5" />, 
-      title: "Notifications", 
-      subtitle: "Daily reminders enabled",
+      title: "सूचनाएं", 
+      subtitle: "दैनिक रिमाइंडर सक्षम",
       action: () => console.log("Toggle notifications")
     },
     { 
       icon: <Phone className="w-5 h-5" />, 
-      title: "Manage Number", 
-      subtitle: "+1 (555) 123-4567",
+      title: "नंबर प्रबंधित करें", 
+      subtitle: "+91 98765 43210",
       action: () => console.log("Manage number")
     },
     { 
       icon: <HelpCircle className="w-5 h-5" />, 
-      title: "Help & Support", 
-      subtitle: "Get help or report issues",
+      title: "सहायता और समर्थन", 
+      subtitle: "सहायता प्राप्त करें या समस्याएं रिपोर्ट करें",
       action: () => console.log("Help")
     }
   ];
@@ -43,7 +43,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   return (
     <div className="bg-white p-8 rounded-3xl shadow-lg w-full h-full flex flex-col">
       <div className="text-center space-y-6 flex-1">
-        <h1 className="text-4xl font-bold text-slate-800">Settings</h1>
+        <h1 className="text-4xl font-bold text-slate-800">सेटिंग्स</h1>
         
         <div className="space-y-3">
           {settingsItems.map((item, index) => (
@@ -70,7 +70,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
 
         <div className="pt-6">
           <div className="text-xs text-slate-400 mb-2">Lingoose v1.0.0</div>
-          <p className="text-sm text-slate-500">Made with 🧡 by chaotic geese</p>
+          <p className="text-sm text-slate-500">🧡 अराजक हंसों द्वारा प्रेम से बनाया गया</p>
         </div>
       </div>
 

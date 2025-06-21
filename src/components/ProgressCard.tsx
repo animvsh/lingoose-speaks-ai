@@ -12,35 +12,35 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
       <div className="text-center space-y-6 flex-1">
         <div className="flex items-center justify-center space-x-2">
           <Star className="w-8 h-8 text-yellow-500 fill-current" />
-          <h1 className="text-4xl font-bold text-slate-800">Great job!</h1>
+          <h1 className="text-4xl font-bold text-slate-800">बहुत बढ़िया!</h1>
           <Star className="w-8 h-8 text-yellow-500 fill-current" />
         </div>
         
         <div className="bg-green-50 p-4 rounded-2xl">
           <div className="flex items-center justify-center space-x-2 mb-2">
             <Trophy className="w-5 h-5 text-green-600" />
-            <span className="font-semibold text-green-800">Call Completed!</span>
+            <span className="font-semibold text-green-800">कॉल पूरी हुई!</span>
           </div>
-          <div className="text-sm text-green-600">8 minutes • 89% engagement</div>
+          <div className="text-sm text-green-600">8 मिनट • 89% सहभागिता</div>
         </div>
 
         <div className="space-y-4 text-left">
           <div className="bg-orange-50 p-4 rounded-2xl">
-            <h3 className="font-semibold text-orange-800 mb-2">🦆 Goose Feedback</h3>
+            <h3 className="font-semibold text-orange-800 mb-2">🦆 गूज़ की प्रतिक्रिया</h3>
             <p className="text-orange-700 text-sm mb-2">
-              We've already discussed this once, but 'rencontrer' means to meet someone by chance.
+              हमने इस पर पहले भी चर्चा की है, लेकिन 'मिलना' का मतलब है किसी से संयोग से मिलना।
             </p>
             <p className="text-orange-700 text-sm">
-              Use the phrase 'retrouver quelqu'un' instead when planning to meet!
+              जब मिलने की योजना बनाई हो तो 'किसी से मिलने जाना' वाक्य का प्रयोग करें!
             </p>
           </div>
 
           <div className="bg-slate-50 p-4 rounded-2xl">
-            <h3 className="font-semibold text-slate-800 mb-2">📝 What you said:</h3>
+            <h3 className="font-semibold text-slate-800 mb-2">📝 आपने क्या कहा:</h3>
             <div className="flex items-center space-x-3">
               <User className="w-6 h-6 text-orange-500" />
               <div className="flex-1">
-                <p className="text-orange-500 font-medium text-sm">"On peut se rencontrer devant le cinema..."</p>
+                <p className="text-orange-500 font-medium text-sm">"हम सिनेमा के सामने मिल सकते हैं..."</p>
                 <div className="w-full bg-orange-200 h-2 rounded-full mt-2">
                   <div className="bg-orange-500 h-2 rounded-full w-3/4"></div>
                 </div>
@@ -53,7 +53,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
           onClick={() => onNavigate("curriculum")}
           className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-2xl text-xl transition-all duration-200 hover:scale-105"
         >
-          Continue Learning
+          सीखना जारी रखें
         </Button>
       </div>
 
