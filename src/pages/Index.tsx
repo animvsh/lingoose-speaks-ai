@@ -49,12 +49,34 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2E8] flex items-center justify-center relative">
-      {/* Mobile App Container */}
-      <div className="w-full max-w-sm min-h-screen flex items-center justify-center p-4 md:min-h-0 md:py-8">
-        <div className="w-full max-w-sm">
-          {renderView()}
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      {/* Mobile Frame */}
+      <div className="relative">
+        {/* Phone Frame */}
+        <div className="w-[375px] h-[667px] bg-black rounded-[3rem] p-2 shadow-2xl">
+          {/* Screen */}
+          <div className="w-full h-full bg-[#F5F2E8] rounded-[2.5rem] overflow-hidden relative">
+            {/* Status Bar */}
+            <div className="absolute top-0 left-0 right-0 h-6 bg-black/5 z-10 flex justify-between items-center px-6 text-xs font-medium text-slate-700">
+              <span>9:41</span>
+              <div className="flex items-center space-x-1">
+                <div className="w-4 h-2 border border-slate-700 rounded-sm">
+                  <div className="w-3 h-1 bg-slate-700 rounded-sm m-0.5"></div>
+                </div>
+              </div>
+            </div>
+            
+            {/* App Content */}
+            <div className="w-full h-full pt-6 pb-4 px-4 flex items-center justify-center">
+              <div className="w-full max-w-sm h-full flex items-center justify-center">
+                {renderView()}
+              </div>
+            </div>
+          </div>
         </div>
+        
+        {/* Home Indicator */}
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-white/30 rounded-full"></div>
       </div>
       
       {showAddToHomeScreen && (
