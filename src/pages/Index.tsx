@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -81,12 +80,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2E8] flex items-center justify-center p-4">
-      {/* Fullscreen App Content */}
-      <div className="w-full max-w-md min-h-screen flex items-center justify-center">
-        <div className="w-full min-h-full flex items-center justify-center overflow-y-auto">
-          {renderView()}
-        </div>
+    <div className="min-h-screen bg-[#F5F2E8] p-4">
+      <div className="w-full max-w-md mx-auto h-screen max-h-screen">
+        {renderView()}
       </div>
       
       {showAddToHomeScreen && (
@@ -97,40 +93,42 @@ const Index = () => {
 };
 
 const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
-  <div className="bg-white p-8 rounded-3xl shadow-lg w-full min-h-full flex flex-col overflow-y-auto">
-    <div className="text-center space-y-6 flex-1">
-      <DuckMascot className="mx-auto" />
-      <div>
-        <h1 className="text-3xl font-bold text-slate-800 mb-2">Lingoose में आपका स्वागत है!</h1>
-        <p className="text-slate-600">"नमस्ते, लेकिन थोड़ी अजीब तरीके से"</p>
-      </div>
-      
-      <div className="space-y-4">
-        <div className="bg-orange-50 p-4 rounded-2xl">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-slate-600 font-medium">आज की प्रवाहता</span>
-            <span className="text-orange-500 font-bold">67%</span>
-          </div>
-          <div className="w-full bg-orange-200 h-2 rounded-full">
-            <div className="bg-orange-500 h-2 rounded-full w-2/3"></div>
-          </div>
+  <div className="bg-white p-6 rounded-3xl shadow-lg w-full h-full max-h-full flex flex-col">
+    <div className="flex-1 overflow-y-auto">
+      <div className="text-center space-y-6">
+        <DuckMascot className="mx-auto" />
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800 mb-2">Lingoose में आपका स्वागत है!</h1>
+          <p className="text-slate-600">"नमस्ते, लेकिन थोड़ी अजीब तरीके से"</p>
         </div>
+        
+        <div className="space-y-4">
+          <div className="bg-orange-50 p-4 rounded-2xl">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-slate-600 font-medium">आज की प्रवाहता</span>
+              <span className="text-orange-500 font-bold">67%</span>
+            </div>
+            <div className="w-full bg-orange-200 h-2 rounded-full">
+              <div className="bg-orange-500 h-2 rounded-full w-2/3"></div>
+            </div>
+          </div>
 
-        <Button 
-          onClick={() => onNavigate("activity")}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-6 rounded-2xl text-xl transition-all duration-200 hover:scale-105"
-        >
-          <Phone className="w-6 h-6 mr-3" />
-          मुझे अभी कॉल करें
-        </Button>
+          <Button 
+            onClick={() => onNavigate("activity")}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-6 rounded-2xl text-xl transition-all duration-200 hover:scale-105"
+          >
+            <Phone className="w-6 h-6 mr-3" />
+            मुझे अभी कॉल करें
+          </Button>
 
-        <div className="text-sm text-slate-500">
-          🔥 7 दिन की स्ट्रीक • 2 कॉल में अगला अनलॉक
+          <div className="text-sm text-slate-500">
+            🔥 7 दिन की स्ट्रीक • 2 कॉल में अगला अनलॉक
+          </div>
         </div>
       </div>
     </div>
 
-    <div className="flex justify-center space-x-8 pt-4 border-t border-slate-100">
+    <div className="flex justify-center space-x-8 pt-4 border-t border-slate-100 mt-4">
       <Button 
         variant="ghost" 
         size="sm"

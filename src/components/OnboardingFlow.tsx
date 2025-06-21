@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Volume2 } from "lucide-react";
@@ -142,15 +141,15 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-lg w-full min-h-full flex flex-col overflow-y-auto">
-      <div className="flex-1 flex items-center justify-center">
-        <div className="w-full max-w-sm">
+    <div className="bg-white p-6 rounded-3xl shadow-lg w-full h-full max-h-full flex flex-col">
+      <div className="flex-1 overflow-y-auto">
+        <div className="w-full max-w-sm mx-auto">
           {renderStep()}
         </div>
       </div>
       
       {currentStep > 0 && currentStep < 2 && (
-        <div className="flex justify-between items-center pt-4 border-t border-slate-100 mt-6">
+        <div className="flex justify-between items-center pt-4 border-t border-slate-100 mt-4">
           <Button 
             variant="ghost"
             onClick={prevStep}
