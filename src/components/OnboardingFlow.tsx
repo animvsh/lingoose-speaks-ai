@@ -44,6 +44,22 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     }
   };
 
+  const handleGoalSelect = (goalId: string) => {
+    setSelectedGoal(goalId);
+    // Automatically move to next step after selection
+    setTimeout(() => {
+      setCurrentStep(1);
+    }, 300);
+  };
+
+  const handleToneSelect = (toneId: string) => {
+    setSelectedTone(toneId);
+    // Automatically move to next step after selection
+    setTimeout(() => {
+      setCurrentStep(2);
+    }, 300);
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -58,7 +74,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               {goals.map((goal) => (
                 <button
                   key={goal.id}
-                  onClick={() => setSelectedGoal(goal.id)}
+                  onClick={() => handleGoalSelect(goal.id)}
                   className={`w-full p-4 rounded-2xl text-left transition-all duration-300 hover:scale-[1.02] ${
                     selectedGoal === goal.id 
                       ? 'bg-orange-500 text-white shadow-lg' 
@@ -90,7 +106,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               {tones.map((tone) => (
                 <button
                   key={tone.id}
-                  onClick={() => setSelectedTone(tone.id)}
+                  onClick={() => handleToneSelect(tone.id)}
                   className={`w-full p-4 rounded-2xl text-left transition-all duration-300 hover:scale-[1.02] ${
                     selectedTone === tone.id 
                       ? 'bg-orange-500 text-white shadow-lg' 
@@ -148,14 +164,16 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
           {renderStep()}
         </div>
         
-        {currentStep > 0 && currentStep < 2 && (
+        {/* Navigation for all steps except the final one */}
+        {currentStep < 2 && (
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-4 py-4 safe-area-bottom">
             <div className="max-w-md mx-auto">
               <div className="flex justify-between items-center">
                 <Button 
                   variant="ghost"
                   onClick={prevStep}
-                  className="text-slate-400 hover:text-slate-600 transition-all duration-200 hover:scale-105"
+                  disabled={currentStep === 0}
+                  className="text-slate-400 hover:text-slate-600 transition-all duration-200 hover:scale-105 disabled:opacity-30"
                 >
                   <ChevronLeft className="w-4 h-4 mr-1" /> back
                 </Button>
