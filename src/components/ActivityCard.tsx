@@ -1,67 +1,71 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Phone, Target, TrendingUp, AlertCircle, CheckCircle, Circle, Lock, ChevronDown, ChevronRight } from "lucide-react";
+import { Phone, Target, TrendingUp, AlertCircle, CheckCircle, Circle, Lock, ChevronDown, ChevronRight, Loader2 } from "lucide-react";
 import AppBar from "./AppBar";
+import { useLearningOutlines } from "@/hooks/useLearningOutlines";
+import { useLearningUnits } from "@/hooks/useLearningUnits";
+import { useSkills } from "@/hooks/useSkills";
+import { useUserProgress } from "@/hooks/useUserProgress";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ActivityCardProps {
   onNavigate: (view: string) => void;
 }
 
 const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
+  const { user } = useAuth();
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
+  const [expandedUnits, setExpandedUnits] = useState<{ [key: string]: any }>({});
 
-  const courseOutline = [
-    {
-      id: "unit1",
-      title: "Basic Conversations",
-      progress: 75,
-      status: "in_progress",
-      skills: [
-        { name: "Greetings & Introductions", completed: true, mastery: 90, practiceHours: 3.5 },
-        { name: "Asking for Directions", completed: true, mastery: 85, practiceHours: 2.8 },
-        { name: "Ordering Food", completed: false, mastery: 60, practiceHours: 1.2 },
-        { name: "Small Talk", completed: false, mastery: 45, practiceHours: 0.8 },
-      ]
-    },
-    {
-      id: "unit2", 
-      title: "Travel & Transportation",
-      progress: 40,
-      status: "in_progress",
-      skills: [
-        { name: "Airport Conversations", completed: true, mastery: 78, practiceHours: 2.1 },
-        { name: "Hotel Check-in", completed: false, mastery: 55, practiceHours: 1.0 },
-        { name: "Public Transportation", completed: false, mastery: 30, practiceHours: 0.5 },
-        { name: "Taxi & Rideshare", completed: false, mastery: 20, practiceHours: 0.3 },
-      ]
-    },
-    {
-      id: "unit3",
-      title: "Business English",
-      progress: 0,
-      status: "locked",
-      skills: [
-        { name: "Meeting Etiquette", completed: false, mastery: 0, practiceHours: 0 },
-        { name: "Email Communication", completed: false, mastery: 0, practiceHours: 0 },
-        { name: "Presentations", completed: false, mastery: 0, practiceHours: 0 },
-        { name: "Negotiations", completed: false, mastery: 0, practiceHours: 0 },
-      ]
-    },
-    {
-      id: "unit4",
-      title: "Advanced Conversations",
-      progress: 0,
-      status: "locked",
-      skills: [
-        { name: "Debates & Discussions", completed: false, mastery: 0, practiceHours: 0 },
-        { name: "Cultural Topics", completed: false, mastery: 0, practiceHours: 0 },
-        { name: "News & Current Events", completed: false, mastery: 0, practiceHours: 0 },
-        { name: "Academic Discussions", completed: false, mastery: 0, practiceHours: 0 },
-      ]
+  const { data: outlines, isLoading: outlinesLoading } = useLearningOutlines();
+  const currentOutline = outlines?.[0]; // Using first outline for now
+
+  const { data: units, isLoading: unitsLoading } = useLearningUnits(currentOutline?.id || '');
+  const { miniSkillScores } = useUserProgress(currentOutline?.id);
+
+  // Load skills for expanded units
+  const expandedUnitIds = Object.keys(expandedUnits);
+  
+  useEffect(() => {
+    if (selectedUnit && units) {
+      const unit = units.find(u => u.id === selectedUnit);
+      if (unit && !expandedUnits[selectedUnit]) {
+        setExpandedUnits(prev => ({ ...prev, [selectedUnit]: { loading: true } }));
+      }
     }
-  ];
+  }, [selectedUnit, units]);
+
+  // Calculate progress for each unit based on user scores
+  const calculateUnitProgress = (unitId: string) => {
+    if (!miniSkillScores) return 0;
+    
+    const unitScores = miniSkillScores.filter(score => 
+      score.mini_skills?.skills?.unit_id === unitId
+    );
+    
+    if (unitScores.length === 0) return 0;
+    
+    const avgScore = unitScores.reduce((sum, score) => sum + score.score, 0) / unitScores.length;
+    return Math.round(avgScore);
+  };
+
+  const getUnitStatus = (unit: any, index: number) => {
+    const progress = calculateUnitProgress(unit.id);
+    
+    if (progress >= 90) return "completed";
+    if (progress > 0 || index === 0) return "in_progress";
+    
+    // Check if previous unit meets unlock threshold
+    if (index > 0 && units) {
+      const prevUnit = units[index - 1];
+      const prevProgress = calculateUnitProgress(prevUnit.id);
+      return prevProgress >= (unit.unlock_threshold || 75) ? "in_progress" : "locked";
+    }
+    
+    return "locked";
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -83,12 +87,42 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     return "bg-orange-50 border-orange-300";
   };
 
-  const getMasteryColor = (mastery: number) => {
-    if (mastery >= 80) return "bg-green-500";
-    if (mastery >= 60) return "bg-blue-500";
-    if (mastery >= 40) return "bg-orange-500";
-    return "bg-gray-400";
-  };
+  if (outlinesLoading || unitsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-24">
+        <AppBar 
+          title="ACTIVITY"
+          onBack={() => onNavigate("home")}
+          showBackButton={true}
+        />
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-24">
+        <AppBar 
+          title="ACTIVITY"
+          onBack={() => onNavigate("home")}
+          showBackButton={true}
+        />
+        <div className="px-6 pt-6">
+          <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
+            <CardContent className="p-6 text-center">
+              <p className="text-gray-600 mb-4">Please sign in to track your learning progress.</p>
+              <Button onClick={() => onNavigate("auth")} className="bg-blue-600 hover:bg-blue-700">
+                Sign In
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -197,137 +231,199 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-gray-900">
               Learning Progress Path
+              {currentOutline && (
+                <span className="text-sm font-normal text-gray-600 block mt-1">
+                  {currentOutline.name}
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <div className="space-y-6">
-              {courseOutline.map((unit, index) => (
-                <div key={unit.id} className="relative">
-                  <div className="flex items-start space-x-4">
-                    {/* Node */}
-                    <div 
-                      className={`relative flex-shrink-0 w-14 h-14 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:shadow-md ${getNodeColor(unit.status, unit.progress)} ${
-                        selectedUnit === unit.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''
-                      }`}
-                      onClick={() => setSelectedUnit(selectedUnit === unit.id ? null : unit.id)}
-                    >
-                      {getStatusIcon(unit.status)}
-                      
-                      {/* Progress Ring */}
-                      {unit.progress > 0 && (
-                        <div className="absolute inset-0 rounded-full">
-                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                            <circle
-                              cx="50"
-                              cy="50"
-                              r="45"
-                              stroke="rgba(0,0,0,0.1)"
-                              strokeWidth="4"
-                              fill="transparent"
-                            />
-                            <circle
-                              cx="50"
-                              cy="50"
-                              r="45"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              fill="transparent"
-                              strokeDasharray={`${unit.progress * 2.83} 283`}
-                              strokeLinecap="round"
-                              className="text-blue-600"
-                            />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Unit Info */}
-                    <div className="flex-1 bg-gray-50 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900">
-                          {unit.title}
-                        </h3>
-                        {selectedUnit === unit.id ? (
-                          <ChevronDown className="w-4 h-4 text-gray-500" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-500" />
+              {units?.map((unit, index) => {
+                const progress = calculateUnitProgress(unit.id);
+                const status = getUnitStatus(unit, index);
+                
+                return (
+                  <div key={unit.id} className="relative">
+                    <div className="flex items-start space-x-4">
+                      {/* Node */}
+                      <div 
+                        className={`relative flex-shrink-0 w-14 h-14 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:shadow-md ${getNodeColor(status, progress)} ${
+                          selectedUnit === unit.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+                        }`}
+                        onClick={() => setSelectedUnit(selectedUnit === unit.id ? null : unit.id)}
+                      >
+                        {getStatusIcon(status)}
+                        
+                        {/* Progress Ring */}
+                        {progress > 0 && (
+                          <div className="absolute inset-0 rounded-full">
+                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r="45"
+                                stroke="rgba(0,0,0,0.1)"
+                                strokeWidth="4"
+                                fill="transparent"
+                              />
+                              <circle
+                                cx="50"
+                                cy="50"
+                                r="45"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                fill="transparent"
+                                strokeDasharray={`${progress * 2.83} 283`}
+                                strokeLinecap="round"
+                                className="text-blue-600"
+                              />
+                            </svg>
+                          </div>
                         )}
                       </div>
-                      <div className="flex items-center space-x-3">
-                        <div className="flex-1 bg-gray-200 h-2 rounded-full">
-                          <div 
-                            className="h-full bg-blue-600 rounded-full transition-all duration-500"
-                            style={{ width: `${unit.progress}%` }}
-                          ></div>
+
+                      {/* Unit Info */}
+                      <div className="flex-1 bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold text-gray-900">
+                            {unit.name}
+                          </h3>
+                          {selectedUnit === unit.id ? (
+                            <ChevronDown className="w-4 h-4 text-gray-500" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4 text-gray-500" />
+                          )}
                         </div>
-                        <span className="text-gray-600 text-sm font-medium">
-                          {unit.progress}%
-                        </span>
-                      </div>
-                      
-                      {unit.status === "locked" && (
-                        <p className="text-gray-500 text-sm mt-2">
-                          Complete previous units to unlock
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Connector Line */}
-                  {index < courseOutline.length - 1 && (
-                    <div className="absolute left-7 top-14 w-0.5 h-6 bg-gray-200"></div>
-                  )}
-
-                  {/* Expanded Skills Detail */}
-                  {selectedUnit === unit.id && (
-                    <div className="mt-4 ml-18 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                      <h4 className="font-medium text-gray-900 mb-4">
-                        Skills & Mastery in {unit.title}
-                      </h4>
-                      <div className="space-y-3">
-                        {unit.skills.map((skill, skillIndex) => (
-                          <div 
-                            key={skillIndex} 
-                            className="bg-gray-50 rounded-lg p-3"
-                          >
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center space-x-2">
-                                {skill.completed ? (
-                                  <CheckCircle className="w-4 h-4 text-green-600" />
-                                ) : (
-                                  <Circle className="w-4 h-4 text-gray-400" />
-                                )}
-                                <span className={`font-medium text-sm ${skill.completed ? 'text-green-800' : 'text-gray-700'}`}>
-                                  {skill.name}
-                                </span>
-                              </div>
-                              <span className="text-xs text-gray-500">
-                                {skill.practiceHours}h practiced
-                              </span>
-                            </div>
-                            
-                            {/* Mastery Progress */}
-                            <div className="flex items-center space-x-3">
-                              <div className="flex-1 bg-gray-200 h-1.5 rounded-full">
-                                <div 
-                                  className={`h-full rounded-full transition-all duration-500 ${getMasteryColor(skill.mastery)}`}
-                                  style={{ width: `${skill.mastery}%` }}
-                                ></div>
-                              </div>
-                              <span className="text-xs font-medium text-gray-600">
-                                {skill.mastery}% mastered
-                              </span>
-                            </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-1 bg-gray-200 h-2 rounded-full">
+                            <div 
+                              className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                              style={{ width: `${progress}%` }}
+                            ></div>
                           </div>
-                        ))}
+                          <span className="text-gray-600 text-sm font-medium">
+                            {progress}%
+                          </span>
+                        </div>
+                        
+                        {status === "locked" && (
+                          <p className="text-gray-500 text-sm mt-2">
+                            Complete previous units to unlock
+                          </p>
+                        )}
+                        
+                        {unit.description && (
+                          <p className="text-gray-600 text-sm mt-2">
+                            {unit.description}
+                          </p>
+                        )}
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    {/* Connector Line */}
+                    {index < (units?.length || 0) - 1 && (
+                      <div className="absolute left-7 top-14 w-0.5 h-6 bg-gray-200"></div>
+                    )}
+
+                    {/* Expanded Skills Detail */}
+                    {selectedUnit === unit.id && (
+                      <div className="mt-4 ml-18 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                        <SkillsDetail unitId={unit.id} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
+      </div>
+    </div>
+  );
+};
+
+// Separate component for skills detail to manage loading state
+const SkillsDetail = ({ unitId }: { unitId: string }) => {
+  const { data: skills, isLoading } = useSkills(unitId);
+  const { miniSkillScores } = useUserProgress();
+
+  const calculateSkillProgress = (skillId: string) => {
+    if (!miniSkillScores) return 0;
+    
+    const skillScores = miniSkillScores.filter(score => 
+      score.mini_skills?.skill_id === skillId
+    );
+    
+    if (skillScores.length === 0) return 0;
+    
+    const avgScore = skillScores.reduce((sum, score) => sum + score.score, 0) / skillScores.length;
+    return Math.round(avgScore);
+  };
+
+  const getMasteryColor = (mastery: number) => {
+    if (mastery >= 80) return "bg-green-500";
+    if (mastery >= 60) return "bg-blue-500";
+    if (mastery >= 40) return "bg-orange-500";
+    return "bg-gray-400";
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-4">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h4 className="font-medium text-gray-900 mb-4">
+        Skills in this Unit
+      </h4>
+      <div className="space-y-3">
+        {skills?.map((skill, skillIndex) => {
+          const progress = calculateSkillProgress(skill.id);
+          const completed = progress >= 80;
+          
+          return (
+            <div 
+              key={skill.id} 
+              className="bg-gray-50 rounded-lg p-3"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2">
+                  {completed ? (
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-gray-400" />
+                  )}
+                  <span className={`font-medium text-sm ${completed ? 'text-green-800' : 'text-gray-700'}`}>
+                    {skill.name}
+                  </span>
+                </div>
+              </div>
+              
+              {skill.description && (
+                <p className="text-xs text-gray-600 mb-2">{skill.description}</p>
+              )}
+              
+              {/* Mastery Progress */}
+              <div className="flex items-center space-x-3">
+                <div className="flex-1 bg-gray-200 h-1.5 rounded-full">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-500 ${getMasteryColor(progress)}`}
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+                <span className="text-xs font-medium text-gray-600">
+                  {progress}% mastered
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

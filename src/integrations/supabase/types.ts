@@ -9,6 +9,221 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      conversations: {
+        Row: {
+          conversation_data: Json | null
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          outline_id: string
+          skill_id: string | null
+          unit_id: string | null
+          user_id: string
+        }
+        Insert: {
+          conversation_data?: Json | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          outline_id: string
+          skill_id?: string | null
+          unit_id?: string | null
+          user_id: string
+        }
+        Update: {
+          conversation_data?: Json | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          outline_id?: string
+          skill_id?: string | null
+          unit_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_outline_id_fkey"
+            columns: ["outline_id"]
+            isOneToOne: false
+            referencedRelation: "learning_outlines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "learning_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_outlines: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          difficulty_level: string | null
+          id: string
+          language: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          id?: string
+          language: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          id?: string
+          language?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      learning_units: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          outline_id: string
+          unit_order: number
+          unlock_threshold: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          outline_id: string
+          unit_order: number
+          unlock_threshold?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          outline_id?: string
+          unit_order?: number
+          unlock_threshold?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_units_outline_id_fkey"
+            columns: ["outline_id"]
+            isOneToOne: false
+            referencedRelation: "learning_outlines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mini_skills: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          max_score: number | null
+          mini_skill_order: number
+          name: string
+          skill_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          max_score?: number | null
+          mini_skill_order: number
+          name: string
+          skill_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          max_score?: number | null
+          mini_skill_order?: number
+          name?: string
+          skill_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mini_skills_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      skills: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          skill_order: number
+          unit_id: string
+          unlock_threshold: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          skill_order: number
+          unit_id: string
+          unlock_threshold?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          skill_order?: number
+          unit_id?: string
+          unlock_threshold?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skills_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "learning_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           created_at: string | null
@@ -34,6 +249,116 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_mini_skill_scores: {
+        Row: {
+          attempts: number | null
+          created_at: string | null
+          id: string
+          last_practiced: string | null
+          mini_skill_id: string
+          score: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string | null
+          id?: string
+          last_practiced?: string | null
+          mini_skill_id: string
+          score?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string | null
+          id?: string
+          last_practiced?: string | null
+          mini_skill_id?: string
+          score?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_mini_skill_scores_mini_skill_id_fkey"
+            columns: ["mini_skill_id"]
+            isOneToOne: false
+            referencedRelation: "mini_skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_mini_skill_scores_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_outline_progress: {
+        Row: {
+          created_at: string | null
+          current_skill_id: string | null
+          current_unit_id: string | null
+          id: string
+          outline_id: string
+          overall_progress_percentage: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_skill_id?: string | null
+          current_unit_id?: string | null
+          id?: string
+          outline_id: string
+          overall_progress_percentage?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_skill_id?: string | null
+          current_unit_id?: string | null
+          id?: string
+          outline_id?: string
+          overall_progress_percentage?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_outline_progress_current_skill_id_fkey"
+            columns: ["current_skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_outline_progress_current_unit_id_fkey"
+            columns: ["current_unit_id"]
+            isOneToOne: false
+            referencedRelation: "learning_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_outline_progress_outline_id_fkey"
+            columns: ["outline_id"]
+            isOneToOne: false
+            referencedRelation: "learning_outlines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_outline_progress_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
@@ -70,6 +395,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_skill_progress: {
+        Args: { p_user_id: string; p_skill_id: string }
+        Returns: number
+      }
+      calculate_unit_progress: {
+        Args: { p_user_id: string; p_unit_id: string }
+        Returns: number
+      }
+      is_skill_unlocked: {
+        Args: { p_user_id: string; p_skill_id: string }
+        Returns: boolean
+      }
+      is_unit_unlocked: {
+        Args: { p_user_id: string; p_unit_id: string }
+        Returns: boolean
+      }
       setLanguage: {
         Args: Record<PropertyKey, never>
         Returns: undefined
