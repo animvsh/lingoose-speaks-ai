@@ -9,6 +9,56 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      activities: {
+        Row: {
+          activity_order: number
+          created_at: string | null
+          description: string | null
+          difficulty_level: string | null
+          estimated_duration_minutes: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          prompt: string
+          skill_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          activity_order?: number
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          estimated_duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          prompt: string
+          skill_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          activity_order?: number
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          estimated_duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          prompt?: string
+          skill_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           conversation_data: Json | null
@@ -249,6 +299,67 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_activity_ratings: {
+        Row: {
+          activity_id: string
+          completed_at: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          feedback_notes: string | null
+          id: string
+          rating: number
+          skill_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          feedback_notes?: string | null
+          id?: string
+          rating: number
+          skill_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          feedback_notes?: string | null
+          id?: string
+          rating?: number
+          skill_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_activity_ratings_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_activity_ratings_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_activity_ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
