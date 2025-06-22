@@ -554,6 +554,10 @@ export type Database = {
         Args: { p_phone_number: string; p_language: string }
         Returns: undefined
       }
+      create_user_with_phone: {
+        Args: { p_phone_number: string; p_language?: string }
+        Returns: string
+      }
       is_skill_unlocked: {
         Args: { p_user_id: string; p_skill_id: string }
         Returns: boolean
