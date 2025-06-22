@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, BarChart3, Settings, User, LogOut } from "lucide-react";
@@ -154,9 +153,9 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   const { signOut } = useAuth();
   
   return (
-    <div className="min-h-screen bg-yellow-100 pb-24">
-      {/* Fixed App Bar at Top */}
-      <div className="fixed top-0 left-0 right-0 bg-yellow-100 border-b-4 border-orange-600 px-4 py-4 z-50">
+    <div className="min-h-screen bg-yellow-100">
+      {/* Fixed App Bar at Top - Higher z-index and proper positioning */}
+      <div className="fixed top-0 left-0 right-0 bg-yellow-100 border-b-4 border-orange-600 px-4 py-4 z-[9999] shadow-lg">
         <div className="max-w-md mx-auto">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
@@ -180,8 +179,8 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
         </div>
       </div>
 
-      {/* Main Content with top padding to account for fixed header */}
-      <div className="px-4 pt-24">
+      {/* Main Content with proper top padding */}
+      <div className="pt-28 px-4 pb-28">
         {/* Welcome Section */}
         <div className="text-center mb-6">
           <div className="relative inline-block mb-4">
@@ -213,8 +212,8 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
         </div>
       </div>
 
-      {/* Fixed Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-slate-400 px-4 py-4 z-50">
+      {/* Fixed Bottom Navigation - Increased z-index */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-slate-400 px-4 py-4 z-[9999] shadow-lg">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
             <Button 
