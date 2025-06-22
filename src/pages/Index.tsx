@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, BarChart3, Settings, User, LogOut } from "lucide-react";
@@ -153,7 +154,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   const { signOut } = useAuth();
   
   return (
-    <div className="min-h-screen bg-yellow-100">
+    <div className="min-h-screen bg-yellow-100 pb-24">
       <div className="px-4 pt-6">
         {/* Header with sign out button */}
         <div className="flex justify-between items-start mb-6">
@@ -200,8 +201,8 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="bg-white border-t-4 border-slate-400 px-4 py-4">
+      {/* Fixed Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-slate-400 px-4 py-4 z-50">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
             <Button 
