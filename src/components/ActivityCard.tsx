@@ -72,67 +72,67 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
-      <div className="px-6 pt-8">
+    <div className="min-h-screen bg-gray-100 pb-24">
+      <div className="px-4 pt-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
-          <div 
+        <div className="flex items-center justify-between mb-8">
+          <div
             onClick={() => onNavigate("home")}
-            className="w-16 h-16 bg-orange-500 hover:bg-orange-600 rounded-full flex items-center justify-center shadow-[0_8px_0_0_#ea580c] hover:shadow-[0_4px_0_0_#ea580c] hover:translate-y-1 transition-all duration-150 cursor-pointer active:shadow-[0_2px_0_0_#ea580c] active:translate-y-2"
+            className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center shadow-[0_4px_0_0_#ea580c] hover:shadow-[0_2px_0_0_#ea580c] hover:translate-y-0.5 transition-all duration-100 cursor-pointer active:shadow-[0_1px_0_0_#ea580c] active:translate-y-1"
           >
-            <ArrowLeft className="w-7 h-7 text-white" />
+            <ArrowLeft className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-3xl font-black text-orange-600 uppercase tracking-wider drop-shadow-md">
+          <h1 className="text-2xl font-black text-orange-500 uppercase tracking-wider">
             TODAY'S ACTIVITY
           </h1>
-          <div className="w-16 h-16"></div>
+          <div className="w-12 h-12"></div>
         </div>
 
         {/* Today's Challenge Card */}
         <div className="relative mb-8">
-          <div className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-[2rem] p-8 shadow-[0_12px_0_0_#ea580c] border-4 border-orange-600">
-            <div className="absolute -top-4 -right-4 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-[0_6px_0_0_#16a34a] border-4 border-white">
-              <Zap className="w-8 h-8 text-white" />
+          <div className="bg-orange-500 rounded-3xl p-6 shadow-[0_8px_0_0_#ea580c] hover:shadow-[0_4px_0_0_#ea580c] hover:translate-y-1 transition-all duration-100">
+            <div className="absolute -top-3 -right-3 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-[0_4px_0_0_#16a34a]">
+              <Zap className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-3xl font-black text-white text-center mb-6 uppercase tracking-wider drop-shadow-lg">
+            <h2 className="text-2xl font-black text-white text-center mb-6 uppercase tracking-wider">
               TODAY'S CHALLENGE
             </h2>
             
             {/* Decorative blocks */}
-            <div className="flex justify-center space-x-6 mb-8">
-              <div className="w-20 h-20 bg-orange-300 rounded-3xl shadow-[0_8px_0_0_#fb923c] border-4 border-orange-400 transform rotate-3"></div>
-              <div className="w-20 h-20 bg-pink-400 rounded-3xl shadow-[0_8px_0_0_#ec4899] border-4 border-pink-500 transform -rotate-3"></div>
+            <div className="flex justify-center space-x-4 mb-6">
+              <div className="w-16 h-16 bg-orange-400 rounded-2xl shadow-[0_4px_0_0_#fb923c] transform rotate-3"></div>
+              <div className="w-16 h-16 bg-pink-400 rounded-2xl shadow-[0_4px_0_0_#ec4899] transform -rotate-3"></div>
             </div>
           </div>
         </div>
 
         {/* Scenario Card */}
-        <div className="bg-gradient-to-br from-orange-300 to-orange-400 rounded-[2rem] p-8 mb-8 shadow-[0_10px_0_0_#fb923c] border-4 border-orange-500">
-          <div className="flex items-center space-x-6 mb-6">
-            <div className="w-16 h-16 bg-orange-600 rounded-2xl flex items-center justify-center shadow-[0_6px_0_0_#ea580c] border-3 border-orange-700">
-              <Play className="w-8 h-8 text-white" />
+        <div className="bg-orange-400 rounded-3xl p-6 mb-6 shadow-[0_6px_0_0_#fb923c] hover:shadow-[0_3px_0_0_#fb923c] hover:translate-y-0.5 transition-all duration-100">
+          <div className="flex items-center space-x-4 mb-4">
+            <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center shadow-[0_3px_0_0_#ea580c]">
+              <Play className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-2xl font-black text-orange-900 uppercase tracking-wider">
+            <h3 className="text-xl font-black text-orange-900 uppercase tracking-wide">
               SCENARIO: MOVIE DATE GONE WRONG
             </h3>
           </div>
-          <p className="text-orange-900 font-bold text-lg leading-relaxed">
+          <p className="text-orange-900 font-bold text-base">
             I'll awkwardly pretend to ask you out to a movie. We'll practice casual conversation and reflexive verbs while navigating this hilariously uncomfortable situation.
           </p>
         </div>
 
         {/* Learning Focus Card */}
-        <div className="bg-white rounded-[2rem] p-8 mb-8 shadow-[0_10px_0_0_#e5e7eb] border-4 border-gray-200">
-          <div className="flex items-start space-x-6">
-            <div className="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-[0_6px_0_0_#9333ea] border-3 border-purple-600">
-              <CheckCircle className="w-8 h-8 text-white" />
+        <div className="bg-white rounded-3xl p-6 mb-6 shadow-[0_6px_0_0_#e5e7eb] hover:shadow-[0_3px_0_0_#e5e7eb] hover:translate-y-0.5 transition-all duration-100">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-[0_3px_0_0_#9333ea]">
+              <CheckCircle className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-2xl font-black text-gray-800 mb-6 uppercase tracking-wider">Learning Focus:</h3>
-              <div className="flex flex-wrap gap-4">
-                <span className="bg-purple-200 text-purple-900 px-6 py-3 rounded-2xl font-black text-sm shadow-[0_4px_0_0_#c4b5fd] border-2 border-purple-300">Reflexive Verbs</span>
-                <span className="bg-blue-200 text-blue-900 px-6 py-3 rounded-2xl font-black text-sm shadow-[0_4px_0_0_#93c5fd] border-2 border-blue-300">Casual Tone</span>
-                <span className="bg-green-200 text-green-900 px-6 py-3 rounded-2xl font-black text-sm shadow-[0_4px_0_0_#86efac] border-2 border-green-300">Rejection Phrases</span>
+              <h3 className="text-xl font-black text-gray-800 mb-4 uppercase tracking-wide">Learning Focus:</h3>
+              <div className="flex flex-wrap gap-3">
+                <span className="bg-purple-200 text-purple-900 px-4 py-2 rounded-2xl font-black text-sm shadow-[0_3px_0_0_#c4b5fd]">Reflexive Verbs</span>
+                <span className="bg-blue-200 text-blue-900 px-4 py-2 rounded-2xl font-black text-sm shadow-[0_3px_0_0_#93c5fd]">Casual Tone</span>
+                <span className="bg-green-200 text-green-900 px-4 py-2 rounded-2xl font-black text-sm shadow-[0_3px_0_0_#86efac]">Rejection Phrases</span>
               </div>
             </div>
           </div>
@@ -142,17 +142,17 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         <Button 
           onClick={handleStartCall}
           disabled={isStartingCall}
-          className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black py-8 rounded-[2rem] text-2xl shadow-[0_8px_0_0_#ea580c] hover:shadow-[0_4px_0_0_#ea580c] hover:translate-y-1 active:shadow-[0_2px_0_0_#ea580c] active:translate-y-2 transition-all duration-150 border-4 border-orange-700 disabled:opacity-50 disabled:cursor-not-allowed mb-8"
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-6 rounded-3xl text-xl shadow-[0_6px_0_0_#ea580c] hover:shadow-[0_3px_0_0_#ea580c] hover:translate-y-0.5 active:shadow-[0_1px_0_0_#ea580c] active:translate-y-1 transition-all duration-100 border-0 disabled:opacity-50 disabled:cursor-not-allowed mb-6"
         >
-          <Phone className="w-8 h-8 mr-4" />
+          <Phone className="w-6 h-6 mr-3" />
           {isStartingCall ? "Starting Call..." : "START CALL"}
         </Button>
 
         {/* Info Card */}
-        <div className="bg-yellow-200 rounded-[2rem] p-6 shadow-[0_6px_0_0_#fbbf24] border-4 border-yellow-300 text-center mb-6">
+        <div className="bg-yellow-300 rounded-3xl p-5 shadow-[0_4px_0_0_#fbbf24] text-center">
           <div className="flex items-center justify-center space-x-3 text-yellow-900">
-            <Clock className="w-6 h-6" />
-            <p className="font-black text-lg">
+            <Clock className="w-5 h-5" />
+            <p className="font-black text-base">
               {isStartingCall ? "Initiating call..." : "You'll receive a call in ~30 seconds"}
             </p>
           </div>
@@ -160,40 +160,40 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white px-6 py-6 shadow-[0_-8px_32px_rgba(0,0,0,0.1)] border-t-4 border-gray-200">
+      <div className="fixed bottom-0 left-0 right-0 bg-white px-4 py-4 shadow-[0_-4px_0_0_#e5e7eb]">
         <div className="max-w-md mx-auto">
-          <div className="flex justify-center space-x-6">
+          <div className="flex justify-center space-x-4">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-16 h-16 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 transition-all duration-150 shadow-[0_4px_0_0_#9ca3af] hover:shadow-[0_2px_0_0_#9ca3af] hover:translate-y-0.5 border-2 border-gray-300"
+              className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 transition-all duration-100 shadow-[0_3px_0_0_#9ca3af] hover:shadow-[0_1px_0_0_#9ca3af] hover:translate-y-0.5 border-0"
             >
-              <Home className="w-7 h-7" />
+              <Home className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-16 h-16 bg-orange-500 rounded-2xl text-white shadow-[0_4px_0_0_#ea580c] border-2 border-orange-600"
+              className="w-12 h-12 bg-orange-500 rounded-2xl text-white shadow-[0_3px_0_0_#ea580c] border-0"
             >
-              <Phone className="w-7 h-7" />
+              <Phone className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-16 h-16 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 transition-all duration-150 shadow-[0_4px_0_0_#9ca3af] hover:shadow-[0_2px_0_0_#9ca3af] hover:translate-y-0.5 border-2 border-gray-300"
+              className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 transition-all duration-100 shadow-[0_3px_0_0_#9ca3af] hover:shadow-[0_1px_0_0_#9ca3af] hover:translate-y-0.5 border-0"
             >
-              <CheckCircle className="w-7 h-7" />
+              <CheckCircle className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-16 h-16 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 transition-all duration-150 shadow-[0_4px_0_0_#9ca3af] hover:shadow-[0_2px_0_0_#9ca3af] hover:translate-y-0.5 border-2 border-gray-300"
+              className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 transition-all duration-100 shadow-[0_3px_0_0_#9ca3af] hover:shadow-[0_1px_0_0_#9ca3af] hover:translate-y-0.5 border-0"
             >
-              <Settings className="w-7 h-7" />
+              <Settings className="w-5 h-5" />
             </Button>
           </div>
         </div>

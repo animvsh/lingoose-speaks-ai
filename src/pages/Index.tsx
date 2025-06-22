@@ -84,7 +84,7 @@ const Index = () => {
     setTimeout(() => {
       setCurrentView(view);
       setIsTransitioning(false);
-    }, 100); // Reduced from 150ms for snappier transitions
+    }, 50); // Super fast transitions
   };
 
   const handleWelcomeComplete = () => {
@@ -138,7 +138,7 @@ const Index = () => {
     })();
 
     return (
-      <div className={`transition-all duration-200 ${isTransitioning ? 'opacity-0 scale-98' : 'opacity-100 scale-100'}`}>
+      <div className={`transition-all duration-100 ${isTransitioning ? 'opacity-0 scale-99' : 'opacity-100 scale-100'}`}>
         {viewContent}
       </div>
     );
@@ -166,8 +166,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   const [isLoaded, setIsLoaded] = useState(false);
   
   useEffect(() => {
-    // Faster initial load
-    setTimeout(() => setIsLoaded(true), 50);
+    setTimeout(() => setIsLoaded(true), 20); // Super fast load
   }, []);
   
   // Calculate mock progress values
@@ -190,14 +189,14 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-50 pb-20">
-      {/* Header with enhanced gradient and shadow */}
-      <div className="bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 px-6 py-6 mb-6 rounded-b-[2rem] shadow-xl">
+    <div className="min-h-screen bg-gray-100 pb-20">
+      {/* Header */}
+      <div className="bg-orange-500 px-4 py-5 mb-6 rounded-b-3xl shadow-[0_6px_0_0_#ea580c]">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <DuckMascot className="w-10 h-10 mr-3 drop-shadow-md" />
+            <DuckMascot className="w-8 h-8 mr-3" />
             <div>
-              <h1 className="text-xl font-black text-white drop-shadow-sm">
+              <h1 className="text-lg font-black text-white">
                 Hi {userProfile?.full_name?.split(' ')[0] || 'there'}! 👋
               </h1>
             </div>
@@ -206,40 +205,38 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
       </div>
 
       <div className="px-4 space-y-4">
-        {/* Native Fluency Score Card - More compact and snappy */}
-        <div className={`bg-white rounded-2xl p-6 text-center shadow-lg border border-gray-100 transform transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+        {/* Native Fluency Score Card */}
+        <div className={`bg-white rounded-3xl p-5 text-center shadow-[0_6px_0_0_#e5e7eb] hover:shadow-[0_3px_0_0_#e5e7eb] hover:translate-y-0.5 transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
           <div className="mb-4">
-            <div className={`text-5xl font-black mb-2 ${getFluencyColor(nativeFluency)} transition-all duration-700`}>
+            <div className={`text-4xl font-black mb-2 ${getFluencyColor(nativeFluency)} transition-all duration-300`}>
               {nativeFluency}%
             </div>
-            <h2 className="text-xl font-black text-gray-800 mb-2 tracking-tight">NATIVE FLUENCY</h2>
+            <h2 className="text-lg font-black text-gray-800 mb-2 tracking-tight">NATIVE FLUENCY</h2>
             <p className="text-gray-600 font-medium text-sm">Speech clarity, vocabulary, and flow</p>
           </div>
           
-          {/* Sleeker progress bar */}
-          <div className="w-full bg-gray-200 h-3 rounded-full mb-4 overflow-hidden">
+          <div className="w-full bg-gray-200 h-3 rounded-full mb-4 shadow-[0_2px_0_0_#d1d5db]">
             <div 
-              className={`h-full rounded-full transition-all duration-1000 delay-200 ${getFluencyBgColor(nativeFluency)} shadow-sm`}
+              className={`h-full rounded-full transition-all duration-500 ${getFluencyBgColor(nativeFluency)} shadow-[0_1px_0_0_rgba(0,0,0,0.2)]`}
               style={{ width: isLoaded ? `${nativeFluency}%` : '0%' }}
             ></div>
           </div>
           
-          {/* Compact goose quote */}
-          <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+          <div className="bg-gray-100 rounded-2xl p-3 shadow-[0_2px_0_0_#d1d5db]">
             <p className="text-gray-700 font-medium text-sm italic">
               "Just {100 - nativeFluency}% away from native level! 🦆"
             </p>
           </div>
         </div>
 
-        {/* Today's Challenge - More compact and actionable */}
-        <div className={`bg-gradient-to-r from-blue-400 to-blue-500 rounded-2xl p-5 shadow-lg border border-blue-300 transform transition-all duration-500 delay-100 hover:scale-[1.02] active:scale-[0.98] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+        {/* Today's Challenge */}
+        <div className={`bg-blue-500 rounded-3xl p-5 shadow-[0_6px_0_0_#2563eb] hover:shadow-[0_3px_0_0_#2563eb] hover:translate-y-0.5 transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
           <div className="flex items-center mb-3">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-md">
-              <Phone className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center mr-3 shadow-[0_2px_0_0_#1d4ed8]">
+              <Phone className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-black text-white uppercase tracking-tight">
+              <h3 className="text-base font-black text-white uppercase tracking-tight">
                 TODAY'S CHALLENGE
               </h3>
               <p className="text-blue-100 font-medium text-sm">
@@ -249,24 +246,24 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
           </div>
           <Button 
             onClick={() => onNavigate("activity")}
-            className="w-full bg-white hover:bg-gray-50 text-blue-600 font-black py-3 text-lg rounded-xl shadow-md border-0 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full bg-white hover:bg-gray-50 text-blue-600 font-black py-3 text-base rounded-2xl shadow-[0_3px_0_0_#e5e7eb] hover:shadow-[0_1px_0_0_#e5e7eb] hover:translate-y-0.5 transition-all duration-100 border-0"
           >
             START NOW
           </Button>
         </div>
 
-        {/* Improvements - More compact grid */}
+        {/* Improvements */}
         <div 
           onClick={() => onNavigate("progress")}
-          className={`bg-gradient-to-r from-green-400 to-green-500 rounded-2xl p-5 shadow-lg border border-green-300 cursor-pointer transform transition-all duration-500 delay-200 hover:scale-[1.02] active:scale-[0.98] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+          className={`bg-green-500 rounded-3xl p-5 shadow-[0_6px_0_0_#16a34a] hover:shadow-[0_3px_0_0_#16a34a] hover:translate-y-0.5 cursor-pointer transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-3 shadow-md">
-                <Trophy className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 bg-green-600 rounded-2xl flex items-center justify-center mr-3 shadow-[0_2px_0_0_#15803d]">
+                <Trophy className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-white uppercase tracking-tight">
+                <h3 className="text-base font-black text-white uppercase tracking-tight">
                   IMPROVEMENTS
                 </h3>
                 <p className="text-green-100 font-medium text-sm">
@@ -274,73 +271,73 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
                 </p>
               </div>
             </div>
-            <ArrowLeft className="w-5 h-5 text-green-100 rotate-180" />
+            <ArrowLeft className="w-4 h-4 text-green-100 rotate-180" />
           </div>
           
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white/90 rounded-xl p-3 text-center backdrop-blur-sm">
-              <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center mx-auto mb-1">
-                <Clock className="w-4 h-4 text-white" />
+            <div className="bg-white/90 rounded-2xl p-3 text-center shadow-[0_2px_0_0_rgba(255,255,255,0.3)]">
+              <div className="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center mx-auto mb-1 shadow-[0_1px_0_0_#9333ea]">
+                <Clock className="w-3 h-3 text-white" />
               </div>
-              <div className="text-xl font-black text-purple-700">8min</div>
+              <div className="text-lg font-black text-purple-700">8min</div>
               <div className="text-xs text-purple-600 font-bold">TALK TIME</div>
             </div>
-            <div className="bg-white/90 rounded-xl p-3 text-center backdrop-blur-sm">
-              <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center mx-auto mb-1">
-                <Star className="w-4 h-4 text-white" />
+            <div className="bg-white/90 rounded-2xl p-3 text-center shadow-[0_2px_0_0_rgba(255,255,255,0.3)]">
+              <div className="w-6 h-6 bg-pink-500 rounded-lg flex items-center justify-center mx-auto mb-1 shadow-[0_1px_0_0_#ec4899]">
+                <Star className="w-3 h-3 text-white" />
               </div>
-              <div className="text-xl font-black text-pink-700">89%</div>
+              <div className="text-lg font-black text-pink-700">89%</div>
               <div className="text-xs text-pink-600 font-bold">ENGAGEMENT</div>
             </div>
           </div>
         </div>
 
-        {/* Start Learning Button - More prominent */}
-        <div className={`transform transition-all duration-500 delay-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+        {/* Start Learning Button */}
+        <div className={`transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
           <Button 
             onClick={() => onNavigate("curriculum")}
-            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black py-5 text-xl rounded-2xl shadow-xl border-0 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-5 text-lg rounded-3xl shadow-[0_6px_0_0_#ea580c] hover:shadow-[0_3px_0_0_#ea580c] hover:translate-y-0.5 transition-all duration-100 border-0"
           >
             START LEARNING
           </Button>
         </div>
       </div>
 
-      {/* Bottom Navigation - More compact and modern */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-3 shadow-2xl">
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white px-4 py-3 shadow-[0_-4px_0_0_#e5e7eb]">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-4">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-14 h-14 bg-orange-500 hover:bg-orange-600 rounded-xl text-white shadow-md border-0 transition-all duration-200 hover:scale-105 active:scale-95"
+              className="w-12 h-12 bg-orange-500 rounded-2xl text-white shadow-[0_3px_0_0_#ea580c] border-0"
             >
-              <Home className="w-6 h-6" />
+              <Home className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-14 h-14 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600 hover:text-gray-700 shadow-md border-0 transition-all duration-200 hover:scale-105 active:scale-95"
+              className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 shadow-[0_3px_0_0_#9ca3af] hover:shadow-[0_1px_0_0_#9ca3af] hover:translate-y-0.5 border-0 transition-all duration-100"
             >
-              <Phone className="w-6 h-6" />
+              <Phone className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-14 h-14 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600 hover:text-gray-700 shadow-md border-0 transition-all duration-200 hover:scale-105 active:scale-95"
+              className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 shadow-[0_3px_0_0_#9ca3af] hover:shadow-[0_1px_0_0_#9ca3af] hover:translate-y-0.5 border-0 transition-all duration-100"
             >
-              <CheckCircle className="w-6 h-6" />
+              <CheckCircle className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-14 h-14 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600 hover:text-gray-700 shadow-md border-0 transition-all duration-200 hover:scale-105 active:scale-95"
+              className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 shadow-[0_3px_0_0_#9ca3af] hover:shadow-[0_1px_0_0_#9ca3af] hover:translate-y-0.5 border-0 transition-all duration-100"
             >
-              <Settings className="w-6 h-6" />
+              <Settings className="w-5 h-5" />
             </Button>
           </div>
         </div>
