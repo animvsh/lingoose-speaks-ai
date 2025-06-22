@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target } from "lucide-react";
@@ -26,7 +25,6 @@ const Index = () => {
   const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
   
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -76,10 +74,9 @@ const Index = () => {
     }
   }, [user, userProfile, currentView]);
 
-  const handleNavigation = (view: string, direction: 'left' | 'right' = 'left') => {
+  const handleNavigation = (view: string) => {
     if (currentView === view) return;
     
-    setSlideDirection(direction);
     setIsTransitioning(true);
     
     setTimeout(() => {
@@ -94,9 +91,8 @@ const Index = () => {
       
       setTimeout(() => {
         setIsTransitioning(false);
-        setSlideDirection(null);
       }, 50);
-    }, 150);
+    }, 100);
   };
 
   const handleSwipeNavigation = (direction: 'left' | 'right') => {
@@ -106,17 +102,17 @@ const Index = () => {
       // Go back in history
       const previousView = navigationHistory[currentHistoryIndex - 1];
       setCurrentHistoryIndex(currentHistoryIndex - 1);
-      handleNavigation(previousView, 'right');
+      handleNavigation(previousView);
     } else if (direction === 'left' && currentHistoryIndex < navigationHistory.length - 1) {
       // Go forward in history
       const nextView = navigationHistory[currentHistoryIndex + 1];
       setCurrentHistoryIndex(currentHistoryIndex + 1);
-      handleNavigation(nextView, 'left');
+      handleNavigation(nextView);
     } else if (direction === 'left') {
       // Navigate to next logical view
       const currentIndex = navigatableViews.indexOf(currentView);
       const nextIndex = (currentIndex + 1) % navigatableViews.length;
-      handleNavigation(navigatableViews[nextIndex], 'left');
+      handleNavigation(navigatableViews[nextIndex]);
     }
   };
 
@@ -172,15 +168,8 @@ const Index = () => {
 
   const getTransitionClasses = () => {
     if (!isTransitioning) {
-      return 'opacity-100 translate-x-0 scale-100';
+      return 'opacity-100 scale-100';
     }
-    
-    if (slideDirection === 'left') {
-      return 'opacity-0 -translate-x-full scale-95';
-    } else if (slideDirection === 'right') {
-      return 'opacity-0 translate-x-full scale-95';
-    }
-    
     return 'opacity-0 scale-95';
   };
 
@@ -212,10 +201,10 @@ const Index = () => {
 
     return (
       <div 
-        className={`transition-all duration-300 ease-in-out transform ${getTransitionClasses()}`}
+        className={`transition-all duration-200 ease-out transform ${getTransitionClasses()}`}
         style={{ 
           transitionProperty: 'opacity, transform',
-          transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)'
+          transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }}
       >
         {viewContent}
@@ -237,7 +226,7 @@ const Index = () => {
 };
 
 const HomeView = ({ onNavigate, userProfile, callLogs }: { 
-  onNavigate: (view: string, direction?: 'left' | 'right') => void;
+  onNavigate: (view: string) => void;
   userProfile: any;
   callLogs: any[];
 }) => {
@@ -435,23 +424,23 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   );
 };
 
-const ActivityView = ({ onNavigate }: { onNavigate: (view: string, direction?: 'left' | 'right') => void }) => (
+const ActivityView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
   <ActivityCard onNavigate={onNavigate} />
 );
 
-const ProgressView = ({ onNavigate }: { onNavigate: (view: string, direction?: 'left' | 'right') => void }) => (
+const ProgressView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
   <ProgressCard onNavigate={onNavigate} />
 );
 
-const CurriculumView = ({ onNavigate }: { onNavigate: (view: string, direction?: 'left' | 'right') => void }) => (
+const CurriculumView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
   <CurriculumCard onNavigate={onNavigate} />
 );
 
-const FluencyMapView = ({ onNavigate }: { onNavigate: (view: string, direction?: 'left' | 'right') => void }) => (
+const FluencyMapView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
   <FluencyMapCard onNavigate={onNavigate} />
 );
 
-const SettingsView = ({ onNavigate }: { onNavigate: (view: string, direction?: 'left' | 'right') => void }) => (
+const SettingsView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
   <SettingsCard onNavigate={onNavigate} />
 );
 
