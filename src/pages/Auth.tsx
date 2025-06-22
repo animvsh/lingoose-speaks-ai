@@ -21,6 +21,26 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
+      // Bypass auth for specific test phone number
+      if (phoneNumber === "6505188736") {
+        toast({
+          title: "Test Mode Activated!",
+          description: "Using test phone number - proceeding without OTP.",
+        });
+        
+        // Simulate successful auth for test number
+        setTimeout(() => {
+          toast({
+            title: "Welcome to Lingoose!",
+            description: "Test authentication successful. Redirecting...",
+          });
+          window.location.href = '/';
+        }, 1000);
+        
+        setIsLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithOtp({
         phone: phoneNumber,
       });
@@ -112,12 +132,17 @@ const Auth = () => {
                     required
                   />
                 </div>
+                {phoneNumber === "6505188736" && (
+                  <div className="text-center p-2 bg-green-100 rounded-lg border border-green-300">
+                    <p className="text-green-700 text-sm font-bold">🧪 Test Mode: This number will bypass authentication</p>
+                  </div>
+                )}
                 <Button
                   type="submit"
                   disabled={isLoading}
                   className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
                 >
-                  {isLoading ? "Sending Code..." : "Send Verification Code"}
+                  {isLoading ? "Processing..." : phoneNumber === "6505188736" ? "Sign In (Test Mode)" : "Send Verification Code"}
                 </Button>
               </form>
             ) : (
