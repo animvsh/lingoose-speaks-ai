@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useUserActivityRatings } from "@/hooks/useUserActivityRatings";
 import { format } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ActivityCardProps {
   onNavigate: (view: string) => void;
@@ -16,34 +17,54 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   const [isStartingCall, setIsStartingCall] = useState(false);
   const { toast } = useToast();
   const { ratings } = useUserActivityRatings();
+  const { user } = useAuth();
 
   // Get the most recent activity rating
   const lastActivity = ratings?.[0];
 
   const handleStartCall = async () => {
+    if (!user?.user_metadata?.phone_number) {
+      toast({
+        title: "❌ Phone Number Required",
+        description: "Please add your phone number in profile settings to start practice sessions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsStartingCall(true);
     try {
-      // Simulate call initiation
       toast({
         title: "🎯 Practice Session Starting!",
         description: "Connecting you to your hotel check-in scenario...",
         className: "border-2 border-blue-400 bg-blue-50 text-blue-800",
       });
+
+      const phoneNumber = user.user_metadata.phone_number;
       
-      // In real implementation, you would call the VAPI function here
-      // const { data, error } = await supabase.functions.invoke('start-vapi-call', {
-      //   body: { scenario: 'hotel-checkin' }
-      // });
-      
-      setTimeout(() => {
+      // Call the Supabase Edge Function to start the VAPI call
+      const { data, error } = await supabase.functions.invoke('start-vapi-call', {
+        body: { 
+          phoneNumber: phoneNumber,
+          userId: user.id,
+          topic: "Hotel check-in conversation practice"
+        }
+      });
+
+      if (error) {
+        console.error('Error starting call:', error);
+        toast({
+          title: "❌ Connection Failed",
+          description: error.message || "Failed to start practice session. Please try again.",
+          variant: "destructive",
+        });
+      } else {
         toast({
           title: "📞 Call Connected!",
           description: "Your practice session is now live. Good luck!",
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
-        setIsStartingCall(false);
-      }, 2000);
-      
+      }
     } catch (error) {
       console.error('Error starting call:', error);
       toast({
@@ -51,6 +72,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         description: "Failed to start practice session. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsStartingCall(false);
     }
   };
