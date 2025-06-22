@@ -34,6 +34,53 @@ export const usePhoneAuth = () => {
     return phone;
   };
 
+  const createTestUserIfNotExists = async (): Promise<void> => {
+    try {
+      console.log('Checking if test user exists...');
+      
+      // Try to sign in the test user to see if they exist
+      const { data: existingUser, error: signInError } = await supabase.auth.signInWithPassword({
+        email: 'testuser@lingoose.app',
+        password: 'testpassword123'
+      });
+
+      if (existingUser?.user) {
+        console.log('Test user already exists');
+        // Sign out immediately after checking
+        await supabase.auth.signOut();
+        return;
+      }
+
+      if (signInError && signInError.message.includes("Invalid login credentials")) {
+        console.log('Test user does not exist, creating...');
+        
+        // Create the test user
+        const { data: newUser, error: signUpError } = await supabase.auth.signUp({
+          email: 'testuser@lingoose.app',
+          password: 'testpassword123',
+          options: {
+            data: {
+              full_name: 'Test User',
+              phone_number: '+16505188736'
+            }
+          }
+        });
+
+        if (signUpError) {
+          console.error('Failed to create test user:', signUpError);
+          return;
+        }
+
+        console.log('Test user created successfully:', newUser);
+        
+        // Sign out the newly created user
+        await supabase.auth.signOut();
+      }
+    } catch (error) {
+      console.error('Error handling test user:', error);
+    }
+  };
+
   const sendOTP = async (phoneNumber: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     
@@ -43,7 +90,12 @@ export const usePhoneAuth = () => {
       
       // Check if this is our test phone number
       if (formattedPhone === '+16505188736') {
-        console.log('Test phone number detected, using test OTP: 123456');
+        console.log('Test phone number detected, ensuring test user exists...');
+        
+        // Ensure test user exists
+        await createTestUserIfNotExists();
+        
+        console.log('Using test OTP: 123456');
         
         // Store a fixed OTP for the test number
         const otpData: StoredOTP = {
