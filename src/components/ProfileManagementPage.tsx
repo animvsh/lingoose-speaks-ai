@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { User, Edit3, Save, Camera, Phone as PhoneIcon, Clock, Home, Settings, ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUpdateUserProfile } from "@/hooks/useUpdateUserProfile";
@@ -17,24 +17,22 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
   const updateProfileMutation = useUpdateUserProfile();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [fullName, setFullName] = useState(userProfile?.full_name || "");
-  const [phoneNumber, setPhoneNumber] = useState(userProfile?.phone_number || "");
-  const [language, setLanguage] = useState(userProfile?.language || "hindi");
-  const [preferredCallTime, setPreferredCallTime] = useState(userProfile?.preferred_call_time || "09:00:00");
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [language, setLanguage] = useState("hindi");
+  const [preferredCallTime, setPreferredCallTime] = useState("09:00:00");
 
-  // Update state when profile data loads
-  useState(() => {
+  // Update state when profile data loads - use useEffect instead of useState
+  useEffect(() => {
     if (userProfile) {
       setFullName(userProfile.full_name || "");
       setPhoneNumber(userProfile.phone_number || "");
       setLanguage(userProfile.language || "hindi");
       setPreferredCallTime(userProfile.preferred_call_time || "09:00:00");
     }
-  });
+  }, [userProfile]);
 
   const handleSaveProfile = async () => {
-    setIsEditing(false);
-    
     const profileData = {
       full_name: fullName,
       phone_number: phoneNumber,
@@ -42,8 +40,33 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
       preferred_call_time: preferredCallTime,
     };
 
-    updateProfileMutation.mutate(profileData);
+    console.log('Saving profile data:', profileData);
+    
+    updateProfileMutation.mutate(profileData, {
+      onSuccess: () => {
+        setIsEditing(false);
+        console.log('Profile updated successfully');
+      },
+      onError: (error) => {
+        console.error('Failed to update profile:', error);
+      }
+    });
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-amber-50 pb-24">
+        <AppBar 
+          title="MY PROFILE" 
+          onBack={() => onNavigate("settings")} 
+          showBackButton={true} 
+        />
+        <div className="px-6 py-8">
+          <div className="text-center">Loading profile...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
@@ -77,12 +100,13 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 className="w-full text-center text-3xl font-bold text-orange-600 bg-transparent border-b-2 border-orange-300 focus:outline-none focus:border-orange-500"
+                placeholder="Enter your name"
               />
             ) : (
-              fullName
+              fullName || "New User"
             )}
           </h2>
-          <p className="text-gray-600">{user?.phone_number}</p>
+          <p className="text-gray-600">{phoneNumber}</p>
         </div>
 
         {/* Profile Details */}
@@ -99,6 +123,7 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     className="w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-orange-500"
+                    placeholder="+1234567890"
                   />
                 ) : (
                   <p className="font-medium text-gray-800">{phoneNumber || "Add phone number"}</p>
