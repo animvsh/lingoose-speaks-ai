@@ -1,6 +1,5 @@
-
 import { Button } from "@/components/ui/button";
-import { Phone, Clock, CheckCircle, Home, Settings, ArrowLeft, Play, Mic, Users, MapPin, Coffee, Briefcase, Heart, ShoppingCart, Plane, GraduationCap, Car, Music, Book, Star, Target, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+import { Phone, Clock, CheckCircle, Home, Settings, ArrowLeft, Play, Mic, Users, MapPin, Coffee, Briefcase, Heart, ShoppingCart, Plane, GraduationCap, Car, Music, Book, Star, Target, TrendingUp, TrendingDown, AlertCircle, RefreshCw } from "lucide-react";
 import DuckMascot from "./DuckMascot";
 import LearningProgressTree from "./LearningProgressTree";
 import { useState } from "react";
@@ -15,8 +14,31 @@ interface ActivityCardProps {
   onNavigate: (view: string) => void;
 }
 
+interface GeneratedActivity {
+  name: string;
+  description: string;
+  duration: string;
+  skills: Array<{
+    name: string;
+    level: string;
+  }>;
+}
+
 const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   const [isStartingCall, setIsStartingCall] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [currentActivity, setCurrentActivity] = useState({
+    name: "Hotel check-in conversation 🏨",
+    description: "Practice checking into a hotel",
+    duration: "15",
+    skills: [
+      { name: "Greeting & Politeness", level: "Beginner" },
+      { name: "Personal Information", level: "Beginner" },
+      { name: "Room Preferences", level: "Intermediate" },
+      { name: "Payment Methods", level: "Beginner" }
+    ]
+  });
+  
   const { toast } = useToast();
   const { ratings } = useUserActivityRatings();
   const { user } = useAuth();
@@ -47,6 +69,56 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     }
   });
 
+  const handleRegenerateActivity = async () => {
+    setIsRegenerating(true);
+    try {
+      toast({
+        title: "🔄 Generating New Activity",
+        description: "Creating a fresh practice session for you...",
+        className: "border-2 border-purple-400 bg-purple-50 text-purple-800",
+      });
+
+      const { data, error } = await supabase.functions.invoke('generate-activity', {
+        body: { 
+          currentActivity: currentActivity.name
+        }
+      });
+
+      if (error) {
+        console.error('Error generating activity:', error);
+        throw new Error(error.message);
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Update the current activity with the generated data
+      setCurrentActivity({
+        name: data.name,
+        description: data.description,
+        duration: data.duration.toString(),
+        skills: data.skills || []
+      });
+
+      toast({
+        title: "✨ New Activity Generated!",
+        description: `Ready to practice: ${data.name}`,
+        className: "border-2 border-green-400 bg-green-50 text-green-800",
+      });
+
+    } catch (error) {
+      console.error('Error regenerating activity:', error);
+      toast({
+        title: "❌ Generation Failed",
+        description: error.message || "Failed to generate new activity. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
   const handleStartCall = async () => {
     if (!user?.user_metadata?.phone_number) {
       toast({
@@ -61,18 +133,17 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     try {
       toast({
         title: "🎯 Practice Session Starting!",
-        description: "Connecting you to your hotel check-in scenario...",
+        description: `Connecting you to your ${currentActivity.name.toLowerCase()} scenario...`,
         className: "border-2 border-blue-400 bg-blue-50 text-blue-800",
       });
 
       const phoneNumber = user.user_metadata.phone_number;
       
-      // Call the Supabase Edge Function to start the VAPI call
       const { data, error } = await supabase.functions.invoke('start-vapi-call', {
         body: { 
           phoneNumber: phoneNumber,
           userId: user.id,
-          topic: "Hotel check-in conversation practice"
+          topic: `${currentActivity.name} conversation practice`
         }
       });
 
@@ -112,14 +183,6 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       />
     ));
   };
-
-  // Today's activity skills (mock data - in real app this would come from database)
-  const todaysActivitySkills = [
-    { name: "Greeting & Politeness", level: "Beginner" },
-    { name: "Personal Information", level: "Beginner" },
-    { name: "Room Preferences", level: "Intermediate" },
-    { name: "Payment Methods", level: "Beginner" }
-  ];
 
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
@@ -184,7 +247,6 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
               </div>
             </div>
 
-            {/* Rating Stars */}
             <div className="flex items-center justify-center space-x-1">
               {renderStars(lastActivity.rating)}
             </div>
@@ -218,12 +280,12 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
                 TODAY'S ACTIVITY
               </h3>
               <p className="text-blue-100 font-medium text-sm">
-                Hotel check-in conversation 🏨
+                {currentActivity.description}
               </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-600 rounded-2xl flex flex-col items-center justify-center border-2 border-blue-700">
-                <div className="text-2xl font-bold text-white">15</div>
+                <div className="text-2xl font-bold text-white">{currentActivity.duration}</div>
                 <div className="text-xs text-blue-100 font-medium">MIN</div>
               </div>
             </div>
@@ -252,7 +314,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
               Skills Tested:
             </h4>
             <div className="grid grid-cols-2 gap-2">
-              {todaysActivitySkills.map((skill, index) => (
+              {currentActivity.skills.map((skill, index) => (
                 <div key={index} className="bg-blue-300 rounded-xl p-2 border-2 border-blue-400">
                   <div className="text-xs font-bold text-blue-800">{skill.name}</div>
                   <div className="text-xs text-blue-700">{skill.level}</div>
@@ -260,23 +322,45 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
               ))}
             </div>
           </div>
-          
-          <Button 
-            onClick={handleStartCall}
-            disabled={isStartingCall}
-            className="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold py-4 text-lg rounded-2xl border-4 border-white transition-all duration-300"
-          >
-            {isStartingCall ? (
-              <>
-                <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-3"></div>
-                STARTING...
-              </>
-            ) : (
-              <>
-                ⚡ START PRACTICE SESSION
-              </>
-            )}
-          </Button>
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <Button 
+              onClick={handleStartCall}
+              disabled={isStartingCall}
+              className="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold py-4 text-lg rounded-2xl border-4 border-white transition-all duration-300"
+            >
+              {isStartingCall ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-3"></div>
+                  STARTING...
+                </>
+              ) : (
+                <>
+                  ⚡ START PRACTICE SESSION
+                </>
+              )}
+            </Button>
+
+            <Button 
+              onClick={handleRegenerateActivity}
+              disabled={isRegenerating}
+              variant="outline"
+              className="w-full bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-3 text-base rounded-2xl border-2 border-blue-300 transition-all duration-300"
+            >
+              {isRegenerating ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin mr-2"></div>
+                  GENERATING...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  REGENERATE ACTIVITY
+                </>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Learning Progress Tree */}
