@@ -2,14 +2,74 @@
 import { Button } from "@/components/ui/button";
 import { Phone, Home, Clock, CheckCircle, BarChart3, Settings, Play, Zap, ArrowLeft } from "lucide-react";
 import DuckMascot from "./DuckMascot";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ActivityCardProps {
   onNavigate: (view: string) => void;
 }
 
 const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
-  const handleStartCall = () => {
-    setTimeout(() => onNavigate("progress"), 2000);
+  const { user } = useAuth();
+  const { data: userProfile } = useUserProfile();
+  const { toast } = useToast();
+  const [isStartingCall, setIsStartingCall] = useState(false);
+
+  const handleStartCall = async () => {
+    if (!user || !userProfile) {
+      toast({
+        title: "Error",
+        description: "Please log in to start a call",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!userProfile.phone_number) {
+      toast({
+        title: "Phone Number Required",
+        description: "Please add your phone number in settings to start calls",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsStartingCall(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('start-vapi-call', {
+        body: {
+          phoneNumber: userProfile.phone_number,
+          userId: user.id
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Call Started!",
+        description: "You should receive a call shortly. Get ready to practice Hindi!",
+        variant: "default",
+      });
+
+      // Navigate to progress after a short delay
+      setTimeout(() => {
+        onNavigate("progress");
+      }, 2000);
+
+    } catch (error: any) {
+      console.error('Error starting call:', error);
+      toast({
+        title: "Call Failed",
+        description: error.message || "Failed to start the call. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsStartingCall(false);
+    }
   };
 
   return (
@@ -81,15 +141,18 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
             <Button 
               onClick={handleStartCall}
-              className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-6 px-6 rounded-2xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
+              disabled={isStartingCall}
+              className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-6 px-6 rounded-2xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Phone className="w-6 h-6 mr-3" />
-              Start Call
+              {isStartingCall ? "Starting Call..." : "Start Call"}
             </Button>
 
             <div className="flex items-center justify-center space-x-2 text-slate-800 bg-white border-3 border-slate-400 rounded-full px-4 py-3 font-bold">
               <Clock className="w-5 h-5" />
-              <p className="text-sm font-black uppercase tracking-wide">You'll receive a call in ~30 seconds</p>
+              <p className="text-sm font-black uppercase tracking-wide">
+                {isStartingCall ? "Initiating call..." : "You'll receive a call in ~30 seconds"}
+              </p>
             </div>
           </div>
         </div>
