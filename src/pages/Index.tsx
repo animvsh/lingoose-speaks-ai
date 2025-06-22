@@ -43,17 +43,24 @@ const Index = () => {
     } else if (user && userProfile) {
       const onboardingComplete = localStorage.getItem('lingooseOnboardingComplete');
       
-      // Check if this is a new user (just created profile)
-      const isNewUser = !onboardingComplete && userProfile.full_name === 'New User';
+      // Check if this is a new user (profile name is 'New User' and hasn't completed onboarding)
+      const isNewUser = userProfile.full_name === 'New User' && !onboardingComplete;
       
-      if (onboardingComplete && !isNewUser) {
+      console.log('User profile:', userProfile);
+      console.log('Is new user:', isNewUser);
+      console.log('Onboarding complete:', onboardingComplete);
+      
+      if (isNewUser) {
+        // New user needs to go through onboarding
+        setCurrentView("welcome");
+      } else if (onboardingComplete) {
         // Existing user who has completed onboarding
         setHasOnboarded(true);
         setCurrentView("home");
         setNavigationHistory(["home"]);
         setCurrentHistoryIndex(0);
       } else {
-        // New user or existing user who hasn't completed onboarding
+        // Existing user who hasn't completed onboarding (edge case)
         setCurrentView("welcome");
       }
     } else {
@@ -72,17 +79,24 @@ const Index = () => {
     if (user && userProfile && currentView === "loading") {
       const onboardingComplete = localStorage.getItem('lingooseOnboardingComplete');
       
-      // Check if this is a new user (just created profile)
-      const isNewUser = !onboardingComplete && userProfile.full_name === 'New User';
+      // Check if this is a new user (profile name is 'New User' and hasn't completed onboarding)
+      const isNewUser = userProfile.full_name === 'New User' && !onboardingComplete;
       
-      if (onboardingComplete && !isNewUser) {
+      console.log('Loading effect - User profile:', userProfile);
+      console.log('Loading effect - Is new user:', isNewUser);
+      console.log('Loading effect - Onboarding complete:', onboardingComplete);
+      
+      if (isNewUser) {
+        // New user needs to go through onboarding
+        setCurrentView("welcome");
+      } else if (onboardingComplete) {
         // Existing user who has completed onboarding
         setHasOnboarded(true);
         setCurrentView("home");
         setNavigationHistory(["home"]);
         setCurrentHistoryIndex(0);
       } else {
-        // New user or existing user who hasn't completed onboarding
+        // Existing user who hasn't completed onboarding (edge case)
         setCurrentView("welcome");
       }
     }
