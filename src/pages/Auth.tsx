@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,8 +28,8 @@ const Auth = () => {
           description: "Using test phone number - proceeding without OTP.",
         });
         
-        // Create a test user session by signing them up/in with a test email
-        const testEmail = "testuser@example.com";
+        // Create a test user session by signing them up/in with a valid email
+        const testEmail = "test@gmail.com";
         const testPassword = "testpassword123";
         
         // Try to sign in first, if it doesn't exist, sign up
