@@ -54,9 +54,23 @@ serve(async (req) => {
       )
     }
 
-    // Log the API key length for debugging (without exposing the actual key)
-    console.log(`VAPI API key length: ${vapiApiKey.length} characters`);
-    console.log(`VAPI API key starts with: ${vapiApiKey.substring(0, 10)}...`);
+    // Validate API key format - VAPI keys should not contain spaces or "Vapi API" prefix
+    const cleanApiKey = vapiApiKey.trim();
+    if (cleanApiKey.includes(' ') || cleanApiKey.toLowerCase().includes('vapi api')) {
+      console.error('Invalid VAPI API key format detected');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid VAPI API key format. Please ensure you\'ve copied the correct API key from your VAPI dashboard.',
+          details: 'The API key should not contain spaces or descriptive text. It should be a clean token string.',
+          help: 'Go to https://dashboard.vapi.ai/account and copy the raw API key value without any prefixes.'
+        }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Log the API key info for debugging (without exposing the actual key)
+    console.log(`VAPI API key length: ${cleanApiKey.length} characters`);
+    console.log(`VAPI API key first 8 chars: ${cleanApiKey.substring(0, 8)}...`);
 
     // Format phone number to E.164 format
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
@@ -94,7 +108,7 @@ serve(async (req) => {
     const vapiResponse = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${vapiApiKey}`,
+        'Authorization': `Bearer ${cleanApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
@@ -116,12 +130,12 @@ serve(async (req) => {
       console.error('Response text was:', responseText);
       
       // Handle specific VAPI API authentication errors
-      if (responseText.includes('failed to extract key')) {
+      if (responseText.includes('failed to extract key') || responseText.includes('authentication')) {
         return new Response(
           JSON.stringify({ 
-            error: 'VAPI API authentication failed. Please check that your VAPI API key is correctly configured in the environment variables.',
+            error: 'VAPI API authentication failed. The API key appears to be invalid or incorrectly formatted.',
             details: { responseText, status: vapiResponse.status },
-            help: 'Go to https://dashboard.vapi.ai/account to get your API key and ensure it\'s properly set in your Supabase secrets.'
+            help: 'Please verify your VAPI API key at https://dashboard.vapi.ai/account. Make sure to copy only the key value without any prefixes or spaces.'
           }),
           { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
