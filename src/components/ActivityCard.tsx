@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Home, Phone, CheckCircle, Settings, ArrowLeft, Star, Clock, Users, Zap } from "lucide-react";
+import { Home, Phone, CheckCircle, Settings, ArrowLeft, Star, Clock, Users, Zap, MapPin, Award } from "lucide-react";
 import LearningProgressTree from "./LearningProgressTree";
 
 interface ActivityCardProps {
@@ -27,52 +27,108 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       </div>
 
       <div className="px-6 space-y-6">
-        {/* Today's Focus - Redesigned */}
-        <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mr-4">
-              <Phone className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold">Today's Focus</h3>
-              <p className="text-blue-100 text-sm">Ready for your daily challenge?</p>
-            </div>
-          </div>
+        {/* Today's Focus - Enhanced Design */}
+        <div className="relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 rounded-3xl"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent_50%)] rounded-3xl"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.1),transparent_50%)] rounded-3xl"></div>
           
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h4 className="font-semibold text-lg">Hotel Check-in Conversation</h4>
-                <p className="text-blue-100 text-sm">Practice professional hospitality dialogue</p>
+          <div className="relative p-8 text-white">
+            {/* Header Section */}
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30">
+                  <Phone className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold mb-1">Today's Focus</h3>
+                  <p className="text-blue-100 text-sm opacity-90">Ready for your daily challenge?</p>
+                </div>
               </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold">15</div>
-                <div className="text-xs text-blue-100">MIN</div>
+              <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 border border-white/30">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs font-medium text-white">LIVE</span>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4 text-sm">
-              <div className="flex items-center space-x-1">
-                <Star className="w-4 h-4 text-yellow-300" />
-                <span>Intermediate</span>
+            {/* Main Content Card */}
+            <div className="bg-white/15 backdrop-blur-md rounded-2xl p-6 mb-6 border border-white/20 shadow-xl">
+              <div className="flex items-start justify-between mb-5">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                      <Star className="w-3 h-3 text-yellow-800" />
+                    </div>
+                    <span className="text-xs font-semibold text-yellow-200 uppercase tracking-wide">Intermediate Level</span>
+                  </div>
+                  <h4 className="font-bold text-xl mb-2 text-white">Hotel Check-in Conversation</h4>
+                  <p className="text-blue-100 text-sm leading-relaxed mb-4">
+                    Master professional hospitality dialogue with real-world scenarios and interactive practice sessions
+                  </p>
+                  
+                  {/* Features Grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-8 h-8 bg-blue-400/30 rounded-lg flex items-center justify-center">
+                        <Users className="w-4 h-4 text-blue-200" />
+                      </div>
+                      <span className="text-blue-100">2-person dialogue</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-8 h-8 bg-green-400/30 rounded-lg flex items-center justify-center">
+                        <Clock className="w-4 h-4 text-green-200" />
+                      </div>
+                      <span className="text-blue-100">~15 minutes</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-8 h-8 bg-purple-400/30 rounded-lg flex items-center justify-center">
+                        <MapPin className="w-4 h-4 text-purple-200" />
+                      </div>
+                      <span className="text-blue-100">Hotel lobby</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-8 h-8 bg-orange-400/30 rounded-lg flex items-center justify-center">
+                        <Award className="w-4 h-4 text-orange-200" />
+                      </div>
+                      <span className="text-blue-100">+50 XP reward</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Time Display */}
+                <div className="text-center ml-6">
+                  <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center border border-white/30">
+                    <div className="text-3xl font-bold text-white">15</div>
+                    <div className="text-xs text-blue-100 font-medium">MIN</div>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-1">
-                <Users className="w-4 h-4 text-blue-200" />
-                <span>2-person dialogue</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Clock className="w-4 h-4 text-green-300" />
-                <span>~15 min</span>
+              
+              {/* Progress Bar */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-blue-100">Session Progress</span>
+                  <span className="text-xs font-medium text-white">0/3 completed</span>
+                </div>
+                <div className="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                  <div className="w-0 h-full bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full transition-all duration-500"></div>
+                </div>
               </div>
             </div>
+            
+            {/* Action Button */}
+            <Button 
+              className="w-full bg-white hover:bg-gray-50 text-blue-600 font-bold py-4 rounded-2xl transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] border-0"
+            >
+              <Zap className="w-6 h-6 mr-3 text-yellow-500" />
+              Start Practice Session
+              <div className="ml-auto flex items-center space-x-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-xs text-gray-500">Ready</span>
+              </div>
+            </Button>
           </div>
-          
-          <Button 
-            className="w-full bg-white hover:bg-gray-100 text-blue-600 font-semibold py-3 rounded-xl transition-all duration-200 shadow-sm"
-          >
-            <Zap className="w-5 h-5 mr-2" />
-            Start Practice Session
-          </Button>
         </div>
 
         {/* Learning Progress Tree */}
