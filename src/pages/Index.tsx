@@ -114,22 +114,22 @@ const Index = () => {
 };
 
 const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
-  <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50">
+  <div className="min-h-screen bg-yellow-100">
     {/* Scrollable Content Container with bottom padding for navbar */}
-    <div className="pb-28">
+    <div className="pb-32">
       <div className="px-4 pt-6">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="relative inline-block">
             <DuckMascot className="mx-auto mb-4 hover:scale-110 transition-transform duration-300" />
-            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center animate-pulse">
-              <span className="text-xs">✓</span>
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400 border-2 border-green-600 rounded-full flex items-center justify-center animate-bounce">
+              <span className="text-xs font-black">✓</span>
             </div>
           </div>
-          <h1 className="text-4xl font-black bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent mb-3">
+          <h1 className="text-4xl font-black text-orange-600 mb-3 uppercase tracking-wider transform -rotate-1">
             Welcome Back!
           </h1>
-          <p className="text-slate-700 font-semibold text-lg">Ready for today's Hindi adventure?</p>
+          <p className="text-slate-800 font-bold text-lg">Ready for today's Hindi adventure?</p>
         </div>
 
         {/* Dashboard Content */}
@@ -142,27 +142,27 @@ const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
         <div className="mb-8">
           <Button 
             onClick={() => onNavigate("activity")}
-            className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-6 px-6 rounded-3xl text-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl shadow-lg"
+            className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-6 px-6 rounded-2xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
           >
             <Phone className="w-6 h-6 mr-3" />
             Start Your Daily Call
           </Button>
-          <div className="text-center text-sm text-slate-500 mt-3 bg-white/60 backdrop-blur-sm rounded-full px-4 py-2">
+          <div className="text-center text-sm text-slate-800 mt-3 bg-white border-3 border-slate-400 rounded-full px-4 py-2 font-bold">
             🔥 12 day streak • Next milestone: 15 days
           </div>
         </div>
       </div>
     </div>
 
-    {/* Fixed Bottom Navigation - ALWAYS stays at bottom */}
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-slate-200/50 px-4 py-4 shadow-2xl">
+    {/* Fixed Bottom Navigation - Cartoon style */}
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-4 border-slate-400 px-4 py-4">
       <div className="max-w-md mx-auto">
-        <div className="flex justify-center space-x-8">
+        <div className="flex justify-center space-x-6">
           <Button 
             variant="ghost" 
             size="sm"
             onClick={() => onNavigate("home")}
-            className="w-14 h-14 bg-gradient-to-br from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 rounded-2xl text-white transition-all duration-300 hover:scale-110 shadow-lg"
+            className="w-16 h-16 bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 rounded-2xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
           >
             <Home className="w-6 h-6" />
           </Button>
@@ -170,7 +170,7 @@ const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
             variant="ghost" 
             size="sm"
             onClick={() => onNavigate("progress")}
-            className="w-14 h-14 rounded-2xl text-slate-400 hover:bg-blue-50 hover:text-blue-500 transition-all duration-300 hover:scale-110"
+            className="w-16 h-16 bg-blue-300 hover:bg-blue-400 border-4 border-blue-600 rounded-2xl text-blue-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
           >
             <BarChart3 className="w-6 h-6" />
           </Button>
@@ -178,7 +178,7 @@ const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
             variant="ghost" 
             size="sm"
             onClick={() => onNavigate("curriculum")}
-            className="w-14 h-14 rounded-2xl text-slate-400 hover:bg-green-50 hover:text-green-500 transition-all duration-300 hover:scale-110"
+            className="w-16 h-16 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-2xl text-green-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
           >
             <CheckCircle className="w-6 h-6" />
           </Button>
@@ -186,7 +186,7 @@ const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
             variant="ghost" 
             size="sm"
             onClick={() => onNavigate("settings")}
-            className="w-14 h-14 rounded-2xl text-slate-400 hover:bg-purple-50 hover:text-purple-500 transition-all duration-300 hover:scale-110"
+            className="w-16 h-16 bg-purple-300 hover:bg-purple-400 border-4 border-purple-600 rounded-2xl text-purple-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
           >
             <Settings className="w-6 h-6" />
           </Button>
