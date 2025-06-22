@@ -22,66 +22,66 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-yellow-100">
+    <div className="min-h-screen bg-[#F5F2E8]">
       <div className="px-4 pt-6">
         {/* Header with Back Button */}
         <div className="flex items-center justify-between mb-6">
           <Button
             onClick={() => onNavigate("home")}
-            className="w-12 h-12 bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 rounded-2xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
+            className="w-14 h-14 bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 rounde d-3xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3 shadow-lg"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-7 h-7" />
           </Button>
-          <h1 className="text-3xl font-black text-orange-600 uppercase tracking-wider transform -rotate-1">
+          <h1 className="text-4xl font-black text-orange-600 uppercase tracking-wider transform -rotate-1 drop-shadow-lg">
             Curriculum
           </h1>
-          <div className="w-12 h-12"></div> {/* Spacer */}
+          <div className="w-14 h-14"></div> {/* Spacer */}
         </div>
       
-        <div className="bg-orange-300 border-4 border-orange-600 p-6 rounded-2xl mb-8 transform hover:rotate-1 transition-transform duration-200">
+        <div className="bg-gradient-to-r from-orange-300 to-orange-400 border-4 border-orange-600 p-6 rounded-[2rem] mb-8 transform hover:rotate-1 transition-transform duration-200 shadow-xl">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-black text-orange-900 text-xl uppercase tracking-wide">France Theme - Week 2</h2>
-            <span className="text-sm text-orange-800 font-bold bg-orange-100 px-3 py-1 rounded-full border-2 border-orange-400">3/5 complete</span>
+            <h2 className="font-black text-orange-900 text-2xl uppercase tracking-wide drop-shadow-sm">France Theme - Week 2</h2>
+            <span className="text-sm text-orange-800 font-bold bg-orange-100 px-4 py-2 rounded-full border-3 border-orange-400 shadow-lg">3/5 complete</span>
           </div>
-          <div className="w-full bg-orange-200 h-4 rounded-full border-2 border-orange-400">
-            <div className="bg-orange-600 h-full rounded-full w-3/5 border-r-2 border-orange-800"></div>
+          <div className="w-full bg-orange-200 h-5 rounded-full border-3 border-orange-400 shadow-inner">
+            <div className="bg-gradient-to-r from-orange-600 to-orange-700 h-full rounded-full w-3/5 border-r-2 border-orange-800 shadow-lg"></div>
           </div>
         </div>
         
         <div className="space-y-4 mb-8">
           {curriculumItems.map((item, index) => (
-            <div key={index} className={`flex items-center space-x-4 p-4 rounded-2xl border-4 ${
+            <div key={index} className={`flex items-center space-x-4 p-6 rounded-[2rem] border-4 ${
               item.completed 
-                ? 'bg-green-300 border-green-600 transform hover:scale-105' 
-                : 'bg-slate-300 border-slate-600 transform hover:scale-105'
+                ? 'bg-gradient-to-r from-green-300 to-green-400 border-green-600 transform hover:scale-105 shadow-xl hover:shadow-green-300/50' 
+                : 'bg-gradient-to-r from-slate-300 to-slate-400 border-slate-600 transform hover:scale-105 shadow-xl hover:shadow-slate-300/50'
             } transition-all duration-200`}>
-              <div className="text-sm font-black text-slate-800 w-12 uppercase tracking-wide">{item.date}</div>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-3 ${
+              <div className="text-sm font-black text-slate-800 w-16 uppercase tracking-wide bg-white px-3 py-2 rounded-full border-2 border-slate-400 shadow-lg">{item.date}</div>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-4 shadow-lg ${
                 item.completed ? 'bg-green-600 border-green-800' : 'bg-slate-500 border-slate-700'
               }`}>
-                <Check className="w-5 h-5 text-white" />
+                <Check className="w-6 h-6 text-white" />
               </div>
-              <span className={`font-black flex-1 text-lg uppercase tracking-wide ${
+              <span className={`font-black flex-1 text-xl uppercase tracking-wide drop-shadow-sm ${
                 item.completed ? 'text-green-900' : 'text-slate-700'
               }`}>{item.topic}</span>
             </div>
           ))}
         </div>
 
-        <div className="bg-slate-300 border-4 border-slate-600 p-6 rounded-2xl transform hover:-rotate-1 transition-transform duration-200 mb-8">
-          <h3 className="font-black text-slate-900 mb-4 flex items-center text-xl uppercase tracking-wide">
-            <Target className="w-6 h-6 mr-3" />
+        <div className="bg-gradient-to-r from-slate-300 to-slate-400 border-4 border-slate-600 p-6 rounded-[2rem] transform hover:-rotate-1 transition-transform duration-200 mb-8 shadow-xl">
+          <h3 className="font-black text-slate-900 mb-4 flex items-center text-2xl uppercase tracking-wide drop-shadow-sm">
+            <Target className="w-8 h-8 mr-3" />
             Upcoming Unlocks
           </h3>
           {upcomingUnlocks.map((unlock, index) => (
             <div key={index} className="mb-4 last:mb-0">
               <div className="flex justify-between text-lg mb-2">
-                <span className="text-slate-800 font-black uppercase tracking-wide">{unlock.item}</span>
-                <span className="text-slate-700 font-bold bg-slate-100 px-3 py-1 rounded-full border-2 border-slate-400">{unlock.progress}%</span>
+                <span className="text-slate-800 font-black uppercase tracking-wide drop-shadow-sm">{unlock.item}</span>
+                <span className="text-slate-700 font-bold bg-slate-100 px-4 py-2 rounded-full border-3 border-slate-400 shadow-lg">{unlock.progress}%</span>
               </div>
-              <div className="w-full bg-slate-200 h-3 rounded-full border-2 border-slate-400">
+              <div className="w-full bg-slate-200 h-4 rounded-full border-3 border-slate-400 shadow-inner">
                 <div 
-                  className="bg-orange-500 h-full rounded-full transition-all duration-300 border-r-2 border-orange-700"
+                  className="bg-gradient-to-r from-orange-500 to-orange-600 h-full rounded-full transition-all duration-300 border-r-2 border-orange-700 shadow-lg"
                   style={{ width: `${unlock.progress}%` }}
                 ></div>
               </div>
@@ -90,41 +90,41 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation - Updated to show curriculum as active */}
-      <div className="bg-white border-t-4 border-slate-400 px-4 py-4">
+      {/* Bottom Navigation - Fixed to show all 4 buttons */}
+      <div className="bg-white border-t-6 border-slate-400 px-4 py-4 shadow-2xl">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-16 h-16 bg-blue-300 hover:bg-blue-400 border-4 border-blue-600 rounded-2xl text-blue-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
+              className="w-18 h-18 bg-blue-300 hover:bg-blue-400 border-4 border-blue-600 rounded-3xl text-blue-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3 shadow-lg"
             >
-              <Home className="w-6 h-6" />
+              <Home className="w-7 h-7" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-16 h-16 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-2xl text-green-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
+              className="w-18 h-18 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-3xl text-green-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3 shadow-lg"
             >
-              <Phone className="w-6 h-6" />
+              <Phone className="w-7 h-7" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-16 h-16 bg-purple-400 hover:bg-purple-500 border-4 border-purple-600 rounded-2xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
+              className="w-18 h-18 bg-purple-400 hover:bg-purple-500 border-4 border-purple-600 rounded-3xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3 shadow-lg"
             >
-              <CheckCircle className="w-6 h-6" />
+              <CheckCircle className="w-7 h-7" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-16 h-16 bg-pink-300 hover:bg-pink-400 border-4 border-pink-600 rounded-2xl text-pink-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
+              className="w-18 h-18 bg-pink-300 hover:bg-pink-400 border-4 border-pink-600 rounded-3xl text-pink-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3 shadow-lg"
             >
-              <Settings className="w-6 h-6" />
+              <Settings className="w-7 h-7" />
             </Button>
           </div>
         </div>
