@@ -20,6 +20,7 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
   // Profile form states
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [preferredCallTime, setPreferredCallTime] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -28,6 +29,7 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
     if (userProfile) {
       setFullName(userProfile.full_name || "");
       setPhoneNumber(userProfile.phone_number || "");
+      setPreferredCallTime(userProfile.preferred_call_time || "09:00");
     }
   }, [userProfile]);
 
@@ -41,6 +43,7 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
         .update({
           full_name: fullName,
           phone_number: phoneNumber,
+          preferred_call_time: preferredCallTime,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -158,6 +161,17 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
                 className="border-2 border-gray-300 rounded-xl font-medium"
                 placeholder="Enter your phone number"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Preferred Call Time</label>
+              <Input
+                type="time"
+                value={preferredCallTime}
+                onChange={(e) => setPreferredCallTime(e.target.value)}
+                className="border-2 border-gray-300 rounded-xl font-medium"
+              />
+              <p className="text-xs text-gray-500 mt-1">Set your preferred time for daily practice calls</p>
             </div>
             
             <div>
