@@ -8,7 +8,7 @@ interface PreviousActivitySectionProps {
 const PreviousActivitySection = ({ lastCall }: PreviousActivitySectionProps) => {
   if (!lastCall) {
     return (
-      <div className="bg-white rounded-3xl p-6 border-4 border-gray-200 text-center">
+      <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
         <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Clock className="w-8 h-8 text-gray-400" />
         </div>
@@ -59,7 +59,7 @@ const PreviousActivitySection = ({ lastCall }: PreviousActivitySectionProps) => 
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+    <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200">
       <div className="flex items-center mb-4">
         <div className="w-14 h-14 bg-green-400 rounded-2xl flex items-center justify-center mr-4">
           <CheckCircle className="w-7 h-7 text-white" />

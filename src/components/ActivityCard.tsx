@@ -92,7 +92,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           created_at: call.created_at,
           vapi_call_id: call.vapi_call_id,
           transcript: call.transcript,
-          sentiment: call.sentiment_analysis?.overall_sentiment
+          sentiment: call.sentiment_analysis ? (call.sentiment_analysis as any)?.overall_sentiment : null
         }));
       }
 
@@ -108,12 +108,12 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       return (conversations || []).map(conv => ({
         id: conv.id,
         user_id: conv.user_id,
-        phone_number: conv.conversation_data?.phone_number || '',
-        call_status: conv.conversation_data?.status || 'completed',
+        phone_number: conv.conversation_data ? (conv.conversation_data as any)?.phone_number || '' : '',
+        call_status: conv.conversation_data ? (conv.conversation_data as any)?.status || 'completed' : 'completed',
         duration_seconds: conv.duration_seconds || 300, // Default 5 minutes if not available
         created_at: conv.created_at,
-        vapi_call_id: conv.conversation_data?.call_id,
-        scenario: conv.conversation_data?.scenario
+        vapi_call_id: conv.conversation_data ? (conv.conversation_data as any)?.call_id : null,
+        scenario: conv.conversation_data ? (conv.conversation_data as any)?.scenario : null
       }));
     },
     enabled: !!user
@@ -142,7 +142,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           showBackButton={true} 
         />
         <div className="px-6 pt-6">
-          <div className="bg-white rounded-3xl p-6 border-4 border-gray-200 text-center">
+          <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
             <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
               <RefreshCw className="w-8 h-8 text-gray-400 animate-spin" />
             </div>
@@ -180,7 +180,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         />
 
         {/* Learning Progress Tree */}
-        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+        <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200">
           <div className="flex items-center mb-4">
             <div className="w-14 h-14 bg-purple-400 rounded-2xl flex items-center justify-center mr-4">
               <Trophy className="w-7 h-7 text-white" />
@@ -199,7 +199,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       </div>
 
       {/* Bottom Navigation - Fixed positioning */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 z-50">
         <div className="max-w-md mx-auto px-6 py-4">
           <div className="flex justify-center space-x-4">
             <Button
