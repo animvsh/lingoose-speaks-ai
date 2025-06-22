@@ -1,6 +1,5 @@
-
 import { Button } from "@/components/ui/button";
-import { Phone, Clock, CheckCircle, Home, Settings, ArrowLeft, Play, Mic, Users, MapPin, Coffee, Briefcase, Heart, ShoppingCart, Plane, GraduationCap, Car, Music, Book, Star, Target } from "lucide-react";
+import { Phone, Clock, CheckCircle, Home, Settings, ArrowLeft, Play, Mic, Users, MapPin, Coffee, Briefcase, Heart, ShoppingCart, Plane, GraduationCap, Car, Music, Book, Star, Target, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
 import DuckMascot from "./DuckMascot";
 import { useState } from "react";
 import AppBar from "./AppBar";
@@ -22,6 +21,29 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
   // Get the most recent activity rating
   const lastActivity = ratings?.[0];
+
+  // Analyze recent performance (last 3 activities)
+  const recentActivities = ratings?.slice(0, 3) || [];
+  const skillPerformance = recentActivities.reduce((acc, activity) => {
+    const skillName = activity.activities.name;
+    if (!acc[skillName]) {
+      acc[skillName] = [];
+    }
+    acc[skillName].push(activity.rating);
+    return acc;
+  }, {} as Record<string, number[]>);
+
+  const improvedSkills = [];
+  const strugglingSkills = [];
+
+  Object.entries(skillPerformance).forEach(([skillName, ratings]) => {
+    const avgRating = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+    if (avgRating >= 4) {
+      improvedSkills.push({ name: skillName, avgRating, attempts: ratings.length });
+    } else if (avgRating < 3) {
+      strugglingSkills.push({ name: skillName, avgRating, attempts: ratings.length });
+    }
+  });
 
   const handleStartCall = async () => {
     if (!user?.user_metadata?.phone_number) {
@@ -108,16 +130,16 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           </p>
         </div>
 
-        {/* Last Activity Panel */}
+        {/* Last Call Details */}
         {lastActivity && (
           <div className="bg-purple-400 rounded-3xl p-6 border-4 border-purple-500 mb-8">
             <div className="flex items-center mb-4">
               <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center mr-4">
-                <CheckCircle className="w-7 h-7 text-white" />
+                <Phone className="w-7 h-7 text-white" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-white uppercase tracking-wide">
-                  LAST COMPLETED
+                  LAST CALL SUMMARY
                 </h3>
                 <p className="text-purple-100 font-medium text-sm">
                   {lastActivity.activities.name}
@@ -156,6 +178,87 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
             <div className="flex items-center justify-center space-x-1">
               {renderStars(lastActivity.rating)}
             </div>
+          </div>
+        )}
+
+        {/* Skills Performance Analysis */}
+        {(improvedSkills.length > 0 || strugglingSkills.length > 0) && (
+          <div className="space-y-4">
+            {/* Improved Skills */}
+            {improvedSkills.length > 0 && (
+              <div className="bg-green-400 rounded-3xl p-6 border-4 border-green-500">
+                <div className="flex items-center mb-4">
+                  <div className="w-14 h-14 bg-green-600 rounded-2xl flex items-center justify-center mr-4">
+                    <TrendingUp className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-white uppercase tracking-wide">
+                      SKILLS IMPROVED
+                    </h3>
+                    <p className="text-green-100 font-medium text-sm">
+                      You're doing great in these areas!
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  {improvedSkills.slice(0, 2).map((skill, index) => (
+                    <div key={index} className="bg-green-300 rounded-2xl p-4 border-2 border-green-400">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-bold text-green-800 truncate">
+                          {skill.name}
+                        </h4>
+                        <div className="flex items-center space-x-1">
+                          {renderStars(Math.round(skill.avgRating))}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-green-700">
+                        <span>{skill.avgRating.toFixed(1)}/5.0 average</span>
+                        <span>{skill.attempts} attempts</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Struggling Skills */}
+            {strugglingSkills.length > 0 && (
+              <div className="bg-orange-400 rounded-3xl p-6 border-4 border-orange-500">
+                <div className="flex items-center mb-4">
+                  <div className="w-14 h-14 bg-orange-600 rounded-2xl flex items-center justify-center mr-4">
+                    <AlertCircle className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-white uppercase tracking-wide">
+                      NEEDS PRACTICE
+                    </h3>
+                    <p className="text-orange-100 font-medium text-sm">
+                      Focus on these skills next
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  {strugglingSkills.slice(0, 2).map((skill, index) => (
+                    <div key={index} className="bg-orange-300 rounded-2xl p-4 border-2 border-orange-400">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-bold text-orange-800 truncate">
+                          {skill.name}
+                        </h4>
+                        <div className="flex items-center space-x-1">
+                          {renderStars(Math.round(skill.avgRating))}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-orange-700">
+                        <span>{skill.avgRating.toFixed(1)}/5.0 average</span>
+                        <span>{skill.attempts} attempts</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -217,24 +320,23 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         </div>
 
         {/* Simple Learning Progress Section */}
-        <div className="bg-green-400 rounded-3xl p-6 border-4 border-green-500">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold text-white uppercase tracking-wide mb-2">
-              KEEP LEARNING!
-            </h3>
-            <p className="text-green-100 font-medium">
-              Complete activities to unlock new challenges
-            </p>
-            <div className="mt-4">
-              <Button
-                onClick={() => onNavigate("curriculum")}
-                className="bg-white hover:bg-green-50 text-green-600 font-bold py-3 px-6 rounded-xl"
-              >
-                VIEW CURRICULUM
-              </Button>
+        {(!ratings || ratings.length === 0) && (
+          <div className="bg-gray-200 rounded-3xl p-8 border-4 border-gray-300 text-center">
+            <div className="w-16 h-16 bg-gray-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-white" />
             </div>
+            <h3 className="text-2xl font-bold text-gray-700 mb-2">Start Learning</h3>
+            <p className="text-gray-600 font-medium mb-4">
+              Begin your language learning journey to see your progress here!
+            </p>
+            <Button 
+              onClick={() => onNavigate("curriculum")}
+              className="bg-orange-400 hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-2xl"
+            >
+              START FIRST SESSION
+            </Button>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Bottom Navigation */}
