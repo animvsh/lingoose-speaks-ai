@@ -16,10 +16,10 @@ export const useCallInitiation = () => {
 
       console.log('User from auth context:', user);
 
-      // Read the user profile from the database to get the most up-to-date phone number
+      // Read the user profile from the database to get the most up-to-date phone number and conversation summary
       const { data: userProfile, error: profileError } = await supabase
         .from('user_profiles')
-        .select('phone_number, full_name')
+        .select('phone_number, full_name, last_conversation_summary')
         .eq('id', user.id)
         .single();
 
@@ -35,6 +35,7 @@ export const useCallInitiation = () => {
       console.log('User profile from database:', userProfile);
 
       const phoneNumber = userProfile.phone_number;
+      const lastConversationSummary = userProfile.last_conversation_summary;
       
       if (!phoneNumber) {
         throw new Error('Phone number not found. Please update your profile.');
@@ -47,13 +48,15 @@ export const useCallInitiation = () => {
       }
 
       console.log('Starting call with phone number:', phoneNumber);
+      console.log('Last conversation summary:', lastConversationSummary);
 
       // Start the call using the edge function
       const { data, error } = await supabase.functions.invoke('start-vapi-call', {
         body: {
           phoneNumber: phoneNumber,
           userId: user.id,
-          topic: currentActivity.description || currentActivity.name
+          topic: currentActivity.description || currentActivity.name,
+          lastConversationSummary: lastConversationSummary
         }
       });
 

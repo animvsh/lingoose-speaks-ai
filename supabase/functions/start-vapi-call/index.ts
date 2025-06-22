@@ -30,7 +30,12 @@ serve(async (req) => {
   }
 
   try {
-    const { phoneNumber, userId, topic = "Hindi conversation practice" } = await req.json()
+    const { 
+      phoneNumber, 
+      userId, 
+      topic = "Hindi conversation practice",
+      lastConversationSummary = null 
+    } = await req.json()
     
     if (!phoneNumber || !userId) {
       return new Response(
@@ -54,6 +59,18 @@ serve(async (req) => {
     console.log(`Original phone number: ${phoneNumber}`);
     console.log(`Formatted phone number (E.164): ${formattedPhoneNumber}`);
     console.log(`Topic: ${topic}`);
+    console.log(`Last conversation summary: ${lastConversationSummary}`);
+
+    // Prepare variable values for the assistant
+    const variableValues: any = {
+      topic: topic,
+      language: "hindi"
+    };
+
+    // Include conversation summary if available
+    if (lastConversationSummary) {
+      variableValues.previousConversationSummary = lastConversationSummary;
+    }
 
     // Use the conversationalist agent approach with assistantId
     const vapiResponse = await fetch('https://api.vapi.ai/call', {
@@ -65,10 +82,7 @@ serve(async (req) => {
       body: JSON.stringify({
         assistantId: "d3c48fab-0d85-4e6e-9f22-076b9e3c537c",
         assistantOverrides: {
-          variableValues: {
-            topic: topic,
-            language: "hindi"
-          }
+          variableValues: variableValues
         },
         phoneNumberId: "84d220a6-8dd1-4808-b31e-a6364ce98885",
         customer: {
@@ -114,6 +128,7 @@ serve(async (req) => {
           phone_number: formattedPhoneNumber,
           status: 'initiated',
           scenario: topic,
+          last_conversation_summary: lastConversationSummary,
           vapi_response: vapiData
         }
       })

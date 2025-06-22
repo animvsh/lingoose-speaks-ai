@@ -121,6 +121,42 @@ export type Database = {
           },
         ]
       }
+      curriculum_insights: {
+        Row: {
+          comparison_analysis: Json
+          confidence_score: number | null
+          created_at: string
+          id: string
+          insights: Json
+          learning_recommendations: Json
+          phone_number: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comparison_analysis: Json
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          insights: Json
+          learning_recommendations: Json
+          phone_number: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comparison_analysis?: Json
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          insights?: Json
+          learning_recommendations?: Json
+          phone_number?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       learning_outlines: {
         Row: {
           created_at: string | null
