@@ -107,6 +107,8 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
               size="sm"
               onClick={() => onNavigate("activity")}
               className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              <Phone className="w-7 h-7" />
             </Button>
             <Button 
               variant="ghost" 
