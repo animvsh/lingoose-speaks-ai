@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target, BookOpen } from "lucide-react";
@@ -301,7 +302,8 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               ></div>
             </div>
             
-            <div className="bg-orange-50 rounded-2xl p-4 border-2 border-orange-100">
+            <div className="bg-orange-50 rounded-2xl p-4 border-2 border-orange-100 relative">
+              <DuckMascot size="sm" className="w-6 h-6 absolute top-2 right-2 opacity-40" />
               <p className="text-orange-700 font-bold text-sm">
                 "Just {100 - nativeFluency}% away from native level! 🦆✨"
               </p>
@@ -322,6 +324,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
                   Hotel check-in conversation 🇪🇸
                 </p>
               </div>
+              <DuckMascot size="sm" className="w-8 h-8 opacity-30" />
             </div>
             <Button 
               onClick={() => onNavigate("activity")}
@@ -354,7 +357,8 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
             </div>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl p-4 text-center border-2 border-white">
+              <div className="bg-white rounded-2xl p-4 text-center border-2 border-white relative">
+                <DuckMascot size="sm" className="w-4 h-4 absolute top-1 right-1 opacity-20" />
                 <div className="w-8 h-8 bg-purple-400 rounded-xl flex items-center justify-center mx-auto mb-2">
                   <Target className="w-4 h-4 text-white" />
                 </div>
@@ -375,8 +379,9 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
           <div className={`transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
             <Button 
               onClick={() => onNavigate("curriculum")}
-              className="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-6 text-xl rounded-3xl border-4 border-orange-500"
+              className="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-6 text-xl rounded-3xl border-4 border-orange-500 relative"
             >
+              <DuckMascot size="sm" className="w-6 h-6 absolute left-4 opacity-50" />
               START LEARNING 🚀
             </Button>
           </div>
@@ -391,9 +396,10 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-14 h-14 bg-orange-400 rounded-2xl text-white"
+              className="w-14 h-14 bg-orange-400 rounded-2xl text-white relative"
             >
               <Home className="w-6 h-6" />
+              <DuckMascot size="sm" className="w-3 h-3 absolute -top-1 -right-1" />
             </Button>
             <Button 
               variant="ghost" 

@@ -10,7 +10,7 @@ interface AppBarProps {
   showLogo?: boolean;
 }
 
-const AppBar = ({ title, onBack, showBackButton = true, showLogo = false }: AppBarProps) => {
+const AppBar = ({ title, onBack, showBackButton = true, showLogo = true }: AppBarProps) => {
   return (
     <div className="px-6 pt-8 pb-6">
       <div className="flex items-center justify-between">
@@ -27,9 +27,14 @@ const AppBar = ({ title, onBack, showBackButton = true, showLogo = false }: AppB
           <div className="w-14 h-14"></div>
         )}
         
-        <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide text-center flex-1">
-          {title}
-        </h1>
+        <div className="flex items-center justify-center flex-1">
+          <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide text-center">
+            {title}
+          </h1>
+          {showLogo && (
+            <DuckMascot size="sm" className="w-8 h-8 ml-2 opacity-60" />
+          )}
+        </div>
         
         <div className="w-14 h-14"></div>
       </div>
