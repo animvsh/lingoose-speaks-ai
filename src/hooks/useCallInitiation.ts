@@ -1,5 +1,5 @@
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 export const useCallInitiation = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const startCallMutation = useMutation({
     mutationFn: async (currentActivity: any) => {
@@ -85,6 +86,14 @@ export const useCallInitiation = () => {
         description: "You should receive a call shortly. Answer to start your practice session!",
       });
       console.log('Call started successfully:', data);
+      
+      // Invalidate all analytics and call-related queries to trigger refresh
+      queryClient.invalidateQueries({ queryKey: ['curriculum-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ['call-logs'] });
+      queryClient.invalidateQueries({ queryKey: ['user-activity-ratings'] });
+      queryClient.invalidateQueries({ queryKey: ['call-analysis'] });
+      queryClient.invalidateQueries({ queryKey: ['latest-call-analysis'] });
+      queryClient.invalidateQueries({ queryKey: ['vapi_call_analysis'] });
     },
     onError: (error) => {
       console.error('Failed to start call:', error);

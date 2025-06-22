@@ -1,9 +1,7 @@
 
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Clock, Home, Phone, Settings, Star, Trophy, Target, TrendingUp, Flame } from "lucide-react";
-import { useUserActivityRatings } from "@/hooks/useUserActivityRatings";
-import { useUserProgress } from "@/hooks/useUserProgress";
-import { format, subDays, isAfter } from "date-fns";
+import { CheckCircle, Clock, Home, Phone, Settings, Star, Trophy, Target, TrendingUp, Flame, BarChart3 } from "lucide-react";
+import { useCurriculumAnalytics } from "@/hooks/useCurriculumAnalytics";
 import { useMemo } from "react";
 import AppBar from "./AppBar";
 
@@ -12,131 +10,24 @@ interface CurriculumCardProps {
 }
 
 const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
-  const { ratings } = useUserActivityRatings();
-  const { miniSkillScores } = useUserProgress();
+  const { data: analytics, isLoading, refetch } = useCurriculumAnalytics();
 
-  // Calculate analytics from actual data
-  const analytics = useMemo(() => {
-    if (!ratings || ratings.length === 0) {
+  // Memoized analytics to prevent unnecessary re-renders
+  const analyticsData = useMemo(() => {
+    if (!analytics) {
       return {
         totalCalls: 0,
         talkTime: '0h',
         fluencyScore: 0,
         currentStreak: 0,
         thisWeekCalls: 0,
-        avgRating: 0
+        avgRating: 0,
+        recentImprovements: [],
+        strugglingAreas: []
       };
     }
-
-    const totalCalls = ratings.length;
-    const totalDurationMinutes = ratings.reduce((sum, rating) => 
-      sum + (rating.duration_seconds ? Math.round(rating.duration_seconds / 60) : 0), 0
-    );
-    const talkTime = totalDurationMinutes >= 60 
-      ? `${Math.floor(totalDurationMinutes / 60)}.${Math.round((totalDurationMinutes % 60) / 6)}h`
-      : `${totalDurationMinutes}min`;
-
-    // Calculate average rating as fluency score
-    const avgRating = Math.round(ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratings.length);
-    const fluencyScore = Math.round((avgRating / 5) * 100);
-
-    // Calculate current streak (consecutive days with activities)
-    const sortedRatings = [...ratings].sort((a, b) => 
-      new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime()
-    );
-    
-    let streak = 0;
-    let currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    
-    for (let i = 0; i < sortedRatings.length; i++) {
-      const ratingDate = new Date(sortedRatings[i].completed_at);
-      ratingDate.setHours(0, 0, 0, 0);
-      
-      const daysDiff = Math.floor((currentDate.getTime() - ratingDate.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (daysDiff === streak) {
-        streak++;
-      } else if (daysDiff > streak) {
-        break;
-      }
-    }
-
-    // This week's calls
-    const oneWeekAgo = subDays(new Date(), 7);
-    const thisWeekCalls = ratings.filter(rating => 
-      isAfter(new Date(rating.completed_at), oneWeekAgo)
-    ).length;
-
-    return {
-      totalCalls,
-      talkTime,
-      fluencyScore,
-      currentStreak: streak,
-      thisWeekCalls,
-      avgRating
-    };
-  }, [ratings]);
-
-  // Analyze skill progress over recent activities
-  const skillProgressAnalysis = useMemo(() => {
-    if (!ratings || !miniSkillScores || ratings.length === 0) {
-      return { recentImprovements: [], strugglingAreas: [] };
-    }
-
-    // Get last 5 activities to analyze trends
-    const recentRatings = ratings.slice(0, 5);
-    const skillRatingMap = new Map();
-
-    // Group ratings by skill
-    recentRatings.forEach(rating => {
-      const skillId = rating.skill_id;
-      if (!skillRatingMap.has(skillId)) {
-        skillRatingMap.set(skillId, []);
-      }
-      skillRatingMap.get(skillId).push({
-        rating: rating.rating,
-        date: rating.completed_at,
-        activityName: rating.activities.name
-      });
-    });
-
-    const recentImprovements = [];
-    const strugglingAreas = [];
-
-    // Analyze each skill's trend
-    skillRatingMap.forEach((skillRatings, skillId) => {
-      if (skillRatings.length >= 2) {
-        const sortedRatings = skillRatings.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        const firstRating = sortedRatings[0].rating;
-        const lastRating = sortedRatings[sortedRatings.length - 1].rating;
-        const improvement = lastRating - firstRating;
-        const avgRating = sortedRatings.reduce((sum, r) => sum + r.rating, 0) / sortedRatings.length;
-
-        if (improvement > 0) {
-          recentImprovements.push({
-            skillId,
-            improvement,
-            avgRating,
-            activityName: sortedRatings[sortedRatings.length - 1].activityName,
-            attempts: sortedRatings.length
-          });
-        } else if (avgRating < 3) {
-          strugglingAreas.push({
-            skillId,
-            avgRating,
-            activityName: sortedRatings[sortedRatings.length - 1].activityName,
-            attempts: sortedRatings.length
-          });
-        }
-      }
-    });
-
-    return {
-      recentImprovements: recentImprovements.slice(0, 3),
-      strugglingAreas: strugglingAreas.slice(0, 3)
-    };
-  }, [ratings, miniSkillScores]);
+    return analytics;
+  }, [analytics]);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -148,6 +39,31 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
       />
     ));
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-amber-50 pb-24">
+        <AppBar 
+          title="THIS WEEK" 
+          onBack={() => onNavigate("home")} 
+          showBackButton={true} 
+        />
+        <div className="px-6 space-y-6">
+          <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
+            <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <BarChart3 className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide mb-2">
+              LOADING ANALYTICS
+            </h3>
+            <p className="text-gray-600 font-medium text-sm">
+              Gathering your learning insights...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
@@ -166,7 +82,29 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
           <p className="text-xl font-semibold text-gray-700">
             Your learning progress
           </p>
+          {analyticsData.lastActivity && (
+            <p className="text-sm text-gray-500 mt-2">
+              Last activity: {analyticsData.lastActivity.toLocaleDateString()}
+            </p>
+          )}
         </div>
+
+        {/* Data Source Indicator */}
+        {(analyticsData.callAnalysisCount > 0 || analyticsData.activityRatingsCount > 0) && (
+          <div className="bg-blue-100 rounded-2xl p-4 border-2 border-blue-200 mb-6">
+            <div className="flex items-center justify-center space-x-4">
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-700">{analyticsData.callAnalysisCount}</div>
+                <div className="text-xs text-blue-600 font-medium">AI Calls</div>
+              </div>
+              <div className="w-px h-8 bg-blue-300"></div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-700">{analyticsData.activityRatingsCount}</div>
+                <div className="text-xs text-blue-600 font-medium">Practice Sessions</div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Main Stats Grid */}
         <div className="grid grid-cols-2 gap-4 mb-8">
@@ -178,10 +116,10 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
             <h3 className="text-sm font-bold text-orange-800 uppercase tracking-wide mb-1">
               TOTAL CALLS
             </h3>
-            <div className="text-4xl font-bold text-orange-900 mb-2">{analytics.totalCalls}</div>
+            <div className="text-4xl font-bold text-orange-900 mb-2">{analyticsData.totalCalls}</div>
             <div className="flex items-center text-orange-700 text-sm font-medium">
               <span className="mr-1">📈</span>
-              +{analytics.thisWeekCalls} this week
+              +{analyticsData.thisWeekCalls} this week
             </div>
           </div>
 
@@ -193,7 +131,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
             <h3 className="text-sm font-bold text-green-800 uppercase tracking-wide mb-1">
               TALK TIME
             </h3>
-            <div className="text-4xl font-bold text-green-900 mb-2">{analytics.talkTime}</div>
+            <div className="text-4xl font-bold text-green-900 mb-2">{analyticsData.talkTime}</div>
             <div className="flex items-center text-green-700 text-sm font-medium">
               <span className="mr-1">🎯</span>
               Total practice time
@@ -208,10 +146,10 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
             <h3 className="text-sm font-bold text-yellow-800 uppercase tracking-wide mb-1">
               FLUENCY SCORE
             </h3>
-            <div className="text-4xl font-bold text-yellow-900 mb-2">{analytics.fluencyScore}%</div>
+            <div className="text-4xl font-bold text-yellow-900 mb-2">{analyticsData.fluencyScore}%</div>
             <div className="flex items-center text-yellow-700 text-sm font-medium">
               <span className="mr-1">⭐</span>
-              Avg: {analytics.avgRating}/5 stars
+              {analyticsData.avgRating > 0 ? `Avg: ${analyticsData.avgRating}/5 stars` : 'AI-powered analysis'}
             </div>
           </div>
 
@@ -223,7 +161,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
             <h3 className="text-sm font-bold text-red-800 uppercase tracking-wide mb-1">
               CURRENT STREAK
             </h3>
-            <div className="text-4xl font-bold text-red-900 mb-2">{analytics.currentStreak}</div>
+            <div className="text-4xl font-bold text-red-900 mb-2">{analyticsData.currentStreak}</div>
             <div className="flex items-center text-red-700 text-sm font-medium">
               <span className="mr-1">🔥</span>
               days strong!
@@ -231,8 +169,8 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
           </div>
         </div>
 
-        {/* Skill Progress Analysis */}
-        {skillProgressAnalysis.recentImprovements.length > 0 && (
+        {/* Recent Improvements */}
+        {analyticsData.recentImprovements.length > 0 && (
           <div className="bg-blue-400 rounded-3xl p-6 border-4 border-blue-500 mb-8">
             <div className="flex items-center mb-4">
               <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mr-4">
@@ -243,24 +181,34 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
                   RECENT IMPROVEMENTS
                 </h3>
                 <p className="text-blue-100 font-medium text-sm">
-                  Skills you're getting better at!
+                  Areas where you're excelling!
                 </p>
               </div>
             </div>
             
             <div className="space-y-3">
-              {skillProgressAnalysis.recentImprovements.map((improvement, index) => (
+              {analyticsData.recentImprovements.map((improvement, index) => (
                 <div key={index} className="bg-blue-300 rounded-2xl p-4 border-2 border-blue-400">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-sm font-bold text-blue-800 truncate">
-                      {improvement.activityName}
+                      {improvement.area}
                     </h4>
                     <div className="flex items-center space-x-1">
-                      {renderStars(Math.round(improvement.avgRating))}
+                      {improvement.source === 'ratings' && renderStars(Math.round(improvement.improvement))}
+                      {improvement.source === 'call_analysis' && (
+                        <div className="text-xs font-bold text-blue-700 bg-blue-200 px-2 py-1 rounded">
+                          AI Analysis
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-blue-700">
-                    <span>+{improvement.improvement} improvement</span>
+                    <span>
+                      {improvement.source === 'ratings' ? 
+                        `+${improvement.improvement} improvement` : 
+                        `${improvement.improvement} positive sessions`
+                      }
+                    </span>
                     <span>{improvement.attempts} attempts</span>
                   </div>
                 </div>
@@ -269,7 +217,8 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
           </div>
         )}
 
-        {skillProgressAnalysis.strugglingAreas.length > 0 && (
+        {/* Struggling Areas */}
+        {analyticsData.strugglingAreas.length > 0 && (
           <div className="bg-purple-400 rounded-3xl p-6 border-4 border-purple-500 mb-8">
             <div className="flex items-center mb-4">
               <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center mr-4">
@@ -280,20 +229,20 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
                   FOCUS AREAS
                 </h3>
                 <p className="text-purple-100 font-medium text-sm">
-                  Skills that need more practice
+                  Areas that need more practice
                 </p>
               </div>
             </div>
             
             <div className="space-y-3">
-              {skillProgressAnalysis.strugglingAreas.map((area, index) => (
+              {analyticsData.strugglingAreas.map((area, index) => (
                 <div key={index} className="bg-purple-300 rounded-2xl p-4 border-2 border-purple-400">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-sm font-bold text-purple-800 truncate">
-                      {area.activityName}
+                      {area.area}
                     </h4>
-                    <div className="flex items-center space-x-1">
-                      {renderStars(Math.round(area.avgRating))}
+                    <div className="text-xs font-bold text-purple-700 bg-purple-200 px-2 py-1 rounded">
+                      {area.avgPerformance}% performance
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-purple-700">
@@ -307,7 +256,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
         )}
 
         {/* No Data Message */}
-        {(!ratings || ratings.length === 0) && (
+        {analyticsData.totalCalls === 0 && (
           <div className="bg-gray-200 rounded-3xl p-8 border-4 border-gray-300 text-center">
             <div className="w-16 h-16 bg-gray-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-white" />
@@ -321,7 +270,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white px-6 py-4 border-t border-gray-100">
+      <div className="fixed bottom-0 left-0 right-0 bg-amber-50 px-6 py-4 border-t border-gray-100">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-4">
             <Button 

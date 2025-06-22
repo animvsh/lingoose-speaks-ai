@@ -1,7 +1,6 @@
-
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Trophy, Home, Phone, CheckCircle, Settings } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import AppBar from "./AppBar";
@@ -17,6 +16,7 @@ interface ActivityCardProps {
 
 const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { startCall, isStartingCall } = useCallInitiation();
   const { regenerateActivity, isRegenerating } = useActivityGeneration();
 
@@ -125,9 +125,16 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     }
   };
 
-  const handleStartPractice = () => {
+  const handleStartPractice = async () => {
     if (currentActivity) {
-      startCall(currentActivity);
+      await startCall(currentActivity);
+      
+      // Refresh all relevant queries after starting a call
+      queryClient.invalidateQueries({ queryKey: ['call-logs'] });
+      queryClient.invalidateQueries({ queryKey: ['curriculum-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ['user-activity-ratings'] });
+      queryClient.invalidateQueries({ queryKey: ['call-analysis'] });
+      queryClient.invalidateQueries({ queryKey: ['latest-call-analysis'] });
     }
   };
 
