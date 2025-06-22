@@ -620,6 +620,71 @@ export type Database = {
         }
         Relationships: []
       }
+      vapi_call_analysis: {
+        Row: {
+          call_data: Json
+          call_duration: number | null
+          call_ended_at: string | null
+          call_started_at: string | null
+          call_status: string | null
+          conversation_id: string | null
+          created_at: string
+          extracted_insights: Json | null
+          id: string
+          performance_metrics: Json | null
+          phone_number: string
+          sentiment_analysis: Json | null
+          transcript: string | null
+          updated_at: string
+          user_id: string
+          vapi_call_id: string
+        }
+        Insert: {
+          call_data: Json
+          call_duration?: number | null
+          call_ended_at?: string | null
+          call_started_at?: string | null
+          call_status?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          extracted_insights?: Json | null
+          id?: string
+          performance_metrics?: Json | null
+          phone_number: string
+          sentiment_analysis?: Json | null
+          transcript?: string | null
+          updated_at?: string
+          user_id: string
+          vapi_call_id: string
+        }
+        Update: {
+          call_data?: Json
+          call_duration?: number | null
+          call_ended_at?: string | null
+          call_started_at?: string | null
+          call_status?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          extracted_insights?: Json | null
+          id?: string
+          performance_metrics?: Json | null
+          phone_number?: string
+          sentiment_analysis?: Json | null
+          transcript?: string | null
+          updated_at?: string
+          user_id?: string
+          vapi_call_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vapi_call_analysis_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
