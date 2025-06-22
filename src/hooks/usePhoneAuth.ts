@@ -1,21 +1,10 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface StoredOTP {
-  otp: string;
-  phoneNumber: string;
-  expiresAt: number;
-}
-
 export const usePhoneAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-
-  const generateOTP = (): string => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  };
 
   const formatPhoneNumber = (phone: string): string => {
     // Remove all non-digit characters
@@ -119,12 +108,12 @@ export const usePhoneAuth = () => {
     }
   };
 
-  const sendOTP = async (phoneNumber: string): Promise<{ success: boolean; error?: string }> => {
+  const signInWithPhone = async (phoneNumber: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     
     try {
       const formattedPhone = formatPhoneNumber(phoneNumber);
-      console.log('Sending OTP to:', formattedPhone);
+      console.log('Signing in with phone:', formattedPhone);
       
       // Ensure user profile exists (create if needed)
       await createOrFindUserProfile(formattedPhone);
@@ -136,98 +125,7 @@ export const usePhoneAuth = () => {
         // Ensure test user exists
         await createTestUserIfNotExists();
         
-        console.log('Using test OTP: 123456');
-        
-        // Store a fixed OTP for the test number
-        const otpData: StoredOTP = {
-          otp: '123456',
-          phoneNumber: formattedPhone,
-          expiresAt: Date.now() + (10 * 60 * 1000) // 10 minutes from now
-        };
-        localStorage.setItem('phone_auth_otp', JSON.stringify(otpData));
-        
-        return { success: true };
-      }
-      
-      // Generate OTP for real phone numbers
-      const otp = generateOTP();
-      const expiresAt = Date.now() + (10 * 60 * 1000); // 10 minutes from now
-      
-      // Store OTP in localStorage
-      const otpData: StoredOTP = {
-        otp,
-        phoneNumber: formattedPhone,
-        expiresAt
-      };
-      localStorage.setItem('phone_auth_otp', JSON.stringify(otpData));
-      
-      console.log('Generated OTP:', otp, 'for phone:', formattedPhone);
-      
-      // Send SMS via Supabase edge function
-      const { data, error } = await supabase.functions.invoke('send-sms', {
-        body: { phoneNumber: formattedPhone, otp }
-      });
-
-      if (error) {
-        console.error('Edge function error:', error);
-        throw new Error(error.message || 'Failed to send SMS');
-      }
-
-      if (!data?.success) {
-        console.error('SMS sending failed:', data);
-        throw new Error(data?.error || 'Failed to send SMS');
-      }
-
-      console.log('SMS sent successfully');
-      return { success: true };
-      
-    } catch (error: any) {
-      console.error('Send OTP error:', error);
-      return { 
-        success: false, 
-        error: error.message || 'Failed to send verification code. Please check your phone number and try again.' 
-      };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const verifyOTP = async (phoneNumber: string, inputOTP: string): Promise<{ success: boolean; error?: string }> => {
-    setIsLoading(true);
-    
-    try {
-      const formattedPhone = formatPhoneNumber(phoneNumber);
-      
-      // Get stored OTP
-      const storedData = localStorage.getItem('phone_auth_otp');
-      if (!storedData) {
-        throw new Error('No verification code found. Please request a new one.');
-      }
-
-      const otpData: StoredOTP = JSON.parse(storedData);
-      
-      // Check if OTP has expired
-      if (Date.now() > otpData.expiresAt) {
-        localStorage.removeItem('phone_auth_otp');
-        throw new Error('Verification code has expired. Please request a new one.');
-      }
-
-      // Check if phone number matches
-      if (otpData.phoneNumber !== formattedPhone) {
-        throw new Error('Phone number mismatch. Please try again.');
-      }
-
-      // Verify OTP
-      if (otpData.otp !== inputOTP) {
-        throw new Error('Invalid verification code. Please try again.');
-      }
-
-      // OTP is valid, clean up
-      localStorage.removeItem('phone_auth_otp');
-      
-      // Check if this is our test phone number
-      if (formattedPhone === '+16505188736') {
-        console.log('Test phone number detected, signing in as test user');
+        console.log('Signing in as test user');
         
         // Sign in as the test user using email and password
         const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -329,19 +227,26 @@ export const usePhoneAuth = () => {
       return { success: true };
       
     } catch (error: any) {
-      console.error('Verify OTP error:', error);
+      console.error('Phone sign in error:', error);
       return { 
         success: false, 
-        error: error.message || 'Failed to verify code' 
+        error: error.message || 'Failed to sign in with phone number' 
       };
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Keep the old method names for compatibility but they now do the same thing
+  const sendOTP = signInWithPhone;
+  const verifyOTP = async (_phoneNumber: string, _otp: string) => {
+    return { success: true }; // OTP verification is no longer needed
+  };
+
   return {
     sendOTP,
     verifyOTP,
+    signInWithPhone,
     isLoading
   };
 };

@@ -3,19 +3,16 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Phone, Shield } from "lucide-react";
 import { usePhoneAuth } from "@/hooks/usePhoneAuth";
 import { useToast } from "@/hooks/use-toast";
 
 const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState<"phone" | "otp">("phone");
-  const { sendOTP, verifyOTP, isLoading } = usePhoneAuth();
+  const { signInWithPhone, isLoading } = usePhoneAuth();
   const { toast } = useToast();
 
-  const handleSendOTP = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!phoneNumber.trim()) {
@@ -27,36 +24,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
       return;
     }
 
-    const result = await sendOTP(phoneNumber);
-    if (result.success) {
-      setStep("otp");
-      toast({
-        title: "📱 Code Sent!",
-        description: "Please check your phone for the verification code.",
-        className: "border-2 border-green-400 bg-green-50 text-green-800",
-      });
-    } else {
-      toast({
-        title: "❌ Failed to Send Code",
-        description: result.error || "Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (otp.length !== 6) {
-      toast({
-        title: "❌ Invalid Code",
-        description: "Please enter the complete 6-digit code.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const result = await verifyOTP(phoneNumber, otp);
+    const result = await signInWithPhone(phoneNumber);
     if (result.success) {
       toast({
         title: "🎉 Welcome!",
@@ -69,7 +37,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
       }, 1500);
     } else {
       toast({
-        title: "❌ Verification Failed",
+        title: "❌ Sign In Failed",
         description: result.error || "Please try again.",
         variant: "destructive",
       });
@@ -83,78 +51,35 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
           <Shield className="w-6 h-6 text-slate-600" />
         </div>
         <CardTitle className="text-2xl font-black text-slate-800 uppercase tracking-wide">
-          {step === "phone" ? "Enter Phone Number" : "Verify Code"}
+          Enter Phone Number
         </CardTitle>
         <CardDescription className="text-slate-600 font-bold">
-          {step === "phone" 
-            ? "Enter your phone number to get started" 
-            : `Enter the 6-digit code sent to ${phoneNumber}`
-          }
+          Enter your phone number to sign in instantly
         </CardDescription>
       </CardHeader>
       
       <CardContent>
-        {step === "phone" ? (
-          <form onSubmit={handleSendOTP} className="space-y-4">
-            <div className="relative">
-              <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
-              <Input
-                type="tel"
-                placeholder="Enter your phone number (+1234567890)"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="pl-10 border-2 border-slate-300 rounded-xl font-bold"
-                required
-              />
-            </div>
+        <form onSubmit={handleSignIn} className="space-y-4">
+          <div className="relative">
+            <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+            <Input
+              type="tel"
+              placeholder="Enter your phone number (+1234567890)"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="pl-10 border-2 border-slate-300 rounded-xl font-bold"
+              required
+            />
+          </div>
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
-            >
-              {isLoading ? "Sending Code..." : "Get Started"}
-            </Button>
-          </form>
-        ) : (
-          <form onSubmit={handleVerifyOTP} className="space-y-6">
-            <div className="flex justify-center">
-              <InputOTP
-                maxLength={6}
-                value={otp}
-                onChange={(value) => setOtp(value)}
-              >
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
-            >
-              {isLoading ? "Verifying..." : "Continue"}
-            </Button>
-
-            <div className="text-center">
-              <Button
-                type="button"
-                variant="link"
-                onClick={() => setStep("phone")}
-                className="text-slate-600 hover:text-slate-800 font-bold"
-              >
-                Back to phone number
-              </Button>
-            </div>
-          </form>
-        )}
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );
