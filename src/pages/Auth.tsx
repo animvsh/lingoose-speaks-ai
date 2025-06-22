@@ -2,117 +2,100 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Phone, MessageSquare } from "lucide-react";
+import { Mail, Lock, Phone, User, ArrowLeft } from "lucide-react";
 import DuckMascot from "@/components/DuckMascot";
-import { usePhoneAuth } from "@/hooks/usePhoneAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [otp, setOtp] = useState("");
-  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { sendOTP, verifyOTP, isLoading } = usePhoneAuth();
 
-  const handleSendOTP = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Basic phone number validation
-    if (!phoneNumber.trim()) {
-      toast({
-        title: "📱 Phone Number Required",
-        description: "Please enter your phone number to continue.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-      return;
-    }
+    setIsLoading(true);
 
-    // Format phone number validation
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-    if (!phoneRegex.test(phoneNumber.replace(/\s/g, ''))) {
-      toast({
-        title: "❌ Invalid Phone Number",
-        description: "Please enter a valid phone number with country code (e.g., +1234567890).",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-      return;
-    }
+    try {
+      if (!email.trim() || !password.trim()) {
+        toast({
+          title: "❌ Missing Information",
+          description: "Please enter both email and password.",
+          variant: "destructive",
+          className: "border-2 border-red-400 bg-red-50 text-red-800",
+        });
+        return;
+      }
 
-    const result = await sendOTP(phoneNumber);
-    
-    if (result.success) {
-      setStep("otp");
-      toast({
-        title: "📨 Verification Code Sent!",
-        description: "Check your phone for the 6-digit code. It may take a minute to arrive.",
-        className: "border-2 border-green-400 bg-green-50 text-green-800",
-      });
-    } else {
-      toast({
-        title: "❌ Failed to Send Code",
-        description: result.error || "Please check your phone number and try again.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-    }
-  };
+      if (!isLogin && (!fullName.trim() || !phoneNumber.trim())) {
+        toast({
+          title: "❌ Missing Information",
+          description: "Please enter your full name and phone number.",
+          variant: "destructive",
+          className: "border-2 border-red-400 bg-red-50 text-red-800",
+        });
+        return;
+      }
 
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (otp.length !== 6) {
-      toast({
-        title: "❌ Invalid Code",
-        description: "Please enter the complete 6-digit verification code.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-      return;
-    }
+      const redirectUrl = `${window.location.origin}/`;
 
-    const result = await verifyOTP(phoneNumber, otp);
-    
-    if (result.success) {
-      toast({
-        title: "🎉 Welcome to Lingoose!",
-        description: "Phone verification successful. Welcome aboard!",
-        className: "border-2 border-green-400 bg-green-50 text-green-800",
-      });
-      
-      // Small delay to show the success message, then redirect
+      if (isLogin) {
+        // Sign in existing user
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "🎉 Welcome Back!",
+          description: "Successfully signed in to Lingoose!",
+          className: "border-2 border-green-400 bg-green-50 text-green-800",
+        });
+      } else {
+        // Sign up new user
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: redirectUrl,
+            data: {
+              full_name: fullName,
+              phone_number: phoneNumber
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "🎉 Account Created!",
+          description: "Welcome to Lingoose! Please check your email to verify your account.",
+          className: "border-2 border-green-400 bg-green-50 text-green-800",
+        });
+      }
+
+      // Redirect after successful auth
       setTimeout(() => {
         window.location.href = '/';
       }, 1500);
-    } else {
-      toast({
-        title: "❌ Verification Failed",
-        description: result.error || "Please check your code and try again.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-    }
-  };
 
-  const handleResendCode = async () => {
-    const result = await sendOTP(phoneNumber);
-    
-    if (result.success) {
+    } catch (error: any) {
+      console.error('Auth error:', error);
       toast({
-        title: "📨 New Code Sent!",
-        description: "A new verification code has been sent to your phone.",
-        className: "border-2 border-blue-400 bg-blue-50 text-blue-800",
-      });
-    } else {
-      toast({
-        title: "❌ Failed to Resend",
-        description: result.error || "Please try again in a moment.",
+        title: "❌ Authentication Failed",
+        description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
         className: "border-2 border-red-400 bg-red-50 text-red-800",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -130,89 +113,90 @@ const Auth = () => {
         <Card className="border-4 border-slate-400 rounded-2xl bg-white shadow-lg">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-black text-slate-800 uppercase tracking-wide flex items-center justify-center gap-2">
-              {step === "phone" ? <Phone className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
-              {step === "phone" ? "Sign In" : "Enter Code"}
+              <User className="w-6 h-6" />
+              {isLogin ? "Sign In" : "Sign Up"}
             </CardTitle>
             <CardDescription className="text-slate-600 font-bold">
-              {step === "phone" 
-                ? "Enter your phone number to get started" 
-                : `Enter the 6-digit code sent to ${phoneNumber}`
+              {isLogin 
+                ? "Enter your credentials to continue" 
+                : "Create your account to get started"
               }
             </CardDescription>
           </CardHeader>
           
           <CardContent>
-            {step === "phone" ? (
-              <form onSubmit={handleSendOTP} className="space-y-4">
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
-                  <Input
-                    type="tel"
-                    placeholder="Enter your phone number (e.g., +1234567890)"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="pl-10 border-2 border-slate-300 rounded-xl font-bold"
-                    required
-                  />
-                </div>
+            <form onSubmit={handleAuth} className="space-y-4">
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 border-2 border-slate-300 rounded-xl font-bold"
+                  required
+                />
+              </div>
+
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                <Input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 border-2 border-slate-300 rounded-xl font-bold"
+                  required
+                />
+              </div>
+
+              {!isLogin && (
+                <>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                    <Input
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="pl-10 border-2 border-slate-300 rounded-xl font-bold"
+                      required
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                    <Input
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="pl-10 border-2 border-slate-300 rounded-xl font-bold"
+                      required
+                    />
+                  </div>
+                </>
+              )}
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
+              >
+                {isLoading ? (isLogin ? "Signing In..." : "Creating Account...") : (isLogin ? "Sign In" : "Create Account")}
+              </Button>
+
+              <div className="text-center">
                 <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
+                  type="button"
+                  variant="link"
+                  onClick={() => setIsLogin(!isLogin)}
+                  className="text-slate-600 hover:text-slate-800 font-bold"
                 >
-                  {isLoading ? "Sending..." : "Send Verification Code"}
+                  {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
                 </Button>
-              </form>
-            ) : (
-              <form onSubmit={handleVerifyOTP} className="space-y-6">
-                <div className="flex justify-center">
-                  <InputOTP
-                    maxLength={6}
-                    value={otp}
-                    onChange={(value) => setOtp(value)}
-                  >
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} className="border-2 border-slate-300 rounded-lg w-12 h-12 text-xl font-bold" />
-                      <InputOTPSlot index={1} className="border-2 border-slate-300 rounded-lg w-12 h-12 text-xl font-bold" />
-                      <InputOTPSlot index={2} className="border-2 border-slate-300 rounded-lg w-12 h-12 text-xl font-bold" />
-                      <InputOTPSlot index={3} className="border-2 border-slate-300 rounded-lg w-12 h-12 text-xl font-bold" />
-                      <InputOTPSlot index={4} className="border-2 border-slate-300 rounded-lg w-12 h-12 text-xl font-bold" />
-                      <InputOTPSlot index={5} className="border-2 border-slate-300 rounded-lg w-12 h-12 text-xl font-bold" />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-                
-                <div className="space-y-3">
-                  <Button
-                    type="submit"
-                    disabled={isLoading || otp.length !== 6}
-                    className="w-full bg-green-400 hover:bg-green-500 border-4 border-green-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:rotate-1"
-                  >
-                    {isLoading ? "Verifying..." : "Sign In"}
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleResendCode}
-                    disabled={isLoading}
-                    className="w-full border-2 border-blue-300 rounded-xl font-bold text-blue-600 hover:bg-blue-50"
-                  >
-                    Resend Code
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setStep("phone")}
-                    className="w-full border-2 border-slate-300 rounded-xl font-bold"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Phone Entry
-                  </Button>
-                </div>
-              </form>
-            )}
+              </div>
+            </form>
           </CardContent>
         </Card>
       </div>
