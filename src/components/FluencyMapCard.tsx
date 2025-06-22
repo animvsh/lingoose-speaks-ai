@@ -7,37 +7,31 @@ interface FluencyMapCardProps {
   onNavigate: (view: string) => void;
 }
 
-// Mock data for demonstration since the database tables were removed
+// Empty courses and nodes since we don't have real data
 const mockCourses = [
   {
     id: "1",
-    name: "French Basics",
-    language: "French",
-    description: "Learn fundamental French conversation skills"
-  },
-  {
-    id: "2", 
-    name: "Spanish Essentials",
-    language: "Spanish",
-    description: "Master essential Spanish phrases and grammar"
+    name: "N/A",
+    language: "N/A",
+    description: "No courses available"
   }
 ];
 
 const mockNodes = [
-  { id: "1", name: "Greetings", difficulty: "beginner" as const },
-  { id: "2", name: "Numbers", difficulty: "beginner" as const },
-  { id: "3", name: "Family", difficulty: "intermediate" as const },
-  { id: "4", name: "Food", difficulty: "intermediate" as const },
-  { id: "5", name: "Travel", difficulty: "advanced" as const },
-  { id: "6", name: "Business", difficulty: "advanced" as const }
+  { id: "1", name: "N/A", difficulty: "beginner" as const },
+  { id: "2", name: "N/A", difficulty: "beginner" as const },
+  { id: "3", name: "N/A", difficulty: "intermediate" as const },
+  { id: "4", name: "N/A", difficulty: "intermediate" as const },
+  { id: "5", name: "N/A", difficulty: "advanced" as const },
+  { id: "6", name: "N/A", difficulty: "advanced" as const }
 ];
 
 const FluencyMapCard = ({ onNavigate }: FluencyMapCardProps) => {
   const [selectedCourse, setSelectedCourse] = useState<string>("1");
   const [nodeProgress, setNodeProgress] = useState<Record<string, { status: string; fluency: number }>>({
-    "1": { status: "completed", fluency: 100 },
-    "2": { status: "in_progress", fluency: 75 },
-    "3": { status: "available", fluency: 0 },
+    "1": { status: "locked", fluency: 0 },
+    "2": { status: "locked", fluency: 0 },
+    "3": { status: "locked", fluency: 0 },
     "4": { status: "locked", fluency: 0 },
     "5": { status: "locked", fluency: 0 },
     "6": { status: "locked", fluency: 0 }
@@ -74,29 +68,14 @@ const FluencyMapCard = ({ onNavigate }: FluencyMapCardProps) => {
   };
 
   const handleNodeClick = (nodeId: string, currentStatus: string) => {
-    if (currentStatus === 'locked') return;
-    
-    let newStatus = currentStatus;
-    let newFluency = nodeProgress[nodeId]?.fluency || 0;
-    
-    if (currentStatus === 'available') {
-      newStatus = 'in_progress';
-      newFluency = 50;
-    } else if (currentStatus === 'in_progress') {
-      newStatus = 'completed';
-      newFluency = 100;
-    }
-    
-    setNodeProgress(prev => ({
-      ...prev,
-      [nodeId]: { status: newStatus, fluency: newFluency }
-    }));
+    // All nodes are locked since we don't have real data
+    return;
   };
 
   const selectedCourseData = mockCourses.find(c => c.id === selectedCourse);
-  const completedCount = Object.values(nodeProgress).filter(p => p.status === 'completed' || p.status === 'mastered').length;
-  const inProgressCount = Object.values(nodeProgress).filter(p => p.status === 'in_progress').length;
-  const masteredCount = Object.values(nodeProgress).filter(p => p.status === 'mastered').length;
+  const completedCount = 0; // No completed courses
+  const inProgressCount = 0; // No courses in progress
+  const masteredCount = 0; // No mastered courses
 
   return (
     <div className="min-h-screen bg-stone-50 pb-28">
@@ -118,7 +97,7 @@ const FluencyMapCard = ({ onNavigate }: FluencyMapCardProps) => {
         {/* Course Selection */}
         <div className="bg-white rounded-3xl p-6 mb-8 border-4 border-gray-100 hover:border-orange-200 transition-all duration-300 hover:-translate-y-1">
           <h2 className="font-black text-gray-800 mb-4 text-2xl uppercase tracking-wide">
-            {selectedCourseData?.name || 'Select Course'} ✨
+            {selectedCourseData?.name || 'N/A'} ✨
           </h2>
           <p className="text-gray-600 font-semibold text-base mb-6">
             {selectedCourseData?.description}
@@ -128,11 +107,8 @@ const FluencyMapCard = ({ onNavigate }: FluencyMapCardProps) => {
               <Button
                 key={course.id}
                 onClick={() => setSelectedCourse(course.id)}
-                className={`px-6 py-3 rounded-2xl text-base font-black border-4 transition-all duration-300 hover:-translate-y-0.5 ${
-                  selectedCourse === course.id
-                    ? 'bg-orange-400 text-white border-white hover:border-orange-200'
-                    : 'bg-gray-200 text-gray-700 border-white hover:border-gray-200'
-                }`}
+                disabled
+                className={`px-6 py-3 rounded-2xl text-base font-black border-4 transition-all duration-300 bg-gray-200 text-gray-500 border-gray-300 cursor-not-allowed opacity-60`}
               >
                 {course.language} 🌟
               </Button>
@@ -162,36 +138,30 @@ const FluencyMapCard = ({ onNavigate }: FluencyMapCardProps) => {
               return (
                 <div
                   key={node.id}
-                  className="absolute cursor-pointer transition-all duration-300"
+                  className="absolute transition-all duration-300"
                   style={{
                     left: `${Math.min(x, 280)}px`,
                     top: `${Math.min(y, 400)}px`,
                   }}
-                  onClick={() => handleNodeClick(node.id, status)}
                 >
                   {/* Node Circle */}
-                  <div className={`w-20 h-20 rounded-2xl flex items-center justify-center font-black border-4 transition-all duration-300 ${getNodeColor(status)} ${status === 'locked' ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}>
+                  <div className={`w-20 h-20 rounded-2xl flex items-center justify-center font-black border-4 transition-all duration-300 ${getNodeColor(status)} cursor-not-allowed opacity-60`}>
                     {getStatusIcon(status)}
                   </div>
                   
                   {/* Node Label */}
                   <div className="mt-3 text-center">
-                    <div className="text-sm font-black text-gray-700 max-w-[90px] leading-tight">
+                    <div className="text-sm font-black text-gray-500 max-w-[90px] leading-tight">
                       {node.name}
                     </div>
-                    {fluency > 0 && (
-                      <div className="text-sm text-orange-600 font-bold mt-1">
-                        {fluency}% fluent ⭐
-                      </div>
-                    )}
+                    <div className="text-sm text-gray-400 font-bold mt-1">
+                      N/A
+                    </div>
                   </div>
                   
                   {/* Difficulty Badge */}
-                  <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full text-sm font-black flex items-center justify-center text-white border-2 border-white ${
-                    node.difficulty === 'beginner' ? 'bg-green-400' :
-                    node.difficulty === 'intermediate' ? 'bg-yellow-400' : 'bg-red-400'
-                  }`}>
-                    {node.difficulty?.charAt(0).toUpperCase()}
+                  <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full text-sm font-black flex items-center justify-center text-white border-2 border-white bg-gray-400`}>
+                    N
                   </div>
                 </div>
               );
@@ -200,28 +170,28 @@ const FluencyMapCard = ({ onNavigate }: FluencyMapCardProps) => {
         </div>
 
         {/* Progress Summary */}
-        <div className="bg-gradient-to-br from-green-400 to-green-500 rounded-3xl p-6 border-4 border-white hover:border-green-200 transition-all duration-300 hover:-translate-y-1">
+        <div className="bg-gradient-to-br from-gray-400 to-gray-500 rounded-3xl p-6 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-1">
           <h3 className="font-black text-white mb-4 text-2xl uppercase tracking-wide">
             Your Progress 🏆
           </h3>
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-white/95 rounded-2xl p-4 text-center border-2 border-white/50">
-              <div className="text-2xl font-black text-green-700">
-                {completedCount}
+              <div className="text-2xl font-black text-gray-700">
+                N/A
               </div>
-              <div className="text-xs text-green-600 font-bold">COMPLETED ✅</div>
+              <div className="text-xs text-gray-600 font-bold">COMPLETED ✅</div>
             </div>
             <div className="bg-white/95 rounded-2xl p-4 text-center border-2 border-white/50">
-              <div className="text-2xl font-black text-orange-700">
-                {inProgressCount}
+              <div className="text-2xl font-black text-gray-700">
+                N/A
               </div>
-              <div className="text-xs text-orange-600 font-bold">IN PROGRESS ⚡</div>
+              <div className="text-xs text-gray-600 font-bold">IN PROGRESS ⚡</div>
             </div>
             <div className="bg-white/95 rounded-2xl p-4 text-center border-2 border-white/50">
-              <div className="text-2xl font-black text-purple-700">
-                {masteredCount}
+              <div className="text-2xl font-black text-gray-700">
+                N/A
               </div>
-              <div className="text-xs text-purple-600 font-bold">MASTERED 🌟</div>
+              <div className="text-xs text-gray-600 font-bold">MASTERED 🌟</div>
             </div>
           </div>
         </div>

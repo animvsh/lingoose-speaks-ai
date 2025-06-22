@@ -6,53 +6,13 @@ import { useCallLogs } from "@/hooks/useCallLogs";
 const DashboardStats = () => {
   const { data: callLogs = [] } = useCallLogs();
   
-  // Calculate real stats from call logs
-  const totalCalls = callLogs.length;
-  const totalTalkTime = callLogs.reduce((acc, log) => acc + (log.duration || 0), 0);
-  const totalHours = Math.floor(totalTalkTime / 3600);
-  const totalMinutes = Math.floor((totalTalkTime % 3600) / 60);
-  const talkTimeDisplay = totalHours > 0 ? `${totalHours}.${Math.floor(totalMinutes/6)}h` : `${totalMinutes}m`;
-  
-  // Calculate streak (consecutive days with calls)
-  const today = new Date();
-  let currentStreak = 0;
-  const sortedLogs = [...callLogs].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-  
-  for (let i = 0; i < 30; i++) { // Check last 30 days
-    const targetDate = new Date(today);
-    targetDate.setDate(today.getDate() - i);
-    const dateStr = targetDate.toDateString();
-    
-    const hasCallOnDate = sortedLogs.some(log => 
-      new Date(log.created_at).toDateString() === dateStr
-    );
-    
-    if (hasCallOnDate) {
-      currentStreak++;
-    } else if (i > 0) { // Allow today to not have a call yet
-      break;
-    }
-  }
-  
-  // Calculate this week's calls
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(today.getDate() - 7);
-  const thisWeekCalls = callLogs.filter(log => 
-    new Date(log.created_at) >= oneWeekAgo
-  ).length;
-  
-  // Calculate fluency score based on call frequency and duration
-  const avgCallDuration = totalCalls > 0 ? totalTalkTime / totalCalls : 0;
-  const fluencyScore = Math.min(100, Math.floor(
-    (totalCalls * 2) + // 2 points per call
-    (avgCallDuration / 60) + // 1 point per minute average
-    (currentStreak * 3) // 3 points per streak day
-  ));
-  
-  // Calculate active days
-  const uniqueDays = new Set(
-    callLogs.map(log => new Date(log.created_at).toDateString())
-  ).size;
+  // Since we're using mock data, show N/A for all values
+  const totalCalls = "N/A";
+  const talkTimeDisplay = "N/A";
+  const currentStreak = "N/A";
+  const thisWeekCalls = "N/A";
+  const fluencyScore = "N/A";
+  const uniqueDays = "N/A";
 
   return (
     <div className="space-y-6 mb-6">
@@ -70,8 +30,7 @@ const DashboardStats = () => {
               <h3 className="text-lg font-black text-orange-900 uppercase tracking-wide">Total Calls</h3>
               <div className="text-4xl font-black text-orange-900">{totalCalls}</div>
               <div className="flex items-center text-sm">
-                <TrendingUp className="w-4 h-4 text-green-700 mr-1" />
-                <span className="text-green-800 font-bold">+{thisWeekCalls} this week</span>
+                <span className="text-orange-800 font-bold">No data available</span>
               </div>
             </div>
           </CardContent>
@@ -89,8 +48,7 @@ const DashboardStats = () => {
               <h3 className="text-lg font-black text-green-900 uppercase tracking-wide">Talk Time</h3>
               <div className="text-4xl font-black text-green-900">{talkTimeDisplay}</div>
               <div className="flex items-center text-sm">
-                <TrendingUp className="w-4 h-4 text-green-700 mr-1" />
-                <span className="text-green-800 font-bold">Total sessions</span>
+                <span className="text-green-800 font-bold">No data available</span>
               </div>
             </div>
           </CardContent>
@@ -106,10 +64,9 @@ const DashboardStats = () => {
             </div>
             <div className="space-y-2">
               <h3 className="text-lg font-black text-yellow-900 uppercase tracking-wide">Fluency Score</h3>
-              <div className="text-4xl font-black text-yellow-900">{fluencyScore}%</div>
+              <div className="text-4xl font-black text-yellow-900">{fluencyScore}</div>
               <div className="flex items-center text-sm">
-                <TrendingUp className="w-4 h-4 text-green-700 mr-1" />
-                <span className="text-green-800 font-bold">Keep it up!</span>
+                <span className="text-yellow-800 font-bold">No data available</span>
               </div>
             </div>
           </CardContent>
@@ -127,7 +84,7 @@ const DashboardStats = () => {
               <h3 className="text-lg font-black text-red-900 uppercase tracking-wide">Current Streak</h3>
               <div className="text-4xl font-black text-red-900">{currentStreak}</div>
               <div className="flex items-center text-sm">
-                <span className="text-red-800 font-bold">days strong! 🔥</span>
+                <span className="text-red-800 font-bold">No data available</span>
               </div>
             </div>
           </CardContent>
@@ -143,17 +100,14 @@ const DashboardStats = () => {
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-black text-purple-900 mb-2 uppercase tracking-wide">
-                {thisWeekCalls >= 5 ? "Weekly Champion! 🏆" : "Keep Going! 💪"}
+                No Data Available 📊
               </h3>
               <p className="text-purple-800 font-bold">
-                {thisWeekCalls >= 5 
-                  ? `You've completed ${thisWeekCalls} conversations this week. Outstanding!`
-                  : `You've completed ${thisWeekCalls} conversations this week. Try for 5!`
-                }
+                Start using the app to see your progress and achievements here!
               </p>
             </div>
             <div className="text-right">
-              <div className="text-3xl font-black text-purple-900">{thisWeekCalls}/7</div>
+              <div className="text-3xl font-black text-purple-900">N/A</div>
               <div className="text-sm text-purple-800 font-bold uppercase">conversations</div>
             </div>
           </div>
@@ -167,7 +121,7 @@ const DashboardStats = () => {
             <Star className="w-5 h-5 text-white" />
           </div>
           <div className="text-2xl font-black text-pink-900">
-            {totalCalls > 0 ? Math.min(5.0, 3.0 + (fluencyScore / 50)).toFixed(1) : "0.0"}
+            N/A
           </div>
           <div className="text-sm text-pink-800 font-bold uppercase">Avg Rating</div>
         </div>
@@ -176,7 +130,7 @@ const DashboardStats = () => {
             <Target className="w-5 h-5 text-white" />
           </div>
           <div className="text-2xl font-black text-blue-900">
-            {Math.min(100, Math.floor((totalCalls / 30) * 100))}%
+            N/A
           </div>
           <div className="text-sm text-blue-800 font-bold uppercase">Goal Progress</div>
         </div>
