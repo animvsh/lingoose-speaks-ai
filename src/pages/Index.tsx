@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target } from "lucide-react";
@@ -15,6 +14,7 @@ import AddToHomeScreen from "@/components/AddToHomeScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import SplashScreen from "@/components/SplashScreen";
+import AppBar from "@/components/AppBar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useCallLogs } from "@/hooks/useCallLogs";
@@ -266,16 +266,11 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
-      {/* Header */}
-      <div className="px-6 pt-8 pb-6">
-        <div className="flex items-center justify-between">
-          <div className="w-14 h-14"></div>
-          <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide">
-            HOME
-          </h1>
-          <div className="w-14 h-14"></div>
-        </div>
-      </div>
+      <AppBar 
+        title="HOME"
+        showBackButton={false}
+        showLogo={true}
+      />
 
       <div className="px-6 space-y-6">
         {/* Welcome Card */}
