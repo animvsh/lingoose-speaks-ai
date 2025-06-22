@@ -40,7 +40,7 @@ export const usePhoneAuth = () => {
       
       // Try to sign in the test user to see if they exist
       const { data: existingUser, error: signInError } = await supabase.auth.signInWithPassword({
-        email: 'testuser@lingoose.app',
+        email: 'testuser@example.com',
         password: 'testpassword123'
       });
 
@@ -56,7 +56,7 @@ export const usePhoneAuth = () => {
         
         // Create the test user
         const { data: newUser, error: signUpError } = await supabase.auth.signUp({
-          email: 'testuser@lingoose.app',
+          email: 'testuser@example.com',
           password: 'testpassword123',
           options: {
             data: {
@@ -190,7 +190,7 @@ export const usePhoneAuth = () => {
         
         // Sign in as the test user using email and password
         const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email: 'testuser@lingoose.app',
+          email: 'testuser@example.com',
           password: 'testpassword123'
         });
         
@@ -205,7 +205,7 @@ export const usePhoneAuth = () => {
       
       // For real phone numbers, create/sign in normally
       const sanitizedPhone = formattedPhone.replace(/[^0-9]/g, '');
-      const testEmail = `phone${sanitizedPhone}@lingoose.app`;
+      const testEmail = `phone${sanitizedPhone}@example.com`;
       const testPassword = 'phone_auth_secure_' + sanitizedPhone;
       
       console.log('Attempting to sign in with email:', testEmail);
