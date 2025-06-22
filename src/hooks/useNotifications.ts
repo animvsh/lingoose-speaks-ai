@@ -59,12 +59,12 @@ export const useNotifications = () => {
         applicationServerKey: vapidPublicKey
       });
 
-      // Save subscription to database
+      // Save subscription to database - cast to Json type
       const { error } = await supabase
         .from('subscriptions')
         .insert({
           user_id: user.id,
-          subscription: subscription.toJSON()
+          subscription: subscription.toJSON() as any
         });
 
       if (error) throw error;
