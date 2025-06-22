@@ -57,12 +57,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      // Clear localStorage
+      // Set loading state to show smooth transition
+      setLoading(true);
+      
+      // Clear localStorage immediately
       localStorage.removeItem('phone_authenticated');
       localStorage.removeItem('current_user_profile');
       localStorage.removeItem('phone_number');
       
-      // Clear state
+      // Clear state immediately
       setUser(null);
       
       toast({
@@ -70,10 +73,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "You have been signed out successfully.",
       });
       
-      // Redirect to auth page
-      setTimeout(() => {
-        window.location.href = '/auth';
-      }, 500);
+      // Use replace instead of href to avoid the white screen
+      window.location.replace('/auth');
       
     } catch (error: any) {
       console.error('Sign out failed:', error);
@@ -84,9 +85,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('phone_number');
       setUser(null);
       
-      setTimeout(() => {
-        window.location.href = '/auth';
-      }, 500);
+      // Still redirect even on error
+      window.location.replace('/auth');
     }
   };
 

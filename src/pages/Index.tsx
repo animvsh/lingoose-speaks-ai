@@ -39,7 +39,7 @@ const Index = () => {
 
   const handleSplashComplete = () => {
     if (!authLoading && !user) {
-      window.location.href = '/auth';
+      window.location.replace('/auth');
     } else if (user && userProfile) {
       const onboardingComplete = localStorage.getItem('lingooseOnboardingComplete');
       
@@ -57,8 +57,9 @@ const Index = () => {
   };
 
   useEffect(() => {
+    // Redirect to auth if not authenticated, but avoid white screen
     if (!authLoading && !user && currentView !== "splash") {
-      window.location.href = '/auth';
+      window.location.replace('/auth');
     }
   }, [user, authLoading, currentView]);
 
@@ -126,19 +127,30 @@ const Index = () => {
     return <SplashScreen onComplete={handleSplashComplete} />;
   }
 
+  // Show loading screen during auth loading or profile loading
   if (currentView === "loading" || authLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 flex items-center justify-center">
         <div className="text-center">
-          <DuckMascot className="mx-auto mb-4 animate-bounce" />
-          <p className="text-slate-700 font-bold text-lg">Loading your account...</p>
+          <DuckMascot className="mx-auto mb-6 animate-bounce" />
+          <div className="text-2xl font-bold text-orange-600 mb-3">Loading...</div>
+          <p className="text-slate-700 font-medium text-lg">Setting up your account</p>
         </div>
       </div>
     );
   }
 
+  // If no user after loading, redirect will handle it
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <DuckMascot className="mx-auto mb-6" />
+          <div className="text-xl font-bold text-orange-600 mb-3">Redirecting...</div>
+          <p className="text-slate-700 font-medium">Taking you to the login screen</p>
+        </div>
+      </div>
+    );
   }
 
   const handleWelcomeComplete = () => {
