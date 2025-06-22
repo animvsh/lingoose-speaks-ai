@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Phone, CheckCircle, Home, BarChart3, Settings, User, LogOut } from "lucide-react";
+import { Phone, CheckCircle, Home, BarChart3, Settings, User, LogOut, Calendar, Clock, Target, Flame } from "lucide-react";
 import DuckMascot from "@/components/DuckMascot";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
@@ -9,10 +9,6 @@ import AddToHomeScreen from "@/components/AddToHomeScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import SettingsCard from "@/components/SettingsCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
-import DashboardStats from "@/components/DashboardStats";
-import WeeklyChart from "@/components/WeeklyChart";
-import RecentFeedback from "@/components/RecentFeedback";
-import GoalProgress from "@/components/GoalProgress";
 import SplashScreen from "@/components/SplashScreen";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -28,7 +24,6 @@ const Index = () => {
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Handle splash screen completion
   const handleSplashComplete = () => {
     if (!authLoading && !user) {
       window.location.href = '/auth';
@@ -42,12 +37,10 @@ const Index = () => {
         setCurrentView("welcome");
       }
     } else {
-      // Still loading, show loading state
       setCurrentView("loading");
     }
   };
 
-  // Redirect to auth if not authenticated (after splash)
   useEffect(() => {
     if (!authLoading && !user && currentView !== "splash") {
       window.location.href = '/auth';
@@ -56,7 +49,6 @@ const Index = () => {
 
   useEffect(() => {
     if (user && userProfile && currentView === "loading") {
-      // Check if user has already onboarded
       const onboardingComplete = localStorage.getItem('lingooseOnboardingComplete');
       
       if (onboardingComplete) {
@@ -68,12 +60,10 @@ const Index = () => {
     }
   }, [user, userProfile, currentView]);
 
-  // Show splash screen first
   if (currentView === "splash") {
     return <SplashScreen onComplete={handleSplashComplete} />;
   }
 
-  // Show loading while auth is initializing (after splash)
   if (currentView === "loading" || authLoading || profileLoading) {
     return (
       <div className="min-h-screen bg-yellow-100 flex items-center justify-center">
@@ -85,7 +75,6 @@ const Index = () => {
     );
   }
 
-  // Don't render anything if user is not authenticated
   if (!user) {
     return null;
   }
@@ -99,13 +88,11 @@ const Index = () => {
   };
 
   const handleWelcomeComplete = () => {
-    // Check if it's a mobile device and not already added to home screen
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                         (window.navigator as any).standalone === true;
     const addToHomeScreenDismissed = localStorage.getItem('addToHomeScreenDismissed');
     
-    // Show add to home screen prompt if conditions are met
     if (isMobile && !isStandalone && !addToHomeScreenDismissed) {
       setCurrentView("add-to-home");
       setShowAddToHomeScreen(true);
@@ -132,7 +119,7 @@ const Index = () => {
         case "welcome":
           return <WelcomeScreen onComplete={handleWelcomeComplete} />;
         case "add-to-home":
-          return null; // AddToHomeScreen overlay handles this
+          return null;
         case "onboarding":
           return <OnboardingFlow onComplete={handleOnboardingComplete} />;
         case "home":
@@ -177,101 +164,174 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
 }) => {
   const { signOut } = useAuth();
   
+  // Calculate mock progress values
+  const totalCalls = callLogs?.length || 0;
+  const nativeFluency = Math.min(34 + (totalCalls * 2), 85); // Mock progression
+  const streak = 4; // Mock streak
+  const dailyProgress = Math.min((totalCalls * 3), 15); // Mock daily minutes
+  
   return (
     <div className="min-h-screen bg-yellow-100">
-      {/* Fixed App Bar at Top - Higher z-index and proper positioning */}
-      <div className="fixed top-0 left-0 right-0 bg-yellow-100 border-b-4 border-orange-600 px-4 py-4 z-[9999] shadow-lg">
-        <div className="max-w-md mx-auto">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <DuckMascot className="w-12 h-12 mr-3" />
-              <div>
-                <h1 className="text-lg font-black text-orange-600 uppercase tracking-wider">
-                  Hello, {userProfile?.full_name?.split(' ')[0] || 'User'}!
-                </h1>
-                <p className="text-sm text-slate-800 font-bold">Ready to learn?</p>
-              </div>
-            </div>
-            <Button
-              onClick={signOut}
-              variant="ghost"
-              size="sm"
-              className="p-2 text-slate-600 hover:text-slate-800"
-            >
-              <LogOut className="w-5 h-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content with proper top padding */}
-      <div className="pt-28 px-4 pb-28">
-        {/* Welcome Section */}
-        <div className="text-center mb-6">
-          <div className="relative inline-block mb-4">
-            <div className="w-6 h-6 bg-green-400 border-2 border-green-600 rounded-full flex items-center justify-center animate-bounce">
-              <span className="text-xs font-black">✓</span>
+      {/* Clean Header */}
+      <div className="px-6 py-6">
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center">
+            <DuckMascot className="w-10 h-10 mr-3" />
+            <div>
+              <h1 className="text-xl font-bold text-slate-800">
+                Hi {userProfile?.full_name?.split(' ')[0] || 'there'} 👋
+              </h1>
+              <p className="text-sm text-orange-600 font-semibold">
+                You're {nativeFluency}% to native fluency!
+              </p>
             </div>
           </div>
-          <p className="text-slate-800 font-bold text-lg">Ready for today's Hindi adventure?</p>
+          <Button
+            onClick={signOut}
+            variant="ghost"
+            size="sm"
+            className="p-2 text-slate-500 hover:text-slate-700"
+          >
+            <LogOut className="w-5 h-5" />
+          </Button>
         </div>
 
-        {/* Dashboard Content */}
-        <DashboardStats />
-        <WeeklyChart />
-        <RecentFeedback />
-        <GoalProgress />
-
-        {/* Quick Action */}
+        {/* Primary CTA */}
         <div className="mb-8">
           <Button 
             onClick={() => onNavigate("activity")}
-            className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-6 px-6 rounded-2xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-6 rounded-3xl text-lg shadow-lg mb-4"
           >
             <Phone className="w-6 h-6 mr-3" />
-            Start Your Daily Call
+            Start Call
           </Button>
-          <div className="text-center text-sm text-slate-800 mt-3 bg-white border-3 border-slate-400 rounded-full px-4 py-2 font-bold">
-            🔥 {callLogs?.length || 0} calls completed • Total learning time: {Math.floor((callLogs?.reduce((acc, log) => acc + (log.duration || 0), 0) || 0) / 60)} mins
+          
+          <Button 
+            variant="outline"
+            className="w-full border-2 border-orange-200 text-orange-700 font-semibold py-4 px-6 rounded-3xl"
+          >
+            <Calendar className="w-5 h-5 mr-2" />
+            Schedule Call
+          </Button>
+        </div>
+
+        {/* Progress Summary Cards */}
+        <div className="space-y-4 mb-8">
+          {/* Current Progress Summary */}
+          <div className="bg-white rounded-3xl p-6 shadow-lg border border-slate-100">
+            <h3 className="font-bold text-slate-800 mb-4 flex items-center">
+              <Target className="w-5 h-5 mr-2 text-blue-500" />
+              Current Progress
+            </h3>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-black text-blue-600">61%</div>
+                <div className="text-xs text-slate-600">Vocabulary</div>
+              </div>
+              <div>
+                <div className="text-2xl font-black text-green-600">52%</div>
+                <div className="text-xs text-slate-600">Grammar</div>
+              </div>
+              <div>
+                <div className="text-2xl font-black text-purple-600">44%</div>
+                <div className="text-xs text-slate-600">Accent</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Stats Row */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Streak Tracker */}
+            <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-100">
+              <div className="flex items-center justify-center mb-2">
+                <Flame className="w-5 h-5 text-orange-500 mr-2" />
+                <span className="font-bold text-slate-800">{streak}-day streak</span>
+              </div>
+              <div className="text-2xl text-center">🔥</div>
+            </div>
+
+            {/* Daily Goal Status */}
+            <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-100">
+              <div className="flex items-center justify-center mb-2">
+                <Clock className="w-5 h-5 text-green-500 mr-2" />
+                <span className="font-bold text-slate-800 text-sm">Daily Goal</span>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-green-600">{dailyProgress}/15</div>
+                <div className="text-xs text-slate-600">minutes</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Last Topic Recap */}
+          <div className="bg-white rounded-3xl p-4 shadow-lg border border-slate-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-600 mb-1">Last call:</p>
+                <p className="font-bold text-slate-800">Movie Date Gone Wrong 🎬</p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => onNavigate("progress")}
+                className="text-orange-600 hover:text-orange-700"
+              >
+                View Details
+              </Button>
+            </div>
+          </div>
+
+          {/* Notification Preview */}
+          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl p-4 border border-orange-100">
+            <div className="flex items-center">
+              <div className="w-2 h-2 bg-orange-500 rounded-full mr-3 animate-pulse"></div>
+              <p className="text-sm text-orange-800 font-medium">
+                Next practice call in 2h
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Fixed Bottom Navigation - Increased z-index */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-slate-400 px-4 py-4 z-[9999] shadow-lg">
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-4 py-3 safe-area-bottom">
         <div className="max-w-md mx-auto">
-          <div className="flex justify-center space-x-6">
+          <div className="flex justify-center space-x-8">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-16 h-16 bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 rounded-2xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
+              className="flex flex-col items-center py-2 px-3 text-orange-600"
             >
-              <Home className="w-6 h-6" />
+              <Home className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Home</span>
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("progress")}
-              className="w-16 h-16 bg-blue-300 hover:bg-blue-400 border-4 border-blue-600 rounded-2xl text-blue-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
+              className="flex flex-col items-center py-2 px-3 text-slate-500 hover:text-slate-700"
             >
-              <BarChart3 className="w-6 h-6" />
+              <BarChart3 className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Progress</span>
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-16 h-16 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-2xl text-green-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
+              className="flex flex-col items-center py-2 px-3 text-slate-500 hover:text-slate-700"
             >
-              <CheckCircle className="w-6 h-6" />
+              <CheckCircle className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Topics</span>
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-16 h-16 bg-purple-300 hover:bg-purple-400 border-4 border-purple-600 rounded-2xl text-purple-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
+              className="flex flex-col items-center py-2 px-3 text-slate-500 hover:text-slate-700"
             >
-              <Settings className="w-6 h-6" />
+              <Settings className="w-5 h-5 mb-1" />
+              <span className="text-xs font-medium">Settings</span>
             </Button>
           </div>
         </div>
