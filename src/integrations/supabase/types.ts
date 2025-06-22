@@ -509,6 +509,7 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          auth_user_id: string | null
           created_at: string | null
           full_name: string
           id: string
@@ -518,15 +519,17 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          auth_user_id?: string | null
           created_at?: string | null
           full_name: string
-          id: string
+          id?: string
           language?: string | null
           phone_number: string
           preferred_call_time?: string | null
           updated_at?: string | null
         }
         Update: {
+          auth_user_id?: string | null
           created_at?: string | null
           full_name?: string
           id?: string

@@ -199,6 +199,19 @@ export const usePhoneAuth = () => {
           throw new Error('Failed to authenticate test user');
         }
         
+        // Link the test user to existing profile if it exists
+        if (signInData.user) {
+          const { error: linkError } = await supabase
+            .from('user_profiles')
+            .update({ auth_user_id: signInData.user.id })
+            .eq('phone_number', formattedPhone)
+            .is('auth_user_id', null);
+          
+          if (linkError) {
+            console.error('Error linking test user profile:', linkError);
+          }
+        }
+        
         console.log('Test user signed in successfully:', signInData);
         return { success: true };
       }
@@ -218,7 +231,16 @@ export const usePhoneAuth = () => {
       
       if (signInError && signInError.message.includes("Invalid login credentials")) {
         console.log('User does not exist, creating new user...');
-        // User doesn't exist, create them
+        
+        // Check if a profile already exists for this phone number
+        const { data: existingProfile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('phone_number', formattedPhone)
+          .is('auth_user_id', null)
+          .single();
+        
+        // Create auth user
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: testEmail,
           password: testPassword,
@@ -235,11 +257,38 @@ export const usePhoneAuth = () => {
           throw signUpError;
         }
         
+        // If there's an existing profile, link it to the new auth user
+        if (existingProfile && signUpData.user) {
+          const { error: linkError } = await supabase
+            .from('user_profiles')
+            .update({ auth_user_id: signUpData.user.id })
+            .eq('id', existingProfile.id);
+          
+          if (linkError) {
+            console.error('Error linking existing profile:', linkError);
+          } else {
+            console.log('Linked existing profile to new auth user');
+          }
+        }
+        
         console.log('User created successfully:', signUpData);
       } else if (signInError) {
         console.error('Sign in error:', signInError);
         throw signInError;
       } else {
+        // User signed in successfully, link any unlinked profile
+        if (signInData?.user) {
+          const { error: linkError } = await supabase
+            .from('user_profiles')
+            .update({ auth_user_id: signInData.user.id })
+            .eq('phone_number', formattedPhone)
+            .is('auth_user_id', null);
+          
+          if (linkError) {
+            console.error('Error linking profile on sign in:', linkError);
+          }
+        }
+        
         console.log('User signed in successfully:', signInData);
       }
 

@@ -14,14 +14,33 @@ export const useCallInitiation = () => {
         throw new Error('User or activity not found');
       }
 
-      // Get user profile for phone number
-      const { data: userProfile, error: profileError } = await supabase
+      // Get user profile - first try linked profile, then by phone number
+      let userProfile = null;
+      
+      // Try to find profile linked to auth user
+      const { data: linkedProfile } = await supabase
         .from('user_profiles')
         .select('phone_number')
-        .eq('id', user.id)
+        .eq('auth_user_id', user.id)
         .single();
 
-      if (profileError || !userProfile?.phone_number) {
+      if (linkedProfile) {
+        userProfile = linkedProfile;
+      } else {
+        // Try to find by phone number if no linked profile
+        const userPhone = user.phone || user.user_metadata?.phone_number;
+        if (userPhone) {
+          const { data: phoneProfile } = await supabase
+            .from('user_profiles')
+            .select('phone_number')
+            .eq('phone_number', userPhone)
+            .single();
+          
+          userProfile = phoneProfile;
+        }
+      }
+
+      if (!userProfile?.phone_number) {
         throw new Error('Phone number not found. Please update your profile.');
       }
 
