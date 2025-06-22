@@ -9,7 +9,204 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      agent_audit_logs: {
+        Row: {
+          action: Database["public"]["Enums"]["agent_action"]
+          agent_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["agent_action"]
+          agent_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["agent_action"]
+          agent_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      call_logs: {
+        Row: {
+          call_sid: string | null
+          created_at: string | null
+          duration: number | null
+          id: string
+          metadata: Json | null
+          phone_number: string
+          recording_url: string | null
+          status: Database["public"]["Enums"]["call_status"] | null
+          transcript: string | null
+          user_id: string
+        }
+        Insert: {
+          call_sid?: string | null
+          created_at?: string | null
+          duration?: number | null
+          id?: string
+          metadata?: Json | null
+          phone_number: string
+          recording_url?: string | null
+          status?: Database["public"]["Enums"]["call_status"] | null
+          transcript?: string | null
+          user_id: string
+        }
+        Update: {
+          call_sid?: string | null
+          created_at?: string | null
+          duration?: number | null
+          id?: string
+          metadata?: Json | null
+          phone_number?: string
+          recording_url?: string | null
+          status?: Database["public"]["Enums"]["call_status"] | null
+          transcript?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          call_log_id: string | null
+          created_at: string | null
+          id: string
+          message: string
+          metadata: Json | null
+          role: Database["public"]["Enums"]["message_role"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          call_log_id?: string | null
+          created_at?: string | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          role: Database["public"]["Enums"]["message_role"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          call_log_id?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          role?: Database["public"]["Enums"]["message_role"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_call_log_id_fkey"
+            columns: ["call_log_id"]
+            isOneToOne: false
+            referencedRelation: "call_logs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_context: {
+        Row: {
+          context: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          context?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          context?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_context_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string
+          id: string
+          language_goal: string | null
+          persona: Database["public"]["Enums"]["persona_type"] | null
+          phone_number: string
+          proficiency_level:
+            | Database["public"]["Enums"]["proficiency_level"]
+            | null
+          updated_at: string | null
+          voice_preferences: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name: string
+          id: string
+          language_goal?: string | null
+          persona?: Database["public"]["Enums"]["persona_type"] | null
+          phone_number: string
+          proficiency_level?:
+            | Database["public"]["Enums"]["proficiency_level"]
+            | null
+          updated_at?: string | null
+          voice_preferences?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          language_goal?: string | null
+          persona?: Database["public"]["Enums"]["persona_type"] | null
+          phone_number?: string
+          proficiency_level?:
+            | Database["public"]["Enums"]["proficiency_level"]
+            | null
+          updated_at?: string | null
+          voice_preferences?: Json | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +215,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      agent_action: "created" | "called" | "updated"
+      call_status: "completed" | "failed" | "missed" | "in_progress"
+      message_role: "user" | "assistant" | "system"
+      persona_type:
+        | "goose_strict"
+        | "goose_flirty"
+        | "goose_chaotic"
+        | "goose_supportive"
+      proficiency_level: "beginner" | "intermediate" | "advanced"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +338,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      agent_action: ["created", "called", "updated"],
+      call_status: ["completed", "failed", "missed", "in_progress"],
+      message_role: ["user", "assistant", "system"],
+      persona_type: [
+        "goose_strict",
+        "goose_flirty",
+        "goose_chaotic",
+        "goose_supportive",
+      ],
+      proficiency_level: ["beginner", "intermediate", "advanced"],
+    },
   },
 } as const

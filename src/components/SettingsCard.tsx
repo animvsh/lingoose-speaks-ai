@@ -1,12 +1,17 @@
 
 import { Button } from "@/components/ui/button";
-import { Home, BarChart3, CheckCircle, Settings, ChevronRight, Bell, Phone, User, HelpCircle, ArrowLeft } from "lucide-react";
+import { Home, BarChart3, CheckCircle, Settings, ChevronRight, Bell, Phone, User, HelpCircle, ArrowLeft, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface SettingsCardProps {
   onNavigate: (view: string) => void;
 }
 
 const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
+  const { signOut } = useAuth();
+  const { data: userProfile } = useUserProfile();
+
   const settingsItems = [
     { 
       icon: <User className="w-5 h-5" />, 
@@ -17,7 +22,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
     { 
       icon: <User className="w-5 h-5" />, 
       title: "Change Goose Tone", 
-      subtitle: "Current: Chaotic",
+      subtitle: `Current: ${userProfile?.persona?.replace('goose_', '').replace('_', ' ') || 'Chaotic'}`,
       action: () => console.log("Change tone")
     },
     { 
@@ -29,7 +34,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
     { 
       icon: <Phone className="w-5 h-5" />, 
       title: "Manage Number", 
-      subtitle: "+91 98765 43210",
+      subtitle: userProfile?.phone_number || "+91 98765 43210",
       action: () => console.log("Manage number")
     },
     { 
@@ -37,6 +42,12 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
       title: "Help & Support", 
       subtitle: "Get help or report issues",
       action: () => console.log("Help")
+    },
+    { 
+      icon: <LogOut className="w-5 h-5" />, 
+      title: "Sign Out", 
+      subtitle: "Sign out of your account",
+      action: signOut
     }
   ];
 
@@ -56,6 +67,22 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
           </h1>
           <div className="w-12 h-12"></div> {/* Spacer */}
         </div>
+
+        {/* User Profile Info */}
+        {userProfile && (
+          <div className="bg-white border-4 border-slate-400 rounded-2xl p-4 mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-16 h-16 bg-orange-300 border-3 border-orange-600 rounded-xl flex items-center justify-center text-orange-900">
+                <User className="w-8 h-8" />
+              </div>
+              <div>
+                <div className="font-black text-slate-800 text-xl uppercase tracking-wide">{userProfile.full_name}</div>
+                <div className="text-sm text-slate-600 font-bold">Level: {userProfile.proficiency_level}</div>
+                <div className="text-sm text-slate-600 font-bold">Goal: {userProfile.language_goal}</div>
+              </div>
+            </div>
+          </div>
+        )}
         
         <div className="space-y-4 mb-8">
           {settingsItems.map((item, index) => (
@@ -86,7 +113,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation - Now at bottom of content */}
+      {/* Bottom Navigation */}
       <div className="bg-white border-t-4 border-slate-400 px-4 py-4 w-full">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
