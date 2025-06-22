@@ -24,3 +24,53 @@ self.addEventListener('fetch', (event) => {
     )
   );
 });
+
+// Handle push notifications
+self.addEventListener('push', (event) => {
+  let data = {};
+  
+  if (event.data) {
+    data = event.data.json();
+  }
+  
+  const title = data.title || 'Lingoose';
+  const options = {
+    body: data.body || 'You have a new notification!',
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
+    vibrate: [100, 50, 100],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: 1
+    },
+    actions: [
+      {
+        action: 'explore',
+        title: 'Open App',
+        icon: '/favicon.ico'
+      },
+      {
+        action: 'close',
+        title: 'Close',
+        icon: '/favicon.ico'
+      }
+    ]
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  if (event.action === 'explore') {
+    // Open the app
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
+  // Close action is handled by closing the notification
+});

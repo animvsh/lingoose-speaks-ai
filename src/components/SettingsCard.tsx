@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Home, CheckCircle, Settings, ChevronRight, Bell, Phone, User, HelpCircle, ArrowLeft, LogOut, Mail, Lock, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import NotificationsPanel from "./NotificationsPanel";
 
 interface SettingsCardProps {
   onNavigate: (view: string) => void;
@@ -15,19 +16,25 @@ interface SettingsCardProps {
 
 const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   const { signOut, user } = useAuth();
-  const { data: userProfile } = useUserProfile();
+  const { data: userProfile, refetch: refetchProfile } = useUserProfile();
   const { toast } = useToast();
   
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [showFAQ, setShowFAQ] = useState(false);
   
   // Profile form states
-  const [fullName, setFullName] = useState(userProfile?.full_name || "");
-  const [phoneNumber, setPhoneNumber] = useState(userProfile?.phone_number || "");
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Update form values when userProfile changes
+  useEffect(() => {
+    if (userProfile) {
+      setFullName(userProfile.full_name || "");
+      setPhoneNumber(userProfile.phone_number || "");
+    }
+  }, [userProfile]);
 
   const handleSignOut = async () => {
     try {
@@ -63,6 +70,9 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
 
       if (error) throw error;
 
+      // Refetch the profile to update the UI
+      await refetchProfile();
+
       toast({
         title: "✅ Profile Updated",
         description: "Your profile has been updated successfully.",
@@ -91,6 +101,16 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
       return;
     }
 
+    if (newPassword.length < 6) {
+      toast({
+        title: "❌ Password Too Short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+        className: "border-2 border-red-400 bg-red-50 text-red-800",
+      });
+      return;
+    }
+
     setIsUpdating(true);
     try {
       const { error } = await supabase.auth.updateUser({
@@ -100,7 +120,6 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
       if (error) throw error;
 
       setNewPassword("");
-      setCurrentPassword("");
       
       toast({
         title: "✅ Password Updated",
@@ -126,19 +145,23 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   const faqItems = [
     {
       question: "How do I improve my pronunciation?",
-      answer: "Practice regularly with our AI conversations, focus on listening to native speakers, and don't be afraid to make mistakes!"
+      answer: "Practice regularly with our AI conversations, focus on listening to native speakers, and don't be afraid to make mistakes! Our speech recognition will help you identify areas for improvement."
     },
     {
       question: "Can I change my learning pace?",
-      answer: "Yes! You can adjust your daily goals and lesson frequency in the curriculum section."
+      answer: "Yes! You can adjust your daily goals and lesson frequency in the curriculum section. We recommend starting with 10-15 minutes daily and gradually increasing as you build the habit."
     },
     {
       question: "How does the fluency scoring work?",
-      answer: "Our AI analyzes your speech patterns, vocabulary usage, and conversational flow to give you a comprehensive fluency score."
+      answer: "Our AI analyzes your speech patterns, vocabulary usage, grammar accuracy, and conversational flow to give you a comprehensive fluency score from 0-100%."
     },
     {
       question: "Is my data secure?",
-      answer: "Absolutely! We use industry-standard encryption and never share your personal information with third parties."
+      answer: "Absolutely! We use industry-standard encryption and never share your personal information with third parties. Your voice recordings are processed securely and can be deleted anytime."
+    },
+    {
+      question: "How do notifications work?",
+      answer: "You can enable push notifications to get reminded about lessons, achievements, and daily practice. All notifications can be customized or disabled in settings."
     }
   ];
 
@@ -170,7 +193,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               </div>
               <div>
                 <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Change Language</div>
-                <div className="text-sm text-gray-600 font-medium">Current: English</div>
+                <div className="text-sm text-gray-600 font-medium">Current: French (from English)</div>
               </div>
             </div>
             <ChevronRight className="w-6 h-6 text-gray-400" />
@@ -191,7 +214,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
                 <div>
                   <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Notifications</div>
                   <div className="text-sm text-gray-600 font-medium">
-                    {notificationsEnabled ? "Enabled" : "Disabled"}
+                    Manage push notifications
                   </div>
                 </div>
               </div>
@@ -203,22 +226,8 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
           </div>
           
           {expandedSection === 'notifications' && (
-            <div className="px-5 pb-5 border-t border-gray-100 pt-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-gray-700">Daily Reminders</span>
-                <Switch 
-                  checked={notificationsEnabled} 
-                  onCheckedChange={setNotificationsEnabled}
-                />
-              </div>
-              
-              <Button
-                onClick={handleSignOut}
-                className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-2xl flex items-center justify-center space-x-2"
-              >
-                <LogOut className="w-5 h-5" />
-                <span>SIGN OUT</span>
-              </Button>
+            <div className="px-5 pb-5 border-t border-gray-100 pt-4">
+              <NotificationsPanel />
             </div>
           )}
         </div>
@@ -281,8 +290,8 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
                 
                 <Button
                   onClick={handleUpdateProfile}
-                  disabled={isUpdating}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-xl"
+                  disabled={isUpdating || (!fullName.trim() && !phoneNumber.trim())}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-xl disabled:bg-gray-400"
                 >
                   {isUpdating ? "Updating..." : "Update Profile"}
                 </Button>
@@ -298,14 +307,14 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="border-2 border-gray-300 rounded-xl font-medium"
-                    placeholder="Enter new password"
+                    placeholder="Enter new password (min 6 characters)"
                   />
                 </div>
                 
                 <Button
                   onClick={handleUpdatePassword}
-                  disabled={isUpdating}
-                  className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 rounded-xl"
+                  disabled={isUpdating || newPassword.length < 6}
+                  className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 rounded-xl disabled:bg-gray-400"
                 >
                   {isUpdating ? "Updating..." : "Update Password"}
                 </Button>
@@ -322,8 +331,10 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
                 <Phone className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Manage Number</div>
-                <div className="text-sm text-gray-600 font-medium">{userProfile?.phone_number || "+91 98765 43210"}</div>
+                <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">AI Conversation</div>
+                <div className="text-sm text-gray-600 font-medium">
+                  {userProfile?.phone_number || "Set up voice calls"}
+                </div>
               </div>
             </div>
             <ChevronRight className="w-6 h-6 text-gray-400" />
@@ -367,9 +378,9 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
                 {showFAQ && (
                   <div className="space-y-3 mb-4">
                     {faqItems.map((item, index) => (
-                      <div key={index} className="bg-gray-50 rounded-xl p-3">
-                        <h4 className="font-bold text-gray-800 mb-2">{item.question}</h4>
-                        <p className="text-sm text-gray-600">{item.answer}</p>
+                      <div key={index} className="bg-gray-50 rounded-xl p-3 border-2 border-gray-200">
+                        <h4 className="font-bold text-gray-800 mb-2 text-sm">{item.question}</h4>
+                        <p className="text-xs text-gray-600 leading-relaxed">{item.answer}</p>
                       </div>
                     ))}
                   </div>
@@ -378,20 +389,31 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               
               {/* Embedded YouForm */}
               <div className="px-5 pb-5">
-                <div className="bg-gray-50 rounded-xl p-4">
+                <div className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200">
                   <h4 className="font-bold text-gray-800 mb-3 uppercase tracking-wide">Contact Support</h4>
                   <iframe
                     src="https://app.youform.com/forms/i8pgpq7n"
                     width="100%"
                     height="500"
                     frameBorder="0"
-                    className="rounded-lg"
+                    className="rounded-lg border-2 border-gray-300"
                     title="Support Form"
                   />
                 </div>
               </div>
             </div>
           )}
+        </div>
+
+        {/* Sign Out Section */}
+        <div className="bg-red-50 rounded-3xl p-5 border-4 border-red-200">
+          <Button
+            onClick={handleSignOut}
+            className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-2xl flex items-center justify-center space-x-2"
+          >
+            <LogOut className="w-5 h-5" />
+            <span>SIGN OUT</span>
+          </Button>
         </div>
 
         {/* App Info */}
