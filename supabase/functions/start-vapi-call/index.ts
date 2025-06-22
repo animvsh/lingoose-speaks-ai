@@ -40,7 +40,6 @@ serve(async (req) => {
     }
 
     const vapiApiKey = Deno.env.get('VAPI_API_KEY')
-    const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID')
     
     if (!vapiApiKey) {
       return new Response(
@@ -49,18 +48,11 @@ serve(async (req) => {
       )
     }
 
-    if (!twilioAccountSid) {
-      return new Response(
-        JSON.stringify({ error: 'Twilio Account SID not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
     // Format phone number to E.164 format
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
     console.log(`Formatted phone number: ${formattedPhoneNumber}`);
 
-    // Create the call with Vapi.ai using your specific assistant ID
+    // Create the call with Vapi.ai using the structure from your curl request
     const vapiResponse = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
       headers: {
@@ -68,11 +60,16 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        phoneNumber: {
-          twilioPhoneNumber: formattedPhoneNumber,
-          twilioAccountSid: twilioAccountSid
+        assistantId: "d3c48fab-0d85-4e6e-9f22-076b9e3c537c",
+        assistantOverrides: {
+          variableValues: {
+            topic: "Hindi conversation practice"
+          }
         },
-        assistantId: "2a2bb730-69ea-4cf2-99df-9b8c3408bfea"
+        phoneNumberId: "2a2bb730-69ea-4cf2-99df-9b8c3408bfea",
+        customer: {
+          number: formattedPhoneNumber
+        }
       }),
     })
 
