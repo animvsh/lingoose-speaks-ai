@@ -5,9 +5,9 @@ import DuckMascot from "@/components/DuckMascot";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
 import ProgressCard from "@/components/ProgressCard";
+import SettingsCard from "@/components/SettingsCard";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
-import SettingsCard from "@/components/SettingsCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import SplashScreen from "@/components/SplashScreen";
 import { useAuth } from "@/contexts/AuthContext";
@@ -66,7 +66,7 @@ const Index = () => {
 
   if (currentView === "loading" || authLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-yellow-100 flex items-center justify-center">
+      <div className="min-h-screen bg-[#F5F2E8] flex items-center justify-center">
         <div className="text-center">
           <DuckMascot className="mx-auto mb-4 animate-bounce" />
           <p className="text-slate-700 font-bold text-lg">Loading your account...</p>
@@ -166,22 +166,22 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   
   // Calculate mock progress values
   const totalCalls = callLogs?.length || 0;
-  const nativeFluency = Math.min(34 + (totalCalls * 2), 85); // Mock progression
-  const streak = 4; // Mock streak
-  const dailyProgress = Math.min((totalCalls * 3), 15); // Mock daily minutes
+  const nativeFluency = Math.min(34 + (totalCalls * 2), 85);
+  const streak = 4;
+  const dailyProgress = Math.min((totalCalls * 3), 15);
   
   return (
-    <div className="min-h-screen bg-yellow-100">
-      {/* Clean Header */}
-      <div className="px-6 py-6">
-        <div className="flex justify-between items-center mb-8">
+    <div className="min-h-screen bg-[#F5F2E8] pb-24">
+      {/* Header */}
+      <div className="bg-orange-400 rounded-b-[2rem] p-6 mb-6">
+        <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
-            <DuckMascot className="w-10 h-10 mr-3" />
+            <DuckMascot className="w-12 h-12 mr-3" />
             <div>
-              <h1 className="text-xl font-bold text-slate-800">
-                Hi {userProfile?.full_name?.split(' ')[0] || 'there'} 👋
+              <h1 className="text-2xl font-black text-white">
+                Hi {userProfile?.full_name?.split(' ')[0] || 'there'}! 👋
               </h1>
-              <p className="text-sm text-orange-600 font-semibold">
+              <p className="text-orange-100 font-bold text-sm">
                 You're {nativeFluency}% to native fluency!
               </p>
             </div>
@@ -190,148 +190,135 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
             onClick={signOut}
             variant="ghost"
             size="sm"
-            className="p-2 text-slate-500 hover:text-slate-700"
+            className="p-2 text-orange-100 hover:text-white hover:bg-orange-500 rounded-xl"
           >
             <LogOut className="w-5 h-5" />
           </Button>
         </div>
+      </div>
 
+      <div className="px-6 space-y-6">
         {/* Primary CTA */}
-        <div className="mb-8">
-          <Button 
-            onClick={() => onNavigate("activity")}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-6 rounded-3xl text-lg shadow-lg mb-4"
-          >
-            <Phone className="w-6 h-6 mr-3" />
-            Start Call
-          </Button>
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-green-400 to-green-500 rounded-[1.5rem] p-6 border-4 border-green-600 transform hover:scale-[1.02] transition-transform">
+            <Button 
+              onClick={() => onNavigate("activity")}
+              className="w-full bg-transparent hover:bg-green-600/20 text-white font-black py-4 text-lg border-0"
+            >
+              <Phone className="w-6 h-6 mr-3" />
+              START CALL
+            </Button>
+          </div>
           
-          <Button 
-            variant="outline"
-            className="w-full border-2 border-orange-200 text-orange-700 font-semibold py-4 px-6 rounded-3xl"
-          >
-            <Calendar className="w-5 h-5 mr-2" />
-            Schedule Call
-          </Button>
+          <div className="bg-gradient-to-r from-purple-400 to-purple-500 rounded-[1.5rem] p-4 border-4 border-purple-600 transform hover:scale-[1.02] transition-transform">
+            <Button 
+              variant="ghost"
+              className="w-full text-white font-black py-3 hover:bg-purple-600/20 border-0"
+            >
+              <Calendar className="w-5 h-5 mr-2" />
+              SCHEDULE CALL
+            </Button>
+          </div>
         </div>
 
-        {/* Progress Summary Cards */}
-        <div className="space-y-4 mb-8">
-          {/* Current Progress Summary */}
-          <div className="bg-white rounded-3xl p-6 shadow-lg border border-slate-100">
-            <h3 className="font-bold text-slate-800 mb-4 flex items-center">
-              <Target className="w-5 h-5 mr-2 text-blue-500" />
-              Current Progress
-            </h3>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-black text-blue-600">61%</div>
-                <div className="text-xs text-slate-600">Vocabulary</div>
-              </div>
-              <div>
-                <div className="text-2xl font-black text-green-600">52%</div>
-                <div className="text-xs text-slate-600">Grammar</div>
-              </div>
-              <div>
-                <div className="text-2xl font-black text-purple-600">44%</div>
-                <div className="text-xs text-slate-600">Accent</div>
-              </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gradient-to-br from-blue-400 to-blue-500 rounded-[1.5rem] p-6 border-4 border-blue-600 text-center transform hover:scale-105 transition-transform">
+            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 border-2 border-blue-700">
+              <Target className="w-6 h-6 text-white" />
             </div>
+            <div className="text-3xl font-black text-white">{nativeFluency}%</div>
+            <div className="text-sm text-blue-100 font-bold uppercase tracking-wide">PROGRESS</div>
           </div>
 
-          {/* Quick Stats Row */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* Streak Tracker */}
-            <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-100">
-              <div className="flex items-center justify-center mb-2">
-                <Flame className="w-5 h-5 text-orange-500 mr-2" />
-                <span className="font-bold text-slate-800">{streak}-day streak</span>
-              </div>
-              <div className="text-2xl text-center">🔥</div>
+          <div className="bg-gradient-to-br from-pink-400 to-pink-500 rounded-[1.5rem] p-6 border-4 border-pink-600 text-center transform hover:scale-105 transition-transform">
+            <div className="w-12 h-12 bg-pink-600 rounded-xl flex items-center justify-center mx-auto mb-3 border-2 border-pink-700">
+              <Flame className="w-6 h-6 text-white" />
             </div>
+            <div className="text-3xl font-black text-white">{streak}</div>
+            <div className="text-sm text-pink-100 font-bold uppercase tracking-wide">DAY STREAK</div>
+          </div>
+        </div>
 
-            {/* Daily Goal Status */}
-            <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-100">
-              <div className="flex items-center justify-center mb-2">
-                <Clock className="w-5 h-5 text-green-500 mr-2" />
-                <span className="font-bold text-slate-800 text-sm">Daily Goal</span>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-green-600">{dailyProgress}/15</div>
-                <div className="text-xs text-slate-600">minutes</div>
-              </div>
+        {/* Achievement Card */}
+        <div className="bg-gradient-to-r from-green-300 to-green-400 rounded-[1.5rem] p-6 border-4 border-green-500 transform hover:rotate-1 transition-transform">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center border-3 border-green-700">
+              <CheckCircle className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black text-green-800 uppercase tracking-wide">AWESOME!</h3>
+              <p className="text-green-700 font-bold">Last call completed successfully!</p>
+              <p className="text-sm text-green-600 font-medium">Topic: Movie Date Gone Wrong 🎬</p>
             </div>
           </div>
+        </div>
 
-          {/* Last Topic Recap */}
-          <div className="bg-white rounded-3xl p-4 shadow-lg border border-slate-100">
-            <div className="flex items-center justify-between">
+        {/* Daily Goal */}
+        <div className="bg-gradient-to-r from-orange-300 to-orange-400 rounded-[1.5rem] p-4 border-4 border-orange-500">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center border-2 border-orange-700">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <p className="text-sm text-slate-600 mb-1">Last call:</p>
-                <p className="font-bold text-slate-800">Movie Date Gone Wrong 🎬</p>
+                <p className="text-orange-800 font-black text-lg uppercase">DAILY GOAL</p>
+                <p className="text-orange-700 font-bold">{dailyProgress}/15 minutes</p>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => onNavigate("progress")}
-                className="text-orange-600 hover:text-orange-700"
-              >
-                View Details
-              </Button>
             </div>
-          </div>
-
-          {/* Notification Preview */}
-          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl p-4 border border-orange-100">
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-orange-500 rounded-full mr-3 animate-pulse"></div>
-              <p className="text-sm text-orange-800 font-medium">
-                Next practice call in 2h
-              </p>
+            <div className="w-16 h-3 bg-orange-200 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-orange-600 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min((dailyProgress / 15) * 100, 100)}%` }}
+              ></div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-4 py-3 safe-area-bottom">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-slate-300 px-4 py-4 safe-area-bottom">
         <div className="max-w-md mx-auto">
-          <div className="flex justify-center space-x-8">
+          <div className="flex justify-center space-x-6">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="flex flex-col items-center py-2 px-3 text-orange-600"
+              className="w-16 h-16 bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 rounded-2xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
             >
-              <Home className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Home</span>
+              <Home className="w-6 h-6" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => onNavigate("activity")}
+              className="w-16 h-16 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-2xl text-green-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
+            >
+              <Phone className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("progress")}
-              className="flex flex-col items-center py-2 px-3 text-slate-500 hover:text-slate-700"
+              className="w-16 h-16 bg-blue-300 hover:bg-blue-400 border-4 border-blue-600 rounded-2xl text-blue-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
             >
-              <BarChart3 className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Progress</span>
+              <BarChart3 className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="flex flex-col items-center py-2 px-3 text-slate-500 hover:text-slate-700"
+              className="w-16 h-16 bg-purple-300 hover:bg-purple-400 border-4 border-purple-600 rounded-2xl text-purple-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
             >
-              <CheckCircle className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Topics</span>
+              <CheckCircle className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="flex flex-col items-center py-2 px-3 text-slate-500 hover:text-slate-700"
+              className="w-16 h-16 bg-pink-300 hover:bg-pink-400 border-4 border-pink-600 rounded-2xl text-pink-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
             >
-              <Settings className="w-5 h-5 mb-1" />
-              <span className="text-xs font-medium">Settings</span>
+              <Settings className="w-6 h-6" />
             </Button>
           </div>
         </div>
