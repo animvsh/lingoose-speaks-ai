@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -23,8 +24,10 @@ export const usePhoneAuth = () => {
     return phone;
   };
 
-  const createOrFindUserProfile = async (phoneNumber: string) => {
+  const findOrCreateUserProfile = async (phoneNumber: string) => {
     try {
+      console.log('Looking for existing profile with phone:', phoneNumber);
+      
       // Check if a profile already exists for this phone number
       const { data: existingProfile, error: findError } = await supabase
         .from('user_profiles')
@@ -37,6 +40,8 @@ export const usePhoneAuth = () => {
         return existingProfile;
       }
 
+      console.log('No existing profile found, creating new one...');
+      
       // Create new profile if none exists
       const { data: newProfile, error: createError } = await supabase
         .from('user_profiles')
@@ -56,7 +61,7 @@ export const usePhoneAuth = () => {
       console.log('Created new profile:', newProfile.id);
       return newProfile;
     } catch (error) {
-      console.error('Error in createOrFindUserProfile:', error);
+      console.error('Error in findOrCreateUserProfile:', error);
       throw error;
     }
   };
@@ -115,8 +120,8 @@ export const usePhoneAuth = () => {
       const formattedPhone = formatPhoneNumber(phoneNumber);
       console.log('Signing in with phone:', formattedPhone);
       
-      // Ensure user profile exists (create if needed)
-      await createOrFindUserProfile(formattedPhone);
+      // Find or create user profile first (this is safe to do multiple times)
+      const profile = await findOrCreateUserProfile(formattedPhone);
       
       // Check if this is our test phone number
       if (formattedPhone === '+16505188736') {
@@ -138,16 +143,17 @@ export const usePhoneAuth = () => {
           throw new Error('Failed to authenticate test user');
         }
         
-        // Link the test user to existing profile if it exists
-        if (signInData.user) {
+        // Link the test user to the profile if not already linked
+        if (signInData.user && !profile.auth_user_id) {
           const { error: linkError } = await supabase
             .from('user_profiles')
             .update({ auth_user_id: signInData.user.id })
-            .eq('phone_number', formattedPhone)
-            .is('auth_user_id', null);
+            .eq('id', profile.id);
           
           if (linkError) {
             console.error('Error linking test user profile:', linkError);
+          } else {
+            console.log('Linked test user to profile');
           }
         }
         
@@ -188,13 +194,12 @@ export const usePhoneAuth = () => {
           throw signUpError;
         }
         
-        // Link to the existing profile we created earlier
-        if (signUpData.user) {
+        // Link to the existing profile we found/created earlier
+        if (signUpData.user && !profile.auth_user_id) {
           const { error: linkError } = await supabase
             .from('user_profiles')
             .update({ auth_user_id: signUpData.user.id })
-            .eq('phone_number', formattedPhone)
-            .is('auth_user_id', null);
+            .eq('id', profile.id);
           
           if (linkError) {
             console.error('Error linking new profile:', linkError);
@@ -209,15 +214,16 @@ export const usePhoneAuth = () => {
         throw signInError;
       } else {
         // User signed in successfully, link any unlinked profile
-        if (signInData?.user) {
+        if (signInData?.user && !profile.auth_user_id) {
           const { error: linkError } = await supabase
             .from('user_profiles')
             .update({ auth_user_id: signInData.user.id })
-            .eq('phone_number', formattedPhone)
-            .is('auth_user_id', null);
+            .eq('id', profile.id);
           
           if (linkError) {
             console.error('Error linking profile on sign in:', linkError);
+          } else {
+            console.log('Linked existing profile to auth user');
           }
         }
         
