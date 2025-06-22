@@ -47,11 +47,16 @@ serve(async (req) => {
     const vapiApiKey = Deno.env.get('VAPI_API_KEY')
     
     if (!vapiApiKey) {
+      console.error('VAPI_API_KEY environment variable not found')
       return new Response(
-        JSON.stringify({ error: 'VAPI API key not configured' }),
+        JSON.stringify({ error: 'VAPI API key not configured. Please add your VAPI API key to the environment variables.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    // Log the API key length for debugging (without exposing the actual key)
+    console.log(`VAPI API key length: ${vapiApiKey.length} characters`);
+    console.log(`VAPI API key starts with: ${vapiApiKey.substring(0, 10)}...`);
 
     // Format phone number to E.164 format
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
@@ -72,6 +77,19 @@ serve(async (req) => {
       variableValues.previousConversationSummary = lastConversationSummary;
     }
 
+    const requestBody = {
+      assistantId: "d3c48fab-0d85-4e6e-9f22-076b9e3c537c",
+      assistantOverrides: {
+        variableValues: variableValues
+      },
+      phoneNumberId: "84d220a6-8dd1-4808-b31e-a6364ce98885",
+      customer: {
+        number: formattedPhoneNumber
+      }
+    };
+
+    console.log('VAPI request body:', JSON.stringify(requestBody, null, 2));
+
     // Use the conversationalist agent approach with assistantId
     const vapiResponse = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
@@ -79,16 +97,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${vapiApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        assistantId: "d3c48fab-0d85-4e6e-9f22-076b9e3c537c",
-        assistantOverrides: {
-          variableValues: variableValues
-        },
-        phoneNumberId: "84d220a6-8dd1-4808-b31e-a6364ce98885",
-        customer: {
-          number: formattedPhoneNumber
-        }
-      }),
+      body: JSON.stringify(requestBody),
     })
 
     console.log(`VAPI response status: ${vapiResponse.status}`);
@@ -105,6 +114,18 @@ serve(async (req) => {
     } catch (parseError) {
       console.error('Failed to parse VAPI response as JSON:', parseError);
       console.error('Response text was:', responseText);
+      
+      // Handle specific VAPI API authentication errors
+      if (responseText.includes('failed to extract key')) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'VAPI API authentication failed. Please check that your VAPI API key is correctly configured in the environment variables.',
+            details: { responseText, status: vapiResponse.status },
+            help: 'Go to https://dashboard.vapi.ai/account to get your API key and ensure it\'s properly set in your Supabase secrets.'
+          }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
       
       // Handle non-JSON responses
       let errorMessage = 'Failed to start call with Vapi';
