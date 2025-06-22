@@ -30,7 +30,7 @@ serve(async (req) => {
       )
     }
 
-    // Create the call with Vapi.ai
+    // Create the call with Vapi.ai using your specific assistant ID
     const vapiResponse = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
       headers: {
@@ -39,27 +39,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         phoneNumber: phoneNumber,
-        assistant: {
-          model: {
-            provider: "openai",
-            model: "gpt-3.5-turbo",
-            messages: [
-              {
-                role: "system",
-                content: "You are a Hindi language tutor helping someone practice conversational Hindi. Create an engaging roleplay scenario about asking someone out to a movie that goes awkwardly wrong. Focus on teaching reflexive verbs, casual tone, and rejection phrases. Keep the conversation fun and educational."
-              }
-            ]
-          },
-          voice: {
-            provider: "11labs",
-            voiceId: "21m00Tcm4TlvDq8ikWAM"
-          },
-          name: "Hindi Tutor",
-          firstMessage: "नमस्ते! आज हम एक movie date के बारे में बात करेंगे। मैं आपसे awkwardly पूछूंगा। Are you ready?",
-          recordingEnabled: true,
-          endCallMessage: "Great job practicing Hindi today! Keep up the good work!",
-          maxDurationSeconds: 300
-        }
+        assistantId: "2a2bb730-69ea-4cf2-99df-9b8c3408bfea"
       }),
     })
 
@@ -86,8 +66,8 @@ serve(async (req) => {
         call_id: vapiData.id,
         phone_number: phoneNumber,
         status: 'initiated',
-        scenario: 'Movie Date Gone Wrong',
-        learning_focus: ['Reflexive Verbs', 'Casual Tone', 'Rejection Phrases']
+        scenario: 'Hindi Learning Session',
+        learning_focus: ['Conversation Practice', 'Pronunciation', 'Vocabulary']
       })
 
     if (logError) {
