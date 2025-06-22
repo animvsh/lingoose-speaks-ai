@@ -34,7 +34,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
                   <Trophy className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-black text-green-900 mb-2 uppercase tracking-wide">बहुत बढ़िया!</h3>
+                  <h3 className="text-2xl font-black text-green-900 mb-2 uppercase tracking-wide">Awesome!</h3>
                   <p className="text-green-800 font-bold text-lg">Call completed successfully!</p>
                 </div>
               </div>
@@ -67,16 +67,16 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
               </h3>
               <div className="bg-white border-3 border-orange-500 rounded-xl p-4 mb-4">
                 <p className="text-orange-800 font-bold text-sm mb-2">
-                  हमने इस पर पहले भी चर्चा की है, लेकिन 'मिलना' का मतलब है किसी से संयोग से मिलना।
+                  We've discussed this before, but "meeting" means bumping into someone by chance.
                 </p>
                 <p className="text-orange-800 font-bold text-sm">
-                  जब मिलने की योजना बनाई हो तो 'किसी से मिलने जाना' वाक्य का प्रयोग करें!
+                  When you've planned to meet, use the phrase "going to meet someone"!
                 </p>
               </div>
               <div className="flex items-center space-x-3">
                 <User className="w-8 h-8 text-orange-900" />
                 <div className="flex-1">
-                  <p className="text-orange-900 font-bold text-sm mb-2">"हम सिनेमा के सामने मिल सकते हैं..."</p>
+                  <p className="text-orange-900 font-bold text-sm mb-2">"We can meet in front of the cinema..."</p>
                   <div className="w-full bg-orange-200 h-3 rounded-full">
                     <div className="bg-orange-600 h-3 rounded-full w-3/4"></div>
                   </div>
