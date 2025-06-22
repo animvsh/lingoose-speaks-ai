@@ -1,14 +1,9 @@
 
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
-import { Home, CheckCircle, Settings, ChevronRight, Bell, Phone, User, HelpCircle, ArrowLeft, LogOut, Mail, Lock, ChevronDown, ChevronUp } from "lucide-react";
+import { Home, CheckCircle, Settings, ChevronRight, Bell, Phone, User, HelpCircle, ArrowLeft, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import NotificationsPanel from "./NotificationsPanel";
 
 interface SettingsCardProps {
   onNavigate: (view: string) => void;
@@ -16,25 +11,8 @@ interface SettingsCardProps {
 
 const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   const { signOut, user } = useAuth();
-  const { data: userProfile, refetch: refetchProfile } = useUserProfile();
+  const { data: userProfile } = useUserProfile();
   const { toast } = useToast();
-  
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  const [showFAQ, setShowFAQ] = useState(false);
-  
-  // Profile form states
-  const [fullName, setFullName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  // Update form values when userProfile changes
-  useEffect(() => {
-    if (userProfile) {
-      setFullName(userProfile.full_name || "");
-      setPhoneNumber(userProfile.phone_number || "");
-    }
-  }, [userProfile]);
 
   const handleSignOut = async () => {
     try {
@@ -53,117 +31,6 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
       });
     }
   };
-
-  const handleUpdateProfile = async () => {
-    if (!user) return;
-    
-    setIsUpdating(true);
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({
-          full_name: fullName,
-          phone_number: phoneNumber,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      // Refetch the profile to update the UI
-      await refetchProfile();
-
-      toast({
-        title: "✅ Profile Updated",
-        description: "Your profile has been updated successfully.",
-        className: "border-2 border-green-400 bg-green-50 text-green-800",
-      });
-    } catch (error: any) {
-      toast({
-        title: "❌ Update Failed",
-        description: error.message || "Failed to update profile.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const handleUpdatePassword = async () => {
-    if (!newPassword) {
-      toast({
-        title: "❌ Missing Password",
-        description: "Please enter a new password.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      toast({
-        title: "❌ Password Too Short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-      return;
-    }
-
-    setIsUpdating(true);
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) throw error;
-
-      setNewPassword("");
-      
-      toast({
-        title: "✅ Password Updated",
-        description: "Your password has been updated successfully.",
-        className: "border-2 border-green-400 bg-green-50 text-green-800",
-      });
-    } catch (error: any) {
-      toast({
-        title: "❌ Update Failed",
-        description: error.message || "Failed to update password.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
-  };
-
-  const faqItems = [
-    {
-      question: "How do I improve my pronunciation?",
-      answer: "Practice regularly with our AI conversations, focus on listening to native speakers, and don't be afraid to make mistakes! Our speech recognition will help you identify areas for improvement."
-    },
-    {
-      question: "Can I change my learning pace?",
-      answer: "Yes! You can adjust your daily goals and lesson frequency in the curriculum section. We recommend starting with 10-15 minutes daily and gradually increasing as you build the habit."
-    },
-    {
-      question: "How does the fluency scoring work?",
-      answer: "Our AI analyzes your speech patterns, vocabulary usage, grammar accuracy, and conversational flow to give you a comprehensive fluency score from 0-100%."
-    },
-    {
-      question: "Is my data secure?",
-      answer: "Absolutely! We use industry-standard encryption and never share your personal information with third parties. Your voice recordings are processed securely and can be deleted anytime."
-    },
-    {
-      question: "How do notifications work?",
-      answer: "You can enable push notifications to get reminded about lessons, achievements, and daily practice. All notifications can be customized or disabled in settings."
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -201,126 +68,43 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
         </div>
 
         {/* Notifications Section */}
-        <div className="bg-white rounded-3xl border-4 border-gray-200 overflow-hidden">
-          <div
-            className="p-5 cursor-pointer"
-            onClick={() => toggleSection('notifications')}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
-                  <Bell className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Notifications</div>
-                  <div className="text-sm text-gray-600 font-medium">
-                    Manage push notifications
-                  </div>
+        <div 
+          className="bg-white rounded-3xl p-5 border-4 border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => onNavigate("notifications")}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
+                <Bell className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Notifications</div>
+                <div className="text-sm text-gray-600 font-medium">
+                  Manage push notifications
                 </div>
               </div>
-              {expandedSection === 'notifications' ? 
-                <ChevronUp className="w-6 h-6 text-gray-400" /> : 
-                <ChevronDown className="w-6 h-6 text-gray-400" />
-              }
             </div>
+            <ChevronRight className="w-6 h-6 text-gray-400" />
           </div>
-          
-          {expandedSection === 'notifications' && (
-            <div className="px-5 pb-5 border-t border-gray-100 pt-4">
-              <NotificationsPanel />
-            </div>
-          )}
         </div>
 
         {/* Profile Management Section */}
-        <div className="bg-white rounded-3xl border-4 border-gray-200 overflow-hidden">
-          <div
-            className="p-5 cursor-pointer"
-            onClick={() => toggleSection('profile')}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
-                  <User className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Profile Management</div>
-                  <div className="text-sm text-gray-600 font-medium">Update your information</div>
-                </div>
+        <div 
+          className="bg-white rounded-3xl p-5 border-4 border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => onNavigate("profile-management")}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
+                <User className="w-6 h-6 text-white" />
               </div>
-              {expandedSection === 'profile' ? 
-                <ChevronUp className="w-6 h-6 text-gray-400" /> : 
-                <ChevronDown className="w-6 h-6 text-gray-400" />
-              }
+              <div>
+                <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Profile Management</div>
+                <div className="text-sm text-gray-600 font-medium">Update your information</div>
+              </div>
             </div>
+            <ChevronRight className="w-6 h-6 text-gray-400" />
           </div>
-          
-          {expandedSection === 'profile' && (
-            <div className="px-5 pb-5 border-t border-gray-100 pt-4 space-y-4">
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
-                  <Input
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="border-2 border-gray-300 rounded-xl font-medium"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Phone Number</label>
-                  <Input
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="border-2 border-gray-300 rounded-xl font-medium"
-                    placeholder="Enter your phone number"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Email</label>
-                  <Input
-                    value={user?.email || ""}
-                    disabled
-                    className="border-2 border-gray-200 rounded-xl font-medium bg-gray-50"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
-                </div>
-                
-                <Button
-                  onClick={handleUpdateProfile}
-                  disabled={isUpdating || (!fullName.trim() && !phoneNumber.trim())}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-xl disabled:bg-gray-400"
-                >
-                  {isUpdating ? "Updating..." : "Update Profile"}
-                </Button>
-              </div>
-              
-              <div className="border-t border-gray-200 pt-4 space-y-3">
-                <h4 className="font-bold text-gray-800 uppercase tracking-wide">Change Password</h4>
-                
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">New Password</label>
-                  <Input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="border-2 border-gray-300 rounded-xl font-medium"
-                    placeholder="Enter new password (min 6 characters)"
-                  />
-                </div>
-                
-                <Button
-                  onClick={handleUpdatePassword}
-                  disabled={isUpdating || newPassword.length < 6}
-                  className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 rounded-xl disabled:bg-gray-400"
-                >
-                  {isUpdating ? "Updating..." : "Update Password"}
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Phone Management */}
@@ -342,67 +126,22 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
         </div>
 
         {/* Help & Support Section */}
-        <div className="bg-white rounded-3xl border-4 border-gray-200 overflow-hidden">
-          <div
-            className="p-5 cursor-pointer"
-            onClick={() => toggleSection('help')}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
-                  <HelpCircle className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Help & Support</div>
-                  <div className="text-sm text-gray-600 font-medium">Get help or report issues</div>
-                </div>
+        <div 
+          className="bg-white rounded-3xl p-5 border-4 border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => onNavigate("help-support")}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
+                <HelpCircle className="w-6 h-6 text-white" />
               </div>
-              {expandedSection === 'help' ? 
-                <ChevronUp className="w-6 h-6 text-gray-400" /> : 
-                <ChevronDown className="w-6 h-6 text-gray-400" />
-              }
+              <div>
+                <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Help & Support</div>
+                <div className="text-sm text-gray-600 font-medium">Get help or report issues</div>
+              </div>
             </div>
+            <ChevronRight className="w-6 h-6 text-gray-400" />
           </div>
-          
-          {expandedSection === 'help' && (
-            <div className="border-t border-gray-100 space-y-4">
-              {/* FAQ Toggle */}
-              <div className="px-5 pt-4">
-                <Button
-                  onClick={() => setShowFAQ(!showFAQ)}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2 rounded-xl mb-4"
-                >
-                  {showFAQ ? "Hide FAQs" : "Show FAQs"}
-                </Button>
-                
-                {showFAQ && (
-                  <div className="space-y-3 mb-4">
-                    {faqItems.map((item, index) => (
-                      <div key={index} className="bg-gray-50 rounded-xl p-3 border-2 border-gray-200">
-                        <h4 className="font-bold text-gray-800 mb-2 text-sm">{item.question}</h4>
-                        <p className="text-xs text-gray-600 leading-relaxed">{item.answer}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              
-              {/* Embedded YouForm */}
-              <div className="px-5 pb-5">
-                <div className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200">
-                  <h4 className="font-bold text-gray-800 mb-3 uppercase tracking-wide">Contact Support</h4>
-                  <iframe
-                    src="https://app.youform.com/forms/i8pgpq7n"
-                    width="100%"
-                    height="500"
-                    frameBorder="0"
-                    className="rounded-lg border-2 border-gray-300"
-                    title="Support Form"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Sign Out Section */}

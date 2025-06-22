@@ -32,7 +32,7 @@ const Index = () => {
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
 
-  const navigatableViews = ["home", "activity", "progress", "curriculum", "fluency-map", "settings"];
+  const navigatableViews = ["home", "activity", "progress", "curriculum", "fluency-map", "settings", "notifications", "profile-management", "help-support"];
 
   const handleSplashComplete = () => {
     if (!authLoading && !user) {
@@ -194,6 +194,12 @@ const Index = () => {
           return <FluencyMapView onNavigate={handleNavigation} />;
         case "settings":
           return <SettingsView onNavigate={handleNavigation} />;
+        case "notifications":
+          return <NotificationsView onNavigate={handleNavigation} />;
+        case "profile-management":
+          return <ProfileManagementView onNavigate={handleNavigation} />;
+        case "help-support":
+          return <HelpSupportView onNavigate={handleNavigation} />;
         default:
           return <WelcomeScreen onComplete={handleWelcomeComplete} />;
       }
@@ -451,6 +457,18 @@ const FluencyMapView = ({ onNavigate }: { onNavigate: (view: string) => void }) 
 
 const SettingsView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
   <SettingsCard onNavigate={onNavigate} />
+);
+
+const NotificationsView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+  <NotificationsPage onNavigate={onNavigate} />
+);
+
+const ProfileManagementView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+  <ProfileManagementPage onNavigate={onNavigate} />
+);
+
+const HelpSupportView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+  <HelpSupportPage onNavigate={onNavigate} />
 );
 
 export default Index;
