@@ -82,7 +82,7 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
               fullName
             )}
           </h2>
-          <p className="text-gray-600">{user?.email}</p>
+          <p className="text-gray-600">{user?.phone_number}</p>
         </div>
 
         {/* Profile Details */}

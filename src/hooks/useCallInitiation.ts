@@ -27,8 +27,8 @@ export const useCallInitiation = () => {
       if (linkedProfile) {
         userProfile = linkedProfile;
       } else {
-        // Try to find by phone number if no linked profile
-        const userPhone = user.phone || user.user_metadata?.phone_number;
+        // Try to find by phone number from the current user profile
+        const userPhone = user.phone_number;
         if (userPhone) {
           const { data: phoneProfile } = await supabase
             .from('user_profiles')
