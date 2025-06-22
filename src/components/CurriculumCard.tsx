@@ -22,66 +22,66 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FEFEFE]">
+    <div className="min-h-screen bg-gray-50">
       <div className="px-4 pt-6">
         {/* Header with Back Button */}
         <div className="flex items-center justify-between mb-6">
           <Button
             onClick={() => onNavigate("home")}
-            className="w-14 h-14 bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 rounded-3xl text-white transition-colors duration-200"
+            className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 rounded-2xl text-white transition-all duration-200 shadow-lg"
           >
             <ArrowLeft className="w-7 h-7" />
           </Button>
-          <h1 className="text-4xl font-black text-orange-600 uppercase tracking-wider">
+          <h1 className="text-4xl font-black text-gray-800 uppercase tracking-wider">
             Curriculum
           </h1>
           <div className="w-14 h-14"></div> {/* Spacer */}
         </div>
       
-        <div className="bg-gradient-to-r from-orange-300 to-orange-400 border-4 border-orange-600 p-6 rounded-[2rem] mb-8">
+        <div className="bg-gradient-to-br from-orange-400 to-orange-500 p-6 rounded-3xl mb-8 shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-black text-orange-900 text-2xl uppercase tracking-wide">France Theme - Week 2</h2>
-            <span className="text-sm text-orange-800 font-bold bg-orange-100 px-4 py-2 rounded-full border-3 border-orange-400">3/5 complete</span>
+            <h2 className="font-black text-white text-2xl uppercase tracking-wide">France Theme - Week 2</h2>
+            <span className="text-sm text-white font-semibold bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">3/5 complete</span>
           </div>
-          <div className="w-full bg-orange-200 h-5 rounded-full border-3 border-orange-400">
-            <div className="bg-gradient-to-r from-orange-600 to-orange-700 h-full rounded-full w-3/5 border-r-2 border-orange-800"></div>
+          <div className="w-full bg-white/20 h-5 rounded-full backdrop-blur-sm">
+            <div className="bg-white h-full rounded-full w-3/5 shadow-sm"></div>
           </div>
         </div>
         
         <div className="space-y-4 mb-8">
           {curriculumItems.map((item, index) => (
-            <div key={index} className={`flex items-center space-x-4 p-6 rounded-[2rem] border-4 ${
+            <div key={index} className={`flex items-center space-x-4 p-6 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 border ${
               item.completed 
-                ? 'bg-gradient-to-r from-green-300 to-green-400 border-green-600' 
-                : 'bg-gradient-to-r from-slate-300 to-slate-400 border-slate-600'
-            } transition-colors duration-200`}>
-              <div className="text-sm font-black text-slate-800 w-16 uppercase tracking-wide bg-white px-3 py-2 rounded-full border-2 border-slate-400">{item.date}</div>
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center border-4 ${
-                item.completed ? 'bg-green-600 border-green-800' : 'bg-slate-500 border-slate-700'
+                ? 'bg-white border-green-200 hover:border-green-300' 
+                : 'bg-white border-gray-200 hover:border-gray-300'
+            }`}>
+              <div className="text-sm font-bold text-gray-600 w-16 uppercase tracking-wide bg-gray-100 px-3 py-2 rounded-full border border-gray-200">{item.date}</div>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md ${
+                item.completed ? 'bg-gradient-to-br from-green-400 to-green-500' : 'bg-gray-300'
               }`}>
                 <Check className="w-6 h-6 text-white" />
               </div>
               <span className={`font-black flex-1 text-xl uppercase tracking-wide ${
-                item.completed ? 'text-green-900' : 'text-slate-700'
+                item.completed ? 'text-gray-800' : 'text-gray-500'
               }`}>{item.topic}</span>
             </div>
           ))}
         </div>
 
-        <div className="bg-gradient-to-r from-slate-300 to-slate-400 border-4 border-slate-600 p-6 rounded-[2rem] mb-8">
-          <h3 className="font-black text-slate-900 mb-4 flex items-center text-2xl uppercase tracking-wide">
+        <div className="bg-white p-6 rounded-3xl mb-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+          <h3 className="font-black text-gray-800 mb-4 flex items-center text-2xl uppercase tracking-wide">
             <Target className="w-8 h-8 mr-3" />
             Upcoming Unlocks
           </h3>
           {upcomingUnlocks.map((unlock, index) => (
             <div key={index} className="mb-4 last:mb-0">
               <div className="flex justify-between text-lg mb-2">
-                <span className="text-slate-800 font-black uppercase tracking-wide">{unlock.item}</span>
-                <span className="text-slate-700 font-bold bg-slate-100 px-4 py-2 rounded-full border-3 border-slate-400">{unlock.progress}%</span>
+                <span className="text-gray-700 font-black uppercase tracking-wide">{unlock.item}</span>
+                <span className="text-gray-600 font-semibold bg-gray-100 px-4 py-2 rounded-full border border-gray-200">{unlock.progress}%</span>
               </div>
-              <div className="w-full bg-slate-200 h-4 rounded-full border-3 border-slate-400">
+              <div className="w-full bg-gray-200 h-4 rounded-full border border-gray-300">
                 <div 
-                  className="bg-gradient-to-r from-orange-500 to-orange-600 h-full rounded-full transition-all duration-300 border-r-2 border-orange-700"
+                  className="bg-gradient-to-r from-orange-400 to-orange-500 h-full rounded-full transition-all duration-300 shadow-sm"
                   style={{ width: `${unlock.progress}%` }}
                 ></div>
               </div>
@@ -90,15 +90,15 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation - Fixed to show all 4 buttons */}
-      <div className="bg-white border-t-6 border-slate-400 px-4 py-4">
+      {/* Bottom Navigation */}
+      <div className="bg-white/90 backdrop-blur-md border-t border-gray-200 px-4 py-4 shadow-2xl">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-18 h-18 bg-blue-300 hover:bg-blue-400 border-4 border-blue-600 rounded-3xl text-blue-900 transition-colors duration-200"
+              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <Home className="w-7 h-7" />
             </Button>
@@ -106,15 +106,13 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-18 h-18 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-3xl text-green-900 transition-colors duration-200"
-            >
-              <Phone className="w-7 h-7" />
+              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl"
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-18 h-18 bg-purple-400 hover:bg-purple-500 border-4 border-purple-600 rounded-3xl text-white transition-colors duration-200"
+              className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 rounded-2xl text-white transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <CheckCircle className="w-7 h-7" />
             </Button>
@@ -122,7 +120,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-18 h-18 bg-pink-300 hover:bg-pink-400 border-4 border-pink-600 rounded-3xl text-pink-900 transition-colors duration-200"
+              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               <Settings className="w-7 h-7" />
             </Button>
