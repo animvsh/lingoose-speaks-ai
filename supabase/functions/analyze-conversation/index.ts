@@ -36,57 +36,28 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Get conversation data
-    const { data: conversation, error: convError } = await supabase
+    console.log(`Starting analysis for conversation ${conversationId}`);
+
+    // Fetch conversation data
+    const { data: conversation, error: conversationError } = await supabase
       .from('conversations')
       .select('*')
       .eq('id', conversationId)
       .single()
 
-    if (convError || !conversation) {
-      console.error('Error fetching conversation:', convError)
-      return new Response(
-        JSON.stringify({ error: 'Failed to fetch conversation data' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+    if (conversationError || !conversation) {
+      console.error('Error fetching conversation:', conversationError)
+      throw new Error('Conversation not found')
     }
 
-    // Extract conversation transcript and details
-    const conversationData = conversation.conversation_data || {}
-    const transcript = conversationData.transcript || 'No transcript available'
-    const duration = conversation.duration_seconds || 0
+    // Extract transcript from conversation data
+    const conversationData = conversation.conversation_data as any
+    const transcript = conversationData?.transcript || 'No transcript available'
 
-    console.log('Analyzing conversation:', conversationId)
-    console.log('Transcript length:', transcript.length)
+    console.log('Analyzing conversation with transcript length:', transcript.length);
 
-    // Use OpenAI to analyze the conversation
-    const analysisPrompt = `
-    Analyze this Hindi language conversation practice session and provide detailed insights:
-
-    Conversation Transcript: ${transcript}
-    Duration: ${duration} seconds
-    
-    Please provide a comprehensive analysis in JSON format with the following structure:
-    {
-      "conversationSummary": "Brief summary of what was discussed",
-      "skillsIdentified": ["skill1", "skill2", "skill3"],
-      "strengthsObserved": ["strength1", "strength2"],
-      "areasForImprovement": ["area1", "area2"],
-      "vocabularyUsed": ["word1", "word2", "word3"],
-      "grammarPoints": ["point1", "point2"],
-      "fluencyScore": 0-100,
-      "pronunciationScore": 0-100,
-      "comprehensionScore": 0-100,
-      "confidenceLevel": "low/medium/high",
-      "nextSessionRecommendations": ["recommendation1", "recommendation2"],
-      "specificLearningGoals": ["goal1", "goal2"],
-      "culturalContextUsed": ["context1", "context2"]
-    }
-    
-    Focus on practical learning insights that can help improve Hindi language skills.
-    `
-
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Analyze the conversation using OpenAI
+    const analysisResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openaiApiKey}`,
@@ -97,120 +68,91 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert Hindi language teacher and conversation analyst. Provide detailed, actionable insights about language learning progress.'
+            content: `You are an expert language learning coach. Analyze this Hindi conversation and provide:
+            1. A comprehensive analysis of the learner's performance
+            2. Specific areas for improvement
+            3. Personalized recommendations for future practice
+            4. A brief summary of the conversation topic and key points discussed
+            
+            Format your response as JSON with these fields:
+            {
+              "performance_analysis": "detailed analysis",
+              "areas_for_improvement": ["area1", "area2", "area3"],
+              "recommendations": ["rec1", "rec2", "rec3"],
+              "conversation_summary": "brief summary of what was discussed",
+              "confidence_score": 85
+            }`
           },
           {
             role: 'user',
-            content: analysisPrompt
+            content: `Please analyze this Hindi conversation transcript: ${transcript}`
           }
         ],
         temperature: 0.7,
-        max_tokens: 1500
-      })
+        max_tokens: 1000
+      }),
     })
 
-    if (!openaiResponse.ok) {
-      console.error('OpenAI API error:', await openaiResponse.text())
-      return new Response(
-        JSON.stringify({ error: 'Failed to analyze conversation with AI' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+    if (!analysisResponse.ok) {
+      const error = await analysisResponse.text()
+      console.error('OpenAI API error:', error)
+      throw new Error('Failed to analyze conversation with OpenAI')
     }
 
-    const aiAnalysis = await openaiResponse.json()
-    const analysisText = aiAnalysis.choices[0]?.message?.content
+    const analysisData = await analysisResponse.json()
+    const analysisResult = JSON.parse(analysisData.choices[0].message.content)
 
-    if (!analysisText) {
-      return new Response(
-        JSON.stringify({ error: 'No analysis received from AI' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
+    console.log('Analysis completed:', analysisResult);
 
-    let insights
-    try {
-      insights = JSON.parse(analysisText)
-    } catch {
-      // If JSON parsing fails, create a structured response
-      insights = {
-        conversationSummary: analysisText.substring(0, 200) + '...',
-        skillsIdentified: ['conversation', 'pronunciation'],
-        strengthsObserved: ['active participation'],
-        areasForImprovement: ['continued practice needed'],
-        fluencyScore: 50,
-        pronunciationScore: 50,
-        comprehensionScore: 50,
-        confidenceLevel: 'medium'
-      }
-    }
-
-    // Generate learning recommendations based on analysis
-    const learningRecommendations = {
-      nextTopics: insights.nextSessionRecommendations || ['Basic greetings', 'Daily conversations'],
-      focusAreas: insights.areasForImprovement || ['Pronunciation', 'Vocabulary'],
-      difficultyAdjustment: insights.fluencyScore > 70 ? 'increase' : insights.fluencyScore < 40 ? 'decrease' : 'maintain',
-      recommendedPracticeTime: duration < 300 ? 'extend sessions' : 'maintain current duration'
-    }
-
-    // Create comparison analysis
-    const comparisonAnalysis = {
-      sessionNumber: 1, // This could be calculated based on user's conversation history
-      improvementAreas: insights.areasForImprovement || [],
-      progressIndicators: {
-        fluency: insights.fluencyScore || 50,
-        pronunciation: insights.pronunciationScore || 50,
-        comprehension: insights.comprehensionScore || 50
-      }
-    }
-
-    // Calculate overall confidence score
-    const confidenceScore = Math.round((
-      (insights.fluencyScore || 50) + 
-      (insights.pronunciationScore || 50) + 
-      (insights.comprehensionScore || 50)
-    ) / 3)
-
-    // Store insights in database
-    const { data: savedInsights, error: insertError } = await supabase
+    // Store curriculum insights
+    const { error: insightsError } = await supabase
       .from('curriculum_insights')
       .insert({
         user_id: userId,
         phone_number: phoneNumber,
-        insights: insights,
-        learning_recommendations: learningRecommendations,
-        comparison_analysis: comparisonAnalysis,
-        confidence_score: confidenceScore
-      })
-      .select()
-      .single()
-
-    if (insertError) {
-      console.error('Error saving insights:', insertError)
-      return new Response(
-        JSON.stringify({ error: 'Failed to save insights' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Update user profile with conversation summary
-    const conversationSummary = insights.conversationSummary || 'Completed practice session'
-    const { error: updateError } = await supabase
-      .rpc('update_conversation_summary', {
-        p_phone_number: phoneNumber,
-        p_summary: conversationSummary
+        insights: {
+          performance_analysis: analysisResult.performance_analysis,
+          areas_for_improvement: analysisResult.areas_for_improvement,
+          transcript: transcript
+        },
+        learning_recommendations: {
+          recommendations: analysisResult.recommendations,
+          focus_areas: analysisResult.areas_for_improvement
+        },
+        comparison_analysis: {
+          conversation_id: conversationId,
+          analysis_date: new Date().toISOString()
+        },
+        confidence_score: analysisResult.confidence_score || 75
       })
 
-    if (updateError) {
-      console.error('Error updating conversation summary:', updateError)
+    if (insightsError) {
+      console.error('Error storing insights:', insightsError)
+      throw new Error('Failed to store curriculum insights')
     }
 
-    console.log('Successfully analyzed conversation and saved insights')
+    // Update conversation summary in user profile
+    if (analysisResult.conversation_summary) {
+      const { error: summaryError } = await supabase.rpc('update_conversation_summary', {
+        p_user_id: userId,
+        p_summary: analysisResult.conversation_summary
+      });
+
+      if (summaryError) {
+        console.error('Error updating conversation summary:', summaryError);
+        // Don't throw error here as the main analysis was successful
+      } else {
+        console.log('Conversation summary updated successfully');
+      }
+    }
+
+    console.log(`Analysis completed successfully for conversation ${conversationId}`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        insights: savedInsights,
-        message: 'Conversation analyzed successfully' 
+        analysis: analysisResult,
+        message: 'Conversation analyzed and insights stored successfully' 
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

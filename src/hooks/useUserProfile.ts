@@ -1,8 +1,10 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useUserProfile = () => {
+  const queryClient = useQueryClient();
+
   return useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
@@ -14,7 +16,7 @@ export const useUserProfile = () => {
 
       const profile = JSON.parse(userProfile);
       
-      // Optionally fetch fresh data from database
+      // Always fetch fresh data from database to get latest conversation summary
       const { data: freshProfile, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -27,11 +29,52 @@ export const useUserProfile = () => {
         return profile;
       }
 
-      // Update localStorage with fresh data
+      // Update localStorage with fresh data including conversation summary
       localStorage.setItem('current_user_profile', JSON.stringify(freshProfile));
       
       return freshProfile;
     },
     enabled: !!localStorage.getItem('phone_authenticated'),
+    // Refetch more frequently to ensure we have the latest conversation summary
+    staleTime: 30000, // 30 seconds
+    refetchInterval: 60000, // 1 minute
   });
+
+  // Add a method to manually refresh the profile
+  const refreshProfile = () => {
+    queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+  };
+
+  return {
+    ...useQuery({
+      queryKey: ['userProfile'],
+      queryFn: async () => {
+        const userProfile = localStorage.getItem('current_user_profile');
+        if (!userProfile) {
+          throw new Error('No authenticated user');
+        }
+
+        const profile = JSON.parse(userProfile);
+        
+        const { data: freshProfile, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', profile.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching fresh profile:', error);
+          return profile;
+        }
+
+        localStorage.setItem('current_user_profile', JSON.stringify(freshProfile));
+        
+        return freshProfile;
+      },
+      enabled: !!localStorage.getItem('phone_authenticated'),
+      staleTime: 30000,
+      refetchInterval: 60000,
+    }),
+    refreshProfile
+  };
 };
