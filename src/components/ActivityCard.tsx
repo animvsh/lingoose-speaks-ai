@@ -5,6 +5,8 @@ import LearningProgressTree from "./LearningProgressTree";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useUserActivityRatings } from "@/hooks/useUserActivityRatings";
+import { format } from "date-fns";
 
 interface ActivityCardProps {
   onNavigate: (view: string) => void;
@@ -13,6 +15,10 @@ interface ActivityCardProps {
 const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   const [isStartingCall, setIsStartingCall] = useState(false);
   const { toast } = useToast();
+  const { ratings } = useUserActivityRatings();
+
+  // Get the most recent activity rating
+  const lastActivity = ratings?.[0];
 
   const handleStartCall = async () => {
     setIsStartingCall(true);
@@ -49,6 +55,17 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     }
   };
 
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${
+          i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+        }`}
+      />
+    ));
+  };
+
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
       {/* Header */}
@@ -77,6 +94,57 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
             Ready for today's Hindi adventure?
           </p>
         </div>
+
+        {/* Last Activity Panel */}
+        {lastActivity && (
+          <div className="bg-purple-400 rounded-3xl p-6 border-4 border-purple-500 mb-8">
+            <div className="flex items-center mb-4">
+              <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                <CheckCircle className="w-7 h-7 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-white uppercase tracking-wide">
+                  LAST COMPLETED
+                </h3>
+                <p className="text-purple-100 font-medium text-sm">
+                  {lastActivity.activities.name}
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-600 rounded-2xl flex flex-col items-center justify-center border-2 border-purple-700">
+                  <div className="text-2xl font-bold text-white">{lastActivity.rating}</div>
+                  <div className="text-xs text-purple-100 font-medium">STARS</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="bg-purple-300 rounded-2xl p-3 text-center border-2 border-purple-400">
+                <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+                  <Clock className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-sm font-bold text-purple-800">
+                  {lastActivity.duration_seconds ? `${Math.round(lastActivity.duration_seconds / 60)}MIN` : 'N/A'}
+                </div>
+                <div className="text-xs text-purple-700">duration</div>
+              </div>
+              <div className="bg-purple-300 rounded-2xl p-3 text-center border-2 border-purple-400">
+                <div className="w-8 h-8 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-2">
+                  <Target className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-sm font-bold text-purple-800">
+                  {format(new Date(lastActivity.completed_at), 'MMM d')}
+                </div>
+                <div className="text-xs text-purple-700">completed</div>
+              </div>
+            </div>
+
+            {/* Rating Stars */}
+            <div className="flex items-center justify-center space-x-1">
+              {renderStars(lastActivity.rating)}
+            </div>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4 mb-8">
