@@ -155,29 +155,41 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   
   return (
     <div className="min-h-screen bg-yellow-100 pb-24">
-      <div className="px-4 pt-6">
-        {/* Header with sign out button */}
-        <div className="flex justify-between items-start mb-6">
-          <div className="text-center flex-1">
-            <div className="relative inline-block">
-              <DuckMascot className="mx-auto mb-4 hover:scale-110 transition-transform duration-300" />
-              <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400 border-2 border-green-600 rounded-full flex items-center justify-center animate-bounce">
-                <span className="text-xs font-black">✓</span>
+      {/* Fixed App Bar at Top */}
+      <div className="fixed top-0 left-0 right-0 bg-yellow-100 border-b-4 border-orange-600 px-4 py-4 z-50">
+        <div className="max-w-md mx-auto">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <DuckMascot className="w-12 h-12 mr-3" />
+              <div>
+                <h1 className="text-lg font-black text-orange-600 uppercase tracking-wider">
+                  Hello, {userProfile?.full_name?.split(' ')[0] || 'User'}!
+                </h1>
+                <p className="text-sm text-slate-800 font-bold">Ready to learn?</p>
               </div>
             </div>
-            <h1 className="text-3xl font-black text-orange-600 mb-2 uppercase tracking-wider transform -rotate-1">
-              Welcome Back, {userProfile?.full_name || 'User'}!
-            </h1>
-            <p className="text-slate-800 font-bold text-lg">Ready for today's Hindi adventure?</p>
+            <Button
+              onClick={signOut}
+              variant="ghost"
+              size="sm"
+              className="p-2 text-slate-600 hover:text-slate-800"
+            >
+              <LogOut className="w-5 h-5" />
+            </Button>
           </div>
-          <Button
-            onClick={signOut}
-            variant="ghost"
-            size="sm"
-            className="p-2 text-slate-600 hover:text-slate-800"
-          >
-            <LogOut className="w-5 h-5" />
-          </Button>
+        </div>
+      </div>
+
+      {/* Main Content with top padding to account for fixed header */}
+      <div className="px-4 pt-24">
+        {/* Welcome Section */}
+        <div className="text-center mb-6">
+          <div className="relative inline-block mb-4">
+            <div className="w-6 h-6 bg-green-400 border-2 border-green-600 rounded-full flex items-center justify-center animate-bounce">
+              <span className="text-xs font-black">✓</span>
+            </div>
+          </div>
+          <p className="text-slate-800 font-bold text-lg">Ready for today's Hindi adventure?</p>
         </div>
 
         {/* Dashboard Content */}
