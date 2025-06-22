@@ -30,7 +30,7 @@ serve(async (req) => {
   }
 
   try {
-    const { phoneNumber, userId } = await req.json()
+    const { phoneNumber, userId, topic = "Hindi conversation practice" } = await req.json()
     
     if (!phoneNumber || !userId) {
       return new Response(
@@ -51,8 +51,9 @@ serve(async (req) => {
     // Format phone number to E.164 format
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
     console.log(`Formatted phone number: ${formattedPhoneNumber}`);
+    console.log(`Topic: ${topic}`);
 
-    // Create the call with Vapi.ai using the structure from your curl request
+    // Create the call with Vapi.ai using your curl request structure
     const vapiResponse = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
       headers: {
@@ -63,10 +64,10 @@ serve(async (req) => {
         assistantId: "d3c48fab-0d85-4e6e-9f22-076b9e3c537c",
         assistantOverrides: {
           variableValues: {
-            topic: "Hindi conversation practice"
+            topic: topic
           }
         },
-        phoneNumberId: "2a2bb730-69ea-4cf2-99df-9b8c3408bfea",
+        phoneNumberId: "84d220a6-8dd1-4808-b31e-a6364ce98885",
         customer: {
           number: formattedPhoneNumber
         }
@@ -77,8 +78,19 @@ serve(async (req) => {
 
     if (!vapiResponse.ok) {
       console.error('Vapi API error:', vapiData)
+      
+      // Handle specific error cases
+      let errorMessage = 'Failed to start call with Vapi';
+      if (vapiData.message?.includes('Daily Outbound Call Limit')) {
+        errorMessage = 'Daily call limit reached. Please try again tomorrow or contact support.';
+      } else if (vapiData.message?.includes('Invalid phone number')) {
+        errorMessage = 'Invalid phone number format. Please check and try again.';
+      } else if (vapiData.message) {
+        errorMessage = vapiData.message;
+      }
+      
       return new Response(
-        JSON.stringify({ error: 'Failed to start call with Vapi', details: vapiData }),
+        JSON.stringify({ error: errorMessage, details: vapiData }),
         { status: vapiResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -96,13 +108,15 @@ serve(async (req) => {
         call_id: vapiData.id,
         phone_number: formattedPhoneNumber,
         status: 'initiated',
-        scenario: 'Hindi Learning Session',
+        scenario: topic,
         learning_focus: ['Conversation Practice', 'Pronunciation', 'Vocabulary']
       })
 
     if (logError) {
       console.error('Error logging call:', logError)
     }
+
+    console.log(`Call initiated successfully with ID: ${vapiData.id}`);
 
     return new Response(
       JSON.stringify({ 
