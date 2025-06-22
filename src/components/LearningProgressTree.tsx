@@ -1,198 +1,283 @@
 
+import { Trophy, Star, Lock, CheckCircle2, MapPin, Route, Mountain, Home as HomeIcon, Compass } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { CheckCircle, Lock, Clock, ChevronDown, ChevronRight, Trophy, Star, Target } from "lucide-react";
-import { useLearningOutlines } from "@/hooks/useLearningOutlines";
-import { useLearningUnits } from "@/hooks/useLearningUnits";
-import { useSkills } from "@/hooks/useSkills";
-import { useUserProgress } from "@/hooks/useUserProgress";
-import { useAuth } from "@/contexts/AuthContext";
 
 const LearningProgressTree = () => {
-  const { user } = useAuth();
-  const { data: outlines } = useLearningOutlines();
-  const [expandedUnits, setExpandedUnits] = useState<Set<string>>(new Set());
-  const [selectedOutline] = useState(outlines?.[0]); // Use first outline for demo
-  
-  const { data: units } = useLearningUnits(selectedOutline?.id || "");
-  const { miniSkillScores } = useUserProgress();
-
-  const toggleUnit = (unitId: string) => {
-    const newExpanded = new Set(expandedUnits);
-    if (newExpanded.has(unitId)) {
-      newExpanded.delete(unitId);
-    } else {
-      newExpanded.add(unitId);
+  // Mock data for learning nodes in a map-like structure
+  const mapNodes = [
+    { 
+      id: "start", 
+      name: "Starting Village", 
+      type: "village",
+      status: "completed", 
+      x: 20, 
+      y: 80, 
+      progress: 100,
+      description: "Your learning journey begins here"
+    },
+    { 
+      id: "basics", 
+      name: "Grammar Forest", 
+      type: "forest",
+      status: "completed", 
+      x: 35, 
+      y: 60, 
+      progress: 95,
+      description: "Master basic grammar rules"
+    },
+    { 
+      id: "vocabulary", 
+      name: "Vocabulary Lake", 
+      type: "lake",
+      status: "in_progress", 
+      x: 65, 
+      y: 55, 
+      progress: 65,
+      description: "Expand your word knowledge"
+    },
+    { 
+      id: "conversation", 
+      name: "Conversation City", 
+      type: "city",
+      status: "locked", 
+      x: 80, 
+      y: 30, 
+      progress: 0,
+      description: "Practice real conversations"
+    },
+    { 
+      id: "advanced", 
+      name: "Fluency Peak", 
+      type: "mountain",
+      status: "locked", 
+      x: 70, 
+      y: 10, 
+      progress: 0,
+      description: "Achieve native-like fluency"
+    },
+    { 
+      id: "culture", 
+      name: "Culture Harbor", 
+      type: "harbor",
+      status: "available", 
+      x: 45, 
+      y: 35, 
+      progress: 25,
+      description: "Learn cultural context"
     }
-    setExpandedUnits(newExpanded);
+  ];
+
+  // Define paths between nodes
+  const paths = [
+    { from: "start", to: "basics" },
+    { from: "basics", to: "vocabulary" },
+    { from: "basics", to: "culture" },
+    { from: "vocabulary", to: "conversation" },
+    { from: "culture", to: "conversation" },
+    { from: "conversation", to: "advanced" }
+  ];
+
+  const getNodeIcon = (type: string, status: string) => {
+    switch (type) {
+      case "village": return <HomeIcon className="w-5 h-5" />;
+      case "forest": return <span className="text-lg">🌲</span>;
+      case "lake": return <span className="text-lg">🏞️</span>;
+      case "city": return <span className="text-lg">🏙️</span>;
+      case "mountain": return <Mountain className="w-5 h-5" />;
+      case "harbor": return <span className="text-lg">⚓</span>;
+      default: return <MapPin className="w-5 h-5" />;
+    }
   };
 
-  const getUnitProgress = (unitId: string) => {
-    // Mock progress calculation - in real app this would use the database functions
-    return Math.floor(Math.random() * 100);
+  const getNodeColor = (status: string) => {
+    switch (status) {
+      case "completed": return "bg-green-400 border-green-500 text-white hover:bg-green-500";
+      case "in_progress": return "bg-orange-400 border-orange-500 text-white hover:bg-orange-500";
+      case "available": return "bg-blue-400 border-blue-500 text-white hover:bg-blue-500";
+      case "locked": return "bg-gray-300 border-gray-400 text-gray-600";
+      default: return "bg-gray-300 border-gray-400 text-gray-600";
+    }
   };
 
-  const getUnitColor = (index: number) => {
-    const colors = [
-      { bg: "bg-purple-400", border: "border-purple-500", icon: "bg-purple-600", text: "text-purple-800" },
-      { bg: "bg-pink-400", border: "border-pink-500", icon: "bg-pink-600", text: "text-pink-800" },
-      { bg: "bg-indigo-400", border: "border-indigo-500", icon: "bg-indigo-600", text: "text-indigo-800" },
-      { bg: "bg-teal-400", border: "border-teal-500", icon: "bg-teal-600", text: "text-teal-800" },
-    ];
-    return colors[index % colors.length];
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "completed": return <CheckCircle2 className="w-3 h-3" />;
+      case "in_progress": return <Star className="w-3 h-3" />;
+      case "available": return <Compass className="w-3 h-3" />;
+      case "locked": return <Lock className="w-3 h-3" />;
+      default: return <Lock className="w-3 h-3" />;
+    }
   };
-
-  if (!selectedOutline || !units) {
-    return (
-      <div className="bg-gray-200 rounded-3xl p-6 border-4 border-gray-300">
-        <div className="text-center text-gray-500">
-          <div className="w-8 h-8 bg-gray-300 rounded-full mx-auto mb-2 animate-pulse"></div>
-          <p className="text-sm font-bold uppercase">Loading learning path...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="bg-purple-400 rounded-3xl p-6 border-4 border-purple-500">
-        <div className="flex items-center">
-          <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center mr-4">
-            <Target className="w-7 h-7 text-white" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-white uppercase tracking-wide">LEARNING PROGRESS</h3>
-            <p className="text-purple-100 font-medium text-sm">{selectedOutline.name}</p>
-          </div>
-        </div>
+    <div className="bg-gradient-to-br from-sky-100 to-emerald-100 rounded-3xl p-8 border-4 border-white relative overflow-hidden min-h-[500px]">
+      {/* Map Background Elements */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-10 left-10 w-20 h-20 bg-green-200 rounded-full"></div>
+        <div className="absolute top-32 right-16 w-16 h-16 bg-blue-200 rounded-full"></div>
+        <div className="absolute bottom-20 left-20 w-24 h-24 bg-yellow-200 rounded-full"></div>
+        <div className="absolute bottom-10 right-10 w-12 h-12 bg-purple-200 rounded-full"></div>
       </div>
 
-      {/* Units */}
-      <div className="space-y-4">
-        {units.map((unit, index) => {
-          const progress = getUnitProgress(unit.id);
-          const isExpanded = expandedUnits.has(unit.id);
-          const isLocked = index > 0 && getUnitProgress(units[index - 1].id) < 70;
-          const colors = getUnitColor(index);
-          
-          return (
-            <div key={unit.id} className="relative">
-              <div 
-                className={`${colors.bg} rounded-3xl p-6 border-4 ${colors.border} ${
-                  isLocked ? "opacity-50" : "cursor-pointer hover:scale-[1.02] transition-transform"
-                }`}
-                onClick={() => !isLocked && toggleUnit(unit.id)}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-4 flex-1">
-                    {/* Progress Circle */}
-                    <div className={`w-16 h-16 ${colors.icon} rounded-2xl flex items-center justify-center border-2 ${colors.border}`}>
-                      {isLocked ? (
-                        <Lock className="w-6 h-6 text-white" />
-                      ) : progress === 100 ? (
-                        <CheckCircle className="w-6 h-6 text-white" />
-                      ) : (
-                        <span className="text-white font-bold text-lg">{progress}%</span>
-                      )}
-                    </div>
+      {/* Map Title */}
+      <div className="text-center mb-8 relative z-10">
+        <h3 className="text-2xl font-black text-gray-800 uppercase tracking-wide mb-2">
+          YOUR LEARNING MAP 🗺️
+        </h3>
+        <p className="text-gray-600 font-semibold">
+          Explore the world of Hindi language
+        </p>
+      </div>
 
-                    {/* Unit Info */}
-                    <div className="flex-1 min-w-0">
-                      <h4 className={`font-bold text-lg ${isLocked ? "text-gray-600" : "text-white"} uppercase tracking-wide`}>
-                        {unit.name}
-                      </h4>
-                      <p className={`text-sm font-medium ${isLocked ? "text-gray-500" : colors.text.replace('800', '100')}`}>
-                        {unit.description}
-                      </p>
-                      
-                      {/* Progress Bar */}
-                      <div className="mt-3">
-                        <div className="w-full bg-white/30 h-2 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-white rounded-full transition-all duration-500"
-                            style={{ width: `${progress}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+      {/* Map Container */}
+      <div className="relative w-full h-96 bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl border-4 border-white overflow-hidden">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <svg width="100%" height="100%" viewBox="0 0 100 100" className="w-full h-full">
+            <defs>
+              <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#34d399" strokeWidth="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
 
-                  {/* Expand Arrow */}
-                  {!isLocked && (
-                    <div className="ml-4 flex items-center">
-                      {isExpanded ? (
-                        <ChevronDown className="w-6 h-6 text-white" />
-                      ) : (
-                        <ChevronRight className="w-6 h-6 text-white" />
-                      )}
-                    </div>
+        {/* Paths between nodes */}
+        <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
+          {paths.map((path, index) => {
+            const fromNode = mapNodes.find(n => n.id === path.from);
+            const toNode = mapNodes.find(n => n.id === path.to);
+            if (!fromNode || !toNode) return null;
+
+            const fromX = `${fromNode.x}%`;
+            const fromY = `${fromNode.y}%`;
+            const toX = `${toNode.x}%`;
+            const toY = `${toNode.y}%`;
+
+            // Create a curved path
+            const midX = (fromNode.x + toNode.x) / 2;
+            const midY = (fromNode.y + toNode.y) / 2 - 5; // Slight curve
+
+            return (
+              <path
+                key={index}
+                d={`M ${fromX} ${fromY} Q ${midX}% ${midY}% ${toX} ${toY}`}
+                stroke={toNode.status === 'locked' ? '#d1d5db' : '#10b981'}
+                strokeWidth="3"
+                fill="none"
+                strokeDasharray={toNode.status === 'locked' ? '8,4' : 'none'}
+                className="drop-shadow-sm"
+              />
+            );
+          })}
+        </svg>
+
+        {/* Map Nodes */}
+        {mapNodes.map((node) => (
+          <div
+            key={node.id}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
+            style={{ 
+              left: `${node.x}%`, 
+              top: `${node.y}%`,
+              zIndex: 10
+            }}
+          >
+            {/* Main Node */}
+            <div className={`
+              w-16 h-16 rounded-2xl flex flex-col items-center justify-center 
+              border-4 transition-all duration-300 shadow-lg
+              ${getNodeColor(node.status)}
+              ${node.status !== 'locked' ? 'hover:-translate-y-2 hover:shadow-2xl' : ''}
+            `}>
+              <div className="flex items-center justify-center mb-1">
+                {getNodeIcon(node.type, node.status)}
+              </div>
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center border-2 border-gray-200">
+                {getStatusIcon(node.status)}
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            {node.progress > 0 && (
+              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-20">
+                <div className="bg-white rounded-full h-2 border border-gray-200 overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-green-400 to-blue-400 transition-all duration-500"
+                    style={{ width: `${node.progress}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs font-bold text-center mt-1 text-gray-700">
+                  {node.progress}%
+                </div>
+              </div>
+            )}
+
+            {/* Node Info Tooltip */}
+            <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="bg-white rounded-xl p-3 shadow-lg border-2 border-gray-100 min-w-48">
+                <h4 className="font-bold text-gray-800 text-sm mb-1">{node.name}</h4>
+                <p className="text-xs text-gray-600 mb-2">{node.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${
+                    node.status === 'completed' ? 'bg-green-100 text-green-700' :
+                    node.status === 'in_progress' ? 'bg-orange-100 text-orange-700' :
+                    node.status === 'available' ? 'bg-blue-100 text-blue-700' :
+                    'bg-gray-100 text-gray-600'
+                  }`}>
+                    {node.status.replace('_', ' ').toUpperCase()}
+                  </span>
+                  {node.progress > 0 && (
+                    <span className="text-xs font-bold text-gray-700">
+                      {node.progress}%
+                    </span>
                   )}
                 </div>
               </div>
-
-              {/* Expanded Skills */}
-              {isExpanded && !isLocked && (
-                <UnitSkills unitId={unit.id} />
-              )}
+              {/* Tooltip Arrow */}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-white"></div>
             </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
 
-const UnitSkills = ({ unitId }: { unitId: string }) => {
-  const { data: skills } = useSkills(unitId);
-
-  if (!skills) return null;
-
-  const getSkillColor = (index: number) => {
-    const colors = [
-      "bg-green-300 border-green-400",
-      "bg-blue-300 border-blue-400", 
-      "bg-yellow-300 border-yellow-400",
-      "bg-red-300 border-red-400"
-    ];
-    return colors[index % colors.length];
-  };
-
-  return (
-    <div className="ml-4 mt-4 space-y-3">
-      {skills.map((skill, index) => {
-        const progress = Math.floor(Math.random() * 100);
-        const isCompleted = progress === 100;
-        const colorClass = getSkillColor(index);
-        
-        return (
-          <div key={skill.id} className={`${colorClass} rounded-2xl p-4 border-2`}>
-            <div className="flex items-center space-x-3">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                isCompleted ? "bg-green-600" : "bg-gray-600"
-              }`}>
-                {isCompleted ? (
-                  <CheckCircle className="w-5 h-5 text-white" />
-                ) : (
-                  <span className="text-sm font-bold text-white">{index + 1}</span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h5 className="font-bold text-gray-800 text-sm uppercase tracking-wide">{skill.name}</h5>
-                <div className="w-full bg-white/50 h-2 rounded-full mt-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      progress < 50 ? "bg-red-500" : progress < 80 ? "bg-yellow-500" : "bg-green-500"
-                    }`}
-                    style={{ width: `${progress}%` }}
-                  ></div>
+            {/* Node Label */}
+            <div className="absolute top-20 left-1/2 transform -translate-x-1/2 text-center">
+              <div className="bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 border border-gray-200 shadow-sm">
+                <div className="text-xs font-bold text-gray-700 whitespace-nowrap">
+                  {node.name}
                 </div>
               </div>
-              <span className="text-sm font-bold text-gray-800">{progress}%</span>
             </div>
           </div>
-        );
-      })}
+        ))}
+
+        {/* Compass */}
+        <div className="absolute top-4 right-4 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-gray-200 shadow-lg">
+          <Compass className="w-6 h-6 text-gray-600" />
+        </div>
+
+        {/* Legend */}
+        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 border border-gray-200 shadow-lg">
+          <h4 className="text-xs font-bold text-gray-700 mb-2">LEGEND</h4>
+          <div className="space-y-1">
+            <div className="flex items-center text-xs">
+              <div className="w-3 h-3 bg-green-400 rounded mr-2"></div>
+              <span className="text-gray-600">Completed</span>
+            </div>
+            <div className="flex items-center text-xs">
+              <div className="w-3 h-3 bg-orange-400 rounded mr-2"></div>
+              <span className="text-gray-600">In Progress</span>
+            </div>
+            <div className="flex items-center text-xs">
+              <div className="w-3 h-3 bg-blue-400 rounded mr-2"></div>
+              <span className="text-gray-600">Available</span>
+            </div>
+            <div className="flex items-center text-xs">
+              <div className="w-3 h-3 bg-gray-300 rounded mr-2"></div>
+              <span className="text-gray-600">Locked</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
