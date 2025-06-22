@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +28,7 @@ const Auth = () => {
         });
         
         // Create a test user session by signing them up/in with a test email
-        const testEmail = "test@lingoose.app";
+        const testEmail = "testuser@example.com";
         const testPassword = "testpassword123";
         
         // Try to sign in first, if it doesn't exist, sign up
