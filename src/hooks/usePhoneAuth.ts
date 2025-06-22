@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -66,53 +65,6 @@ export const usePhoneAuth = () => {
     }
   };
 
-  const createTestUserIfNotExists = async (): Promise<void> => {
-    try {
-      console.log('Checking if test user exists...');
-      
-      // Try to sign in the test user to see if they exist
-      const { data: existingUser, error: signInError } = await supabase.auth.signInWithPassword({
-        email: 'testuser@example.com',
-        password: 'testpassword123'
-      });
-
-      if (existingUser?.user) {
-        console.log('Test user already exists');
-        // Sign out immediately after checking
-        await supabase.auth.signOut();
-        return;
-      }
-
-      if (signInError && signInError.message.includes("Invalid login credentials")) {
-        console.log('Test user does not exist, creating...');
-        
-        // Create the test user
-        const { data: newUser, error: signUpError } = await supabase.auth.signUp({
-          email: 'testuser@example.com',
-          password: 'testpassword123',
-          options: {
-            data: {
-              full_name: 'Test User',
-              phone_number: '+16505188736'
-            }
-          }
-        });
-
-        if (signUpError) {
-          console.error('Failed to create test user:', signUpError);
-          return;
-        }
-
-        console.log('Test user created successfully:', newUser);
-        
-        // Sign out the newly created user
-        await supabase.auth.signOut();
-      }
-    } catch (error) {
-      console.error('Error handling test user:', error);
-    }
-  };
-
   const signInWithPhone = async (phoneNumber: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     
@@ -125,43 +77,77 @@ export const usePhoneAuth = () => {
       
       // Check if this is our test phone number
       if (formattedPhone === '+16505188736') {
-        console.log('Test phone number detected, ensuring test user exists...');
+        console.log('Test phone number detected, using test user authentication...');
         
-        // Ensure test user exists
-        await createTestUserIfNotExists();
-        
-        console.log('Signing in as test user');
-        
-        // Sign in as the test user using email and password
+        // Try to sign in as the test user directly
         const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
           email: 'testuser@example.com',
           password: 'testpassword123'
         });
         
-        if (signInError) {
-          console.error('Test user sign in error:', signInError);
-          throw new Error('Failed to authenticate test user');
-        }
-        
-        // Link the test user to the profile if not already linked
-        if (signInData.user && !profile.auth_user_id) {
-          const { error: linkError } = await supabase
-            .from('user_profiles')
-            .update({ auth_user_id: signInData.user.id })
-            .eq('id', profile.id);
+        if (signInError && signInError.message.includes("Invalid login credentials")) {
+          console.log('Test user does not exist, creating...');
           
-          if (linkError) {
-            console.error('Error linking test user profile:', linkError);
+          // Create the test user
+          const { data: newUser, error: signUpError } = await supabase.auth.signUp({
+            email: 'testuser@example.com',
+            password: 'testpassword123',
+            options: {
+              data: {
+                full_name: 'Test User',
+                phone_number: '+16505188736'
+              }
+            }
+          });
+
+          if (signUpError) {
+            console.error('Failed to create test user:', signUpError);
+            // Continue with auto-login instead of failing
+            console.log('Falling back to auto-login for test number');
           } else {
-            console.log('Linked test user to profile');
+            console.log('Test user created successfully:', newUser);
+            
+            // Link the new test user to the profile
+            if (newUser.user && !profile.auth_user_id) {
+              const { error: linkError } = await supabase
+                .from('user_profiles')
+                .update({ auth_user_id: newUser.user.id })
+                .eq('id', profile.id);
+              
+              if (linkError) {
+                console.error('Error linking test user profile:', linkError);
+              } else {
+                console.log('Linked test user to profile');
+              }
+            }
+            
+            return { success: true };
           }
+        } else if (signInError) {
+          console.error('Test user sign in error:', signInError);
+          // Continue with auto-login instead of failing
+          console.log('Falling back to auto-login for test number');
+        } else {
+          // Test user signed in successfully
+          if (signInData?.user && !profile.auth_user_id) {
+            const { error: linkError } = await supabase
+              .from('user_profiles')
+              .update({ auth_user_id: signInData.user.id })
+              .eq('id', profile.id);
+            
+            if (linkError) {
+              console.error('Error linking test user profile:', linkError);
+            } else {
+              console.log('Linked test user to profile');
+            }
+          }
+          
+          console.log('Test user signed in successfully:', signInData);
+          return { success: true };
         }
-        
-        console.log('Test user signed in successfully:', signInData);
-        return { success: true };
       }
       
-      // For real phone numbers, create/sign in automatically
+      // For all phone numbers (including test number if test auth failed), use auto-login
       const sanitizedPhone = formattedPhone.replace(/[^0-9]/g, '');
       const testEmail = `phone${sanitizedPhone}@example.com`;
       const testPassword = 'phone_auth_secure_' + sanitizedPhone;
