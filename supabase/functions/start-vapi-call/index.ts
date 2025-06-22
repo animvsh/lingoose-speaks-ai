@@ -24,19 +24,6 @@ function formatPhoneNumber(phoneNumber: string): string {
   return phoneNumber;
 }
 
-// Function to remove +1 prefix from phone number for customer.number field
-function removeCountryCode(phoneNumber: string): string {
-  // Remove +1 prefix if present
-  if (phoneNumber.startsWith('+1')) {
-    return phoneNumber.substring(2);
-  }
-  // Remove just + prefix if present and starts with 1
-  if (phoneNumber.startsWith('+') && phoneNumber.substring(1).startsWith('1')) {
-    return phoneNumber.substring(2);
-  }
-  return phoneNumber;
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -61,14 +48,11 @@ serve(async (req) => {
       )
     }
 
-    // Format phone number to E.164 format for internal use
+    // Format phone number to E.164 format
     const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
-    // Remove +1 prefix for customer.number field
-    const customerPhoneNumber = removeCountryCode(formattedPhoneNumber);
     
     console.log(`Original phone number: ${phoneNumber}`);
-    console.log(`Formatted phone number: ${formattedPhoneNumber}`);
-    console.log(`Customer phone number (without +1): ${customerPhoneNumber}`);
+    console.log(`Formatted phone number (E.164): ${formattedPhoneNumber}`);
     console.log(`Topic: ${topic}`);
 
     // Create the call with Vapi.ai using workflow structure
@@ -89,7 +73,7 @@ serve(async (req) => {
         },
         phoneNumberId: "84d220a6-8dd1-4808-b31e-a6364ce98885",
         customer: {
-          number: customerPhoneNumber
+          number: formattedPhoneNumber
         }
       }),
     })
