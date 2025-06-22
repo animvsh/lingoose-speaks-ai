@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Phone, CheckCircle, Home, BarChart3, Settings, User, LogOut, Calendar, Clock, Target, Flame } from "lucide-react";
+import { Phone, CheckCircle, Home, BarChart3, Settings, User, LogOut, Calendar, Clock, Target, Flame, Trophy, Volume2, MessageCircle, Star } from "lucide-react";
 import DuckMascot from "@/components/DuckMascot";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
@@ -167,30 +167,48 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   // Calculate mock progress values
   const totalCalls = callLogs?.length || 0;
   const nativeFluency = Math.min(34 + (totalCalls * 2), 85);
-  const streak = 4;
-  const dailyProgress = Math.min((totalCalls * 3), 15);
+  const weeklyGain = 4;
+  const newPhrases = 3;
+  const totalMinutes = 7.5;
+  
+  // Score breakdown
+  const pronunciation = 74;
+  const vocabulary = 63;
+  const flow = 61;
+  
+  // Get fluency color based on score
+  const getFluencyColor = (score: number) => {
+    if (score < 30) return "text-red-500";
+    if (score < 60) return "text-orange-500";
+    if (score < 90) return "text-yellow-600";
+    return "text-green-600";
+  };
+  
+  const getFluencyBgColor = (score: number) => {
+    if (score < 30) return "bg-red-500";
+    if (score < 60) return "bg-orange-500";
+    if (score < 90) return "bg-yellow-500";
+    return "bg-green-500";
+  };
   
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-b-3xl p-6 mb-8 shadow-lg">
-        <div className="flex justify-between items-center mb-6">
+      <div className="bg-orange-500 p-6 mb-8">
+        <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <DuckMascot className="w-16 h-16 mr-4" />
+            <DuckMascot className="w-12 h-12 mr-3" />
             <div>
-              <h1 className="text-3xl font-black text-white">
+              <h1 className="text-2xl font-black text-white">
                 Hi {userProfile?.full_name?.split(' ')[0] || 'there'}! 👋
               </h1>
-              <p className="text-orange-100 font-medium text-sm bg-white/20 px-3 py-1 rounded-full mt-2 backdrop-blur-sm">
-                You're {nativeFluency}% to native fluency!
-              </p>
             </div>
           </div>
           <Button
             onClick={signOut}
             variant="ghost"
             size="sm"
-            className="p-3 text-orange-100 hover:text-white hover:bg-white/20 rounded-2xl transition-all duration-200 backdrop-blur-sm"
+            className="p-3 text-orange-100 hover:text-white hover:bg-white/20 rounded-2xl transition-all duration-200"
           >
             <LogOut className="w-6 h-6" />
           </Button>
@@ -198,93 +216,184 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
       </div>
 
       <div className="px-6 space-y-6">
-        {/* Primary CTA */}
-        <div className="space-y-4">
-          <div className="bg-gradient-to-br from-green-400 to-green-500 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <Button 
-              onClick={() => onNavigate("activity")}
-              className="w-full bg-transparent hover:bg-white/20 text-white font-black py-6 text-xl border-0 tracking-wide backdrop-blur-sm"
-            >
-              <Phone className="w-8 h-8 mr-4" />
-              START CALL
-            </Button>
+        {/* Native Fluency Score Card - Hero Element */}
+        <div className="bg-white rounded-3xl p-8 text-center border border-gray-200">
+          <div className="mb-4">
+            <div className={`text-6xl font-black mb-2 ${getFluencyColor(nativeFluency)}`}>
+              {nativeFluency}%
+            </div>
+            <h2 className="text-2xl font-black text-gray-800 mb-2">NATIVE FLUENCY</h2>
+            <p className="text-gray-600 font-semibold">Compared to a native speaker based on speech clarity, vocabulary, and flow</p>
           </div>
           
-          <div className="bg-gradient-to-br from-purple-400 to-purple-500 rounded-3xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <Button 
-              variant="ghost"
-              className="w-full text-white font-black py-4 hover:bg-white/20 border-0 text-lg tracking-wide backdrop-blur-sm"
-            >
-              <Calendar className="w-6 h-6 mr-3" />
-              SCHEDULE CALL
+          {/* Progress Bar */}
+          <div className="w-full bg-gray-200 h-4 rounded-full mb-4">
+            <div 
+              className={`h-full rounded-full transition-all duration-500 ${getFluencyBgColor(nativeFluency)}`}
+              style={{ width: `${nativeFluency}%` }}
+            ></div>
+          </div>
+          
+          {/* Goose Quote */}
+          <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+            <p className="text-gray-700 font-semibold italic">
+              "We're {100 - nativeFluency}% away from sounding like a native! Let's gooo!" 🦆
+            </p>
+          </div>
+        </div>
+
+        {/* Daily Speaking Mission */}
+        <div className="bg-white rounded-3xl p-6 border border-gray-200">
+          <h3 className="text-2xl font-black text-gray-800 mb-3 uppercase tracking-wide">
+            📢 Daily Speaking Mission
+          </h3>
+          <p className="text-lg text-gray-700 font-semibold mb-4">
+            Today's challenge: <strong>Talk your way through a hotel check-in 🇪🇸</strong>
+          </p>
+          <Button 
+            onClick={() => onNavigate("activity")}
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-black py-4 text-xl rounded-2xl transition-all duration-200"
+          >
+            <Phone className="w-6 h-6 mr-3" />
+            START CHATTING
+          </Button>
+        </div>
+
+        {/* Progress Summary */}
+        <div className="bg-white rounded-3xl p-6 border border-gray-200">
+          <h3 className="text-2xl font-black text-gray-800 mb-4 uppercase tracking-wide">
+            📈 Since Last Week
+          </h3>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-3xl font-black text-green-600 mb-1">+{weeklyGain}%</div>
+              <div className="text-sm text-gray-600 font-semibold">Fluency Gain</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-black text-blue-600 mb-1">+{newPhrases}</div>
+              <div className="text-sm text-gray-600 font-semibold">New Phrases</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-black text-purple-600 mb-1">{totalMinutes}m</div>
+              <div className="text-sm text-gray-600 font-semibold">Total Spoken</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Breakdown of Score */}
+        <div className="bg-white rounded-3xl p-6 border border-gray-200">
+          <h3 className="text-2xl font-black text-gray-800 mb-4 uppercase tracking-wide flex items-center">
+            <BarChart3 className="w-6 h-6 mr-3" />
+            Score Breakdown
+          </h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Volume2 className="w-5 h-5 mr-3 text-blue-500" />
+                <span className="font-bold text-gray-800">Pronunciation</span>
+              </div>
+              <div className="flex items-center">
+                <span className="font-black text-lg mr-3">{pronunciation}%</span>
+                <div className="w-16 h-3 bg-gray-200 rounded-full">
+                  <div className="bg-blue-500 h-full rounded-full" style={{ width: `${pronunciation}%` }}></div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <MessageCircle className="w-5 h-5 mr-3 text-green-500" />
+                <span className="font-bold text-gray-800">Vocabulary Variety</span>
+              </div>
+              <div className="flex items-center">
+                <span className="font-black text-lg mr-3">{vocabulary}%</span>
+                <div className="w-16 h-3 bg-gray-200 rounded-full">
+                  <div className="bg-green-500 h-full rounded-full" style={{ width: `${vocabulary}%` }}></div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Target className="w-5 h-5 mr-3 text-purple-500" />
+                <span className="font-bold text-gray-800">Flow & Recovery</span>
+              </div>
+              <div className="flex items-center">
+                <span className="font-black text-lg mr-3">{flow}%</span>
+                <div className="w-16 h-3 bg-gray-200 rounded-full">
+                  <div className="bg-purple-500 h-full rounded-full" style={{ width: `${flow}%` }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <Button 
+            variant="ghost"
+            className="w-full mt-4 text-gray-600 hover:text-gray-700 font-bold"
+          >
+            👀 View Detailed Report
+          </Button>
+        </div>
+
+        {/* Your Goose Remembers */}
+        <div className="bg-white rounded-3xl p-6 border border-gray-200">
+          <h3 className="text-2xl font-black text-gray-800 mb-4 uppercase tracking-wide">
+            🐣 Your Goose Remembers...
+          </h3>
+          <div className="bg-orange-50 rounded-2xl p-4 border border-orange-200 mb-4">
+            <p className="text-gray-700 font-semibold italic">
+              "Yesterday you struggled with gendered nouns in French — want to practice that again?"
+            </p>
+          </div>
+          <div className="flex space-x-3">
+            <Button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-2xl">
+              🔁 Retry
+            </Button>
+            <Button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-2xl">
+              🧠 Teach Me Again
             </Button>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-6">
-          <div className="bg-gradient-to-br from-blue-400 to-blue-500 rounded-3xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-              <Target className="w-8 h-8 text-white" />
-            </div>
-            <div className="text-4xl font-black text-white mb-2">{nativeFluency}%</div>
-            <div className="text-sm text-blue-100 font-medium uppercase tracking-wide bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">PROGRESS</div>
-          </div>
-
-          <div className="bg-gradient-to-br from-pink-400 to-pink-500 rounded-3xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-              <Flame className="w-8 h-8 text-white" />
-            </div>
-            <div className="text-4xl font-black text-white mb-2">{streak}</div>
-            <div className="text-sm text-pink-100 font-medium uppercase tracking-wide bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">DAY STREAK</div>
-          </div>
-        </div>
-
-        {/* Achievement Card */}
-        <div className="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-          <div className="flex items-center space-x-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-500 rounded-2xl flex items-center justify-center shadow-md">
-              <CheckCircle className="w-10 h-10 text-white" />
-            </div>
-            <div>
-              <h3 className="text-3xl font-black text-gray-800 uppercase tracking-wide mb-1">AWESOME!</h3>
-              <p className="text-gray-600 font-semibold text-lg mb-2">Last call completed successfully!</p>
-              <p className="text-sm text-gray-500 font-medium bg-gray-100 px-3 py-1 rounded-full inline-block">Topic: Movie Date Gone Wrong 🎬</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Daily Goal */}
-        <div className="bg-white rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-md">
-                <Clock className="w-8 h-8 text-white" />
-              </div>
+        {/* Explore & Customize */}
+        <div className="bg-white rounded-3xl p-6 border border-gray-200">
+          <h3 className="text-2xl font-black text-gray-800 mb-4 uppercase tracking-wide">
+            🧰 Explore & Customize
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            <Button variant="ghost" className="p-4 h-auto text-left bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-2xl">
               <div>
-                <p className="text-gray-800 font-black text-xl uppercase tracking-wide mb-1">DAILY GOAL</p>
-                <p className="text-gray-600 font-semibold text-lg">{dailyProgress}/15 minutes</p>
+                <div className="font-bold text-gray-800 mb-1">✨ Pick Your Topic</div>
               </div>
-            </div>
-            <div className="w-20 h-4 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min((dailyProgress / 15) * 100, 100)}%` }}
-              ></div>
-            </div>
+            </Button>
+            <Button variant="ghost" className="p-4 h-auto text-left bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-2xl">
+              <div>
+                <div className="font-bold text-gray-800 mb-1">💬 Change Goose</div>
+              </div>
+            </Button>
+            <Button variant="ghost" className="p-4 h-auto text-left bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-2xl">
+              <div>
+                <div className="font-bold text-gray-800 mb-1">🌐 New Language</div>
+              </div>
+            </Button>
+            <Button variant="ghost" className="p-4 h-auto text-left bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-2xl">
+              <div>
+                <div className="font-bold text-gray-800 mb-1">🪄 Custom Challenge</div>
+              </div>
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200 px-4 py-4 safe-area-bottom shadow-2xl">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-4">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 rounded-2xl text-white transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="w-16 h-16 bg-orange-500 hover:bg-orange-600 rounded-2xl text-white transition-all duration-200"
             >
               <Home className="w-7 h-7" />
             </Button>
@@ -292,7 +401,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 transition-all duration-200"
             >
               <Phone className="w-7 h-7" />
             </Button>
@@ -300,7 +409,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 transition-all duration-200"
             >
               <CheckCircle className="w-7 h-7" />
             </Button>
@@ -308,7 +417,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 transition-all duration-200"
             >
               <Settings className="w-7 h-7" />
             </Button>
