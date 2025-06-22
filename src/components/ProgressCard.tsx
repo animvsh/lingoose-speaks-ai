@@ -5,6 +5,7 @@ import { useUserActivityRatings } from "@/hooks/useUserActivityRatings";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { format, subDays, isAfter } from "date-fns";
 import { useMemo } from "react";
+import AppBar from "./AppBar";
 
 interface ProgressCardProps {
   onNavigate: (view: string) => void;
@@ -150,30 +151,21 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
 
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
-      {/* Header */}
-      <div className="px-6 pt-8 pb-6">
-        <div className="flex items-center justify-between">
-          <Button
-            onClick={() => onNavigate("home")}
-            className="w-12 h-12 bg-white hover:bg-gray-50 rounded-xl text-gray-700 shadow-sm border border-gray-200"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
-            ANALYTICS
-          </h1>
-          <div className="w-12 h-12"></div>
-        </div>
-      </div>
+      {/* Header with AppBar */}
+      <AppBar 
+        title="PROGRESS" 
+        onBack={() => onNavigate("home")} 
+        showBackButton={true} 
+      />
 
       <div className="px-6 space-y-6">
-        {/* Welcome Section */}
+        {/* This Week Section */}
         <div className="text-center mb-8">
           <h2 className="text-4xl font-bold text-orange-600 mb-2 uppercase tracking-wide">
-            YOUR PROGRESS
+            THIS WEEK
           </h2>
           <p className="text-xl font-semibold text-gray-700">
-            Here's how you're doing!
+            Your learning analytics
           </p>
         </div>
 

@@ -230,6 +230,39 @@ export type Database = {
           },
         ]
       }
+      pronunciation_results: {
+        Row: {
+          audio_url: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          language: string | null
+          overall_score: number | null
+          post_id: string | null
+          text: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          language?: string | null
+          overall_score?: number | null
+          post_id?: string | null
+          text?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          language?: string | null
+          overall_score?: number | null
+          post_id?: string | null
+          text?: string | null
+        }
+        Relationships: []
+      }
       skills: {
         Row: {
           created_at: string | null
