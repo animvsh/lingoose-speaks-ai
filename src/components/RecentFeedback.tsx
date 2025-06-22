@@ -11,7 +11,11 @@ const RecentFeedback = () => {
       message: 'Try emphasizing the "र" sound in "करना" - roll that R!',
       timestamp: '2 hours ago',
       icon: AlertCircle,
-      color: 'orange'
+      bgColor: 'bg-orange-300',
+      borderColor: 'border-orange-600',
+      iconBg: 'bg-orange-600',
+      iconBorder: 'border-orange-800',
+      textColor: 'text-orange-900'
     },
     {
       id: 2,
@@ -20,7 +24,11 @@ const RecentFeedback = () => {
       message: 'Perfect use of past tense in yesterday\'s conversation!',
       timestamp: '1 day ago',
       icon: CheckCircle,
-      color: 'green'
+      bgColor: 'bg-green-300',
+      borderColor: 'border-green-600',
+      iconBg: 'bg-green-600',
+      iconBorder: 'border-green-800',
+      textColor: 'text-green-900'
     },
     {
       id: 3,
@@ -29,36 +37,39 @@ const RecentFeedback = () => {
       message: 'Great question about "जी" - it shows respect in Hindi!',
       timestamp: '2 days ago',
       icon: Star,
-      color: 'blue'
+      bgColor: 'bg-purple-300',
+      borderColor: 'border-purple-600',
+      iconBg: 'bg-purple-600',
+      iconBorder: 'border-purple-800',
+      textColor: 'text-purple-900'
     }
   ];
 
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 bg-pink-300 border-4 border-pink-600 rounded-2xl overflow-hidden transform hover:rotate-1 transition-transform duration-200">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-slate-800 flex items-center">
-          <MessageSquare className="w-5 h-5 mr-2 text-orange-500" />
+        <CardTitle className="text-xl font-black text-pink-900 uppercase tracking-wide flex items-center">
+          <div className="w-10 h-10 bg-pink-600 border-3 border-pink-800 rounded-xl flex items-center justify-center mr-3">
+            <MessageSquare className="w-5 h-5 text-white" />
+          </div>
           Recent Feedback
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {feedbackItems.map((item) => {
           const IconComponent = item.icon;
-          const colorClasses = {
-            orange: 'text-orange-500 bg-orange-50',
-            green: 'text-green-500 bg-green-50',
-            blue: 'text-blue-500 bg-blue-50'
-          };
           
           return (
-            <div key={item.id} className="flex space-x-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${colorClasses[item.color as keyof typeof colorClasses]}`}>
-                <IconComponent className="w-4 h-4" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-800">{item.title}</p>
-                <p className="text-sm text-slate-600 mt-1">{item.message}</p>
-                <p className="text-xs text-slate-400 mt-2">{item.timestamp}</p>
+            <div key={item.id} className={`${item.bgColor} border-3 ${item.borderColor} rounded-xl p-4 transform hover:scale-105 transition-transform duration-200`}>
+              <div className="flex space-x-3">
+                <div className={`w-10 h-10 ${item.iconBg} border-2 ${item.iconBorder} rounded-xl flex items-center justify-center`}>
+                  <IconComponent className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-black ${item.textColor} uppercase tracking-wide`}>{item.title}</p>
+                  <p className={`text-sm ${item.textColor} font-bold mt-1`}>{item.message}</p>
+                  <p className={`text-xs ${item.textColor} font-bold mt-2 opacity-70`}>{item.timestamp}</p>
+                </div>
               </div>
             </div>
           );
