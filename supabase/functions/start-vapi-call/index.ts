@@ -55,7 +55,7 @@ serve(async (req) => {
     console.log(`Formatted phone number (E.164): ${formattedPhoneNumber}`);
     console.log(`Topic: ${topic}`);
 
-    // Create the call with Vapi.ai using workflow structure
+    // Use the conversationalist agent approach with assistantId
     const vapiResponse = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
       headers: {
@@ -63,12 +63,11 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        workflowId: "ed07a022-213b-4715-92ff-1ce874b24aa6",
-        workflowOverrides: {
+        assistantId: "d3c48fab-0d85-4e6e-9f22-076b9e3c537c",
+        assistantOverrides: {
           variableValues: {
             topic: topic,
-            language: "hindi",
-            phone_number: formattedPhoneNumber
+            language: "hindi"
           }
         },
         phoneNumberId: "84d220a6-8dd1-4808-b31e-a6364ce98885",
@@ -104,16 +103,19 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Log the call in the database
+    // Log the call in the conversations table
     const { error: logError } = await supabase
-      .from('call_logs')
+      .from('conversations')
       .insert({
         user_id: userId,
-        call_id: vapiData.id,
-        phone_number: formattedPhoneNumber,
-        status: 'initiated',
-        scenario: topic,
-        learning_focus: ['Conversation Practice', 'Pronunciation', 'Vocabulary']
+        outline_id: 'default-outline', // You may want to make this dynamic
+        conversation_data: {
+          call_id: vapiData.id,
+          phone_number: formattedPhoneNumber,
+          status: 'initiated',
+          scenario: topic,
+          vapi_response: vapiData
+        }
       })
 
     if (logError) {
