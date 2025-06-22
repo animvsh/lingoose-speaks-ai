@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Phone, CheckCircle, Clock, Home, BarChart3, Settings, User } from "lucide-react";
+import { Phone, CheckCircle, Home, BarChart3, Settings, User } from "lucide-react";
 import DuckMascot from "@/components/DuckMascot";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
@@ -11,6 +9,10 @@ import AddToHomeScreen from "@/components/AddToHomeScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import SettingsCard from "@/components/SettingsCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
+import DashboardStats from "@/components/DashboardStats";
+import WeeklyChart from "@/components/WeeklyChart";
+import RecentFeedback from "@/components/RecentFeedback";
+import GoalProgress from "@/components/GoalProgress";
 
 const Index = () => {
   const [currentView, setCurrentView] = useState("welcome");
@@ -94,41 +96,37 @@ const Index = () => {
 };
 
 const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
-  <div className="min-h-screen bg-white p-4 sm:p-6">
-    <div className="space-y-6">
-      <div className="text-center space-y-6">
-        <DuckMascot className="mx-auto" />
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">Lingoose में आपका स्वागत है!</h1>
-          <p className="text-slate-600">"नमस्ते, लेकिन थोड़ी अजीब तरीके से"</p>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="bg-orange-50 p-4 rounded-2xl transition-all duration-300 hover:shadow-md">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-slate-600 font-medium">आज की प्रवाहता</span>
-              <span className="text-orange-500 font-bold">67%</span>
-            </div>
-            <div className="w-full bg-orange-200 h-2 rounded-full overflow-hidden">
-              <div className="bg-orange-500 h-2 rounded-full w-2/3 transition-all duration-500 ease-out"></div>
-            </div>
-          </div>
+  <div className="min-h-screen bg-white">
+    <div className="px-4 pt-6 pb-20">
+      {/* Header */}
+      <div className="text-center mb-6">
+        <DuckMascot className="mx-auto mb-4" />
+        <h1 className="text-2xl font-bold text-slate-800 mb-1">Analytics Dashboard</h1>
+        <p className="text-slate-600">Your Hindi learning journey</p>
+      </div>
 
-          <Button 
-            onClick={() => onNavigate("activity")}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-6 rounded-2xl text-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg transform"
-          >
-            <Phone className="w-6 h-6 mr-3" />
-            मुझे अभी कॉल करें
-          </Button>
+      {/* Dashboard Content */}
+      <DashboardStats />
+      <WeeklyChart />
+      <RecentFeedback />
+      <GoalProgress />
 
-          <div className="text-sm text-slate-500">
-            🔥 7 दिन की स्ट्रीक • 2 कॉल में अगला अनलॉक
-          </div>
+      {/* Quick Action */}
+      <div className="mb-6">
+        <Button 
+          onClick={() => onNavigate("activity")}
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-2xl text-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+        >
+          <Phone className="w-5 h-5 mr-3" />
+          Start Your Daily Call
+        </Button>
+        <div className="text-center text-sm text-slate-500 mt-2">
+          🔥 12 day streak • Next milestone: 15 days
         </div>
       </div>
     </div>
 
+    {/* Bottom Navigation */}
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-4 py-3 safe-area-bottom">
       <div className="max-w-md mx-auto">
         <div className="flex justify-center space-x-8">
