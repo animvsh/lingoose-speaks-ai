@@ -59,7 +59,7 @@ const DashboardStats = () => {
       {/* Main Stats Grid - 2x2 layout with cartoon style */}
       <div className="grid grid-cols-2 gap-4">
         {/* Total Calls - Bright Orange */}
-        <Card className="bg-orange-300 border-4 border-orange-600 rounded-2xl overflow-hidden transform hover:rotate-1 transition-transform duration-200">
+        <Card className="bg-orange-300 border-4 border-orange-600 rounded-2xl overflow-hidden">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
               <div className="w-12 h-12 bg-orange-600 border-3 border-orange-800 rounded-xl flex items-center justify-center">
@@ -78,7 +78,7 @@ const DashboardStats = () => {
         </Card>
 
         {/* Talk Time - Bright Green */}
-        <Card className="bg-green-300 border-4 border-green-600 rounded-2xl overflow-hidden transform hover:-rotate-1 transition-transform duration-200">
+        <Card className="bg-green-300 border-4 border-green-600 rounded-2xl overflow-hidden">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
               <div className="w-12 h-12 bg-green-600 border-3 border-green-800 rounded-xl flex items-center justify-center">
@@ -97,7 +97,7 @@ const DashboardStats = () => {
         </Card>
 
         {/* Fluency Score - Bright Yellow */}
-        <Card className="bg-yellow-300 border-4 border-yellow-600 rounded-2xl overflow-hidden transform hover:rotate-1 transition-transform duration-200">
+        <Card className="bg-yellow-300 border-4 border-yellow-600 rounded-2xl overflow-hidden">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
               <div className="w-12 h-12 bg-yellow-600 border-3 border-yellow-800 rounded-xl flex items-center justify-center">
@@ -116,7 +116,7 @@ const DashboardStats = () => {
         </Card>
 
         {/* Current Streak - Bright Red */}
-        <Card className="bg-red-300 border-4 border-red-600 rounded-2xl overflow-hidden transform hover:-rotate-1 transition-transform duration-200">
+        <Card className="bg-red-300 border-4 border-red-600 rounded-2xl overflow-hidden">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
               <div className="w-12 h-12 bg-red-600 border-3 border-red-800 rounded-xl flex items-center justify-center">
@@ -162,7 +162,7 @@ const DashboardStats = () => {
 
       {/* Quick Stats Row - Bright cartoon colors */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-pink-300 border-4 border-pink-600 p-4 rounded-2xl text-center transform hover:scale-105 transition-transform duration-200">
+        <div className="bg-pink-300 border-4 border-pink-600 p-4 rounded-2xl text-center">
           <div className="w-10 h-10 bg-pink-600 border-3 border-pink-800 rounded-xl flex items-center justify-center mx-auto mb-3">
             <Star className="w-5 h-5 text-white" />
           </div>
@@ -171,7 +171,7 @@ const DashboardStats = () => {
           </div>
           <div className="text-sm text-pink-800 font-bold uppercase">Avg Rating</div>
         </div>
-        <div className="bg-blue-300 border-4 border-blue-600 p-4 rounded-2xl text-center transform hover:scale-105 transition-transform duration-200">
+        <div className="bg-blue-300 border-4 border-blue-600 p-4 rounded-2xl text-center">
           <div className="w-10 h-10 bg-blue-600 border-3 border-blue-800 rounded-xl flex items-center justify-center mx-auto mb-3">
             <Target className="w-5 h-5 text-white" />
           </div>
@@ -180,7 +180,7 @@ const DashboardStats = () => {
           </div>
           <div className="text-sm text-blue-800 font-bold uppercase">Goal Progress</div>
         </div>
-        <div className="bg-teal-300 border-4 border-teal-600 p-4 rounded-2xl text-center transform hover:scale-105 transition-transform duration-200">
+        <div className="bg-teal-300 border-4 border-teal-600 p-4 rounded-2xl text-center">
           <div className="w-10 h-10 bg-teal-600 border-3 border-teal-800 rounded-xl flex items-center justify-center mx-auto mb-3">
             <Calendar className="w-5 h-5 text-white" />
           </div>

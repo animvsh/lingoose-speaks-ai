@@ -66,7 +66,7 @@ const Index = () => {
 
   if (currentView === "loading" || authLoading || profileLoading) {
     return (
-      <div className="min-h-screen bg-[#F5F2E8] flex items-center justify-center">
+      <div className="min-h-screen bg-[#FEFEFE] flex items-center justify-center">
         <div className="text-center">
           <DuckMascot className="mx-auto mb-4 animate-bounce" />
           <p className="text-slate-700 font-bold text-lg">Loading your account...</p>
@@ -145,7 +145,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2E8]">
+    <div className="min-h-screen bg-[#FEFEFE]">
       <div className="w-full max-w-md mx-auto">
         {renderView()}
       </div>
@@ -171,14 +171,14 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   const dailyProgress = Math.min((totalCalls * 3), 15);
   
   return (
-    <div className="min-h-screen bg-[#F5F2E8] pb-24">
+    <div className="min-h-screen bg-[#FEFEFE] pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-b-[2.5rem] p-6 mb-6 shadow-xl border-b-8 border-orange-600">
+      <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-b-[2.5rem] p-6 mb-6 border-b-8 border-orange-600">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
-            <DuckMascot className="w-16 h-16 mr-4 transform hover:scale-110 transition-transform duration-200" />
+            <DuckMascot className="w-16 h-16 mr-4" />
             <div>
-              <h1 className="text-3xl font-black text-white drop-shadow-lg">
+              <h1 className="text-3xl font-black text-white">
                 Hi {userProfile?.full_name?.split(' ')[0] || 'there'}! 👋
               </h1>
               <p className="text-orange-100 font-bold text-sm bg-orange-600/30 px-3 py-1 rounded-full mt-1">
@@ -190,7 +190,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
             onClick={signOut}
             variant="ghost"
             size="sm"
-            className="p-3 text-orange-100 hover:text-white hover:bg-orange-500/50 rounded-2xl border-2 border-orange-300/50 hover:border-orange-200 transition-all duration-200 hover:scale-110"
+            className="p-3 text-orange-100 hover:text-white hover:bg-orange-500/50 rounded-2xl border-2 border-orange-300/50 hover:border-orange-200 transition-colors duration-200"
           >
             <LogOut className="w-6 h-6" />
           </Button>
@@ -200,7 +200,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
       <div className="px-6 space-y-6">
         {/* Primary CTA */}
         <div className="space-y-4">
-          <div className="bg-gradient-to-r from-green-400 to-green-500 rounded-[2rem] p-6 border-4 border-green-600 transform hover:scale-[1.02] transition-transform shadow-2xl hover:shadow-green-300/50">
+          <div className="bg-gradient-to-r from-green-400 to-green-500 rounded-[2rem] p-6 border-4 border-green-600">
             <Button 
               onClick={() => onNavigate("activity")}
               className="w-full bg-transparent hover:bg-green-600/20 text-white font-black py-6 text-xl border-0 tracking-wide"
@@ -210,7 +210,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
             </Button>
           </div>
           
-          <div className="bg-gradient-to-r from-purple-400 to-purple-500 rounded-[2rem] p-4 border-4 border-purple-600 transform hover:scale-[1.02] transition-transform shadow-xl hover:shadow-purple-300/50">
+          <div className="bg-gradient-to-r from-purple-400 to-purple-500 rounded-[2rem] p-4 border-4 border-purple-600">
             <Button 
               variant="ghost"
               className="w-full text-white font-black py-4 hover:bg-purple-600/20 border-0 text-lg tracking-wide"
@@ -223,31 +223,31 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-blue-400 to-blue-500 rounded-[2rem] p-6 border-4 border-blue-600 text-center transform hover:scale-105 transition-transform shadow-xl hover:shadow-blue-300/50">
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border-3 border-blue-700 shadow-lg">
+          <div className="bg-gradient-to-br from-blue-400 to-blue-500 rounded-[2rem] p-6 border-4 border-blue-600 text-center">
+            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border-3 border-blue-700">
               <Target className="w-8 h-8 text-white" />
             </div>
-            <div className="text-4xl font-black text-white drop-shadow-lg">{nativeFluency}%</div>
+            <div className="text-4xl font-black text-white">{nativeFluency}%</div>
             <div className="text-sm text-blue-100 font-bold uppercase tracking-wide bg-blue-600/30 px-2 py-1 rounded-full mt-2">PROGRESS</div>
           </div>
 
-          <div className="bg-gradient-to-br from-pink-400 to-pink-500 rounded-[2rem] p-6 border-4 border-pink-600 text-center transform hover:scale-105 transition-transform shadow-xl hover:shadow-pink-300/50">
-            <div className="w-16 h-16 bg-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border-3 border-pink-700 shadow-lg">
+          <div className="bg-gradient-to-br from-pink-400 to-pink-500 rounded-[2rem] p-6 border-4 border-pink-600 text-center">
+            <div className="w-16 h-16 bg-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border-3 border-pink-700">
               <Flame className="w-8 h-8 text-white" />
             </div>
-            <div className="text-4xl font-black text-white drop-shadow-lg">{streak}</div>
+            <div className="text-4xl font-black text-white">{streak}</div>
             <div className="text-sm text-pink-100 font-bold uppercase tracking-wide bg-pink-600/30 px-2 py-1 rounded-full mt-2">DAY STREAK</div>
           </div>
         </div>
 
         {/* Achievement Card */}
-        <div className="bg-gradient-to-r from-green-300 to-green-400 rounded-[2rem] p-6 border-4 border-green-500 transform hover:rotate-1 transition-transform shadow-xl hover:shadow-green-300/50">
+        <div className="bg-gradient-to-r from-green-300 to-green-400 rounded-[2rem] p-6 border-4 border-green-500">
           <div className="flex items-center space-x-4">
-            <div className="w-20 h-20 bg-green-600 rounded-2xl flex items-center justify-center border-4 border-green-700 shadow-lg">
+            <div className="w-20 h-20 bg-green-600 rounded-2xl flex items-center justify-center border-4 border-green-700">
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
             <div>
-              <h3 className="text-3xl font-black text-green-800 uppercase tracking-wide drop-shadow-sm">AWESOME!</h3>
+              <h3 className="text-3xl font-black text-green-800 uppercase tracking-wide">AWESOME!</h3>
               <p className="text-green-700 font-bold text-lg">Last call completed successfully!</p>
               <p className="text-sm text-green-600 font-medium bg-green-200/50 px-3 py-1 rounded-full mt-1 inline-block">Topic: Movie Date Gone Wrong 🎬</p>
             </div>
@@ -255,10 +255,10 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
         </div>
 
         {/* Daily Goal */}
-        <div className="bg-gradient-to-r from-orange-300 to-orange-400 rounded-[2rem] p-6 border-4 border-orange-500 shadow-xl hover:shadow-orange-300/50 transform hover:scale-[1.02] transition-all duration-200">
+        <div className="bg-gradient-to-r from-orange-300 to-orange-400 rounded-[2rem] p-6 border-4 border-orange-500">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-orange-600 rounded-2xl flex items-center justify-center border-3 border-orange-700 shadow-lg">
+              <div className="w-16 h-16 bg-orange-600 rounded-2xl flex items-center justify-center border-3 border-orange-700">
                 <Clock className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -268,7 +268,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
             </div>
             <div className="w-20 h-4 bg-orange-200 rounded-full overflow-hidden border-2 border-orange-400">
               <div 
-                className="h-full bg-orange-600 rounded-full transition-all duration-500 shadow-inner"
+                className="h-full bg-orange-600 rounded-full transition-all duration-500"
                 style={{ width: `${Math.min((dailyProgress / 15) * 100, 100)}%` }}
               ></div>
             </div>
@@ -277,14 +277,14 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-6 border-slate-400 px-4 py-4 safe-area-bottom shadow-2xl">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-6 border-slate-400 px-4 py-4 safe-area-bottom">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-18 h-18 bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 rounded-3xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3 shadow-lg"
+              className="w-18 h-18 bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 rounded-3xl text-white transition-colors duration-200"
             >
               <Home className="w-7 h-7" />
             </Button>
@@ -292,7 +292,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-18 h-18 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-3xl text-green-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3 shadow-lg"
+              className="w-18 h-18 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-3xl text-green-900 transition-colors duration-200"
             >
               <Phone className="w-7 h-7" />
             </Button>
@@ -300,7 +300,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-18 h-18 bg-purple-300 hover:bg-purple-400 border-4 border-purple-600 rounded-3xl text-purple-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3 shadow-lg"
+              className="w-18 h-18 bg-purple-300 hover:bg-purple-400 border-4 border-purple-600 rounded-3xl text-purple-900 transition-colors duration-200"
             >
               <CheckCircle className="w-7 h-7" />
             </Button>
@@ -308,7 +308,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-18 h-18 bg-pink-300 hover:bg-pink-400 border-4 border-pink-600 rounded-3xl text-pink-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3 shadow-lg"
+              className="w-18 h-18 bg-pink-300 hover:bg-pink-400 border-4 border-pink-600 rounded-3xl text-pink-900 transition-colors duration-200"
             >
               <Settings className="w-7 h-7" />
             </Button>

@@ -61,17 +61,17 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F5F2E8] pb-24">
+    <div className="min-h-screen bg-[#FEFEFE] pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-b-[2.5rem] px-6 py-8 mb-6 shadow-xl border-b-8 border-orange-600">
+      <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-b-[2.5rem] px-6 py-8 mb-6 border-b-8 border-orange-600">
         <div className="flex items-center justify-between">
           <Button
             onClick={() => onNavigate("home")}
-            className="w-14 h-14 bg-orange-500 hover:bg-orange-600 border-4 border-orange-600 rounded-3xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3 shadow-lg"
+            className="w-14 h-14 bg-orange-500 hover:bg-orange-600 border-4 border-orange-600 rounded-3xl text-white transition-colors duration-200"
           >
             <ArrowLeft className="w-7 h-7" />
           </Button>
-          <h1 className="text-4xl font-black text-white uppercase tracking-wider drop-shadow-lg">
+          <h1 className="text-4xl font-black text-white uppercase tracking-wider">
             SETTINGS
           </h1>
           <div className="w-14 h-14"></div>
@@ -81,13 +81,13 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
       <div className="px-6 space-y-6">
         {/* User Profile Card */}
         {userProfile && (
-          <div className="bg-gradient-to-r from-purple-300 to-purple-400 rounded-[2rem] p-6 border-4 border-purple-500 transform hover:rotate-1 transition-transform shadow-xl hover:shadow-purple-300/50">
+          <div className="bg-gradient-to-r from-purple-300 to-purple-400 rounded-[2rem] p-6 border-4 border-purple-500">
             <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 bg-purple-600 rounded-2xl flex items-center justify-center border-4 border-purple-700 shadow-lg">
+              <div className="w-20 h-20 bg-purple-600 rounded-2xl flex items-center justify-center border-4 border-purple-700">
                 <User className="w-10 h-10 text-white" />
               </div>
               <div>
-                <div className="font-black text-purple-800 text-3xl uppercase tracking-wide drop-shadow-sm">{userProfile.full_name}</div>
+                <div className="font-black text-purple-800 text-3xl uppercase tracking-wide">{userProfile.full_name}</div>
                 <div className="text-purple-700 font-bold text-lg bg-purple-200/50 px-3 py-1 rounded-full mt-1 inline-block">Level: {userProfile.proficiency_level}</div>
                 <div className="text-purple-700 font-bold text-lg bg-purple-200/50 px-3 py-1 rounded-full mt-1 inline-block ml-2">Goal: {userProfile.language_goal}</div>
               </div>
@@ -100,16 +100,16 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
           {settingsItems.map((item, index) => (
             <div
               key={index}
-              className={`bg-gradient-to-r ${item.color} rounded-[2rem] p-6 border-4 ${item.borderColor} transform hover:scale-[1.02] transition-transform cursor-pointer shadow-xl`}
+              className={`bg-gradient-to-r ${item.color} rounded-[2rem] p-6 border-4 ${item.borderColor} transition-colors cursor-pointer`}
               onClick={item.action}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className={`w-16 h-16 ${item.iconBg} rounded-2xl flex items-center justify-center border-3 border-black/20 shadow-lg`}>
+                  <div className={`w-16 h-16 ${item.iconBg} rounded-2xl flex items-center justify-center border-3 border-black/20`}>
                     {item.icon}
                   </div>
                   <div>
-                    <div className="font-black text-white text-xl uppercase tracking-wide drop-shadow-sm">{item.title}</div>
+                    <div className="font-black text-white text-xl uppercase tracking-wide">{item.title}</div>
                     <div className="text-sm text-white/90 font-bold bg-white/20 px-3 py-1 rounded-full mt-1">{item.subtitle}</div>
                   </div>
                 </div>
@@ -120,7 +120,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
         </div>
 
         {/* Sign Out Button */}
-        <div className="bg-gradient-to-r from-red-400 to-red-500 rounded-[2rem] p-4 border-4 border-red-600 transform hover:scale-[1.02] transition-transform shadow-xl hover:shadow-red-300/50">
+        <div className="bg-gradient-to-r from-red-400 to-red-500 rounded-[2rem] p-4 border-4 border-red-600">
           <Button
             onClick={signOut}
             className="w-full bg-transparent hover:bg-red-600/20 text-white font-black py-6 text-xl border-0 tracking-wide"
@@ -131,21 +131,21 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
         </div>
 
         {/* App Info */}
-        <div className="bg-gradient-to-r from-yellow-300 to-yellow-400 rounded-[2rem] p-6 border-4 border-yellow-500 text-center transform hover:rotate-1 transition-transform shadow-xl hover:shadow-yellow-300/50">
+        <div className="bg-gradient-to-r from-yellow-300 to-yellow-400 rounded-[2rem] p-6 border-4 border-yellow-500 text-center">
           <div className="text-sm text-yellow-800 font-bold mb-2 uppercase tracking-wide bg-yellow-200/50 px-3 py-1 rounded-full inline-block">Lingoose v1.0.0</div>
-          <p className="text-lg text-yellow-900 font-black drop-shadow-sm">🧡 Made with Love by Chaotic Geese</p>
+          <p className="text-lg text-yellow-900 font-black">🧡 Made with Love by Chaotic Geese</p>
         </div>
       </div>
 
       {/* Bottom Navigation - Fixed to show all 4 buttons */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-6 border-slate-400 px-4 py-4 shadow-2xl">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-6 border-slate-400 px-4 py-4">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-18 h-18 bg-orange-300 hover:bg-orange-400 border-4 border-orange-600 rounded-3xl text-orange-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3 shadow-lg"
+              className="w-18 h-18 bg-orange-300 hover:bg-orange-400 border-4 border-orange-600 rounded-3xl text-orange-900 transition-colors duration-200"
             >
               <Home className="w-7 h-7" />
             </Button>
@@ -153,7 +153,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-18 h-18 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-3xl text-green-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3 shadow-lg"
+              className="w-18 h-18 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-3xl text-green-900 transition-colors duration-200"
             >
               <Phone className="w-7 h-7" />
             </Button>
@@ -161,7 +161,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-18 h-18 bg-purple-300 hover:bg-purple-400 border-4 border-purple-600 rounded-3xl text-purple-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3 shadow-lg"
+              className="w-18 h-18 bg-purple-300 hover:bg-purple-400 border-4 border-purple-600 rounded-3xl text-purple-900 transition-colors duration-200"
             >
               <CheckCircle className="w-7 h-7" />
             </Button>
@@ -169,7 +169,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-18 h-18 bg-pink-400 hover:bg-pink-500 border-4 border-pink-600 rounded-3xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3 shadow-lg"
+              className="w-18 h-18 bg-pink-400 hover:bg-pink-500 border-4 border-pink-600 rounded-3xl text-white transition-colors duration-200"
             >
               <Settings className="w-7 h-7" />
             </Button>
