@@ -8,89 +8,89 @@ interface ProgressCardProps {
 
 const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
   return (
-    <div className="min-h-screen bg-[#FEFEFE] pb-24">
+    <div className="min-h-screen bg-[#FFF9E6] pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-b-[2.5rem] px-6 py-8 mb-6 border-b-8 border-orange-600">
+      <div className="bg-gradient-to-r from-orange-300 to-orange-400 rounded-b-[3rem] px-6 py-8 mb-6">
         <div className="flex items-center justify-between">
           <Button
             onClick={() => onNavigate("home")}
-            className="w-14 h-14 bg-orange-500 hover:bg-orange-600 border-4 border-orange-600 rounded-3xl text-white transition-colors duration-200"
+            className="w-16 h-16 bg-orange-400 hover:bg-orange-500 rounded-3xl text-white shadow-lg transition-colors duration-200 border-0"
           >
-            <ArrowLeft className="w-7 h-7" />
+            <ArrowLeft className="w-8 h-8" />
           </Button>
           <h1 className="text-4xl font-black text-white uppercase tracking-wider">
-            TODAY'S PROGRESS
+            PROGRESS
           </h1>
-          <div className="w-14 h-14"></div>
+          <div className="w-16 h-16"></div>
         </div>
       </div>
 
       <div className="px-6 space-y-6">
         {/* Achievement Banner */}
-        <div className="bg-gradient-to-r from-green-400 to-green-500 rounded-[2rem] p-6 border-4 border-green-600">
+        <div className="bg-gradient-to-r from-green-200 to-green-300 rounded-[2.5rem] p-6 shadow-lg">
           <div className="flex items-center space-x-4">
-            <div className="w-20 h-20 bg-green-600 rounded-2xl flex items-center justify-center border-4 border-green-700">
-              <Trophy className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 bg-green-500 rounded-3xl flex items-center justify-center shadow-md">
+              <Trophy className="w-12 h-12 text-white" />
             </div>
             <div>
-              <h3 className="text-4xl font-black text-white mb-2 uppercase tracking-wide">AWESOME!</h3>
-              <p className="text-green-100 font-bold text-xl bg-green-600/30 px-3 py-1 rounded-full">Call completed successfully!</p>
+              <h3 className="text-4xl font-black text-green-800 mb-2 uppercase tracking-wide">AWESOME!</h3>
+              <p className="text-green-700 font-bold text-xl">Call completed successfully!</p>
             </div>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-purple-400 to-purple-500 rounded-[2rem] p-6 border-4 border-purple-600 text-center">
-            <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border-3 border-purple-700">
-              <Clock className="w-8 h-8 text-white" />
+        <div className="grid grid-cols-2 gap-6">
+          <div className="bg-gradient-to-br from-purple-200 to-purple-300 rounded-[2.5rem] p-6 text-center shadow-lg">
+            <div className="w-20 h-20 bg-purple-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-md">
+              <Clock className="w-10 h-10 text-white" />
             </div>
-            <div className="text-5xl font-black text-white">8min</div>
-            <div className="text-sm text-purple-100 font-bold uppercase tracking-wide bg-purple-600/30 px-2 py-1 rounded-full mt-2">TALK TIME</div>
+            <div className="text-5xl font-black text-purple-800 mb-2">8min</div>
+            <div className="text-lg text-purple-700 font-bold uppercase tracking-wide">TALK TIME</div>
           </div>
           
-          <div className="bg-gradient-to-br from-pink-400 to-pink-500 rounded-[2rem] p-6 border-4 border-pink-600 text-center">
-            <div className="w-16 h-16 bg-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border-3 border-pink-700">
-              <Star className="w-8 h-8 text-white" />
+          <div className="bg-gradient-to-br from-pink-200 to-pink-300 rounded-[2.5rem] p-6 text-center shadow-lg">
+            <div className="w-20 h-20 bg-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-md">
+              <Star className="w-10 h-10 text-white" />
             </div>
-            <div className="text-5xl font-black text-white">89%</div>
-            <div className="text-sm text-pink-100 font-bold uppercase tracking-wide bg-pink-600/30 px-2 py-1 rounded-full mt-2">ENGAGEMENT</div>
+            <div className="text-5xl font-black text-pink-800 mb-2">89%</div>
+            <div className="text-lg text-pink-700 font-bold uppercase tracking-wide">ENGAGEMENT</div>
           </div>
         </div>
 
         {/* Goose Feedback Card */}
-        <div className="bg-gradient-to-r from-orange-300 to-orange-400 rounded-[2rem] p-6 border-4 border-orange-500">
+        <div className="bg-gradient-to-r from-orange-200 to-orange-300 rounded-[2.5rem] p-6 shadow-lg">
           <h3 className="text-3xl font-black text-orange-800 mb-4 uppercase tracking-wide flex items-center">
             🦆 GOOSE FEEDBACK
           </h3>
           
-          <div className="bg-white rounded-2xl p-6 mb-4 border-4 border-orange-400">
-            <p className="text-orange-800 font-bold text-base mb-3">
+          <div className="bg-white rounded-3xl p-6 mb-4 shadow-md">
+            <p className="text-orange-800 font-bold text-lg mb-3">
               We've discussed this before, but "meeting" means bumping into someone by chance.
             </p>
-            <p className="text-orange-800 font-bold text-base">
+            <p className="text-orange-800 font-bold text-lg">
               When you've planned to meet, use the phrase "going to meet someone"!
             </p>
           </div>
           
-          <div className="flex items-center space-x-3">
-            <div className="w-16 h-16 bg-orange-600 rounded-2xl flex items-center justify-center border-3 border-orange-700">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-orange-500 rounded-3xl flex items-center justify-center shadow-md">
               <User className="w-8 h-8 text-white" />
             </div>
             <div className="flex-1">
-              <p className="text-orange-800 font-bold text-base mb-3 bg-orange-200/50 px-3 py-1 rounded-full">"We can meet in front of the cinema..."</p>
-              <div className="w-full bg-orange-200 h-4 rounded-full border-3 border-orange-300">
-                <div className="bg-gradient-to-r from-orange-600 to-orange-700 h-full rounded-full w-3/4"></div>
+              <p className="text-orange-800 font-bold text-base mb-3 bg-orange-100 px-4 py-2 rounded-full">"We can meet in front of the cinema..."</p>
+              <div className="w-full bg-orange-100 h-6 rounded-full shadow-inner">
+                <div className="bg-orange-500 h-full rounded-full w-3/4 shadow-sm"></div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Continue Button */}
-        <div className="bg-gradient-to-r from-blue-400 to-blue-500 rounded-[2rem] p-4 border-4 border-blue-600">
+        <div className="bg-gradient-to-r from-blue-200 to-blue-300 rounded-[2.5rem] p-6 shadow-lg">
           <Button 
             onClick={() => onNavigate("curriculum")}
-            className="w-full bg-transparent hover:bg-blue-600/20 text-white font-black py-6 text-xl border-0 tracking-wide"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-black py-6 text-xl rounded-3xl shadow-lg transition-colors duration-200 border-0"
           >
             <CheckCircle className="w-8 h-8 mr-4" />
             CONTINUE LEARNING
@@ -98,15 +98,15 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation - Fixed to show all 4 buttons */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-6 border-slate-400 px-4 py-4 safe-area-bottom">
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white px-4 py-4 safe-area-bottom shadow-lg">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-18 h-18 bg-blue-300 hover:bg-blue-400 border-4 border-blue-600 rounded-3xl text-blue-900 transition-colors duration-200"
+              className="w-16 h-16 bg-blue-200 hover:bg-blue-300 rounded-3xl text-blue-800 transition-colors duration-200 shadow-md border-0"
             >
               <Home className="w-7 h-7" />
             </Button>
@@ -114,7 +114,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-18 h-18 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-3xl text-green-900 transition-colors duration-200"
+              className="w-16 h-16 bg-green-200 hover:bg-green-300 rounded-3xl text-green-800 transition-colors duration-200 shadow-md border-0"
             >
               <Phone className="w-7 h-7" />
             </Button>
@@ -122,7 +122,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-18 h-18 bg-purple-300 hover:bg-purple-400 border-4 border-purple-600 rounded-3xl text-purple-900 transition-colors duration-200"
+              className="w-16 h-16 bg-purple-200 hover:bg-purple-300 rounded-3xl text-purple-800 transition-colors duration-200 shadow-md border-0"
             >
               <CheckCircle className="w-7 h-7" />
             </Button>
@@ -130,7 +130,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-18 h-18 bg-pink-300 hover:bg-pink-400 border-4 border-pink-600 rounded-3xl text-pink-900 transition-colors duration-200"
+              className="w-16 h-16 bg-pink-200 hover:bg-pink-300 rounded-3xl text-pink-800 transition-colors duration-200 shadow-md border-0"
             >
               <Settings className="w-7 h-7" />
             </Button>
