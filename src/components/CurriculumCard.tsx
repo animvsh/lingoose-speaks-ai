@@ -16,7 +16,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-yellow-50 pb-24">
+    <div className="min-h-screen bg-amber-50 pb-24">
       {/* Header */}
       <div className="px-6 pt-8 pb-6">
         <div className="flex items-center justify-between">
