@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Volume2, Sparkles, ArrowLeft } from "lucide-react";
@@ -61,53 +62,58 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     switch (currentStep) {
       case 0:
         return (
-          <div className="min-h-screen bg-background pb-24">
+          <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 pb-8">
             {/* Header */}
             <div className="px-6 pt-8 pb-6">
-              <div className="flex items-center justify-between">
-                <div className="w-14 h-14"></div>
-                <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide">
-                  WHAT'S YOUR GOAL?
-                </h1>
-                <div className="w-14 h-14"></div>
+              <div className="flex items-center justify-center">
+                <div className="text-center">
+                  <DuckMascot className="w-20 h-20 mx-auto mb-4 animate-bounce" />
+                  <h1 className="text-3xl font-bold text-orange-600 mb-2 tracking-wide">
+                    What's Your Goal? 🎯
+                  </h1>
+                  <p className="text-slate-600 font-medium">Tell me why you want to learn Hindi!</p>
+                </div>
               </div>
             </div>
 
-            <div className="px-6 space-y-6">
-              {/* Intro Card */}
-              <div className="bg-orange-400 rounded-3xl p-6 border-4 border-orange-500 text-center">
-                <div className="w-16 h-16 bg-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="w-8 h-8 text-white" />
+            <div className="px-6 space-y-4">
+              {/* Progress indicator */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="flex space-x-2">
+                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-gray-200 rounded-full"></div>
+                  <div className="w-3 h-3 bg-gray-200 rounded-full"></div>
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2 uppercase tracking-wide">Tell me why you want to learn Hindi</h2>
-                <p className="text-white font-medium">Choose your learning motivation</p>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {goals.map((goal) => (
                   <button
                     key={goal.id}
                     onClick={() => handleGoalSelect(goal.id)}
-                    className={`w-full p-6 rounded-3xl text-left transition-all duration-300 border-4 ${
+                    className={`w-full p-4 rounded-2xl text-left transition-all duration-300 border-3 transform hover:scale-[1.02] hover:shadow-lg ${
                       selectedGoal === goal.id 
-                        ? 'bg-green-400 border-green-500 text-white scale-[1.02]' 
-                        : 'bg-white border-gray-200 hover:border-orange-200 hover:bg-orange-50'
+                        ? 'bg-gradient-to-r from-green-400 to-green-500 border-green-600 text-white shadow-lg scale-[1.02]' 
+                        : 'bg-white border-orange-200 hover:border-orange-300 hover:bg-orange-50 shadow-md'
                     }`}
                   >
                     <div className="flex items-center space-x-4">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${
-                        selectedGoal === goal.id ? 'bg-green-600' : 'bg-gray-100'
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all ${
+                        selectedGoal === goal.id ? 'bg-green-600 shadow-inner' : 'bg-orange-100'
                       }`}>
                         {goal.emoji}
                       </div>
                       <div className="flex-1">
-                        <div className="font-bold text-lg mb-1 uppercase tracking-wide">{goal.title}</div>
+                        <div className="font-bold text-lg mb-1">{goal.title}</div>
                         <div className={`text-sm ${
-                          selectedGoal === goal.id ? 'text-white' : 'text-gray-600'
+                          selectedGoal === goal.id ? 'text-green-100' : 'text-slate-600'
                         }`}>
                           {goal.desc}
                         </div>
                       </div>
+                      <ChevronRight className={`w-5 h-5 transition-all ${
+                        selectedGoal === goal.id ? 'text-white' : 'text-orange-400'
+                      }`} />
                     </div>
                   </button>
                 ))}
@@ -118,62 +124,65 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
       case 1:
         return (
-          <div className="min-h-screen bg-background pb-24">
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-8">
             {/* Header */}
             <div className="px-6 pt-8 pb-6">
               <div className="flex items-center justify-between">
                 <Button
                   onClick={prevStep}
-                  className="w-14 h-14 bg-orange-500 hover:bg-orange-600 rounded-2xl text-white shadow-lg"
+                  className="w-12 h-12 bg-purple-500 hover:bg-purple-600 rounded-xl text-white shadow-lg"
                 >
-                  <ArrowLeft className="w-6 h-6" />
+                  <ArrowLeft className="w-5 h-5" />
                 </Button>
-                <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide">
-                  CHOOSE STYLE
-                </h1>
-                <div className="w-14 h-14"></div>
+                <div className="text-center">
+                  <h1 className="text-3xl font-bold text-purple-600 tracking-wide">
+                    Choose Your Style 🎭
+                  </h1>
+                  <p className="text-slate-600 font-medium">How should your AI teacher vibe?</p>
+                </div>
+                <div className="w-12 h-12"></div>
               </div>
             </div>
 
-            <div className="px-6 space-y-6">
-              {/* Intro Card */}
-              <div className="bg-purple-400 rounded-3xl p-6 border-4 border-purple-500 text-center">
-                <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Volume2 className="w-8 h-8 text-white" />
+            <div className="px-6 space-y-4">
+              {/* Progress indicator */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="flex space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-gray-200 rounded-full"></div>
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2 uppercase tracking-wide">Choose Your Teacher Style</h2>
-                <p className="text-white font-medium">How should your AI teacher interact with you?</p>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {tones.map((tone) => (
                   <button
                     key={tone.id}
                     onClick={() => handleToneSelect(tone.id)}
-                    className={`w-full p-6 rounded-3xl text-left transition-all duration-300 border-4 ${
+                    className={`w-full p-4 rounded-2xl text-left transition-all duration-300 border-3 transform hover:scale-[1.02] hover:shadow-lg ${
                       selectedTone === tone.id 
-                        ? 'bg-green-400 border-green-500 text-white scale-[1.02]' 
-                        : 'bg-white border-gray-200 hover:border-purple-200 hover:bg-purple-50'
+                        ? 'bg-gradient-to-r from-green-400 to-green-500 border-green-600 text-white shadow-lg scale-[1.02]' 
+                        : 'bg-white border-purple-200 hover:border-purple-300 hover:bg-purple-50 shadow-md'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${
-                          selectedTone === tone.id ? 'bg-green-600' : 'bg-gray-100'
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl transition-all ${
+                          selectedTone === tone.id ? 'bg-green-600 shadow-inner' : 'bg-purple-100'
                         }`}>
                           {tone.emoji}
                         </div>
                         <div>
-                          <div className="font-bold text-lg mb-1 uppercase tracking-wide">{tone.title}</div>
+                          <div className="font-bold text-lg mb-1">{tone.title}</div>
                           <div className={`text-sm ${
-                            selectedTone === tone.id ? 'text-white' : 'text-gray-600'
+                            selectedTone === tone.id ? 'text-green-100' : 'text-slate-600'
                           }`}>
                             {tone.desc}
                           </div>
                         </div>
                       </div>
                       <Volume2 className={`w-5 h-5 ${
-                        selectedTone === tone.id ? 'text-white' : 'text-gray-400'
+                        selectedTone === tone.id ? 'text-white' : 'text-purple-400'
                       }`} />
                     </div>
                   </button>
@@ -188,55 +197,80 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         const selectedToneData = tones.find(t => t.id === selectedTone);
         
         return (
-          <div className="min-h-screen bg-background pb-24">
+          <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 pb-8">
             {/* Header */}
             <div className="px-6 pt-8 pb-6">
               <div className="flex items-center justify-between">
                 <Button
                   onClick={prevStep}
-                  className="w-14 h-14 bg-orange-500 hover:bg-orange-600 rounded-2xl text-white shadow-lg"
+                  className="w-12 h-12 bg-green-500 hover:bg-green-600 rounded-xl text-white shadow-lg"
                 >
-                  <ArrowLeft className="w-6 h-6" />
+                  <ArrowLeft className="w-5 h-5" />
                 </Button>
-                <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide">
-                  ALL SET!
-                </h1>
-                <div className="w-14 h-14"></div>
+                <div className="text-center">
+                  <h1 className="text-3xl font-bold text-green-600 tracking-wide">
+                    You're All Set! 🎉
+                  </h1>
+                  <p className="text-slate-600 font-medium">Ready to start your journey?</p>
+                </div>
+                <div className="w-12 h-12"></div>
               </div>
             </div>
 
             <div className="px-6 space-y-6">
+              {/* Progress indicator */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="flex space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                </div>
+              </div>
+
               {/* Success Card */}
-              <div className="bg-green-400 rounded-3xl p-6 border-4 border-green-500 text-center">
-                <DuckMascot className="w-16 h-16 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-white mb-2 uppercase tracking-wide">You're All Set! 🎉</h2>
-                <p className="text-white font-medium">
-                  Your AI teacher is ready to help you achieve your goal with a {selectedToneData?.title.toLowerCase()} approach.
+              <div className="bg-gradient-to-r from-green-400 to-green-500 rounded-3xl p-6 border-4 border-green-600 text-center shadow-xl">
+                <div className="relative">
+                  <DuckMascot className="w-20 h-20 mx-auto mb-4" />
+                  <div className="absolute -top-2 -right-8 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse">
+                    <Sparkles className="w-4 h-4 text-yellow-800" />
+                  </div>
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-3">Perfect Match! 🤝</h2>
+                <p className="text-green-100 font-medium text-lg">
+                  Your AI teacher is ready to help you master Hindi!
                 </p>
               </div>
               
               {/* Profile Summary Card */}
-              <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+              <div className="bg-white rounded-3xl p-6 border-4 border-blue-200 shadow-xl">
                 <div className="flex items-center justify-center space-x-3 mb-4">
-                  <span className="text-2xl">{selectedGoalData?.emoji}</span>
-                  <span className="text-2xl">➕</span>
-                  <span className="text-2xl">{selectedToneData?.emoji}</span>
+                  <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-2xl">
+                    {selectedGoalData?.emoji}
+                  </div>
+                  <div className="text-3xl">+</div>
+                  <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-2xl">
+                    {selectedToneData?.emoji}
+                  </div>
                 </div>
-                <h3 className="text-center font-bold text-gray-800 mb-3 uppercase tracking-wide">Your Learning Profile:</h3>
-                <p className="text-center text-gray-800 font-semibold mb-4">{selectedGoalData?.title} + {selectedToneData?.title}</p>
-                <div className="bg-orange-50 p-4 rounded-2xl border-2 border-orange-100">
-                  <p className="text-sm text-orange-700 mb-2 font-medium">Sample scenario:</p>
-                  <p className="font-medium text-orange-800 italic">"Let's plan a movie date... but explain everything in Hindi!"</p>
+                <h3 className="text-center font-bold text-slate-800 mb-2 text-lg">Your Learning Profile:</h3>
+                <p className="text-center text-slate-700 font-semibold mb-4 text-lg">
+                  {selectedGoalData?.title} + {selectedToneData?.title}
+                </p>
+                <div className="bg-gradient-to-r from-orange-100 to-pink-100 p-4 rounded-2xl border-3 border-orange-200">
+                  <p className="text-sm text-orange-700 mb-2 font-semibold">🎬 Sample scenario:</p>
+                  <p className="font-bold text-orange-800 italic text-lg">
+                    "Let's plan a Bollywood movie date... but explain everything in Hindi!"
+                  </p>
                 </div>
               </div>
               
               {/* Start Button */}
               <Button 
                 onClick={nextStep}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 text-xl rounded-3xl border-4 border-orange-600 uppercase tracking-wide"
+                className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-6 text-xl rounded-3xl border-4 border-orange-600 shadow-xl transform hover:scale-[1.02] transition-all duration-300"
               >
                 <Sparkles className="w-6 h-6 mr-3" />
-                Start Learning!
+                Start My Hindi Adventure!
               </Button>
             </div>
           </div>
