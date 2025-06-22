@@ -53,7 +53,7 @@ serve(async (req) => {
     console.log(`Formatted phone number: ${formattedPhoneNumber}`);
     console.log(`Topic: ${topic}`);
 
-    // Create the call with Vapi.ai using your curl request structure
+    // Create the call with Vapi.ai using workflow structure
     const vapiResponse = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
       headers: {
@@ -61,10 +61,12 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        assistantId: "d3c48fab-0d85-4e6e-9f22-076b9e3c537c",
-        assistantOverrides: {
+        workflowId: "ed07a022-213b-4715-92ff-1ce874b24aa6",
+        workflowOverrides: {
           variableValues: {
-            topic: topic
+            topic: topic,
+            language: "hindi",
+            phone_number: formattedPhoneNumber
           }
         },
         phoneNumberId: "84d220a6-8dd1-4808-b31e-a6364ce98885",
