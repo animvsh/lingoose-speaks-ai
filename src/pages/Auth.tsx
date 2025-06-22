@@ -19,6 +19,21 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  const cleanupAuthState = () => {
+    // Remove all Supabase auth keys from localStorage
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+    // Remove from sessionStorage if in use
+    Object.keys(sessionStorage || {}).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -42,6 +57,16 @@ const Auth = () => {
           className: "border-2 border-red-400 bg-red-50 text-red-800",
         });
         return;
+      }
+
+      // Clean up existing state before authentication
+      cleanupAuthState();
+      
+      // Attempt global sign out before new authentication
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.log('Cleanup sign out failed, continuing...', err);
       }
 
       const redirectUrl = `${window.location.origin}/`;
@@ -83,7 +108,7 @@ const Auth = () => {
         });
       }
 
-      // Redirect after successful auth
+      // Force page reload after successful auth
       setTimeout(() => {
         window.location.href = '/';
       }, 1500);
