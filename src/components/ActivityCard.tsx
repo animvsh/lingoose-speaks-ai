@@ -1,6 +1,8 @@
+
 import { Button } from "@/components/ui/button";
 import { Phone, Clock, CheckCircle, Home, Settings, ArrowLeft, Play, Mic, Users, MapPin, Coffee, Briefcase, Heart, ShoppingCart, Plane, GraduationCap, Car, Music, Book, Star, Target, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
 import DuckMascot from "./DuckMascot";
+import LearningProgressTree from "./LearningProgressTree";
 import { useState } from "react";
 import AppBar from "./AppBar";
 import { supabase } from "@/integrations/supabase/client";
@@ -130,8 +132,8 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           </p>
         </div>
 
-        {/* Last Call Details */}
-        {lastActivity && (
+        {/* Previous Activity Section */}
+        {lastActivity ? (
           <div className="bg-purple-400 rounded-3xl p-6 border-4 border-purple-500 mb-8">
             <div className="flex items-center mb-4">
               <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center mr-4">
@@ -139,7 +141,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-white uppercase tracking-wide">
-                  LAST CALL SUMMARY
+                  PREVIOUS ACTIVITY
                 </h3>
                 <p className="text-purple-100 font-medium text-sm">
                   {lastActivity.activities.name}
@@ -177,6 +179,22 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
             {/* Rating Stars */}
             <div className="flex items-center justify-center space-x-1">
               {renderStars(lastActivity.rating)}
+            </div>
+          </div>
+        ) : (
+          <div className="bg-gray-400 rounded-3xl p-6 border-4 border-gray-500 mb-8">
+            <div className="flex items-center justify-center">
+              <div className="w-14 h-14 bg-gray-600 rounded-2xl flex items-center justify-center mr-4">
+                <Phone className="w-7 h-7 text-white" />
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-bold text-white uppercase tracking-wide">
+                  NO PREVIOUS ACTIVITY
+                </h3>
+                <p className="text-gray-100 font-medium text-sm">
+                  Start your first practice session below!
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -262,6 +280,9 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           </div>
         )}
 
+        {/* Learning Progress Tree */}
+        <LearningProgressTree />
+
         {/* Today's Challenge */}
         <div className="bg-blue-400 rounded-3xl p-6 border-4 border-blue-500 mb-8">
           <div className="flex items-center mb-4">
@@ -318,25 +339,6 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
             )}
           </Button>
         </div>
-
-        {/* Simple Learning Progress Section */}
-        {(!ratings || ratings.length === 0) && (
-          <div className="bg-gray-200 rounded-3xl p-8 border-4 border-gray-300 text-center">
-            <div className="w-16 h-16 bg-gray-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-2">Start Learning</h3>
-            <p className="text-gray-600 font-medium mb-4">
-              Begin your language learning journey to see your progress here!
-            </p>
-            <Button 
-              onClick={() => onNavigate("curriculum")}
-              className="bg-orange-400 hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-2xl"
-            >
-              START FIRST SESSION
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Bottom Navigation */}
