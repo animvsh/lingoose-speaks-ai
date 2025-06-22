@@ -550,6 +550,10 @@ export type Database = {
         Args: { p_user_id: string; p_unit_id: string }
         Returns: number
       }
+      create_user: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       is_skill_unlocked: {
         Args: { p_user_id: string; p_skill_id: string }
         Returns: boolean

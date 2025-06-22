@@ -29,7 +29,9 @@ const LearningProgressTree = () => {
 
   const getUnitProgress = (unitId: string) => {
     // Mock progress calculation - in real app this would use the database functions
-    return Math.floor(Math.random() * 100);
+    // Use unit ID to generate consistent progress values
+    const hash = unitId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return Math.floor((hash % 50) + 30); // Generate consistent values between 30-80
   };
 
   const getUnitColor = (index: number) => {
@@ -80,9 +82,9 @@ const LearningProgressTree = () => {
             <div key={unit.id} className="relative">
               <div 
                 className={`${colors.bg} rounded-3xl p-6 border-4 ${colors.border} ${
-                  isLocked ? "opacity-50" : "cursor-pointer hover:scale-[1.02] transition-transform"
+                  "cursor-pointer hover:scale-[1.02] transition-transform"
                 }`}
-                onClick={() => !isLocked && toggleUnit(unit.id)}
+                onClick={() => toggleUnit(unit.id)}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4 flex-1">
@@ -119,21 +121,19 @@ const LearningProgressTree = () => {
                   </div>
 
                   {/* Expand Arrow */}
-                  {!isLocked && (
-                    <div className="ml-4 flex items-center">
-                      {isExpanded ? (
-                        <ChevronDown className="w-6 h-6 text-white" />
-                      ) : (
-                        <ChevronRight className="w-6 h-6 text-white" />
-                      )}
-                    </div>
-                  )}
+                  <div className="ml-4 flex items-center">
+                    {isExpanded ? (
+                      <ChevronDown className="w-6 h-6 text-white" />
+                    ) : (
+                      <ChevronRight className="w-6 h-6 text-white" />
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Expanded Skills */}
-              {isExpanded && !isLocked && (
-                <UnitSkills unitId={unit.id} />
+              {isExpanded && (
+                <UnitSkills unitId={unit.id} isLocked={isLocked} />
               )}
             </div>
           );
@@ -143,7 +143,7 @@ const LearningProgressTree = () => {
   );
 };
 
-const UnitSkills = ({ unitId }: { unitId: string }) => {
+const UnitSkills = ({ unitId, isLocked }: { unitId: string; isLocked: boolean }) => {
   const { data: skills } = useSkills(unitId);
 
   if (!skills) return null;
@@ -158,37 +158,51 @@ const UnitSkills = ({ unitId }: { unitId: string }) => {
     return colors[index % colors.length];
   };
 
+  const getSkillProgress = (skillId: string, index: number) => {
+    // Generate consistent progress based on skill ID and index
+    const hash = skillId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return Math.floor((hash + index * 17) % 60) + 20; // Generate consistent values between 20-80
+  };
+
   return (
     <div className="ml-4 mt-4 space-y-3">
       {skills.map((skill, index) => {
-        const progress = Math.floor(Math.random() * 100);
-        const isCompleted = progress === 100;
+        const progress = getSkillProgress(skill.id, index);
+        const isCompleted = progress >= 80;
         const colorClass = getSkillColor(index);
         
         return (
-          <div key={skill.id} className={`${colorClass} rounded-2xl p-4 border-2`}>
+          <div key={skill.id} className={`${colorClass} rounded-2xl p-4 border-2 ${isLocked ? "opacity-60" : ""}`}>
             <div className="flex items-center space-x-3">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                isCompleted ? "bg-green-600" : "bg-gray-600"
+                isLocked ? "bg-gray-500" : isCompleted ? "bg-green-600" : "bg-gray-600"
               }`}>
-                {isCompleted ? (
+                {isLocked ? (
+                  <Lock className="w-4 h-4 text-white" />
+                ) : isCompleted ? (
                   <CheckCircle className="w-5 h-5 text-white" />
                 ) : (
                   <span className="text-sm font-bold text-white">{index + 1}</span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h5 className="font-bold text-gray-800 text-sm uppercase tracking-wide">{skill.name}</h5>
+                <h5 className={`font-bold text-sm uppercase tracking-wide ${isLocked ? "text-gray-600" : "text-gray-800"}`}>
+                  {skill.name}
+                  {isLocked && <span className="text-xs ml-2 text-gray-500">(LOCKED)</span>}
+                </h5>
                 <div className="w-full bg-white/50 h-2 rounded-full mt-2">
                   <div 
                     className={`h-2 rounded-full transition-all duration-300 ${
-                      progress < 50 ? "bg-red-500" : progress < 80 ? "bg-yellow-500" : "bg-green-500"
+                      isLocked ? "bg-gray-400" : 
+                      progress < 50 ? "bg-red-500" : progress < 70 ? "bg-yellow-500" : "bg-green-500"
                     }`}
                     style={{ width: `${progress}%` }}
                   ></div>
                 </div>
               </div>
-              <span className="text-sm font-bold text-gray-800">{progress}%</span>
+              <span className={`text-sm font-bold ${isLocked ? "text-gray-600" : "text-gray-800"}`}>
+                {progress}%
+              </span>
             </div>
           </div>
         );
