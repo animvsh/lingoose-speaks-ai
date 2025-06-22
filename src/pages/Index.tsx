@@ -1,7 +1,6 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target } from "lucide-react";
+import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target, BookOpen } from "lucide-react";
 import DuckMascot from "@/components/DuckMascot";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
@@ -334,22 +333,22 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
           </Button>
         </div>
 
-        {/* Improvements Card */}
+        {/* Curriculum Card - replacing the Improvements card */}
         <div 
-          onClick={() => onNavigate("progress")}
+          onClick={() => onNavigate("curriculum")}
           className={`bg-green-400 rounded-3xl p-6 border-4 border-green-500 cursor-pointer transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="w-14 h-14 bg-green-600 rounded-2xl flex items-center justify-center mr-4">
-                <Trophy className="w-7 h-7 text-white" />
+                <BookOpen className="w-7 h-7 text-white" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white uppercase tracking-wide">
-                  IMPROVEMENTS
+                  CURRICULUM
                 </h3>
                 <p className="text-green-100 font-medium text-sm">
-                  Since last time
+                  Explore learning path
                 </p>
               </div>
             </div>
@@ -359,17 +358,17 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white rounded-2xl p-4 text-center border-2 border-white">
               <div className="w-8 h-8 bg-purple-400 rounded-xl flex items-center justify-center mx-auto mb-2">
-                <Clock className="w-4 h-4 text-white" />
+                <Target className="w-4 h-4 text-white" />
               </div>
-              <div className="text-xl font-bold text-purple-700">8min</div>
-              <div className="text-xs text-purple-600 font-bold">TALK TIME</div>
+              <div className="text-xl font-bold text-purple-700">12</div>
+              <div className="text-xs text-purple-600 font-bold">MODULES</div>
             </div>
             <div className="bg-white rounded-2xl p-4 text-center border-2 border-white">
               <div className="w-8 h-8 bg-pink-400 rounded-xl flex items-center justify-center mx-auto mb-2">
                 <Star className="w-4 h-4 text-white" />
               </div>
-              <div className="text-xl font-bold text-pink-700">89%</div>
-              <div className="text-xs text-pink-600 font-bold">ENGAGEMENT</div>
+              <div className="text-xl font-bold text-pink-700">3/12</div>
+              <div className="text-xs text-pink-600 font-bold">COMPLETED</div>
             </div>
           </div>
         </div>
