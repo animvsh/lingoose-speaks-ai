@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Volume2, Sparkles, ArrowLeft, Heart, Zap, Star } from "lucide-react";
@@ -337,7 +336,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      {renderView()}
+      {renderStep()}
     </div>
   );
 };
