@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Phone, ArrowLeft, Shield } from "lucide-react";
+import { Phone, Shield } from "lucide-react";
 import { usePhoneAuth } from "@/hooks/usePhoneAuth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -60,7 +60,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
     if (result.success) {
       toast({
         title: "🎉 Welcome!",
-        description: "Successfully signed in with phone number!",
+        description: "Successfully signed in!",
         className: "border-2 border-green-400 bg-green-50 text-green-800",
       });
       // Redirect after successful auth
@@ -80,22 +80,14 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
     <Card className="border-4 border-slate-400 rounded-2xl bg-white shadow-lg">
       <CardHeader className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-            className="absolute left-4 top-4"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
           <Shield className="w-6 h-6 text-slate-600" />
         </div>
         <CardTitle className="text-2xl font-black text-slate-800 uppercase tracking-wide">
-          {step === "phone" ? "Phone Sign In" : "Verify Code"}
+          {step === "phone" ? "Enter Phone Number" : "Verify Code"}
         </CardTitle>
         <CardDescription className="text-slate-600 font-bold">
           {step === "phone" 
-            ? "Enter your phone number to receive a verification code" 
+            ? "Enter your phone number to get started" 
             : `Enter the 6-digit code sent to ${phoneNumber}`
           }
         </CardDescription>
@@ -121,7 +113,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
               disabled={isLoading}
               className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
             >
-              {isLoading ? "Sending Code..." : "Send Verification Code"}
+              {isLoading ? "Sending Code..." : "Get Started"}
             </Button>
           </form>
         ) : (
@@ -148,7 +140,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
               disabled={isLoading}
               className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
             >
-              {isLoading ? "Verifying..." : "Verify Code"}
+              {isLoading ? "Verifying..." : "Continue"}
             </Button>
 
             <div className="text-center">

@@ -34,6 +34,44 @@ export const usePhoneAuth = () => {
     return phone;
   };
 
+  const createOrFindUserProfile = async (phoneNumber: string) => {
+    try {
+      // Check if a profile already exists for this phone number
+      const { data: existingProfile, error: findError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('phone_number', phoneNumber)
+        .single();
+
+      if (existingProfile && !findError) {
+        console.log('Found existing profile:', existingProfile.id);
+        return existingProfile;
+      }
+
+      // Create new profile if none exists
+      const { data: newProfile, error: createError } = await supabase
+        .from('user_profiles')
+        .insert({
+          full_name: 'New User',
+          phone_number: phoneNumber,
+          language: 'hindi'
+        })
+        .select('*')
+        .single();
+
+      if (createError) {
+        console.error('Error creating profile:', createError);
+        throw createError;
+      }
+
+      console.log('Created new profile:', newProfile.id);
+      return newProfile;
+    } catch (error) {
+      console.error('Error in createOrFindUserProfile:', error);
+      throw error;
+    }
+  };
+
   const createTestUserIfNotExists = async (): Promise<void> => {
     try {
       console.log('Checking if test user exists...');
@@ -87,6 +125,9 @@ export const usePhoneAuth = () => {
     try {
       const formattedPhone = formatPhoneNumber(phoneNumber);
       console.log('Sending OTP to:', formattedPhone);
+      
+      // Ensure user profile exists (create if needed)
+      await createOrFindUserProfile(formattedPhone);
       
       // Check if this is our test phone number
       if (formattedPhone === '+16505188736') {
@@ -216,12 +257,12 @@ export const usePhoneAuth = () => {
         return { success: true };
       }
       
-      // For real phone numbers, create/sign in normally
+      // For real phone numbers, create/sign in automatically
       const sanitizedPhone = formattedPhone.replace(/[^0-9]/g, '');
       const testEmail = `phone${sanitizedPhone}@example.com`;
       const testPassword = 'phone_auth_secure_' + sanitizedPhone;
       
-      console.log('Attempting to sign in with email:', testEmail);
+      console.log('Auto-signing in with phone number:', formattedPhone);
       
       // Try to sign in first
       let { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -230,17 +271,9 @@ export const usePhoneAuth = () => {
       });
       
       if (signInError && signInError.message.includes("Invalid login credentials")) {
-        console.log('User does not exist, creating new user...');
+        console.log('User does not exist, creating new auto-login user...');
         
-        // Check if a profile already exists for this phone number
-        const { data: existingProfile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('phone_number', formattedPhone)
-          .is('auth_user_id', null)
-          .single();
-        
-        // Create auth user
+        // Create auth user automatically
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: testEmail,
           password: testPassword,
@@ -253,27 +286,28 @@ export const usePhoneAuth = () => {
         });
         
         if (signUpError) {
-          console.error('Sign up error:', signUpError);
+          console.error('Auto sign up error:', signUpError);
           throw signUpError;
         }
         
-        // If there's an existing profile, link it to the new auth user
-        if (existingProfile && signUpData.user) {
+        // Link to the existing profile we created earlier
+        if (signUpData.user) {
           const { error: linkError } = await supabase
             .from('user_profiles')
             .update({ auth_user_id: signUpData.user.id })
-            .eq('id', existingProfile.id);
+            .eq('phone_number', formattedPhone)
+            .is('auth_user_id', null);
           
           if (linkError) {
-            console.error('Error linking existing profile:', linkError);
+            console.error('Error linking new profile:', linkError);
           } else {
-            console.log('Linked existing profile to new auth user');
+            console.log('Linked profile to new auth user');
           }
         }
         
-        console.log('User created successfully:', signUpData);
+        console.log('Auto-created user successfully:', signUpData);
       } else if (signInError) {
-        console.error('Sign in error:', signInError);
+        console.error('Auto sign in error:', signInError);
         throw signInError;
       } else {
         // User signed in successfully, link any unlinked profile
@@ -289,7 +323,7 @@ export const usePhoneAuth = () => {
           }
         }
         
-        console.log('User signed in successfully:', signInData);
+        console.log('Auto-signed in successfully:', signInData);
       }
 
       return { success: true };
