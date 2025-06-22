@@ -43,12 +43,17 @@ const Index = () => {
     } else if (user && userProfile) {
       const onboardingComplete = localStorage.getItem('lingooseOnboardingComplete');
       
-      if (onboardingComplete) {
+      // Check if this is a new user (just created profile)
+      const isNewUser = !onboardingComplete && userProfile.full_name === 'New User';
+      
+      if (onboardingComplete && !isNewUser) {
+        // Existing user who has completed onboarding
         setHasOnboarded(true);
         setCurrentView("home");
         setNavigationHistory(["home"]);
         setCurrentHistoryIndex(0);
       } else {
+        // New user or existing user who hasn't completed onboarding
         setCurrentView("welcome");
       }
     } else {
@@ -67,12 +72,17 @@ const Index = () => {
     if (user && userProfile && currentView === "loading") {
       const onboardingComplete = localStorage.getItem('lingooseOnboardingComplete');
       
-      if (onboardingComplete) {
+      // Check if this is a new user (just created profile)
+      const isNewUser = !onboardingComplete && userProfile.full_name === 'New User';
+      
+      if (onboardingComplete && !isNewUser) {
+        // Existing user who has completed onboarding
         setHasOnboarded(true);
         setCurrentView("home");
         setNavigationHistory(["home"]);
         setCurrentHistoryIndex(0);
       } else {
+        // New user or existing user who hasn't completed onboarding
         setCurrentView("welcome");
       }
     }

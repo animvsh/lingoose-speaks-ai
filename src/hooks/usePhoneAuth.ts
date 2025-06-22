@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -51,12 +52,12 @@ export const usePhoneAuth = () => {
     }
   };
 
-  const signInWithPhone = async (phoneNumber: string): Promise<{ success: boolean; error?: string }> => {
+  const signInWithPhone = async (phoneNumber: string): Promise<{ success: boolean; error?: string; isNewUser?: boolean }> => {
     setIsLoading(true);
     
     try {
       const formattedPhone = formatPhoneNumber(phoneNumber);
-      console.log('Looking up or creating profile for phone:', formattedPhone);
+      console.log('Looking up profile for phone:', formattedPhone);
       
       // First check if profile exists
       const { data: existingProfile, error: findError } = await supabase
@@ -71,15 +72,19 @@ export const usePhoneAuth = () => {
       }
 
       let profile;
+      let isNewUser = false;
+
       if (existingProfile) {
         console.log('Found existing profile:', existingProfile.id);
         profile = existingProfile;
       } else {
-        console.log('Creating new profile...');
+        console.log('Creating new profile for new user...');
+        isNewUser = true;
+        
         const { data: newProfile, error: createError } = await supabase
           .from('user_profiles')
           .insert({
-            full_name: 'Phone User',
+            full_name: 'New User',
             phone_number: formattedPhone,
             language: 'hindi'
           })
@@ -102,8 +107,8 @@ export const usePhoneAuth = () => {
       localStorage.setItem('phone_authenticated', 'true');
       localStorage.setItem('phone_number', formattedPhone);
 
-      console.log('Phone authentication successful');
-      return { success: true };
+      console.log('Phone authentication successful, isNewUser:', isNewUser);
+      return { success: true, isNewUser };
       
     } catch (error: any) {
       console.error('Phone sign in error:', error);

@@ -26,15 +26,27 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
 
     const result = await signInWithPhone(phoneNumber);
     if (result.success) {
-      toast({
-        title: "🎉 Welcome!",
-        description: "Successfully signed in!",
-        className: "border-2 border-green-400 bg-green-50 text-green-800",
-      });
-      // Force page reload to update auth state
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 1000);
+      if (result.isNewUser) {
+        toast({
+          title: "🎉 Welcome to Lingoose!",
+          description: "Let's get you started with a quick setup!",
+          className: "border-2 border-green-400 bg-green-50 text-green-800",
+        });
+        // For new users, we'll let the main app handle the onboarding flow
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      } else {
+        toast({
+          title: "🎉 Welcome Back!",
+          description: "Successfully signed in!",
+          className: "border-2 border-green-400 bg-green-50 text-green-800",
+        });
+        // For existing users, go straight to the main app
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      }
     } else {
       toast({
         title: "❌ Sign In Failed",
