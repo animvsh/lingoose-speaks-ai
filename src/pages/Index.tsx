@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target } from "lucide-react";
@@ -258,173 +259,174 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   };
   
   const getFluencyBgColor = (score: number) => {
-    if (score < 30) return "bg-red-500";
-    if (score < 60) return "bg-orange-500";
-    if (score < 90) return "bg-yellow-500";
-    return "bg-green-500";
+    if (score < 30) return "bg-red-400";
+    if (score < 60) return "bg-orange-400";
+    if (score < 90) return "bg-yellow-400";
+    return "bg-green-400";
   };
   
   return (
-    <div className="min-h-screen bg-gray-100 pb-20">
+    <div className="min-h-screen bg-stone-50 pb-24">
       {/* Header */}
-      <div className="bg-orange-500 px-4 py-5 mb-6 rounded-b-3xl shadow-[0_6px_0_0_#ea580c]">
+      <div className="bg-gradient-to-br from-orange-400 to-orange-500 px-6 py-8 mb-8 rounded-b-3xl">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <DuckMascot className="w-8 h-8 mr-3" />
+            <DuckMascot className="w-16 h-16 mr-4 transform hover:scale-110 transition-transform duration-200" />
             <div>
-              <h1 className="text-lg font-black text-white">
-                Hi {userProfile?.full_name?.split(' ')[0] || 'there'}! 👋
+              <h1 className="text-2xl font-black text-white drop-shadow-sm">
+                Hey {userProfile?.full_name?.split(' ')[0] || 'there'}! 🌟
               </h1>
+              <p className="text-orange-100 font-semibold">Ready to learn today?</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 space-y-4">
+      <div className="px-6 space-y-6">
         {/* Native Fluency Score Card */}
-        <div className={`bg-white rounded-3xl p-5 text-center shadow-[0_6px_0_0_#e5e7eb] hover:shadow-[0_3px_0_0_#e5e7eb] hover:translate-y-0.5 transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
-          <div className="mb-4">
-            <div className={`text-4xl font-black mb-2 ${getFluencyColor(nativeFluency)} transition-all duration-300`}>
+        <div className={`bg-white rounded-3xl p-6 text-center border-4 border-gray-100 hover:border-orange-200 transition-all duration-300 hover:-translate-y-1 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+          <div className="mb-6">
+            <div className={`text-5xl font-black mb-3 ${getFluencyColor(nativeFluency)} transition-all duration-300`}>
               {nativeFluency}%
             </div>
-            <h2 className="text-lg font-black text-gray-800 mb-2 tracking-tight">NATIVE FLUENCY</h2>
-            <p className="text-gray-600 font-medium text-sm">Speech clarity, vocabulary, and flow</p>
+            <h2 className="text-xl font-black text-gray-800 mb-2 tracking-tight">NATIVE FLUENCY</h2>
+            <p className="text-gray-600 font-semibold text-sm">Speech clarity, vocabulary, and flow</p>
           </div>
           
-          <div className="w-full bg-gray-200 h-3 rounded-full mb-4 shadow-[0_2px_0_0_#d1d5db]">
+          <div className="w-full bg-gray-200 h-4 rounded-full mb-6 overflow-hidden">
             <div 
-              className={`h-full rounded-full transition-all duration-500 ${getFluencyBgColor(nativeFluency)} shadow-[0_1px_0_0_rgba(0,0,0,0.2)]`}
+              className={`h-full rounded-full transition-all duration-700 ${getFluencyBgColor(nativeFluency)}`}
               style={{ width: isLoaded ? `${nativeFluency}%` : '0%' }}
             ></div>
           </div>
           
-          <div className="bg-gray-100 rounded-2xl p-3 shadow-[0_2px_0_0_#d1d5db]">
-            <p className="text-gray-700 font-medium text-sm italic">
-              "Just {100 - nativeFluency}% away from native level! 🦆"
+          <div className="bg-orange-50 rounded-2xl p-4 border-2 border-orange-100">
+            <p className="text-orange-700 font-bold text-sm">
+              "Just {100 - nativeFluency}% away from native level! 🦆✨"
             </p>
           </div>
         </div>
 
         {/* Today's Challenge */}
-        <div className={`bg-blue-500 rounded-3xl p-5 shadow-[0_6px_0_0_#2563eb] hover:shadow-[0_3px_0_0_#2563eb] hover:translate-y-0.5 transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
-          <div className="flex items-center mb-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center mr-3 shadow-[0_2px_0_0_#1d4ed8]">
-              <Phone className="w-5 h-5 text-white" />
+        <div className={`bg-gradient-to-br from-blue-400 to-blue-500 rounded-3xl p-6 border-4 border-white hover:border-blue-200 transition-all duration-300 hover:-translate-y-1 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+          <div className="flex items-center mb-4">
+            <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mr-4">
+              <Phone className="w-7 h-7 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-black text-white uppercase tracking-tight">
+              <h3 className="text-lg font-black text-white uppercase tracking-tight">
                 TODAY'S CHALLENGE
               </h3>
-              <p className="text-blue-100 font-medium text-sm">
+              <p className="text-blue-100 font-semibold text-sm">
                 Hotel check-in conversation 🇪🇸
               </p>
             </div>
           </div>
           <Button 
             onClick={() => onNavigate("activity")}
-            className="w-full bg-white hover:bg-gray-50 text-blue-600 font-black py-3 text-base rounded-2xl shadow-[0_3px_0_0_#e5e7eb] hover:shadow-[0_1px_0_0_#e5e7eb] hover:translate-y-0.5 transition-all duration-100 border-0"
+            className="w-full bg-white hover:bg-blue-50 text-blue-600 font-black py-4 text-lg rounded-2xl border-4 border-white hover:border-blue-100 transition-all duration-300 hover:-translate-y-0.5"
           >
-            START NOW
+            START NOW ⚡
           </Button>
         </div>
 
         {/* Improvements */}
         <div 
           onClick={() => onNavigate("progress")}
-          className={`bg-green-500 rounded-3xl p-5 shadow-[0_6px_0_0_#16a34a] hover:shadow-[0_3px_0_0_#16a34a] hover:translate-y-0.5 cursor-pointer transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}
+          className={`bg-gradient-to-br from-green-400 to-green-500 rounded-3xl p-6 border-4 border-white hover:border-green-200 cursor-pointer transition-all duration-300 hover:-translate-y-1 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
         >
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <div className="w-10 h-10 bg-green-600 rounded-2xl flex items-center justify-center mr-3 shadow-[0_2px_0_0_#15803d]">
-                <Trophy className="w-5 h-5 text-white" />
+              <div className="w-14 h-14 bg-green-600 rounded-2xl flex items-center justify-center mr-4">
+                <Trophy className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="text-base font-black text-white uppercase tracking-tight">
+                <h3 className="text-lg font-black text-white uppercase tracking-tight">
                   IMPROVEMENTS
                 </h3>
-                <p className="text-green-100 font-medium text-sm">
+                <p className="text-green-100 font-semibold text-sm">
                   Since last time
                 </p>
               </div>
             </div>
-            <ArrowLeft className="w-4 h-4 text-green-100 rotate-180" />
+            <ArrowLeft className="w-6 h-6 text-green-100 rotate-180" />
           </div>
           
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white/90 rounded-2xl p-3 text-center shadow-[0_2px_0_0_rgba(255,255,255,0.3)]">
-              <div className="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center mx-auto mb-1 shadow-[0_1px_0_0_#9333ea]">
-                <Clock className="w-3 h-3 text-white" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white/95 rounded-2xl p-4 text-center border-2 border-white/50">
+              <div className="w-8 h-8 bg-purple-400 rounded-xl flex items-center justify-center mx-auto mb-2">
+                <Clock className="w-4 h-4 text-white" />
               </div>
-              <div className="text-lg font-black text-purple-700">8min</div>
+              <div className="text-xl font-black text-purple-700">8min</div>
               <div className="text-xs text-purple-600 font-bold">TALK TIME</div>
             </div>
-            <div className="bg-white/90 rounded-2xl p-3 text-center shadow-[0_2px_0_0_rgba(255,255,255,0.3)]">
-              <div className="w-6 h-6 bg-pink-500 rounded-lg flex items-center justify-center mx-auto mb-1 shadow-[0_1px_0_0_#ec4899]">
-                <Star className="w-3 h-3 text-white" />
+            <div className="bg-white/95 rounded-2xl p-4 text-center border-2 border-white/50">
+              <div className="w-8 h-8 bg-pink-400 rounded-xl flex items-center justify-center mx-auto mb-2">
+                <Star className="w-4 h-4 text-white" />
               </div>
-              <div className="text-lg font-black text-pink-700">89%</div>
+              <div className="text-xl font-black text-pink-700">89%</div>
               <div className="text-xs text-pink-600 font-bold">ENGAGEMENT</div>
             </div>
           </div>
         </div>
 
         {/* New Fluency Map Button */}
-        <div className={`transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
+        <div className={`transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <Button 
             onClick={() => onNavigate("fluency-map")}
-            className="w-full bg-purple-500 hover:bg-purple-600 text-white font-black py-5 text-lg rounded-3xl shadow-[0_6px_0_0_#9333ea] hover:shadow-[0_3px_0_0_#9333ea] hover:translate-y-0.5 transition-all duration-100 border-0 mb-3"
+            className="w-full bg-gradient-to-r from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 text-white font-black py-6 text-xl rounded-3xl border-4 border-white hover:border-purple-200 transition-all duration-300 hover:-translate-y-1 mb-4"
           >
-            <Target className="w-6 h-6 mr-2" />
-            EXPLORE FLUENCY MAP
+            <Target className="w-8 h-8 mr-3" />
+            EXPLORE FLUENCY MAP 🗺️
           </Button>
         </div>
 
         {/* Start Learning Button */}
-        <div className={`transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
+        <div className={`transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <Button 
             onClick={() => onNavigate("curriculum")}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-5 text-lg rounded-3xl shadow-[0_6px_0_0_#ea580c] hover:shadow-[0_3px_0_0_#ea580c] hover:translate-y-0.5 transition-all duration-100 border-0"
+            className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-black py-6 text-xl rounded-3xl border-4 border-white hover:border-orange-200 transition-all duration-300 hover:-translate-y-1"
           >
-            START LEARNING
+            START LEARNING 🚀
           </Button>
         </div>
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white px-4 py-3 shadow-[0_-4px_0_0_#e5e7eb]">
+      <div className="fixed bottom-0 left-0 right-0 bg-white px-6 py-4 border-t-4 border-gray-100">
         <div className="max-w-md mx-auto">
-          <div className="flex justify-center space-x-4">
+          <div className="flex justify-center space-x-3">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-12 h-12 bg-orange-500 rounded-2xl text-white shadow-[0_3px_0_0_#ea580c] border-0"
+              className="w-14 h-14 bg-orange-400 hover:bg-orange-500 rounded-2xl text-white border-4 border-white hover:border-orange-200 transition-all duration-300 hover:-translate-y-0.5"
             >
-              <Home className="w-5 h-5" />
+              <Home className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 shadow-[0_3px_0_0_#9ca3af] hover:shadow-[0_1px_0_0_#9ca3af] hover:translate-y-0.5 border-0 transition-all duration-100"
+              className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-0.5"
             >
-              <Phone className="w-5 h-5" />
+              <Phone className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 shadow-[0_3px_0_0_#9ca3af] hover:shadow-[0_1px_0_0_#9ca3af] hover:translate-y-0.5 border-0 transition-all duration-100"
+              className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-0.5"
             >
-              <CheckCircle className="w-5 h-5" />
+              <CheckCircle className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 shadow-[0_3px_0_0_#9ca3af] hover:shadow-[0_1px_0_0_#9ca3af] hover:translate-y-0.5 border-0 transition-all duration-100"
+              className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-0.5"
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-6 h-6" />
             </Button>
           </div>
         </div>
