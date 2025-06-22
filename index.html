@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Lingoose - AI Language Learning</title>
     <meta name="description" content="Learn languages through AI-powered phone conversations with Lingoose" />
     <meta name="author" content="Lingoose" />
@@ -43,6 +43,7 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
+        -webkit-tap-highlight-color: transparent;
       }
       
       input, textarea {
@@ -55,11 +56,54 @@
       body {
         overscroll-behavior: none;
         -webkit-overflow-scrolling: touch;
+        touch-action: manipulation;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      html {
+        touch-action: manipulation;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      #root {
+        height: 100vh;
+        height: 100dvh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Prevent pull-to-refresh */
+      body {
+        overscroll-behavior-y: contain;
+      }
+
+      /* Disable double-tap zoom */
+      * {
+        touch-action: manipulation;
+      }
+
+      /* Prevent text selection on mobile */
+      .no-select {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
       }
     </style>
   </head>
 
-  <body>
+  <body class="no-select">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

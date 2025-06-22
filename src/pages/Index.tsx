@@ -13,6 +13,7 @@ import DashboardStats from "@/components/DashboardStats";
 import WeeklyChart from "@/components/WeeklyChart";
 import RecentFeedback from "@/components/RecentFeedback";
 import GoalProgress from "@/components/GoalProgress";
+import SplashScreen from "@/components/SplashScreen";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useCallLogs } from "@/hooks/useCallLogs";
@@ -22,20 +23,39 @@ const Index = () => {
   const { data: userProfile, isLoading: profileLoading } = useUserProfile();
   const { data: callLogs } = useCallLogs();
   
-  const [currentView, setCurrentView] = useState("welcome");
+  const [currentView, setCurrentView] = useState("splash");
   const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Redirect to auth if not authenticated
-  useEffect(() => {
+  // Handle splash screen completion
+  const handleSplashComplete = () => {
     if (!authLoading && !user) {
       window.location.href = '/auth';
+    } else if (user && userProfile) {
+      const onboardingComplete = localStorage.getItem('lingooseOnboardingComplete');
+      
+      if (onboardingComplete) {
+        setHasOnboarded(true);
+        setCurrentView("home");
+      } else {
+        setCurrentView("welcome");
+      }
+    } else {
+      // Still loading, show loading state
+      setCurrentView("loading");
     }
-  }, [user, authLoading]);
+  };
+
+  // Redirect to auth if not authenticated (after splash)
+  useEffect(() => {
+    if (!authLoading && !user && currentView !== "splash") {
+      window.location.href = '/auth';
+    }
+  }, [user, authLoading, currentView]);
 
   useEffect(() => {
-    if (user && userProfile) {
+    if (user && userProfile && currentView === "loading") {
       // Check if user has already onboarded
       const onboardingComplete = localStorage.getItem('lingooseOnboardingComplete');
       
@@ -46,10 +66,15 @@ const Index = () => {
         setCurrentView("welcome");
       }
     }
-  }, [user, userProfile]);
+  }, [user, userProfile, currentView]);
 
-  // Show loading while auth is initializing
-  if (authLoading || profileLoading) {
+  // Show splash screen first
+  if (currentView === "splash") {
+    return <SplashScreen onComplete={handleSplashComplete} />;
+  }
+
+  // Show loading while auth is initializing (after splash)
+  if (currentView === "loading" || authLoading || profileLoading) {
     return (
       <div className="min-h-screen bg-yellow-100 flex items-center justify-center">
         <div className="text-center">
