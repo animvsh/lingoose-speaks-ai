@@ -4,6 +4,32 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { subDays, isAfter, startOfWeek, endOfWeek } from "date-fns";
 
+// Define interfaces for better type safety
+interface SentimentAnalysis {
+  overall_sentiment?: string;
+  [key: string]: any;
+}
+
+interface CallAnalysisData {
+  id: string;
+  user_id: string;
+  created_at: string;
+  call_duration?: number;
+  sentiment_analysis?: SentimentAnalysis | null;
+}
+
+interface ActivityRating {
+  id: string;
+  user_id: string;
+  completed_at: string;
+  duration_seconds?: number;
+  rating: number;
+  activities?: {
+    name: string;
+    description: string;
+  };
+}
+
 export const useCurriculumAnalytics = () => {
   const { user } = useAuth();
   
@@ -43,8 +69,8 @@ export const useCurriculumAnalytics = () => {
       }
 
       // Combine and analyze the data
-      const allCallData = callAnalysis || [];
-      const allRatings = activityRatings || [];
+      const allCallData = (callAnalysis || []) as CallAnalysisData[];
+      const allRatings = (activityRatings || []) as ActivityRating[];
 
       // Calculate analytics
       const totalCalls = allCallData.length + allRatings.length;
@@ -68,9 +94,10 @@ export const useCurriculumAnalytics = () => {
       let avgRating = 0;
       
       if (allCallData.length > 0) {
-        const positiveCallsCount = allCallData.filter(call => 
-          call.sentiment_analysis?.overall_sentiment === 'positive'
-        ).length;
+        const positiveCallsCount = allCallData.filter(call => {
+          const sentiment = call.sentiment_analysis as SentimentAnalysis | null;
+          return sentiment?.overall_sentiment === 'positive';
+        }).length;
         fluencyScore = Math.round((positiveCallsCount / allCallData.length) * 100);
       }
       
@@ -119,12 +146,14 @@ export const useCurriculumAnalytics = () => {
 
       // Analyze sentiment trends
       if (recentCallAnalysis.length >= 2) {
-        const recentPositive = recentCallAnalysis.filter(call => 
-          call.sentiment_analysis?.overall_sentiment === 'positive'
-        ).length;
-        const recentNegative = recentCallAnalysis.filter(call => 
-          call.sentiment_analysis?.overall_sentiment === 'negative'
-        ).length;
+        const recentPositive = recentCallAnalysis.filter(call => {
+          const sentiment = call.sentiment_analysis as SentimentAnalysis | null;
+          return sentiment?.overall_sentiment === 'positive';
+        }).length;
+        const recentNegative = recentCallAnalysis.filter(call => {
+          const sentiment = call.sentiment_analysis as SentimentAnalysis | null;
+          return sentiment?.overall_sentiment === 'negative';
+        }).length;
 
         if (recentPositive > recentNegative) {
           recentImprovements.push({

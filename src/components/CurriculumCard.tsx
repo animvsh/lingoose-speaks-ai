@@ -23,7 +23,10 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
         thisWeekCalls: 0,
         avgRating: 0,
         recentImprovements: [],
-        strugglingAreas: []
+        strugglingAreas: [],
+        callAnalysisCount: 0,
+        activityRatingsCount: 0,
+        lastActivity: null as Date | null
       };
     }
     return analytics;
