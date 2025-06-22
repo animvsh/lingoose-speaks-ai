@@ -16,7 +16,7 @@ const DuckMascot = ({ className, size = "lg" }: DuckMascotProps) => {
   return (
     <div className={cn("relative", sizeClasses[size], className)}>
       <img 
-        src="/lovable-uploads/60610b5f-893b-40d5-bd50-4e9d1f11ebbb.png"
+        src="/lovable-uploads/9b390537-0ebd-41d1-a22b-a1866619c6e8.png"
         alt="Lingoose Mascot"
         className="w-full h-full object-contain animate-bounce"
         style={{ animationDuration: "3s" }}
