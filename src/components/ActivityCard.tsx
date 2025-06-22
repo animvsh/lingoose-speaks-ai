@@ -146,69 +146,6 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           </div>
         )}
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          {/* Total Calls */}
-          <div className="bg-orange-400 rounded-3xl p-6 border-4 border-orange-500">
-            <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center mb-4">
-              <Phone className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-sm font-bold text-orange-800 uppercase tracking-wide mb-1">
-              TOTAL CALLS
-            </h3>
-            <div className="text-4xl font-bold text-orange-900 mb-2">47</div>
-            <div className="flex items-center text-orange-700 text-sm font-medium">
-              <span className="mr-1">📈</span>
-              +3 this week
-            </div>
-          </div>
-
-          {/* Talk Time */}
-          <div className="bg-green-400 rounded-3xl p-6 border-4 border-green-500">
-            <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center mb-4">
-              <Clock className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-sm font-bold text-green-800 uppercase tracking-wide mb-1">
-              TALK TIME
-            </h3>
-            <div className="text-4xl font-bold text-green-900 mb-2">6.2h</div>
-            <div className="flex items-center text-green-700 text-sm font-medium">
-              <span className="mr-1">📈</span>
-              +45min this week
-            </div>
-          </div>
-
-          {/* Fluency Score */}
-          <div className="bg-yellow-400 rounded-3xl p-6 border-4 border-yellow-500">
-            <div className="w-12 h-12 bg-yellow-600 rounded-2xl flex items-center justify-center mb-4">
-              <Trophy className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-sm font-bold text-yellow-800 uppercase tracking-wide mb-1">
-              FLUENCY SCORE
-            </h3>
-            <div className="text-4xl font-bold text-yellow-900 mb-2">73%</div>
-            <div className="flex items-center text-yellow-700 text-sm font-medium">
-              <span className="mr-1">📈</span>
-              +8% this month
-            </div>
-          </div>
-
-          {/* Current Streak */}
-          <div className="bg-red-400 rounded-3xl p-6 border-4 border-red-500">
-            <div className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center mb-4">
-              <Flame className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="text-sm font-bold text-red-800 uppercase tracking-wide mb-1">
-              CURRENT STREAK
-            </h3>
-            <div className="text-4xl font-bold text-red-900 mb-2">12</div>
-            <div className="flex items-center text-red-700 text-sm font-medium">
-              <span className="mr-1">🔥</span>
-              days strong!
-            </div>
-          </div>
-        </div>
-
         {/* Today's Challenge */}
         <div className="bg-blue-400 rounded-3xl p-6 border-4 border-blue-500 mb-8">
           <div className="flex items-center mb-4">
