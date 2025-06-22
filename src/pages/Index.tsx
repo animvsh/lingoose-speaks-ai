@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target } from "lucide-react";
@@ -7,6 +8,9 @@ import CurriculumCard from "@/components/CurriculumCard";
 import FluencyMapCard from "@/components/FluencyMapCard";
 import ProgressCard from "@/components/ProgressCard";
 import SettingsCard from "@/components/SettingsCard";
+import NotificationsPage from "@/components/NotificationsPage";
+import ProfileManagementPage from "@/components/ProfileManagementPage";
+import HelpSupportPage from "@/components/HelpSupportPage";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import WelcomeScreen from "@/components/WelcomeScreen";
