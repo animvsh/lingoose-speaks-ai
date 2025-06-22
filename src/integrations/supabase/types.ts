@@ -299,6 +299,47 @@ export type Database = {
         }
         Relationships: []
       }
+      skill_explanations: {
+        Row: {
+          created_at: string
+          difficulty_tips: string | null
+          examples: Json
+          explanation: string
+          id: string
+          skill_id: string
+          updated_at: string
+          use_cases: Json
+        }
+        Insert: {
+          created_at?: string
+          difficulty_tips?: string | null
+          examples: Json
+          explanation: string
+          id?: string
+          skill_id: string
+          updated_at?: string
+          use_cases: Json
+        }
+        Update: {
+          created_at?: string
+          difficulty_tips?: string | null
+          examples?: Json
+          explanation?: string
+          id?: string
+          skill_id?: string
+          updated_at?: string
+          use_cases?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skill_explanations_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       skills: {
         Row: {
           created_at: string | null
