@@ -89,8 +89,8 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
         </div>
       </div>
 
-      {/* Fixed Bottom Navigation - Cartoon style */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-4 border-slate-400 px-4 py-4">
+      {/* Fixed Bottom Navigation - Enhanced positioning */}
+      <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t-4 border-slate-400 px-4 py-4 w-full" style={{ position: 'fixed' }}>
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
             <Button 
