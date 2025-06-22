@@ -127,7 +127,6 @@ export type Database = {
           description: string | null
           difficulty_level: string | null
           id: string
-          language: string
           name: string
           updated_at: string | null
         }
@@ -136,7 +135,6 @@ export type Database = {
           description?: string | null
           difficulty_level?: string | null
           id?: string
-          language: string
           name: string
           updated_at?: string | null
         }
@@ -145,7 +143,6 @@ export type Database = {
           description?: string | null
           difficulty_level?: string | null
           id?: string
-          language?: string
           name?: string
           updated_at?: string | null
         }
@@ -482,6 +479,7 @@ export type Database = {
           created_at: string | null
           full_name: string
           id: string
+          language: string | null
           phone_number: string
           preferred_call_time: string | null
           updated_at: string | null
@@ -490,6 +488,7 @@ export type Database = {
           created_at?: string | null
           full_name: string
           id: string
+          language?: string | null
           phone_number: string
           preferred_call_time?: string | null
           updated_at?: string | null
@@ -498,6 +497,7 @@ export type Database = {
           created_at?: string | null
           full_name?: string
           id?: string
+          language?: string | null
           phone_number?: string
           preferred_call_time?: string | null
           updated_at?: string | null

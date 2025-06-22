@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -20,6 +21,7 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
   // Profile form states
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [language, setLanguage] = useState("");
   const [preferredCallTime, setPreferredCallTime] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
@@ -29,6 +31,7 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
     if (userProfile) {
       setFullName(userProfile.full_name || "");
       setPhoneNumber(userProfile.phone_number || "");
+      setLanguage(userProfile.language || "hindi");
       setPreferredCallTime(userProfile.preferred_call_time || "09:00");
     }
   }, [userProfile]);
@@ -43,6 +46,7 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
         .update({
           full_name: fullName,
           phone_number: phoneNumber,
+          language: language,
           preferred_call_time: preferredCallTime,
           updated_at: new Date().toISOString()
         })
@@ -161,6 +165,24 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
                 className="border-2 border-gray-300 rounded-xl font-medium"
                 placeholder="Enter your phone number"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Preferred Language</label>
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="border-2 border-gray-300 rounded-xl font-medium">
+                  <SelectValue placeholder="Select your preferred language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="hindi">Hindi</SelectItem>
+                  <SelectItem value="english">English</SelectItem>
+                  <SelectItem value="spanish">Spanish</SelectItem>
+                  <SelectItem value="french">French</SelectItem>
+                  <SelectItem value="german">German</SelectItem>
+                  <SelectItem value="chinese">Chinese</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">Choose your preferred language for learning</p>
             </div>
 
             <div>
