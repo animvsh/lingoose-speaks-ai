@@ -28,12 +28,41 @@ const Auth = () => {
           description: "Using test phone number - proceeding without OTP.",
         });
         
-        // Simulate successful auth for test number
-        setTimeout(() => {
-          toast({
-            title: "Welcome to Lingoose!",
-            description: "Test authentication successful. Redirecting...",
+        // Create a test user session by signing them up/in with a test email
+        const testEmail = "test@lingoose.app";
+        const testPassword = "testpassword123";
+        
+        // Try to sign in first, if it doesn't exist, sign up
+        let { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: testEmail,
+          password: testPassword,
+        });
+        
+        if (signInError && signInError.message.includes("Invalid login credentials")) {
+          // User doesn't exist, create them
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email: testEmail,
+            password: testPassword,
+            options: {
+              data: {
+                full_name: "Test User",
+                phone_number: phoneNumber
+              }
+            }
           });
+          
+          if (signUpError) throw signUpError;
+        } else if (signInError) {
+          throw signInError;
+        }
+        
+        toast({
+          title: "Welcome to Lingoose!",
+          description: "Test authentication successful. Redirecting...",
+        });
+        
+        // Small delay to show the success message
+        setTimeout(() => {
           window.location.href = '/';
         }, 1000);
         
