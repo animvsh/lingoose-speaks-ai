@@ -47,12 +47,12 @@ Make sure it's different from the current activity. Respond with a JSON object c
       "description": "Brief description with emoji (e.g., 'Practice ordering food and drinks 🍽️')",
       "duration": "Estimated duration in minutes (10-20)",
       "skills": [
-        {"name": "Skill name", "level": "Beginner/Intermediate/Advanced"},
-        {"name": "Another skill", "level": "Beginner/Intermediate/Advanced"}
+        {"name": "Skill name", "rating": 45},
+        {"name": "Another skill", "rating": 67}
       ]
     }
     
-    Choose 3-4 relevant skills that would be practiced in this activity.`;
+    Choose 3-4 relevant skills that would be practiced in this activity. For each skill, provide a rating between 30-90 that represents the current proficiency level out of 100.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -65,7 +65,7 @@ Make sure it's different from the current activity. Respond with a JSON object c
         messages: [
           { 
             role: 'system', 
-            content: 'You are a Hindi language learning expert. Generate practical conversation activities for learners. Always respond with valid JSON only.' 
+            content: 'You are a Hindi language learning expert. Generate practical conversation activities for learners. Always respond with valid JSON only. For skills, use ratings from 30-90 instead of difficulty levels.' 
           },
           { role: 'user', content: prompt }
         ],

@@ -397,18 +397,8 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
         </div>
       </div>
 
-      {/* Bottom Navigation - Fixed positioning */}
-      <div 
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100"
-        style={{ 
-          position: 'fixed', 
-          bottom: 0, 
-          left: 0, 
-          right: 0, 
-          zIndex: 9999,
-          boxShadow: '0 -2px 10px rgba(0,0,0,0.1)'
-        }}
-      >
+      {/* Bottom Navigation - Fixed positioning with higher z-index */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50">
         <div className="max-w-md mx-auto px-6 py-4">
           <div className="flex justify-center space-x-4">
             <Button 

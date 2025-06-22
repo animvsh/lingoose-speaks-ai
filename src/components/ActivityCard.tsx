@@ -17,10 +17,10 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     description: "Practice checking into a hotel 🇪🇸",
     duration: "15",
     skills: [
-      { name: "Greeting phrases", level: "Beginner" },
-      { name: "Personal information", level: "Intermediate" },
-      { name: "Room preferences", level: "Beginner" },
-      { name: "Payment discussion", level: "Advanced" }
+      { name: "Greeting phrases", rating: 65 },
+      { name: "Personal information", rating: 78 },
+      { name: "Room preferences", rating: 42 },
+      { name: "Payment discussion", rating: 89 }
     ]
   });
 
@@ -54,7 +54,16 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       return response.data;
     },
     onSuccess: (data) => {
-      setCurrentActivity(data);
+      // Update the current activity state with the newly generated activity
+      setCurrentActivity({
+        name: data.name,
+        description: data.description,
+        duration: data.duration,
+        skills: data.skills.map((skill: any) => ({
+          name: skill.name,
+          rating: Math.floor(Math.random() * 40) + 40 // Generate random ratings between 40-80
+        }))
+      });
     },
     onError: (error) => {
       console.error('Failed to regenerate activity:', error);
@@ -67,8 +76,20 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
   const lastCall = callLogs[0];
 
+  const getRatingColor = (rating: number) => {
+    if (rating < 40) return "text-red-600";
+    if (rating < 70) return "text-orange-600";
+    return "text-green-600";
+  };
+
+  const getRatingBgColor = (rating: number) => {
+    if (rating < 40) return "bg-red-50 border-red-100";
+    if (rating < 70) return "bg-orange-50 border-orange-100";
+    return "bg-green-50 border-green-100";
+  };
+
   return (
-    <div className="min-h-screen bg-amber-50 pb-24">
+    <div className="min-h-screen bg-amber-50 pb-28">
       <AppBar 
         title="ACTIVITY" 
         onBack={() => onNavigate("home")} 
@@ -173,12 +194,12 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {currentActivity.skills.map((skill, index) => (
-                  <div key={index} className="bg-blue-50 rounded-xl p-2 border border-blue-100">
+                  <div key={index} className={`rounded-xl p-2 border ${getRatingBgColor(skill.rating)}`}>
                     <div className="text-xs font-bold text-blue-700 uppercase tracking-wide">
                       {skill.name}
                     </div>
-                    <div className="text-xs text-blue-600 font-medium">
-                      {skill.level}
+                    <div className={`text-sm font-bold ${getRatingColor(skill.rating)}`}>
+                      {skill.rating}/100
                     </div>
                   </div>
                 ))}
@@ -210,9 +231,9 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white px-6 py-4 border-t border-gray-100">
-        <div className="max-w-md mx-auto">
+      {/* Bottom Navigation - Fixed positioning */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50">
+        <div className="max-w-md mx-auto px-6 py-4">
           <div className="flex justify-center space-x-4">
             <Button
               variant="ghost"
