@@ -1,30 +1,69 @@
 
 import { Button } from "@/components/ui/button";
 import { Target, TrendingUp, Star, Clock, CheckCircle, Zap, Trophy, Users, Home, Phone, Settings, ArrowLeft, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppBar from "./AppBar";
 import LearningProgressTree from "./LearningProgressTree";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ActivityCardProps {
   onNavigate: (view: string) => void;
 }
 
 const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
-  const [currentActivity, setCurrentActivity] = useState({
-    name: "Hotel check-in conversation",
-    description: "Practice checking into a hotel 🇪🇸",
-    duration: "15",
-    skills: [
-      { name: "Greeting phrases", rating: 65 },
-      { name: "Personal information", rating: 78 },
-      { name: "Room preferences", rating: 42 },
-      { name: "Payment discussion", rating: 89 }
-    ]
-  });
-
+  const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Fetch the latest activity from database
+  const { data: currentActivity, isLoading: isLoadingActivity } = useQuery({
+    queryKey: ['current-activity', user?.id],
+    queryFn: async () => {
+      if (!user) throw new Error('No user found');
+
+      // Get the first active activity (we'll treat this as the current activity)
+      const { data, error } = await supabase
+        .from('activities')
+        .select('*')
+        .eq('is_active', true)
+        .order('activity_order')
+        .limit(1)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      // If no activity found, return a default one
+      if (!data) {
+        return {
+          id: null,
+          name: "Hotel check-in conversation",
+          description: "Practice checking into a hotel 🏨",
+          estimated_duration_minutes: 15,
+          prompt: "You are checking into a hotel. Practice greeting the receptionist, providing your reservation details, asking about amenities, and completing the check-in process.",
+          skills: [
+            { name: "Greeting phrases", rating: 65 },
+            { name: "Personal information", rating: 78 },
+            { name: "Room preferences", rating: 42 },
+            { name: "Payment discussion", rating: 89 }
+          ]
+        };
+      }
+
+      return {
+        ...data,
+        skills: [
+          { name: "Greeting phrases", rating: 65 },
+          { name: "Personal information", rating: 78 },
+          { name: "Room preferences", rating: 42 },
+          { name: "Payment discussion", rating: 89 }
+        ]
+      };
+    },
+    enabled: !!user
+  });
 
   // Fetch call logs
   const { data: callLogs = [] } = useQuery({
@@ -43,8 +82,16 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   // Generate new activity mutation
   const generateActivityMutation = useMutation({
     mutationFn: async () => {
+      if (!user || !currentActivity) {
+        throw new Error('User or current activity not found');
+      }
+
       const response = await supabase.functions.invoke('generate-activity', {
-        body: { currentActivity: currentActivity.name }
+        body: { 
+          currentActivity: currentActivity.name,
+          userId: user.id,
+          activityId: currentActivity.id
+        }
       });
       
       if (response.error) {
@@ -54,16 +101,9 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       return response.data;
     },
     onSuccess: (data) => {
-      // Update the current activity state with the newly generated activity
-      setCurrentActivity({
-        name: data.name,
-        description: data.description,
-        duration: data.duration,
-        skills: data.skills.map((skill: any) => ({
-          name: skill.name,
-          rating: Math.floor(Math.random() * 40) + 40 // Generate random ratings between 40-80
-        }))
-      });
+      console.log('Activity regenerated successfully:', data);
+      // Invalidate and refetch the current activity
+      queryClient.invalidateQueries({ queryKey: ['current-activity', user?.id] });
     },
     onError: (error) => {
       console.error('Failed to regenerate activity:', error);
@@ -87,6 +127,31 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     if (rating < 70) return "bg-orange-50 border-orange-100";
     return "bg-green-50 border-green-100";
   };
+
+  if (isLoadingActivity || !currentActivity) {
+    return (
+      <div className="min-h-screen bg-amber-50">
+        <AppBar 
+          title="ACTIVITY" 
+          onBack={() => onNavigate("home")} 
+          showBackButton={true} 
+        />
+        <div className="px-6 pt-6">
+          <div className="bg-white rounded-3xl p-6 border-4 border-gray-200 text-center">
+            <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <RefreshCw className="w-8 h-8 text-gray-400 animate-spin" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide mb-2">
+              LOADING ACTIVITY
+            </h3>
+            <p className="text-gray-600 font-medium text-sm">
+              Preparing your practice session...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-amber-50 pb-28">
@@ -181,6 +246,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
               variant="ghost"
               size="sm"
               className="text-white hover:bg-blue-500 p-2"
+              title="Generate new activity"
             >
               <RefreshCw className={`w-5 h-5 ${generateActivityMutation.isPending ? 'animate-spin' : ''}`} />
             </Button>
@@ -190,10 +256,10 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
             <div className="bg-white rounded-2xl p-4 border-2 border-white">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-blue-700 font-bold text-sm uppercase tracking-wide">Skills Tested</span>
-                <span className="text-blue-600 font-bold text-sm">{currentActivity.duration} min</span>
+                <span className="text-blue-600 font-bold text-sm">{currentActivity.estimated_duration_minutes || 15} min</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                {currentActivity.skills.map((skill, index) => (
+                {currentActivity.skills?.map((skill, index) => (
                   <div key={index} className={`rounded-xl p-2 border ${getRatingBgColor(skill.rating)}`}>
                     <div className="text-xs font-bold text-blue-700 uppercase tracking-wide">
                       {skill.name}

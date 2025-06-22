@@ -551,7 +551,7 @@ export type Database = {
         Returns: number
       }
       create_user: {
-        Args: Record<PropertyKey, never>
+        Args: { p_phone_number: string; p_language: string }
         Returns: undefined
       }
       is_skill_unlocked: {

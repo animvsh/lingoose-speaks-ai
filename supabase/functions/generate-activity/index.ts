@@ -1,6 +1,7 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,12 +29,19 @@ serve(async (req) => {
 
   try {
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
     }
 
-    const { currentActivity } = await req.json();
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error('Supabase configuration not found');
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const { currentActivity, userId, activityId } = await req.json();
 
     const prompt = `Generate a new conversational practice activity for Hindi language learners. 
     
@@ -41,18 +49,21 @@ Current activity: "${currentActivity || 'Hotel check-in conversation'}"
     
 Please generate a DIFFERENT type of activity from this list: ${activityTypes.join(', ')}
     
-Make sure it's different from the current activity. Respond with a JSON object containing:
+Make sure it's different from the current activity. Create a detailed conversation scenario prompt that an AI assistant can use to conduct the practice session. Respond with a JSON object containing:
     {
       "name": "Activity name (e.g., 'Restaurant ordering conversation')",
       "description": "Brief description with emoji (e.g., 'Practice ordering food and drinks 🍽️')",
       "duration": "Estimated duration in minutes (10-20)",
+      "prompt": "Detailed conversation scenario prompt for the AI assistant to use during the practice session. This should include the setting, the user's role, objectives, and specific conversation goals.",
       "skills": [
         {"name": "Skill name", "rating": 45},
         {"name": "Another skill", "rating": 67}
       ]
     }
     
-    Choose 3-4 relevant skills that would be practiced in this activity. For each skill, provide a rating between 30-90 that represents the current proficiency level out of 100.`;
+    Choose 3-4 relevant skills that would be practiced in this activity. For each skill, provide a rating between 30-90 that represents the current proficiency level out of 100.
+
+    The prompt should be detailed enough for an AI to roleplay the scenario effectively.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -65,12 +76,12 @@ Make sure it's different from the current activity. Respond with a JSON object c
         messages: [
           { 
             role: 'system', 
-            content: 'You are a Hindi language learning expert. Generate practical conversation activities for learners. Always respond with valid JSON only. For skills, use ratings from 30-90 instead of difficulty levels.' 
+            content: 'You are a Hindi language learning expert. Generate practical conversation activities for learners. Always respond with valid JSON only. For skills, use ratings from 30-90 instead of difficulty levels. Include detailed conversation prompts for AI roleplay.' 
           },
           { role: 'user', content: prompt }
         ],
         temperature: 0.8,
-        max_tokens: 500
+        max_tokens: 800
       }),
     });
 
@@ -88,12 +99,48 @@ Make sure it's different from the current activity. Respond with a JSON object c
     // Parse the JSON response
     let activityData;
     try {
-      activityData = JSON.parse(generatedContent);
+      // Clean up the response to handle markdown code blocks
+      const cleanedContent = generatedContent.replace(/```json\n?|\n?```/g, '').trim();
+      activityData = JSON.parse(cleanedContent);
     } catch (parseError) {
       console.error('Failed to parse OpenAI response:', generatedContent);
       throw new Error('Invalid response format from OpenAI');
     }
 
+    // If we have a specific activity to update, update it in the database
+    if (activityId && userId) {
+      console.log('Updating activity in database:', activityId);
+      
+      // Update the activity in the database
+      const { error: updateError } = await supabase
+        .from('activities')
+        .update({
+          name: activityData.name,
+          description: activityData.description,
+          prompt: activityData.prompt,
+          estimated_duration_minutes: parseInt(activityData.duration),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', activityId);
+
+      if (updateError) {
+        console.error('Error updating activity:', updateError);
+        throw new Error('Failed to update activity in database');
+      }
+
+      console.log('Activity updated successfully');
+
+      // Return the updated activity data
+      return new Response(JSON.stringify({
+        ...activityData,
+        id: activityId,
+        updated: true
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Return the generated activity data
     return new Response(JSON.stringify(activityData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
