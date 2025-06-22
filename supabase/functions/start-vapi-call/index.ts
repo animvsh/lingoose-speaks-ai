@@ -7,6 +7,23 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Function to format phone number to E.164 format
+function formatPhoneNumber(phoneNumber: string): string {
+  // Remove all non-digit characters
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  
+  // If it doesn't start with country code, assume US (+1)
+  if (cleaned.length === 10) {
+    return `+1${cleaned}`;
+  } else if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    return `+${cleaned}`;
+  } else if (!phoneNumber.startsWith('+')) {
+    return `+${cleaned}`;
+  }
+  
+  return phoneNumber;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -23,6 +40,8 @@ serve(async (req) => {
     }
 
     const vapiApiKey = Deno.env.get('VAPI_API_KEY')
+    const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID')
+    
     if (!vapiApiKey) {
       return new Response(
         JSON.stringify({ error: 'VAPI API key not configured' }),
@@ -30,8 +49,18 @@ serve(async (req) => {
       )
     }
 
+    if (!twilioAccountSid) {
+      return new Response(
+        JSON.stringify({ error: 'Twilio Account SID not configured' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Format phone number to E.164 format
+    const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+    console.log(`Formatted phone number: ${formattedPhoneNumber}`);
+
     // Create the call with Vapi.ai using your specific assistant ID
-    // Format phone number as expected by Vapi API
     const vapiResponse = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
       headers: {
@@ -40,7 +69,8 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         phoneNumber: {
-          twilioPhoneNumber: phoneNumber
+          twilioPhoneNumber: formattedPhoneNumber,
+          twilioAccountSid: twilioAccountSid
         },
         assistantId: "2a2bb730-69ea-4cf2-99df-9b8c3408bfea"
       }),
@@ -67,7 +97,7 @@ serve(async (req) => {
       .insert({
         user_id: userId,
         call_id: vapiData.id,
-        phone_number: phoneNumber,
+        phone_number: formattedPhoneNumber,
         status: 'initiated',
         scenario: 'Hindi Learning Session',
         learning_focus: ['Conversation Practice', 'Pronunciation', 'Vocabulary']
