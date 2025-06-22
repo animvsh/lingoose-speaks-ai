@@ -185,12 +185,24 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Log the call in the conversations table
+    // Get the first available learning outline to use as outline_id
+    const { data: outline, error: outlineError } = await supabase
+      .from('learning_outlines')
+      .select('id')
+      .limit(1)
+      .single();
+
+    let outlineId = null;
+    if (outline && !outlineError) {
+      outlineId = outline.id;
+    }
+
+    // Log the call in the conversations table with proper outline_id
     const { error: logError } = await supabase
       .from('conversations')
       .insert({
         user_id: userId,
-        outline_id: 'default-outline', // You may want to make this dynamic
+        outline_id: outlineId,
         conversation_data: {
           call_id: vapiData.id,
           phone_number: formattedPhoneNumber,
@@ -203,6 +215,8 @@ serve(async (req) => {
 
     if (logError) {
       console.error('Error logging call:', logError)
+    } else {
+      console.log('Call logged successfully in conversations table')
     }
 
     console.log(`Call initiated successfully with ID: ${vapiData.id}`);

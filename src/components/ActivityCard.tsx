@@ -69,18 +69,54 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     enabled: !!user
   });
 
-  // Fetch call logs
+  // Fetch call logs from conversations table and vapi_call_analysis
   const { data: callLogs = [] } = useQuery({
-    queryKey: ['call-logs'],
+    queryKey: ['call-logs', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      if (!user) throw new Error('No user found');
+
+      // First try to get data from vapi_call_analysis (most complete data)
+      const { data: vapiAnalysis, error: vapiError } = await supabase
+        .from('vapi_call_analysis')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (!vapiError && vapiAnalysis && vapiAnalysis.length > 0) {
+        return vapiAnalysis.map(call => ({
+          id: call.id,
+          user_id: call.user_id,
+          phone_number: call.phone_number,
+          call_status: call.call_status || 'completed',
+          duration_seconds: call.call_duration || 0,
+          created_at: call.created_at,
+          vapi_call_id: call.vapi_call_id,
+          transcript: call.transcript,
+          sentiment: call.sentiment_analysis?.overall_sentiment
+        }));
+      }
+
+      // Fallback to conversations table
+      const { data: conversations, error: convError } = await supabase
         .from('conversations')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return data || [];
-    }
+      if (convError) throw convError;
+      
+      return (conversations || []).map(conv => ({
+        id: conv.id,
+        user_id: conv.user_id,
+        phone_number: conv.conversation_data?.phone_number || '',
+        call_status: conv.conversation_data?.status || 'completed',
+        duration_seconds: conv.duration_seconds || 300, // Default 5 minutes if not available
+        created_at: conv.created_at,
+        vapi_call_id: conv.conversation_data?.call_id,
+        scenario: conv.conversation_data?.scenario
+      }));
+    },
+    enabled: !!user
   });
 
   const handleRegenerateActivity = () => {

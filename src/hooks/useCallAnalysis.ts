@@ -1,17 +1,15 @@
 
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useCallAnalysis = () => {
   const { user } = useAuth();
-  
+
   return useQuery({
-    queryKey: ['callAnalysis', user?.id],
+    queryKey: ['call-analysis', user?.id],
     queryFn: async () => {
-      if (!user?.id) {
-        throw new Error('User not authenticated');
-      }
+      if (!user) throw new Error('No user found');
 
       const { data, error } = await supabase
         .from('vapi_call_analysis')
@@ -19,41 +17,32 @@ export const useCallAnalysis = () => {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching call analysis:', error);
-        throw error;
-      }
-
+      if (error) throw error;
       return data || [];
     },
-    enabled: !!user?.id,
+    enabled: !!user,
   });
 };
 
-export const useCallAnalysisById = (callId: string) => {
+export const useLatestCallAnalysis = () => {
   const { user } = useAuth();
-  
+
   return useQuery({
-    queryKey: ['callAnalysis', callId, user?.id],
+    queryKey: ['latest-call-analysis', user?.id],
     queryFn: async () => {
-      if (!user?.id || !callId) {
-        throw new Error('User not authenticated or call ID missing');
-      }
+      if (!user) throw new Error('No user found');
 
       const { data, error } = await supabase
         .from('vapi_call_analysis')
         .select('*')
-        .eq('vapi_call_id', callId)
         .eq('user_id', user.id)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching call analysis by ID:', error);
-        throw error;
-      }
-
+      if (error) throw error;
       return data;
     },
-    enabled: !!user?.id && !!callId,
+    enabled: !!user,
   });
 };
