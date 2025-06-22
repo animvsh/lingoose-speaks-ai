@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Home, Clock, CheckCircle, User, BarChart3, Settings, Star, Trophy, ArrowLeft, Phone } from "lucide-react";
 
@@ -19,7 +18,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <h1 className="text-4xl font-black text-white uppercase tracking-wider">
-            PROGRESS
+            TODAY'S PROGRESS
           </h1>
           <div className="w-12 h-12"></div>
         </div>
@@ -95,54 +94,6 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
             <CheckCircle className="w-6 h-6 mr-3" />
             CONTINUE LEARNING
           </Button>
-        </div>
-      </div>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-slate-300 px-4 py-4">
-        <div className="max-w-md mx-auto">
-          <div className="flex justify-center space-x-6">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate("home")}
-              className="w-16 h-16 bg-orange-300 hover:bg-orange-400 border-4 border-orange-600 rounded-2xl text-orange-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
-            >
-              <Home className="w-6 h-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate("activity")}
-              className="w-16 h-16 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-2xl text-green-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
-            >
-              <Phone className="w-6 h-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate("progress")}
-              className="w-16 h-16 bg-blue-400 hover:bg-blue-500 border-4 border-blue-600 rounded-2xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
-            >
-              <BarChart3 className="w-6 h-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate("curriculum")}
-              className="w-16 h-16 bg-purple-300 hover:bg-purple-400 border-4 border-purple-600 rounded-2xl text-purple-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
-            >
-              <CheckCircle className="w-6 h-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate("settings")}
-              className="w-16 h-16 bg-pink-300 hover:bg-pink-400 border-4 border-pink-600 rounded-2xl text-pink-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
-            >
-              <Settings className="w-6 h-6" />
-            </Button>
-          </div>
         </div>
       </div>
     </div>

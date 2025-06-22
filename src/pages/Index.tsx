@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, BarChart3, Settings, User, LogOut, Calendar, Clock, Target, Flame } from "lucide-react";
@@ -276,7 +277,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation - Updated to include curriculum instead of progress */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-slate-300 px-4 py-4 safe-area-bottom">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
@@ -295,14 +296,6 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               className="w-16 h-16 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-2xl text-green-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
             >
               <Phone className="w-6 h-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate("progress")}
-              className="w-16 h-16 bg-blue-300 hover:bg-blue-400 border-4 border-blue-600 rounded-2xl text-blue-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
-            >
-              <BarChart3 className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 

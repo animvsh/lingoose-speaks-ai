@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Home, Clock, CheckCircle, Check, BarChart3, Settings, Calendar, Target, ArrowLeft } from "lucide-react";
+import { Home, Clock, CheckCircle, Check, BarChart3, Settings, Calendar, Target, ArrowLeft, Phone } from "lucide-react";
 import DuckMascot from "./DuckMascot";
 
 interface CurriculumCardProps {
@@ -33,7 +33,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <h1 className="text-3xl font-black text-orange-600 uppercase tracking-wider transform -rotate-1">
-            This Week
+            Curriculum
           </h1>
           <div className="w-12 h-12"></div> {/* Spacer */}
         </div>
@@ -90,7 +90,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation - Now at bottom of content */}
+      {/* Bottom Navigation - Updated to show curriculum as active */}
       <div className="bg-white border-t-4 border-slate-400 px-4 py-4">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
@@ -105,16 +105,16 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => onNavigate("progress")}
-              className="w-16 h-16 bg-orange-300 hover:bg-orange-400 border-4 border-orange-600 rounded-2xl text-orange-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
+              onClick={() => onNavigate("activity")}
+              className="w-16 h-16 bg-green-300 hover:bg-green-400 border-4 border-green-600 rounded-2xl text-green-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
             >
-              <BarChart3 className="w-6 h-6" />
+              <Phone className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-16 h-16 bg-green-400 hover:bg-green-500 border-4 border-green-600 rounded-2xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
+              className="w-16 h-16 bg-purple-400 hover:bg-purple-500 border-4 border-purple-600 rounded-2xl text-white transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
             >
               <CheckCircle className="w-6 h-6" />
             </Button>
@@ -122,7 +122,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-16 h-16 bg-purple-300 hover:bg-purple-400 border-4 border-purple-600 rounded-2xl text-purple-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
+              className="w-16 h-16 bg-pink-300 hover:bg-pink-400 border-4 border-pink-600 rounded-2xl text-pink-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
             >
               <Settings className="w-6 h-6" />
             </Button>

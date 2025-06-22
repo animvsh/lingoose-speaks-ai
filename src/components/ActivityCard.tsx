@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Phone, Home, Clock, CheckCircle, BarChart3, Settings, Play, Zap, ArrowLeft } from "lucide-react";
 import DuckMascot from "./DuckMascot";
@@ -158,7 +157,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation - Now at bottom of content */}
+      {/* Bottom Navigation - Updated to replace progress with curriculum */}
       <div className="bg-white border-t-4 border-slate-400 px-4 py-4">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-6">
@@ -169,14 +168,6 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
               className="w-16 h-16 bg-blue-300 hover:bg-blue-400 border-4 border-blue-600 rounded-2xl text-blue-900 transition-all duration-200 hover:scale-110 transform hover:-rotate-3"
             >
               <Home className="w-6 h-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate("progress")}
-              className="w-16 h-16 bg-orange-300 hover:bg-orange-400 border-4 border-orange-600 rounded-2xl text-orange-900 transition-all duration-200 hover:scale-110 transform hover:rotate-3"
-            >
-              <BarChart3 className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
