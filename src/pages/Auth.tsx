@@ -4,121 +4,101 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Phone, MessageSquare } from "lucide-react";
 import DuckMascot from "@/components/DuckMascot";
+import { usePhoneAuth } from "@/hooks/usePhoneAuth";
 
 const Auth = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const { toast } = useToast();
+  const { sendOTP, verifyOTP, isLoading } = usePhoneAuth();
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      // Bypass auth for specific test phone number
-      if (phoneNumber === "6505188736") {
-        toast({
-          title: "Test Mode Activated!",
-          description: "Using test phone number - proceeding without OTP.",
-        });
-        
-        // Create a test user session by signing them up/in with a valid email
-        const testEmail = "test@gmail.com";
-        const testPassword = "testpassword123";
-        
-        // Try to sign in first, if it doesn't exist, sign up
-        let { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email: testEmail,
-          password: testPassword,
-        });
-        
-        if (signInError && signInError.message.includes("Invalid login credentials")) {
-          // User doesn't exist, create them
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            email: testEmail,
-            password: testPassword,
-            options: {
-              data: {
-                full_name: "Test User",
-                phone_number: phoneNumber
-              }
-            }
-          });
-          
-          if (signUpError) throw signUpError;
-        } else if (signInError) {
-          throw signInError;
-        }
-        
-        toast({
-          title: "Welcome to Lingoose!",
-          description: "Test authentication successful. Redirecting...",
-        });
-        
-        // Small delay to show the success message
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 1000);
-        
-        setIsLoading(false);
-        return;
-      }
-
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phoneNumber,
-      });
-
-      if (error) throw error;
-
-      setStep("otp");
+    
+    // Basic phone number validation
+    if (!phoneNumber.trim()) {
       toast({
-        title: "OTP Sent!",
-        description: "Check your phone for the verification code.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Failed to send OTP",
-        description: error.message,
+        title: "Phone number required",
+        description: "Please enter your phone number.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+      return;
+    }
+
+    // Bypass auth for specific test phone number
+    if (phoneNumber === "6505188736") {
+      toast({
+        title: "Test Mode Activated!",
+        description: "Using test phone number - proceeding without SMS.",
+      });
+      
+      // Store test OTP for verification
+      const testOtpData = {
+        otp: "123456",
+        phoneNumber,
+        expiresAt: Date.now() + (10 * 60 * 1000)
+      };
+      localStorage.setItem('phone_auth_otp', JSON.stringify(testOtpData));
+      
+      setStep("otp");
+      toast({
+        title: "Test OTP: 123456",
+        description: "Use this code to complete test authentication.",
+      });
+      return;
+    }
+
+    const result = await sendOTP(phoneNumber);
+    
+    if (result.success) {
+      setStep("otp");
+      toast({
+        title: "Verification code sent!",
+        description: "Check your phone for the 6-digit code.",
+      });
+    } else {
+      toast({
+        title: "Failed to send code",
+        description: result.error || "Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: phoneNumber,
-        token: otp,
-        type: 'sms'
-      });
-
-      if (error) throw error;
-
+    
+    if (otp.length !== 6) {
       toast({
-        title: "Welcome to Lingoose!",
-        description: "You're now signed in. Redirecting...",
-      });
-      
-      window.location.href = '/';
-    } catch (error: any) {
-      toast({
-        title: "Verification failed",
-        description: error.message,
+        title: "Invalid code",
+        description: "Please enter the complete 6-digit code.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+      return;
+    }
+
+    const result = await verifyOTP(phoneNumber, otp);
+    
+    if (result.success) {
+      toast({
+        title: "Welcome to Lingoose!",
+        description: "Phone verification successful. Redirecting...",
+      });
+      
+      // Small delay to show the success message
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+    } else {
+      toast({
+        title: "Verification failed",
+        description: result.error || "Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -163,7 +143,7 @@ const Auth = () => {
                 </div>
                 {phoneNumber === "6505188736" && (
                   <div className="text-center p-2 bg-green-100 rounded-lg border border-green-300">
-                    <p className="text-green-700 text-sm font-bold">🧪 Test Mode: This number will bypass authentication</p>
+                    <p className="text-green-700 text-sm font-bold">🧪 Test Mode: This number will bypass SMS and use OTP: 123456</p>
                   </div>
                 )}
                 <Button
@@ -171,7 +151,7 @@ const Auth = () => {
                   disabled={isLoading}
                   className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
                 >
-                  {isLoading ? "Processing..." : phoneNumber === "6505188736" ? "Sign In (Test Mode)" : "Send Verification Code"}
+                  {isLoading ? "Sending..." : phoneNumber === "6505188736" ? "Sign In (Test Mode)" : "Send Verification Code"}
                 </Button>
               </form>
             ) : (
