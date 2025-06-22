@@ -525,10 +525,6 @@ export type Database = {
         Args: { p_user_id: string; p_unit_id: string }
         Returns: boolean
       }
-      setLanguage: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
     }
     Enums: {
       [_ in never]: never

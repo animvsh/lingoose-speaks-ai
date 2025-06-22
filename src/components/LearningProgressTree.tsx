@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Lock, Clock, ChevronDown, ChevronRight } from "lucide-react";
+import { CheckCircle, Lock, Clock, ChevronDown, ChevronRight, Trophy, Star, Target } from "lucide-react";
 import { useLearningOutlines } from "@/hooks/useLearningOutlines";
 import { useLearningUnits } from "@/hooks/useLearningUnits";
 import { useSkills } from "@/hooks/useSkills";
@@ -32,130 +32,102 @@ const LearningProgressTree = () => {
     return Math.floor(Math.random() * 100);
   };
 
-  const getProgressColor = (progress: number) => {
-    if (progress === 0) return "bg-gray-200";
-    if (progress < 50) return "bg-red-400";
-    if (progress < 80) return "bg-yellow-400";
-    return "bg-green-400";
-  };
-
-  const getProgressRing = (progress: number) => {
-    const circumference = 2 * Math.PI * 20;
-    const strokeDashoffset = circumference - (progress / 100) * circumference;
-    
-    return (
-      <svg className="w-16 h-16 -rotate-90">
-        <circle
-          cx="32"
-          cy="32"
-          r="20"
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="transparent"
-          className="text-gray-200"
-        />
-        <circle
-          cx="32"
-          cy="32"
-          r="20"
-          stroke="currentColor"
-          strokeWidth="4"
-          fill="transparent"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          className={progress < 50 ? "text-red-400" : progress < 80 ? "text-yellow-400" : "text-green-400"}
-          style={{
-            transition: "stroke-dashoffset 0.5s ease-in-out",
-          }}
-        />
-      </svg>
-    );
+  const getUnitColor = (index: number) => {
+    const colors = [
+      { bg: "bg-purple-400", border: "border-purple-500", icon: "bg-purple-600", text: "text-purple-800" },
+      { bg: "bg-pink-400", border: "border-pink-500", icon: "bg-pink-600", text: "text-pink-800" },
+      { bg: "bg-indigo-400", border: "border-indigo-500", icon: "bg-indigo-600", text: "text-indigo-800" },
+      { bg: "bg-teal-400", border: "border-teal-500", icon: "bg-teal-600", text: "text-teal-800" },
+    ];
+    return colors[index % colors.length];
   };
 
   if (!selectedOutline || !units) {
     return (
-      <div className="bg-white rounded-2xl p-6 border border-gray-200">
+      <div className="bg-gray-200 rounded-3xl p-6 border-4 border-gray-300">
         <div className="text-center text-gray-500">
-          <div className="w-8 h-8 bg-gray-200 rounded-full mx-auto mb-2 animate-pulse"></div>
-          <p className="text-sm">Loading learning path...</p>
+          <div className="w-8 h-8 bg-gray-300 rounded-full mx-auto mb-2 animate-pulse"></div>
+          <p className="text-sm font-bold uppercase">Loading learning path...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-200">
-      <div className="flex items-center mb-6">
-        <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mr-3">
-          <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 01.553-.894L9 2l6 3 6-3v13l-6 3-6-3z" />
-          </svg>
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-gray-900">Learning Progress</h3>
-          <p className="text-sm text-gray-500">{selectedOutline.name}</p>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="bg-purple-400 rounded-3xl p-6 border-4 border-purple-500">
+        <div className="flex items-center">
+          <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center mr-4">
+            <Target className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white uppercase tracking-wide">LEARNING PROGRESS</h3>
+            <p className="text-purple-100 font-medium text-sm">{selectedOutline.name}</p>
+          </div>
         </div>
       </div>
 
+      {/* Units */}
       <div className="space-y-4">
         {units.map((unit, index) => {
           const progress = getUnitProgress(unit.id);
           const isExpanded = expandedUnits.has(unit.id);
           const isLocked = index > 0 && getUnitProgress(units[index - 1].id) < 70;
+          const colors = getUnitColor(index);
           
           return (
             <div key={unit.id} className="relative">
-              {/* Connection Line */}
-              {index < units.length - 1 && (
-                <div className="absolute left-8 top-16 w-0.5 h-8 bg-gray-200"></div>
-              )}
-              
               <div 
-                className={`flex items-start space-x-4 p-4 rounded-xl border-2 transition-all duration-200 ${
-                  isLocked 
-                    ? "border-gray-200 bg-gray-50" 
-                    : "border-gray-200 hover:border-blue-200 cursor-pointer"
+                className={`${colors.bg} rounded-3xl p-6 border-4 ${colors.border} ${
+                  isLocked ? "opacity-50" : "cursor-pointer hover:scale-[1.02] transition-transform"
                 }`}
                 onClick={() => !isLocked && toggleUnit(unit.id)}
               >
-                {/* Progress Circle */}
-                <div className="relative flex-shrink-0">
-                  {getProgressRing(progress)}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {isLocked ? (
-                      <Lock className="w-6 h-6 text-gray-400" />
-                    ) : progress === 100 ? (
-                      <CheckCircle className="w-6 h-6 text-green-600" />
-                    ) : (
-                      <Clock className="w-6 h-6 text-blue-600" />
-                    )}
-                  </div>
-                </div>
-
-                {/* Unit Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className={`font-semibold ${isLocked ? "text-gray-400" : "text-gray-900"}`}>
-                        {unit.name}
-                      </h4>
-                      <p className={`text-sm ${isLocked ? "text-gray-300" : "text-gray-500"}`}>
-                        {unit.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`text-sm font-medium ${isLocked ? "text-gray-400" : "text-gray-600"}`}>
-                        {progress}%
-                      </span>
-                      {!isLocked && (
-                        isExpanded ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-4 flex-1">
+                    {/* Progress Circle */}
+                    <div className={`w-16 h-16 ${colors.icon} rounded-2xl flex items-center justify-center border-2 ${colors.border}`}>
+                      {isLocked ? (
+                        <Lock className="w-6 h-6 text-white" />
+                      ) : progress === 100 ? (
+                        <CheckCircle className="w-6 h-6 text-white" />
+                      ) : (
+                        <span className="text-white font-bold text-lg">{progress}%</span>
                       )}
                     </div>
+
+                    {/* Unit Info */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className={`font-bold text-lg ${isLocked ? "text-gray-600" : "text-white"} uppercase tracking-wide`}>
+                        {unit.name}
+                      </h4>
+                      <p className={`text-sm font-medium ${isLocked ? "text-gray-500" : colors.text.replace('800', '100')}`}>
+                        {unit.description}
+                      </p>
+                      
+                      {/* Progress Bar */}
+                      <div className="mt-3">
+                        <div className="w-full bg-white/30 h-2 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-white rounded-full transition-all duration-500"
+                            style={{ width: `${progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Expand Arrow */}
+                  {!isLocked && (
+                    <div className="ml-4 flex items-center">
+                      {isExpanded ? (
+                        <ChevronDown className="w-6 h-6 text-white" />
+                      ) : (
+                        <ChevronRight className="w-6 h-6 text-white" />
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -176,35 +148,48 @@ const UnitSkills = ({ unitId }: { unitId: string }) => {
 
   if (!skills) return null;
 
+  const getSkillColor = (index: number) => {
+    const colors = [
+      "bg-green-300 border-green-400",
+      "bg-blue-300 border-blue-400", 
+      "bg-yellow-300 border-yellow-400",
+      "bg-red-300 border-red-400"
+    ];
+    return colors[index % colors.length];
+  };
+
   return (
-    <div className="ml-12 mt-4 space-y-3">
+    <div className="ml-4 mt-4 space-y-3">
       {skills.map((skill, index) => {
         const progress = Math.floor(Math.random() * 100);
         const isCompleted = progress === 100;
+        const colorClass = getSkillColor(index);
         
         return (
-          <div key={skill.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              isCompleted ? "bg-green-100" : "bg-blue-100"
-            }`}>
-              {isCompleted ? (
-                <CheckCircle className="w-4 h-4 text-green-600" />
-              ) : (
-                <span className="text-xs font-semibold text-blue-600">{index + 1}</span>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h5 className="font-medium text-gray-900 text-sm">{skill.name}</h5>
-              <div className="w-full bg-gray-200 h-1.5 rounded-full mt-1">
-                <div 
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    progress < 50 ? "bg-red-400" : progress < 80 ? "bg-yellow-400" : "bg-green-400"
-                  }`}
-                  style={{ width: `${progress}%` }}
-                ></div>
+          <div key={skill.id} className={`${colorClass} rounded-2xl p-4 border-2`}>
+            <div className="flex items-center space-x-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                isCompleted ? "bg-green-600" : "bg-gray-600"
+              }`}>
+                {isCompleted ? (
+                  <CheckCircle className="w-5 h-5 text-white" />
+                ) : (
+                  <span className="text-sm font-bold text-white">{index + 1}</span>
+                )}
               </div>
+              <div className="flex-1 min-w-0">
+                <h5 className="font-bold text-gray-800 text-sm uppercase tracking-wide">{skill.name}</h5>
+                <div className="w-full bg-white/50 h-2 rounded-full mt-2">
+                  <div 
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      progress < 50 ? "bg-red-500" : progress < 80 ? "bg-yellow-500" : "bg-green-500"
+                    }`}
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+              </div>
+              <span className="text-sm font-bold text-gray-800">{progress}%</span>
             </div>
-            <span className="text-xs font-medium text-gray-500">{progress}%</span>
           </div>
         );
       })}
