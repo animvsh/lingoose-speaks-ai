@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Volume2 } from "lucide-react";
@@ -49,7 +50,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-slate-800 mb-2">what's your goal?</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">what's your goal?</h2>
               <p className="text-slate-600">tell me why you want to learn hindi</p>
             </div>
             
@@ -58,10 +59,10 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
                 <button
                   key={goal.id}
                   onClick={() => setSelectedGoal(goal.id)}
-                  className={`w-full p-4 rounded-2xl text-left transition-all ${
+                  className={`w-full p-4 rounded-2xl text-left transition-all duration-300 hover:scale-[1.02] ${
                     selectedGoal === goal.id 
-                      ? 'bg-orange-500 text-white' 
-                      : 'bg-white border-2 border-slate-200 hover:border-orange-300'
+                      ? 'bg-orange-500 text-white shadow-lg' 
+                      : 'bg-white border-2 border-slate-200 hover:border-orange-300 hover:shadow-md'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -81,7 +82,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-slate-800 mb-2">choose your goose vibe</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">choose your goose vibe</h2>
               <p className="text-slate-600">how should i talk to you?</p>
             </div>
             
@@ -90,10 +91,10 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
                 <button
                   key={tone.id}
                   onClick={() => setSelectedTone(tone.id)}
-                  className={`w-full p-4 rounded-2xl text-left transition-all ${
+                  className={`w-full p-4 rounded-2xl text-left transition-all duration-300 hover:scale-[1.02] ${
                     selectedTone === tone.id 
-                      ? 'bg-orange-500 text-white' 
-                      : 'bg-white border-2 border-slate-200 hover:border-orange-300'
+                      ? 'bg-orange-500 text-white shadow-lg' 
+                      : 'bg-white border-2 border-slate-200 hover:border-orange-300 hover:shadow-md'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -117,7 +118,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
           <div className="text-center space-y-6">
             <DuckMascot className="mx-auto" />
             <div>
-              <h2 className="text-3xl font-bold text-slate-800 mb-4">सभी तैयार!</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4">सभी तैयार!</h2>
               <p className="text-slate-600 mb-4">
                 i'll call you for hindi practice sessions with a {selectedTone} vibe.
               </p>
@@ -128,7 +129,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
             </div>
             <Button 
               onClick={nextStep}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-2xl text-xl"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-2xl text-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
             >
               start learning!
             </Button>
@@ -141,46 +142,50 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-3xl shadow-lg w-full h-full max-h-full flex flex-col">
-      <div className="flex-1 overflow-y-auto">
-        <div className="w-full max-w-sm mx-auto">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-md mx-auto p-4 sm:p-6">
+        <div className="py-8">
           {renderStep()}
         </div>
-      </div>
-      
-      {currentStep > 0 && currentStep < 2 && (
-        <div className="flex justify-between items-center pt-4 border-t border-slate-100 mt-4">
-          <Button 
-            variant="ghost"
-            onClick={prevStep}
-            className="text-slate-400 hover:text-slate-600"
-          >
-            <ChevronLeft className="w-4 h-4 mr-1" /> back
-          </Button>
-          
-          <div className="flex space-x-2">
-            {[0, 1, 2].map((step) => (
-              <div
-                key={step}
-                className={`w-2 h-2 rounded-full ${
-                  step <= currentStep ? 'bg-orange-500' : 'bg-slate-200'
-                }`}
-              />
-            ))}
+        
+        {currentStep > 0 && currentStep < 2 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-4 py-4 safe-area-bottom">
+            <div className="max-w-md mx-auto">
+              <div className="flex justify-between items-center">
+                <Button 
+                  variant="ghost"
+                  onClick={prevStep}
+                  className="text-slate-400 hover:text-slate-600 transition-all duration-200 hover:scale-105"
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" /> back
+                </Button>
+                
+                <div className="flex space-x-2">
+                  {[0, 1, 2].map((step) => (
+                    <div
+                      key={step}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        step <= currentStep ? 'bg-orange-500' : 'bg-slate-200'
+                      }`}
+                    />
+                  ))}
+                </div>
+                
+                <Button 
+                  onClick={nextStep}
+                  disabled={
+                    (currentStep === 0 && !selectedGoal) ||
+                    (currentStep === 1 && !selectedTone)
+                  }
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl disabled:opacity-50 transition-all duration-200 hover:scale-105"
+                >
+                  next <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </div>
           </div>
-          
-          <Button 
-            onClick={nextStep}
-            disabled={
-              (currentStep === 0 && !selectedGoal) ||
-              (currentStep === 1 && !selectedTone)
-            }
-            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl disabled:opacity-50"
-          >
-            next <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

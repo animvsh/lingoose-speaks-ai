@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -80,8 +81,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2E8] p-4">
-      <div className="w-full max-w-md mx-auto h-screen max-h-screen">
+    <div className="min-h-screen bg-[#F5F2E8]">
+      <div className="w-full max-w-md mx-auto">
         {renderView()}
       </div>
       
@@ -93,29 +94,29 @@ const Index = () => {
 };
 
 const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
-  <div className="bg-white p-6 rounded-3xl shadow-lg w-full h-full max-h-full flex flex-col">
-    <div className="flex-1 overflow-y-auto">
+  <div className="min-h-screen bg-white p-4 sm:p-6">
+    <div className="space-y-6">
       <div className="text-center space-y-6">
         <DuckMascot className="mx-auto" />
         <div>
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Lingoose में आपका स्वागत है!</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">Lingoose में आपका स्वागत है!</h1>
           <p className="text-slate-600">"नमस्ते, लेकिन थोड़ी अजीब तरीके से"</p>
         </div>
         
         <div className="space-y-4">
-          <div className="bg-orange-50 p-4 rounded-2xl">
+          <div className="bg-orange-50 p-4 rounded-2xl transition-all duration-300 hover:shadow-md">
             <div className="flex justify-between items-center mb-2">
               <span className="text-slate-600 font-medium">आज की प्रवाहता</span>
               <span className="text-orange-500 font-bold">67%</span>
             </div>
-            <div className="w-full bg-orange-200 h-2 rounded-full">
-              <div className="bg-orange-500 h-2 rounded-full w-2/3"></div>
+            <div className="w-full bg-orange-200 h-2 rounded-full overflow-hidden">
+              <div className="bg-orange-500 h-2 rounded-full w-2/3 transition-all duration-500 ease-out"></div>
             </div>
           </div>
 
           <Button 
             onClick={() => onNavigate("activity")}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-6 rounded-2xl text-xl transition-all duration-200 hover:scale-105"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-6 px-6 rounded-2xl text-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg transform"
           >
             <Phone className="w-6 h-6 mr-3" />
             मुझे अभी कॉल करें
@@ -128,39 +129,43 @@ const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
       </div>
     </div>
 
-    <div className="flex justify-center space-x-8 pt-4 border-t border-slate-100 mt-4">
-      <Button 
-        variant="ghost" 
-        size="sm"
-        onClick={() => onNavigate("home")}
-        className="w-12 h-12 bg-orange-500 hover:bg-orange-600 rounded-xl text-white"
-      >
-        <Home className="w-5 h-5" />
-      </Button>
-      <Button 
-        variant="ghost" 
-        size="sm"
-        onClick={() => onNavigate("progress")}
-        className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100"
-      >
-        <BarChart3 className="w-5 h-5" />
-      </Button>
-      <Button 
-        variant="ghost" 
-        size="sm"
-        onClick={() => onNavigate("curriculum")}
-        className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100"
-      >
-        <CheckCircle className="w-5 h-5" />
-      </Button>
-      <Button 
-        variant="ghost" 
-        size="sm"
-        onClick={() => onNavigate("settings")}
-        className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100"
-      >
-        <Settings className="w-5 h-5" />
-      </Button>
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-4 py-3 safe-area-bottom">
+      <div className="max-w-md mx-auto">
+        <div className="flex justify-center space-x-8">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => onNavigate("home")}
+            className="w-12 h-12 bg-orange-500 hover:bg-orange-600 rounded-xl text-white transition-all duration-200 hover:scale-105"
+          >
+            <Home className="w-5 h-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => onNavigate("progress")}
+            className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100 transition-all duration-200 hover:scale-105"
+          >
+            <BarChart3 className="w-5 h-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => onNavigate("curriculum")}
+            className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100 transition-all duration-200 hover:scale-105"
+          >
+            <CheckCircle className="w-5 h-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => onNavigate("settings")}
+            className="w-12 h-12 rounded-xl text-slate-400 hover:bg-slate-100 transition-all duration-200 hover:scale-105"
+          >
+            <Settings className="w-5 h-5" />
+          </Button>
+        </div>
+      </div>
     </div>
   </div>
 );
