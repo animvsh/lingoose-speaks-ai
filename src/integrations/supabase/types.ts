@@ -525,6 +525,10 @@ export type Database = {
         Args: { p_user_id: string; p_unit_id: string }
         Returns: boolean
       }
+      setLanguage: {
+        Args: { p_language: string; p_phone_number: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
