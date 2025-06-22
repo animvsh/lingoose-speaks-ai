@@ -1,6 +1,7 @@
+
 import { Button } from "@/components/ui/button";
-import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star } from "lucide-react";
-import { useState } from "react";
+import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import AppBar from "./AppBar";
 
@@ -12,6 +13,30 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   const { signOut } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowAddToHomeScreen(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    // Check if already installed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        (window.navigator as any).standalone === true;
+    
+    if (!isStandalone) {
+      setShowAddToHomeScreen(true);
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -19,6 +44,42 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
 
   const toggleNotifications = () => {
     setNotificationsEnabled(!notificationsEnabled);
+  };
+
+  const handleAddToHomeScreen = async () => {
+    console.log('Add to home screen clicked from settings');
+    
+    if (deferredPrompt) {
+      try {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to install prompt: ${outcome}`);
+        
+        if (outcome === 'accepted') {
+          setShowAddToHomeScreen(false);
+          localStorage.setItem('pwaInstalled', 'true');
+        }
+        
+        setDeferredPrompt(null);
+      } catch (error) {
+        console.error('Error showing install prompt:', error);
+      }
+    } else {
+      // Show manual instructions
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isAndroid = /Android/.test(navigator.userAgent);
+      
+      let instructions = '';
+      if (isIOS) {
+        instructions = 'To add this app to your home screen:\n\n1. Tap the Share button (⎋)\n2. Select "Add to Home Screen"\n3. Tap "Add"';
+      } else if (isAndroid) {
+        instructions = 'To add this app to your home screen:\n\n1. Tap the menu (⋮)\n2. Select "Add to Home screen" or "Install app"\n3. Tap "Add" or "Install"';
+      } else {
+        instructions = 'To add this app:\n\n1. Open your browser menu\n2. Look for "Add to Home Screen" or "Install"\n3. Follow the prompts';
+      }
+      
+      alert(instructions);
+    }
   };
 
   return (
@@ -52,6 +113,24 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
           <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
             App Settings
           </h3>
+          
+          {showAddToHomeScreen && (
+            <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+              <div className="flex items-center">
+                <Plus className="w-5 h-5 mr-3 text-green-500" />
+                <span className="text-gray-700 font-medium">Add to Home Screen</span>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleAddToHomeScreen}
+                className="bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+              >
+                Install
+              </Button>
+            </div>
+          )}
+          
           <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
             <div className="flex items-center">
               <Bell className="w-5 h-5 mr-3 text-blue-500" />

@@ -35,6 +35,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
       setShowPWAPrompt(true);
     }
 
+    // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(console.error);
     }
@@ -56,6 +57,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
         
         if (outcome === 'accepted') {
           setShowPWAPrompt(false);
+          localStorage.setItem('pwaInstalled', 'true');
         }
         
         setDeferredPrompt(null);
@@ -64,20 +66,15 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
         console.error('Error showing install prompt:', error);
       }
     } else {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const isAndroid = /Android/.test(navigator.userAgent);
-      
-      let instructions = '';
-      if (isIOS) {
-        instructions = 'To add this app to your home screen:\n\n1. Tap the Share button (⎋)\n2. Select "Add to Home Screen"\n3. Tap "Add"';
-      } else if (isAndroid) {
-        instructions = 'To add this app to your home screen:\n\n1. Tap the menu (⋮)\n2. Select "Add to Home screen" or "Install app"\n3. Tap "Add" or "Install"';
-      } else {
-        instructions = 'To add this app:\n\n1. Open your browser menu\n2. Look for "Add to Home Screen" or "Install"\n3. Follow the prompts';
-      }
-      
-      alert(instructions);
+      // Store the global prompt for later use
+      (window as any).showAddToHomeScreenInstructions = true;
+      onComplete();
     }
+  };
+
+  const handleSkipInstall = () => {
+    localStorage.setItem('addToHomeScreenSkipped', 'true');
+    onComplete();
   };
 
   return (
@@ -131,8 +128,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
               {showPWAPrompt && (
                 <Button 
                   onClick={handleAddToHomeScreen}
-                  variant="outline"
-                  className="w-full border-2 border-orange-300 text-orange-600 hover:bg-orange-50 font-bold py-6 px-8 rounded-3xl text-lg transition-all duration-500 hover:scale-[1.02] hover:shadow-xl bg-white/80 backdrop-blur-sm"
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-6 px-8 rounded-3xl text-lg transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl transform shadow-xl"
                 >
                   <Plus className="w-6 h-6 mr-3" />
                   Add to Home Screen
@@ -140,11 +136,16 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
               )}
 
               <Button 
-                onClick={onComplete}
-                className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-6 px-8 rounded-3xl text-xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl transform shadow-xl"
+                onClick={showPWAPrompt ? handleSkipInstall : onComplete}
+                variant={showPWAPrompt ? "outline" : "default"}
+                className={`w-full font-bold py-6 px-8 rounded-3xl text-xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl transform shadow-xl ${
+                  showPWAPrompt 
+                    ? "border-2 border-orange-300 text-orange-600 hover:bg-orange-50 bg-white/80 backdrop-blur-sm" 
+                    : "bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white"
+                }`}
               >
                 <Sparkles className="w-6 h-6 mr-3" />
-                Start Learning
+                {showPWAPrompt ? "Skip & Continue" : "Start Learning"}
               </Button>
             </div>
 

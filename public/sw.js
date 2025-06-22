@@ -8,9 +8,26 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', (event) => {
+  console.log('Service Worker installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(urlsToCache))
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker activating...');
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
   );
 });
 
@@ -23,6 +40,38 @@ self.addEventListener('fetch', (event) => {
       }
     )
   );
+});
+
+// Handle app installation
+self.addEventListener('beforeinstallprompt', (event) => {
+  console.log('Before install prompt triggered');
+  // Don't show the default install prompt immediately
+  event.preventDefault();
+  
+  // Store the event for later use
+  self.deferredPrompt = event;
+  
+  // Notify the main thread that install is available
+  self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => {
+      client.postMessage({
+        type: 'INSTALL_AVAILABLE'
+      });
+    });
+  });
+});
+
+self.addEventListener('appinstalled', (event) => {
+  console.log('App was installed');
+  
+  // Notify all clients that the app was installed
+  self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => {
+      client.postMessage({
+        type: 'APP_INSTALLED'
+      });
+    });
+  });
 });
 
 // Handle push notifications

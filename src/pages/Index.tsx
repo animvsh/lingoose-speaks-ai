@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target, BookOpen } from "lucide-react";
@@ -143,12 +142,10 @@ const Index = () => {
   }
 
   const handleWelcomeComplete = () => {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                        (window.navigator as any).standalone === true;
-    const addToHomeScreenDismissed = localStorage.getItem('addToHomeScreenDismissed');
+    // Check if we should show the add to home screen prompt
+    const shouldShowAddToHome = (window as any).showAddToHomeScreenInstructions;
     
-    if (isMobile && !isStandalone && !addToHomeScreenDismissed) {
+    if (shouldShowAddToHome) {
       setCurrentView("add-to-home");
       setShowAddToHomeScreen(true);
     } else {
