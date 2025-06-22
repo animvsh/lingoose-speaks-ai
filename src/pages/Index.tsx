@@ -266,7 +266,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   };
   
   return (
-    <div className="min-h-screen bg-amber-50 pb-24 relative">
+    <div className="min-h-screen bg-amber-50 pb-24">
       <AppBar 
         title="DASHBOARD"
         showBackButton={false}
@@ -397,7 +397,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white px-6 py-4 border-t border-gray-100 z-50" style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+      <div className="fixed bottom-0 left-0 right-0 bg-white px-6 py-4 border-t border-gray-100 z-50">
         <div className="max-w-md mx-auto">
           <div className="flex justify-center space-x-4">
             <Button 
