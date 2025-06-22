@@ -31,6 +31,7 @@ serve(async (req) => {
     }
 
     // Create the call with Vapi.ai using your specific assistant ID
+    // Format phone number as expected by Vapi API
     const vapiResponse = await fetch('https://api.vapi.ai/call', {
       method: 'POST',
       headers: {
@@ -38,7 +39,9 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        phoneNumber: phoneNumber,
+        phoneNumber: {
+          twilioPhoneNumber: phoneNumber
+        },
         assistantId: "2a2bb730-69ea-4cf2-99df-9b8c3408bfea"
       }),
     })
