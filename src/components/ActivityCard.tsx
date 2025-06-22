@@ -1,5 +1,6 @@
+
 import { Button } from "@/components/ui/button";
-import { Phone, Clock, CheckCircle, Home, Settings, ArrowLeft, Play, Mic, Users, MapPin, Coffee, Briefcase, Heart, ShoppingCart, Plane, GraduationCap, Car, Music, GameController2, Book } from "lucide-react";
+import { Phone, Clock, CheckCircle, Home, Settings, ArrowLeft, Play, Mic, Users, MapPin, Coffee, Briefcase, Heart, ShoppingCart, Plane, GraduationCap, Car, Music, Book, Star, Target } from "lucide-react";
 import DuckMascot from "./DuckMascot";
 import { useState } from "react";
 import AppBar from "./AppBar";
@@ -215,8 +216,25 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           </Button>
         </div>
 
-        {/* Learning Progress Tree */}
-        <LearningProgressTree />
+        {/* Simple Learning Progress Section */}
+        <div className="bg-green-400 rounded-3xl p-6 border-4 border-green-500">
+          <div className="text-center">
+            <h3 className="text-2xl font-bold text-white uppercase tracking-wide mb-2">
+              KEEP LEARNING!
+            </h3>
+            <p className="text-green-100 font-medium">
+              Complete activities to unlock new challenges
+            </p>
+            <div className="mt-4">
+              <Button
+                onClick={() => onNavigate("curriculum")}
+                className="bg-white hover:bg-green-50 text-green-600 font-bold py-3 px-6 rounded-xl"
+              >
+                VIEW CURRICULUM
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Bottom Navigation */}

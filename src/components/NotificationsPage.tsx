@@ -1,5 +1,6 @@
+
 import { Button } from "@/components/ui/button";
-import { Bell, Clock, CheckCircle, X, Home, Phone, Settings, ArrowLeft } from "lucide-react";
+import { Bell, Clock, CheckCircle, X, Home, Phone, Settings, ArrowLeft, Trophy } from "lucide-react";
 import { useState } from "react";
 import AppBar from "./AppBar";
 
