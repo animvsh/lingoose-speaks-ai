@@ -1,12 +1,10 @@
 
 import { Button } from "@/components/ui/button";
-import { Home, Phone, CheckCircle, Settings, ArrowLeft, Star, Clock, Users, Target, Trophy, Flame, Calendar, TrendingUp } from "lucide-react";
+import { Home, Phone, CheckCircle, Settings, ArrowLeft, Star, Clock, Users, Target, Trophy, Flame } from "lucide-react";
 import LearningProgressTree from "./LearningProgressTree";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useUserActivityRatings } from "@/hooks/useUserActivityRatings";
+import { useState } from "react";
 
 interface ActivityCardProps {
   onNavigate: (view: string) => void;
@@ -15,8 +13,6 @@ interface ActivityCardProps {
 const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   const [isStartingCall, setIsStartingCall] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
-  const { ratings } = useUserActivityRatings();
 
   const handleStartCall = async () => {
     setIsStartingCall(true);
@@ -51,32 +47,6 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       });
       setIsStartingCall(false);
     }
-  };
-
-  // Get recent activity records
-  const recentActivities = ratings?.slice(0, 3) || [];
-
-  const getRatingColor = (rating: number) => {
-    if (rating >= 90) return "text-green-600 bg-green-100";
-    if (rating >= 75) return "text-blue-600 bg-blue-100";
-    if (rating >= 60) return "text-orange-600 bg-orange-100";
-    return "text-red-600 bg-red-100";
-  };
-
-  const getRatingEmoji = (rating: number) => {
-    if (rating >= 90) return "🌟";
-    if (rating >= 75) return "⭐";
-    if (rating >= 60) return "👍";
-    return "💪";
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   return (
@@ -118,7 +88,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
             <h3 className="text-sm font-bold text-orange-800 uppercase tracking-wide mb-1">
               TOTAL CALLS
             </h3>
-            <div className="text-4xl font-bold text-orange-900 mb-2">{ratings?.length || 47}</div>
+            <div className="text-4xl font-bold text-orange-900 mb-2">47</div>
             <div className="flex items-center text-orange-700 text-sm font-medium">
               <span className="mr-1">📈</span>
               +3 this week
@@ -170,67 +140,6 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
             </div>
           </div>
         </div>
-
-        {/* Recent Activity Records */}
-        {recentActivities.length > 0 && (
-          <div className="bg-white rounded-3xl p-6 border-4 border-gray-200 mb-8">
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-purple-400 rounded-2xl flex items-center justify-center mr-4">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-gray-800 uppercase tracking-wide">
-                  RECENT SESSIONS 📊
-                </h3>
-                <p className="text-gray-600 font-medium text-sm">Your latest practice results</p>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              {recentActivities.map((activity, index) => (
-                <div key={activity.id} className="bg-gray-50 rounded-2xl p-4 border-2 border-gray-100">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center mr-3 text-sm font-bold ${getRatingColor(activity.rating)}`}>
-                        {getRatingEmoji(activity.rating)}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-800 text-sm">
-                          {activity.activities?.name || 'Practice Session'}
-                        </h4>
-                        <p className="text-xs text-gray-500">
-                          {activity.completed_at ? formatDate(activity.completed_at) : 'Recently'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className={`text-lg font-bold ${getRatingColor(activity.rating).split(' ')[0]}`}>
-                        {activity.rating}%
-                      </div>
-                      {activity.duration_seconds && (
-                        <div className="text-xs text-gray-500">
-                          {Math.round(activity.duration_seconds / 60)}min
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  {activity.feedback_notes && (
-                    <p className="text-xs text-gray-600 mt-2 italic">
-                      "{activity.feedback_notes}"
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-            
-            <Button 
-              onClick={() => onNavigate("progress")}
-              className="w-full mt-4 bg-purple-400 hover:bg-purple-500 text-white font-bold py-3 text-base rounded-2xl border-4 border-purple-500"
-            >
-              VIEW ALL SESSIONS 📈
-            </Button>
-          </div>
-        )}
 
         {/* Today's Challenge */}
         <div className="bg-blue-400 rounded-3xl p-6 border-4 border-blue-500 mb-8">
@@ -289,7 +198,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           </Button>
         </div>
 
-        {/* Learning Progress Tree (Map Style) */}
+        {/* Learning Progress Tree */}
         <LearningProgressTree />
       </div>
 
