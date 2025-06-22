@@ -13,7 +13,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50 pb-24">
       <div className="max-w-md mx-auto p-6">
         <div className="bg-white/80 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20 h-full flex flex-col">
           <div className="text-center space-y-8 flex-1">
@@ -78,8 +78,13 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
               <p className="text-sm font-medium">You'll receive a call in ~30 seconds</p>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="flex justify-center space-x-6 pt-6 border-t border-slate-100 mt-8">
+      {/* Fixed Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 px-4 py-4 safe-area-bottom shadow-2xl">
+        <div className="max-w-md mx-auto">
+          <div className="flex justify-center space-x-8">
             <Button 
               variant="ghost" 
               size="sm"
