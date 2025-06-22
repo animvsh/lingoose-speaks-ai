@@ -56,103 +56,53 @@ export const usePhoneAuth = () => {
     
     try {
       const formattedPhone = formatPhoneNumber(phoneNumber);
-      console.log('Signing in with phone:', formattedPhone);
+      console.log('Looking up or creating profile for phone:', formattedPhone);
       
-      // Check if profile already exists
-      const existingProfile = await findExistingProfile(formattedPhone);
-      
-      // Generate consistent credentials for this phone number
-      const sanitizedPhone = formattedPhone.replace(/[^0-9]/g, '');
-      const autoEmail = `phone${sanitizedPhone}@example.com`;
-      const autoPassword = 'phone_auth_secure_' + sanitizedPhone;
-      
-      console.log('Attempting auto-sign in with:', autoEmail);
-      
-      // Try to sign in first
-      let { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: autoEmail,
-        password: autoPassword,
-      });
-      
-      if (signInError && signInError.message.includes("Invalid login credentials")) {
-        console.log('User does not exist, creating new auto-login user...');
-        
-        // Create profile first if it doesn't exist
-        let profileToUse = existingProfile;
-        if (!existingProfile) {
-          console.log('Creating new profile...');
-          const { data: newProfile, error: createProfileError } = await supabase
-            .from('user_profiles')
-            .insert({
-              full_name: 'Phone User',
-              phone_number: formattedPhone,
-              language: 'hindi'
-            })
-            .select('*')
-            .single();
+      // First check if profile exists
+      const { data: existingProfile, error: findError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('phone_number', formattedPhone)
+        .maybeSingle();
 
-          if (createProfileError) {
-            console.error('Error creating profile:', createProfileError);
-            throw createProfileError;
-          }
-          
-          profileToUse = newProfile;
-          console.log('Created new profile:', profileToUse.id);
-        }
-        
-        // Create auth user
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email: autoEmail,
-          password: autoPassword,
-          options: {
-            data: {
-              full_name: "Phone User",
-              phone_number: formattedPhone
-            }
-          }
-        });
-        
-        if (signUpError) {
-          console.error('Auto sign up error:', signUpError);
-          throw signUpError;
-        }
-        
-        // Link the profile to the new auth user
-        if (signUpData.user && profileToUse && !profileToUse.auth_user_id) {
-          const { error: linkError } = await supabase
-            .from('user_profiles')
-            .update({ auth_user_id: signUpData.user.id })
-            .eq('id', profileToUse.id);
-          
-          if (linkError) {
-            console.error('Error linking profile:', linkError);
-          } else {
-            console.log('Linked profile to new auth user');
-          }
-        }
-        
-        console.log('Auto-created user successfully:', signUpData);
-      } else if (signInError) {
-        console.error('Auto sign in error:', signInError);
-        throw signInError;
-      } else {
-        // User signed in successfully, link any unlinked profile
-        if (signInData?.user && existingProfile && !existingProfile.auth_user_id) {
-          const { error: linkError } = await supabase
-            .from('user_profiles')
-            .update({ auth_user_id: signInData.user.id })
-            .eq('id', existingProfile.id);
-          
-          if (linkError) {
-            console.error('Error linking profile on sign in:', linkError);
-          } else {
-            console.log('Linked existing profile to auth user');
-          }
-        }
-        
-        console.log('Auto-signed in successfully:', signInData);
+      if (findError) {
+        console.error('Error finding profile:', findError);
+        throw findError;
       }
 
+      let profile;
+      if (existingProfile) {
+        console.log('Found existing profile:', existingProfile.id);
+        profile = existingProfile;
+      } else {
+        console.log('Creating new profile...');
+        const { data: newProfile, error: createError } = await supabase
+          .from('user_profiles')
+          .insert({
+            full_name: 'Phone User',
+            phone_number: formattedPhone,
+            language: 'hindi'
+          })
+          .select('*')
+          .single();
+
+        if (createError) {
+          console.error('Error creating profile:', createError);
+          throw createError;
+        }
+        
+        profile = newProfile;
+        console.log('Created new profile:', profile.id);
+      }
+
+      // Store the profile info in localStorage to simulate being "logged in"
+      localStorage.setItem('current_user_profile', JSON.stringify(profile));
+      
+      // Also store a simple flag to indicate they're authenticated
+      localStorage.setItem('phone_authenticated', 'true');
+      localStorage.setItem('phone_number', formattedPhone);
+
+      console.log('Phone authentication successful');
       return { success: true };
       
     } catch (error: any) {
@@ -166,7 +116,7 @@ export const usePhoneAuth = () => {
     }
   };
 
-  // Keep the old method names for compatibility but they now do the same thing
+  // Keep the old method names for compatibility
   const sendOTP = signInWithPhone;
   const verifyOTP = async (_phoneNumber: string, _otp: string) => {
     return { success: true }; // OTP verification is no longer needed

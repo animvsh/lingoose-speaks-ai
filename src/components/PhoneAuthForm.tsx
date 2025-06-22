@@ -31,10 +31,10 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
         description: "Successfully signed in!",
         className: "border-2 border-green-400 bg-green-50 text-green-800",
       });
-      // Redirect after successful auth
+      // Force page reload to update auth state
       setTimeout(() => {
         window.location.href = '/';
-      }, 1500);
+      }, 1000);
     } else {
       toast({
         title: "❌ Sign In Failed",
@@ -54,7 +54,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
           Enter Phone Number
         </CardTitle>
         <CardDescription className="text-slate-600 font-bold">
-          Enter your phone number to sign in instantly
+          Enter your phone number to sign in instantly (no verification required)
         </CardDescription>
       </CardHeader>
       
@@ -77,7 +77,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
             disabled={isLoading}
             className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
           >
-            {isLoading ? "Signing In..." : "Sign In"}
+            {isLoading ? "Signing In..." : "Sign In Instantly"}
           </Button>
         </form>
       </CardContent>

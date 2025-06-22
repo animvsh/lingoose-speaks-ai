@@ -1,12 +1,19 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+interface UserProfile {
+  id: string;
+  full_name: string;
+  phone_number: string;
+  language: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: UserProfile | null;
+  session: any; // Keep for compatibility
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -21,63 +28,41 @@ export const useAuth = () => {
   return context;
 };
 
-const cleanupAuthState = () => {
-  // Remove all Supabase auth keys from localStorage
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-      localStorage.removeItem(key);
-    }
-  });
-  // Remove from sessionStorage if in use
-  Object.keys(sessionStorage || {}).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-      sessionStorage.removeItem(key);
-    }
-  });
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('Auth state change:', event, session?.user?.id);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+    // Check if user is authenticated via phone
+    const isAuthenticated = localStorage.getItem('phone_authenticated');
+    const userProfile = localStorage.getItem('current_user_profile');
+    
+    if (isAuthenticated === 'true' && userProfile) {
+      try {
+        const profile = JSON.parse(userProfile);
+        setUser(profile);
+        console.log('Restored user session:', profile.phone_number);
+      } catch (error) {
+        console.error('Error parsing stored user profile:', error);
+        // Clear invalid data
+        localStorage.removeItem('phone_authenticated');
+        localStorage.removeItem('current_user_profile');
+        localStorage.removeItem('phone_number');
       }
-    );
-
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session:', session?.user?.id);
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    }
+    
+    setLoading(false);
   }, []);
 
   const signOut = async () => {
     try {
-      // Clean up auth state first
-      cleanupAuthState();
+      // Clear localStorage
+      localStorage.removeItem('phone_authenticated');
+      localStorage.removeItem('current_user_profile');
+      localStorage.removeItem('phone_number');
       
-      // Attempt global sign out
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
-      if (error) {
-        console.error('Sign out error:', error);
-        // Continue with cleanup even if sign out fails
-      }
-      
-      // Clear local state
-      setSession(null);
+      // Clear state
       setUser(null);
       
       toast({
@@ -85,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "You have been signed out successfully.",
       });
       
-      // Force page reload for clean state
+      // Redirect to auth page
       setTimeout(() => {
         window.location.href = '/auth';
       }, 500);
@@ -93,15 +78,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       console.error('Sign out failed:', error);
       
-      // Force cleanup and redirect even if there's an error
-      cleanupAuthState();
-      setSession(null);
+      // Force cleanup even if there's an error
+      localStorage.removeItem('phone_authenticated');
+      localStorage.removeItem('current_user_profile');
+      localStorage.removeItem('phone_number');
       setUser(null);
-      
-      toast({
-        title: "Signed out",
-        description: "You have been signed out (with cleanup).",
-      });
       
       setTimeout(() => {
         window.location.href = '/auth';
@@ -111,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const value = {
     user,
-    session,
+    session: user ? { user } : null, // Create a fake session for compatibility
     loading,
     signOut,
   };

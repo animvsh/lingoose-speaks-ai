@@ -1,11 +1,9 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 export const useUpdateUserProfile = () => {
-  const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -16,56 +14,29 @@ export const useUpdateUserProfile = () => {
       language?: string;
       preferred_call_time?: string;
     }) => {
-      if (!user?.id) {
+      // Get the current user profile from localStorage
+      const userProfile = localStorage.getItem('current_user_profile');
+      if (!userProfile) {
         throw new Error('No authenticated user');
       }
 
-      // First try to update profile linked to auth user
-      const { data: linkedProfile, error: linkedError } = await supabase
+      const profile = JSON.parse(userProfile);
+
+      const { data: updatedProfile, error } = await supabase
         .from('user_profiles')
         .update(profileData)
-        .eq('auth_user_id', user.id)
+        .eq('id', profile.id)
         .select('*')
         .single();
 
-      if (linkedProfile && !linkedError) {
-        return linkedProfile;
+      if (error) {
+        throw error;
       }
 
-      // If no linked profile, try to find and update by phone number
-      const userPhone = user.phone || user.user_metadata?.phone_number;
-      if (userPhone) {
-        const { data: phoneProfile, error: phoneError } = await supabase
-          .from('user_profiles')
-          .update({ ...profileData, auth_user_id: user.id }) // Also link it while updating
-          .eq('phone_number', userPhone)
-          .is('auth_user_id', null)
-          .select('*')
-          .single();
+      // Update localStorage with fresh data
+      localStorage.setItem('current_user_profile', JSON.stringify(updatedProfile));
 
-        if (phoneProfile && !phoneError) {
-          return phoneProfile;
-        }
-      }
-
-      // If no profile exists, create a new one
-      const { data: newProfile, error: createError } = await supabase
-        .from('user_profiles')
-        .insert({
-          ...profileData,
-          auth_user_id: user.id,
-          full_name: profileData.full_name || 'New User',
-          phone_number: profileData.phone_number || userPhone || '+1234567890',
-          language: profileData.language || 'hindi'
-        })
-        .select('*')
-        .single();
-
-      if (createError) {
-        throw createError;
-      }
-
-      return newProfile;
+      return updatedProfile;
     },
     onSuccess: () => {
       // Invalidate and refetch user profile
