@@ -58,6 +58,19 @@ export const useCallInitiation = () => {
       });
 
       if (error) {
+        // Handle specific Twilio trial account errors
+        if (error.message && error.message.includes('Trial accounts may only make calls to verified numbers')) {
+          throw new Error('Your phone number needs to be verified with our calling service. This is a limitation of trial accounts. Please contact support to verify your number, or try with a different verified phone number.');
+        }
+        
+        if (error.message && error.message.includes('Daily Outbound Call Limit')) {
+          throw new Error('Daily call limit reached. Please try again tomorrow or contact support for increased limits.');
+        }
+        
+        if (error.message && error.message.includes('Invalid phone number')) {
+          throw new Error('Invalid phone number format. Please check your phone number in profile settings and ensure it includes the country code (e.g., +1 for US numbers).');
+        }
+        
         throw new Error(error.message || 'Failed to start call');
       }
 
@@ -72,11 +85,21 @@ export const useCallInitiation = () => {
     },
     onError: (error) => {
       console.error('Failed to start call:', error);
-      toast({
-        title: "Call Failed",
-        description: error instanceof Error ? error.message : 'Failed to start practice call',
-        variant: "destructive",
-      });
+      
+      // Show specific toast message for trial account limitation
+      if (error instanceof Error && error.message.includes('verified numbers')) {
+        toast({
+          title: "Phone Verification Required",
+          description: "Your phone number needs to be verified. Please contact support or try with a different verified number.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Call Failed",
+          description: error instanceof Error ? error.message : 'Failed to start practice call',
+          variant: "destructive",
+        });
+      }
     }
   });
 
