@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target } from "lucide-react";
 import DuckMascot from "@/components/DuckMascot";
@@ -15,6 +14,7 @@ import SplashScreen from "@/components/SplashScreen";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useCallLogs } from "@/hooks/useCallLogs";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 
 const Index = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -25,6 +25,15 @@ const Index = () => {
   const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Define navigation history and current index
+  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
+  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
+
+  const navigatableViews = ["home", "activity", "progress", "curriculum", "fluency-map", "settings"];
 
   const handleSplashComplete = () => {
     if (!authLoading && !user) {
@@ -35,6 +44,8 @@ const Index = () => {
       if (onboardingComplete) {
         setHasOnboarded(true);
         setCurrentView("home");
+        setNavigationHistory(["home"]);
+        setCurrentHistoryIndex(0);
       } else {
         setCurrentView("welcome");
       }
@@ -56,11 +67,60 @@ const Index = () => {
       if (onboardingComplete) {
         setHasOnboarded(true);
         setCurrentView("home");
+        setNavigationHistory(["home"]);
+        setCurrentHistoryIndex(0);
       } else {
         setCurrentView("welcome");
       }
     }
   }, [user, userProfile, currentView]);
+
+  const handleNavigation = (view: string, direction: 'left' | 'right' = 'left') => {
+    if (currentView === view) return;
+    
+    setSlideDirection(direction);
+    setIsTransitioning(true);
+    
+    setTimeout(() => {
+      setCurrentView(view);
+      
+      // Update navigation history for navigatable views
+      if (navigatableViews.includes(view)) {
+        const newHistory = [...navigationHistory.slice(0, currentHistoryIndex + 1), view];
+        setNavigationHistory(newHistory);
+        setCurrentHistoryIndex(newHistory.length - 1);
+      }
+      
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setSlideDirection(null);
+      }, 50);
+    }, 150);
+  };
+
+  const handleSwipeNavigation = (direction: 'left' | 'right') => {
+    if (!navigatableViews.includes(currentView)) return;
+
+    if (direction === 'right' && currentHistoryIndex > 0) {
+      // Go back in history
+      const previousView = navigationHistory[currentHistoryIndex - 1];
+      setCurrentHistoryIndex(currentHistoryIndex - 1);
+      handleNavigation(previousView, 'right');
+    } else if (direction === 'left' && currentHistoryIndex < navigationHistory.length - 1) {
+      // Go forward in history
+      const nextView = navigationHistory[currentHistoryIndex + 1];
+      setCurrentHistoryIndex(currentHistoryIndex + 1);
+      handleNavigation(nextView, 'left');
+    } else if (direction === 'left') {
+      // Navigate to next logical view
+      const currentIndex = navigatableViews.indexOf(currentView);
+      const nextIndex = (currentIndex + 1) % navigatableViews.length;
+      handleNavigation(navigatableViews[nextIndex], 'left');
+    }
+  };
+
+  // Setup swipe navigation
+  useSwipeNavigation(containerRef, handleSwipeNavigation);
 
   if (currentView === "splash") {
     return <SplashScreen onComplete={handleSplashComplete} />;
@@ -80,14 +140,6 @@ const Index = () => {
   if (!user) {
     return null;
   }
-
-  const handleNavigation = (view: string) => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentView(view);
-      setIsTransitioning(false);
-    }, 50); // Super fast transitions
-  };
 
   const handleWelcomeComplete = () => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -113,6 +165,22 @@ const Index = () => {
     localStorage.setItem('lingooseOnboardingComplete', 'true');
     setHasOnboarded(true);
     setCurrentView("home");
+    setNavigationHistory(["home"]);
+    setCurrentHistoryIndex(0);
+  };
+
+  const getTransitionClasses = () => {
+    if (!isTransitioning) {
+      return 'opacity-100 translate-x-0 scale-100';
+    }
+    
+    if (slideDirection === 'left') {
+      return 'opacity-0 -translate-x-full scale-95';
+    } else if (slideDirection === 'right') {
+      return 'opacity-0 translate-x-full scale-95';
+    }
+    
+    return 'opacity-0 scale-95';
   };
 
   const renderView = () => {
@@ -142,14 +210,20 @@ const Index = () => {
     })();
 
     return (
-      <div className={`transition-all duration-100 ${isTransitioning ? 'opacity-0 scale-99' : 'opacity-100 scale-100'}`}>
+      <div 
+        className={`transition-all duration-300 ease-in-out transform ${getTransitionClasses()}`}
+        style={{ 
+          transitionProperty: 'opacity, transform',
+          transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        }}
+      >
         {viewContent}
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div ref={containerRef} className="min-h-screen bg-gray-50 overflow-hidden">
       <div className="w-full max-w-md mx-auto">
         {renderView()}
       </div>
@@ -162,7 +236,7 @@ const Index = () => {
 };
 
 const HomeView = ({ onNavigate, userProfile, callLogs }: { 
-  onNavigate: (view: string) => void;
+  onNavigate: (view: string, direction?: 'left' | 'right') => void;
   userProfile: any;
   callLogs: any[];
 }) => {
@@ -170,14 +244,12 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   const [isLoaded, setIsLoaded] = useState(false);
   
   useEffect(() => {
-    setTimeout(() => setIsLoaded(true), 20); // Super fast load
+    setTimeout(() => setIsLoaded(true), 20);
   }, []);
   
-  // Calculate mock progress values
   const totalCalls = callLogs?.length || 0;
   const nativeFluency = Math.min(34 + (totalCalls * 2), 85);
   
-  // Get fluency color based on score
   const getFluencyColor = (score: number) => {
     if (score < 30) return "text-red-500";
     if (score < 60) return "text-orange-500";
@@ -361,23 +433,23 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   );
 };
 
-const ActivityView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+const ActivityView = ({ onNavigate }: { onNavigate: (view: string, direction?: 'left' | 'right') => void }) => (
   <ActivityCard onNavigate={onNavigate} />
 );
 
-const ProgressView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+const ProgressView = ({ onNavigate }: { onNavigate: (view: string, direction?: 'left' | 'right') => void }) => (
   <ProgressCard onNavigate={onNavigate} />
 );
 
-const CurriculumView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+const CurriculumView = ({ onNavigate }: { onNavigate: (view: string, direction?: 'left' | 'right') => void }) => (
   <CurriculumCard onNavigate={onNavigate} />
 );
 
-const FluencyMapView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+const FluencyMapView = ({ onNavigate }: { onNavigate: (view: string, direction?: 'left' | 'right') => void }) => (
   <FluencyMapCard onNavigate={onNavigate} />
 );
 
-const SettingsView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+const SettingsView = ({ onNavigate }: { onNavigate: (view: string, direction?: 'left' | 'right') => void }) => (
   <SettingsCard onNavigate={onNavigate} />
 );
 
