@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, Phone, User, ArrowLeft } from "lucide-react";
 import DuckMascot from "@/components/DuckMascot";
+import PhoneAuthForm from "@/components/PhoneAuthForm";
 import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
@@ -14,6 +15,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isLogin, setIsLogin] = useState(true);
+  const [authMethod, setAuthMethod] = useState<"email" | "phone">("email");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -99,6 +101,24 @@ const Auth = () => {
     }
   };
 
+  if (authMethod === "phone") {
+    return (
+      <div className="min-h-screen bg-yellow-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <DuckMascot className="mx-auto mb-4 hover:scale-110 transition-transform duration-300" />
+            <h1 className="text-4xl font-black text-orange-600 mb-2 uppercase tracking-wider transform -rotate-1">
+              Lingoose
+            </h1>
+            <p className="text-slate-700 font-bold">Your AI Hindi Learning Companion</p>
+          </div>
+          
+          <PhoneAuthForm onBack={() => setAuthMethod("email")} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-yellow-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -125,6 +145,28 @@ const Auth = () => {
           </CardHeader>
           
           <CardContent>
+            {/* Auth Method Selection */}
+            <div className="flex gap-2 mb-6">
+              <Button
+                type="button"
+                variant={authMethod === "email" ? "default" : "outline"}
+                onClick={() => setAuthMethod("email")}
+                className="flex-1 font-bold"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Email
+              </Button>
+              <Button
+                type="button"
+                variant={authMethod === "phone" ? "default" : "outline"}
+                onClick={() => setAuthMethod("phone")}
+                className="flex-1 font-bold"
+              >
+                <Phone className="w-4 h-4 mr-2" />
+                Phone
+              </Button>
+            </div>
+
             <form onSubmit={handleAuth} className="space-y-4">
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
