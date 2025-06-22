@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Home, Clock, CheckCircle, User, Settings, Star, Trophy, ArrowLeft, Phone } from "lucide-react";
 
@@ -8,7 +7,7 @@ interface ProgressCardProps {
 
 const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
   return (
-    <div className="min-h-screen bg-amber-50 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <div className="px-6 pt-8 pb-6">
         <div className="flex items-center justify-between">

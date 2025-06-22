@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Volume2, Sparkles, ArrowLeft } from "lucide-react";
@@ -62,7 +61,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     switch (currentStep) {
       case 0:
         return (
-          <div className="min-h-screen bg-amber-50 pb-24">
+          <div className="min-h-screen bg-background pb-24">
             {/* Header */}
             <div className="px-6 pt-8 pb-6">
               <div className="flex items-center justify-between">
@@ -119,7 +118,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
       case 1:
         return (
-          <div className="min-h-screen bg-amber-50 pb-24">
+          <div className="min-h-screen bg-background pb-24">
             {/* Header */}
             <div className="px-6 pt-8 pb-6">
               <div className="flex items-center justify-between">
@@ -189,7 +188,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         const selectedToneData = tones.find(t => t.id === selectedTone);
         
         return (
-          <div className="min-h-screen bg-amber-50 pb-24">
+          <div className="min-h-screen bg-background pb-24">
             {/* Header */}
             <div className="px-6 pt-8 pb-6">
               <div className="flex items-center justify-between">

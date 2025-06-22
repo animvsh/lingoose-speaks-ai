@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Home, CheckCircle, Settings, ChevronRight, Bell, Phone, User, HelpCircle, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,7 +50,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-amber-50 pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <div className="px-6 pt-8 pb-6">
         <div className="flex items-center justify-between">
