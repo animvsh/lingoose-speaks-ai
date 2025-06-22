@@ -91,7 +91,38 @@ serve(async (req) => {
       }),
     })
 
-    const vapiData = await vapiResponse.json()
+    console.log(`VAPI response status: ${vapiResponse.status}`);
+    console.log(`VAPI response headers:`, Object.fromEntries(vapiResponse.headers.entries()));
+
+    // Get the response text first
+    const responseText = await vapiResponse.text();
+    console.log(`VAPI response text: ${responseText}`);
+
+    let vapiData;
+    try {
+      // Try to parse as JSON
+      vapiData = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse VAPI response as JSON:', parseError);
+      console.error('Response text was:', responseText);
+      
+      // Handle non-JSON responses
+      let errorMessage = 'Failed to start call with Vapi';
+      if (responseText.includes('Daily Outbound Call Limit')) {
+        errorMessage = 'Daily call limit reached. Please try again tomorrow or contact support.';
+      } else if (responseText.includes('Invalid phone number')) {
+        errorMessage = 'Invalid phone number format. Please check and try again.';
+      } else if (responseText.includes('Trial accounts may only make calls to verified numbers')) {
+        errorMessage = 'Your phone number needs to be verified. Trial accounts can only call verified numbers. Please contact support to verify your number.';
+      } else if (responseText) {
+        errorMessage = responseText;
+      }
+      
+      return new Response(
+        JSON.stringify({ error: errorMessage, details: { responseText, status: vapiResponse.status } }),
+        { status: vapiResponse.status || 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     if (!vapiResponse.ok) {
       console.error('Vapi API error:', vapiData)
@@ -102,6 +133,8 @@ serve(async (req) => {
         errorMessage = 'Daily call limit reached. Please try again tomorrow or contact support.';
       } else if (vapiData.message?.includes('Invalid phone number')) {
         errorMessage = 'Invalid phone number format. Please check and try again.';
+      } else if (vapiData.message?.includes('Trial accounts may only make calls to verified numbers')) {
+        errorMessage = 'Your phone number needs to be verified. Trial accounts can only call verified numbers. Please contact support to verify your number.';
       } else if (vapiData.message) {
         errorMessage = vapiData.message;
       }
