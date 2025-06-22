@@ -114,45 +114,48 @@ const Index = () => {
 };
 
 const HomeView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
-  <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50 pb-24">
-    <div className="px-4 pt-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="relative inline-block">
-          <DuckMascot className="mx-auto mb-4 hover:scale-110 transition-transform duration-300" />
-          <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center animate-pulse">
-            <span className="text-xs">✓</span>
+  <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50">
+    {/* Scrollable Content Container with bottom padding for navbar */}
+    <div className="pb-28">
+      <div className="px-4 pt-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="relative inline-block">
+            <DuckMascot className="mx-auto mb-4 hover:scale-110 transition-transform duration-300" />
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center animate-pulse">
+              <span className="text-xs">✓</span>
+            </div>
           </div>
+          <h1 className="text-4xl font-black bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent mb-3">
+            Welcome Back!
+          </h1>
+          <p className="text-slate-700 font-semibold text-lg">Ready for today's Hindi adventure?</p>
         </div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent mb-2">
-          Welcome Back! 👋
-        </h1>
-        <p className="text-slate-600 font-medium">Ready for today's Hindi adventure?</p>
-      </div>
 
-      {/* Dashboard Content */}
-      <DashboardStats />
-      <WeeklyChart />
-      <RecentFeedback />
-      <GoalProgress />
+        {/* Dashboard Content */}
+        <DashboardStats />
+        <WeeklyChart />
+        <RecentFeedback />
+        <GoalProgress />
 
-      {/* Quick Action */}
-      <div className="mb-8">
-        <Button 
-          onClick={() => onNavigate("activity")}
-          className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-6 px-6 rounded-3xl text-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl shadow-lg"
-        >
-          <Phone className="w-6 h-6 mr-3" />
-          Start Your Daily Call
-        </Button>
-        <div className="text-center text-sm text-slate-500 mt-3 bg-white/60 backdrop-blur-sm rounded-full px-4 py-2">
-          🔥 12 day streak • Next milestone: 15 days
+        {/* Quick Action */}
+        <div className="mb-8">
+          <Button 
+            onClick={() => onNavigate("activity")}
+            className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-6 px-6 rounded-3xl text-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl shadow-lg"
+          >
+            <Phone className="w-6 h-6 mr-3" />
+            Start Your Daily Call
+          </Button>
+          <div className="text-center text-sm text-slate-500 mt-3 bg-white/60 backdrop-blur-sm rounded-full px-4 py-2">
+            🔥 12 day streak • Next milestone: 15 days
+          </div>
         </div>
       </div>
     </div>
 
-    {/* Fixed Bottom Navigation */}
-    <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 px-4 py-4 safe-area-bottom shadow-2xl">
+    {/* Fixed Bottom Navigation - ALWAYS stays at bottom */}
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-slate-200/50 px-4 py-4 shadow-2xl">
       <div className="max-w-md mx-auto">
         <div className="flex justify-center space-x-8">
           <Button 

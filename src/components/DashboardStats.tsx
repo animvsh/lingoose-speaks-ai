@@ -5,116 +5,125 @@ import { Phone, Clock, TrendingUp, Calendar, Star, Target, Zap, Award, Trophy, F
 const DashboardStats = () => {
   return (
     <div className="space-y-6 mb-6">
-      {/* Main Stats Grid */}
+      {/* Main Stats Grid - 2x2 layout like the reference */}
       <div className="grid grid-cols-2 gap-4">
-        <Card className="bg-gradient-to-br from-orange-100 to-orange-200 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-orange-800 flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-3">
-                <Phone className="w-4 h-4 text-white" />
+        {/* Total Calls - Orange/Peach */}
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] rounded-3xl overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center">
+                <Phone className="w-6 h-6 text-white" />
               </div>
-              Total Calls
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-orange-900 mb-1">47</div>
-            <div className="flex items-center text-sm">
-              <TrendingUp className="w-3 h-3 text-green-600 mr-1" />
-              <span className="text-green-700 font-medium">+3 this week</span>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-orange-900">Total Calls</h3>
+              <div className="text-4xl font-black text-orange-900">47</div>
+              <div className="flex items-center text-sm">
+                <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
+                <span className="text-green-700 font-semibold">+3 this week</span>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-100 to-emerald-200 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-green-800 flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
-                <Clock className="w-4 h-4 text-white" />
+        {/* Talk Time - Green/Mint */}
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] rounded-3xl overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center">
+                <Clock className="w-6 h-6 text-white" />
               </div>
-              Talk Time
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-900 mb-1">6.2h</div>
-            <div className="flex items-center text-sm">
-              <TrendingUp className="w-3 h-3 text-green-600 mr-1" />
-              <span className="text-green-700 font-medium">+45min this week</span>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-green-900">Talk Time</h3>
+              <div className="text-4xl font-black text-green-900">6.2h</div>
+              <div className="flex items-center text-sm">
+                <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
+                <span className="text-green-700 font-semibold">+45min this week</span>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-100 to-blue-200 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-blue-800 flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <Award className="w-4 h-4 text-white" />
+        {/* Fluency Score - Orange/Peach */}
+        <Card className="bg-gradient-to-br from-orange-50 to-amber-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] rounded-3xl overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center">
+                <Award className="w-6 h-6 text-white" />
               </div>
-              Fluency Score
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-900 mb-1">73%</div>
-            <div className="flex items-center text-sm">
-              <TrendingUp className="w-3 h-3 text-green-600 mr-1" />
-              <span className="text-green-700 font-medium">+8% this month</span>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-orange-900">Fluency Score</h3>
+              <div className="text-4xl font-black text-orange-900">73%</div>
+              <div className="flex items-center text-sm">
+                <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
+                <span className="text-green-700 font-semibold">+8% this month</span>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-100 to-pink-200 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-purple-800 flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center mr-3">
-                <Flame className="w-4 h-4 text-white animate-pulse" />
+        {/* Current Streak - Orange/Amber */}
+        <Card className="bg-gradient-to-br from-orange-50 to-amber-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] rounded-3xl overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center">
+                <Flame className="w-6 h-6 text-white" />
               </div>
-              Current Streak
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-purple-900 mb-1">12</div>
-            <div className="flex items-center text-sm">
-              <Flame className="w-3 h-3 text-orange-500 mr-1" />
-              <span className="text-orange-700 font-medium">days strong! 🔥</span>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-orange-900">Current Streak</h3>
+              <div className="text-4xl font-black text-orange-900">12</div>
+              <div className="flex items-center text-sm">
+                <span className="text-red-600 font-semibold">days strong! 🔥</span>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Achievement Banner */}
-      <Card className="bg-gradient-to-r from-amber-50 to-yellow-100 border-2 border-amber-200 shadow-lg">
-        <CardContent className="p-4">
+      {/* Achievement Banner - More playful */}
+      <Card className="bg-gradient-to-r from-yellow-100 to-orange-100 border-0 shadow-lg rounded-3xl overflow-hidden">
+        <CardContent className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center">
-              <Trophy className="w-6 h-6 text-white" />
+            <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
+              <Trophy className="w-8 h-8 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-amber-900 mb-1">Weekly Champion! 🏆</h3>
-              <p className="text-sm text-amber-700">You've completed 5 conversations this week. Keep it up!</p>
+              <h3 className="text-xl font-black text-orange-900 mb-2">Weekly Champion! 🏆</h3>
+              <p className="text-orange-800 font-medium">You've completed 5 conversations this week. Keep it up!</p>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-amber-900">5/7</div>
-              <div className="text-xs text-amber-600">conversations</div>
+              <div className="text-3xl font-black text-orange-900">5/7</div>
+              <div className="text-sm text-orange-700 font-medium">conversations</div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Quick Stats Row */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-gradient-to-br from-rose-50 to-pink-100 p-4 rounded-2xl border border-rose-200 text-center">
-          <Star className="w-6 h-6 text-rose-500 mx-auto mb-2" />
-          <div className="text-lg font-bold text-rose-800">4.8</div>
-          <div className="text-xs text-rose-600">Avg Rating</div>
+      {/* Quick Stats Row - More colorful */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-gradient-to-br from-pink-50 to-rose-100 p-6 rounded-3xl border-0 shadow-lg text-center">
+          <div className="w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <Star className="w-5 h-5 text-white" />
+          </div>
+          <div className="text-2xl font-black text-pink-900">4.8</div>
+          <div className="text-sm text-pink-700 font-medium">Avg Rating</div>
         </div>
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-100 p-4 rounded-2xl border border-indigo-200 text-center">
-          <Target className="w-6 h-6 text-indigo-500 mx-auto mb-2" />
-          <div className="text-lg font-bold text-indigo-800">89%</div>
-          <div className="text-xs text-indigo-600">Goal Progress</div>
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-6 rounded-3xl border-0 shadow-lg text-center">
+          <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <Target className="w-5 h-5 text-white" />
+          </div>
+          <div className="text-2xl font-black text-blue-900">89%</div>
+          <div className="text-sm text-blue-700 font-medium">Goal Progress</div>
         </div>
-        <div className="bg-gradient-to-br from-teal-50 to-cyan-100 p-4 rounded-2xl border border-teal-200 text-center">
-          <Calendar className="w-6 h-6 text-teal-500 mx-auto mb-2" />
-          <div className="text-lg font-bold text-teal-800">28</div>
-          <div className="text-xs text-teal-600">Days Active</div>
+        <div className="bg-gradient-to-br from-teal-50 to-cyan-100 p-6 rounded-3xl border-0 shadow-lg text-center">
+          <div className="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <Calendar className="w-5 h-5 text-white" />
+          </div>
+          <div className="text-2xl font-black text-teal-900">28</div>
+          <div className="text-sm text-teal-700 font-medium">Days Active</div>
         </div>
       </div>
     </div>
