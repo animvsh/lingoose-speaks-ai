@@ -32,19 +32,19 @@ export const useFetchCallData = () => {
     },
     onSuccess: (data) => {
       toast({
-        title: "Call Data Retrieved! 📊",
-        description: "Call analysis has been completed and saved.",
+        title: "Call Data Fetched! 📊",
+        description: "Call data has been successfully retrieved and analyzed.",
       });
       console.log('Call data fetched successfully:', data);
       
-      // Invalidate and refetch call analysis data
+      // Invalidate call analysis queries to refresh the data
       queryClient.invalidateQueries({ queryKey: ['callAnalysis'] });
     },
     onError: (error) => {
       console.error('Failed to fetch call data:', error);
       toast({
-        title: "Failed to Fetch Call Data",
-        description: error instanceof Error ? error.message : 'Failed to retrieve call analysis',
+        title: "Fetch Failed",
+        description: error instanceof Error ? error.message : 'Failed to fetch call data',
         variant: "destructive",
       });
     }
