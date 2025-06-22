@@ -84,7 +84,7 @@ const Index = () => {
     setTimeout(() => {
       setCurrentView(view);
       setIsTransitioning(false);
-    }, 150);
+    }, 100); // Reduced from 150ms for snappier transitions
   };
 
   const handleWelcomeComplete = () => {
@@ -138,7 +138,7 @@ const Index = () => {
     })();
 
     return (
-      <div className={`transition-all duration-300 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+      <div className={`transition-all duration-200 ${isTransitioning ? 'opacity-0 scale-98' : 'opacity-100 scale-100'}`}>
         {viewContent}
       </div>
     );
@@ -166,7 +166,8 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   const [isLoaded, setIsLoaded] = useState(false);
   
   useEffect(() => {
-    setTimeout(() => setIsLoaded(true), 100);
+    // Faster initial load
+    setTimeout(() => setIsLoaded(true), 50);
   }, []);
   
   // Calculate mock progress values
@@ -189,14 +190,14 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   };
   
   return (
-    <div className="min-h-screen bg-yellow-50 pb-24">
-      {/* Header */}
-      <div className="bg-orange-400 px-6 py-8 mb-8 rounded-b-3xl">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-50 pb-20">
+      {/* Header with enhanced gradient and shadow */}
+      <div className="bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 px-6 py-6 mb-6 rounded-b-[2rem] shadow-xl">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <DuckMascot className="w-12 h-12 mr-3" />
+            <DuckMascot className="w-10 h-10 mr-3 drop-shadow-md" />
             <div>
-              <h1 className="text-2xl font-black text-white">
+              <h1 className="text-xl font-black text-white drop-shadow-sm">
                 Hi {userProfile?.full_name?.split(' ')[0] || 'there'}! 👋
               </h1>
             </div>
@@ -204,142 +205,142 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
         </div>
       </div>
 
-      <div className="px-6 space-y-6">
-        {/* Native Fluency Score Card - Hero Element */}
-        <div className={`bg-white rounded-3xl p-8 text-center shadow-lg border-4 border-gray-200 transform transition-all duration-700 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+      <div className="px-4 space-y-4">
+        {/* Native Fluency Score Card - More compact and snappy */}
+        <div className={`bg-white rounded-2xl p-6 text-center shadow-lg border border-gray-100 transform transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <div className="mb-4">
-            <div className={`text-6xl font-black mb-2 ${getFluencyColor(nativeFluency)} animate-fade-in`}>
+            <div className={`text-5xl font-black mb-2 ${getFluencyColor(nativeFluency)} transition-all duration-700`}>
               {nativeFluency}%
             </div>
-            <h2 className="text-2xl font-black text-gray-800 mb-2">NATIVE FLUENCY</h2>
-            <p className="text-gray-600 font-semibold">Compared to a native speaker based on speech clarity, vocabulary, and flow</p>
+            <h2 className="text-xl font-black text-gray-800 mb-2 tracking-tight">NATIVE FLUENCY</h2>
+            <p className="text-gray-600 font-medium text-sm">Speech clarity, vocabulary, and flow</p>
           </div>
           
-          {/* Progress Bar */}
-          <div className="w-full bg-gray-200 h-4 rounded-full mb-4 border-2 border-gray-300">
+          {/* Sleeker progress bar */}
+          <div className="w-full bg-gray-200 h-3 rounded-full mb-4 overflow-hidden">
             <div 
-              className={`h-full rounded-full transition-all duration-1000 delay-300 ${getFluencyBgColor(nativeFluency)}`}
+              className={`h-full rounded-full transition-all duration-1000 delay-200 ${getFluencyBgColor(nativeFluency)} shadow-sm`}
               style={{ width: isLoaded ? `${nativeFluency}%` : '0%' }}
             ></div>
           </div>
           
-          {/* Goose Quote */}
-          <div className="bg-gray-50 rounded-2xl p-4 border-2 border-gray-200">
-            <p className="text-gray-700 font-semibold italic">
-              "We're {100 - nativeFluency}% away from sounding like a native! Let's gooo!" 🦆
+          {/* Compact goose quote */}
+          <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+            <p className="text-gray-700 font-medium text-sm italic">
+              "Just {100 - nativeFluency}% away from native level! 🦆"
             </p>
           </div>
         </div>
 
-        {/* Today's Challenge */}
-        <div className={`bg-blue-300 rounded-3xl p-6 shadow-lg border-4 border-blue-400 transform transition-all duration-700 delay-200 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-          <div className="flex items-center mb-4">
-            <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mr-4 shadow-md">
-              <Phone className="w-8 h-8 text-white" />
+        {/* Today's Challenge - More compact and actionable */}
+        <div className={`bg-gradient-to-r from-blue-400 to-blue-500 rounded-2xl p-5 shadow-lg border border-blue-300 transform transition-all duration-500 delay-100 hover:scale-[1.02] active:scale-[0.98] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+          <div className="flex items-center mb-3">
+            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-3 shadow-md">
+              <Phone className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <h3 className="text-2xl font-black text-blue-800 uppercase">
+            <div className="flex-1">
+              <h3 className="text-lg font-black text-white uppercase tracking-tight">
                 TODAY'S CHALLENGE
               </h3>
-              <p className="text-blue-700 font-bold text-lg">
-                Talk your way through a hotel check-in 🇪🇸
+              <p className="text-blue-100 font-medium text-sm">
+                Hotel check-in conversation 🇪🇸
               </p>
             </div>
           </div>
           <Button 
             onClick={() => onNavigate("activity")}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 text-xl rounded-2xl shadow-lg border-0"
+            className="w-full bg-white hover:bg-gray-50 text-blue-600 font-black py-3 text-lg rounded-xl shadow-md border-0 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
-            START CHALLENGE
+            START NOW
           </Button>
         </div>
 
-        {/* Improvements Since Last Time - Clickable Panel */}
+        {/* Improvements - More compact grid */}
         <div 
           onClick={() => onNavigate("progress")}
-          className={`bg-green-300 rounded-3xl p-6 shadow-lg border-4 border-green-400 cursor-pointer hover:scale-105 transform transition-all duration-700 delay-400 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}
+          className={`bg-gradient-to-r from-green-400 to-green-500 rounded-2xl p-5 shadow-lg border border-green-300 cursor-pointer transform transition-all duration-500 delay-200 hover:scale-[1.02] active:scale-[0.98] ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center">
-              <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mr-4 shadow-md">
-                <Trophy className="w-8 h-8 text-white" />
+              <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-3 shadow-md">
+                <Trophy className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-2xl font-black text-green-800 uppercase">
+                <h3 className="text-lg font-black text-white uppercase tracking-tight">
                   IMPROVEMENTS
                 </h3>
-                <p className="text-green-700 font-bold text-lg">
+                <p className="text-green-100 font-medium text-sm">
                   Since last time
                 </p>
               </div>
             </div>
-            <ArrowLeft className="w-6 h-6 text-green-700 rotate-180" />
+            <ArrowLeft className="w-5 h-5 text-green-100 rotate-180" />
           </div>
           
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="bg-white rounded-2xl p-4 text-center border-2 border-green-200">
-              <div className="w-10 h-10 bg-purple-400 rounded-xl flex items-center justify-center mx-auto mb-2">
-                <Clock className="w-6 h-6 text-white" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white/90 rounded-xl p-3 text-center backdrop-blur-sm">
+              <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center mx-auto mb-1">
+                <Clock className="w-4 h-4 text-white" />
               </div>
-              <div className="text-2xl font-black text-purple-700">8min</div>
-              <div className="text-sm text-purple-600 font-bold">TALK TIME</div>
+              <div className="text-xl font-black text-purple-700">8min</div>
+              <div className="text-xs text-purple-600 font-bold">TALK TIME</div>
             </div>
-            <div className="bg-white rounded-2xl p-4 text-center border-2 border-green-200">
-              <div className="w-10 h-10 bg-pink-400 rounded-xl flex items-center justify-center mx-auto mb-2">
-                <Star className="w-6 h-6 text-white" />
+            <div className="bg-white/90 rounded-xl p-3 text-center backdrop-blur-sm">
+              <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center mx-auto mb-1">
+                <Star className="w-4 h-4 text-white" />
               </div>
-              <div className="text-2xl font-black text-pink-700">89%</div>
-              <div className="text-sm text-pink-600 font-bold">ENGAGEMENT</div>
+              <div className="text-xl font-black text-pink-700">89%</div>
+              <div className="text-xs text-pink-600 font-bold">ENGAGEMENT</div>
             </div>
           </div>
         </div>
 
-        {/* Start Learning Button */}
-        <div className={`transform transition-all duration-700 delay-600 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+        {/* Start Learning Button - More prominent */}
+        <div className={`transform transition-all duration-500 delay-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <Button 
             onClick={() => onNavigate("curriculum")}
-            className="w-full bg-orange-400 hover:bg-orange-500 text-white font-black py-6 text-2xl rounded-3xl shadow-lg border-4 border-orange-500"
+            className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-black py-5 text-xl rounded-2xl shadow-xl border-0 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             START LEARNING
           </Button>
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-gray-200 px-4 py-4 shadow-2xl">
+      {/* Bottom Navigation - More compact and modern */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-3 shadow-2xl">
         <div className="max-w-md mx-auto">
-          <div className="flex justify-center space-x-6">
+          <div className="flex justify-center space-x-4">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-16 h-16 bg-orange-400 hover:bg-orange-500 rounded-2xl text-white shadow-lg border-2 border-orange-500"
+              className="w-14 h-14 bg-orange-500 hover:bg-orange-600 rounded-xl text-white shadow-md border-0 transition-all duration-200 hover:scale-105 active:scale-95"
             >
-              <Home className="w-7 h-7" />
+              <Home className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 shadow-lg border-2 border-gray-200"
+              className="w-14 h-14 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600 hover:text-gray-700 shadow-md border-0 transition-all duration-200 hover:scale-105 active:scale-95"
             >
-              <Phone className="w-7 h-7" />
+              <Phone className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 shadow-lg border-2 border-gray-200"
+              className="w-14 h-14 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600 hover:text-gray-700 shadow-md border-0 transition-all duration-200 hover:scale-105 active:scale-95"
             >
-              <CheckCircle className="w-7 h-7" />
+              <CheckCircle className="w-6 h-6" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-16 h-16 bg-gray-100 hover:bg-gray-200 rounded-2xl text-gray-600 hover:text-gray-700 shadow-lg border-2 border-gray-200"
+              className="w-14 h-14 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-600 hover:text-gray-700 shadow-md border-0 transition-all duration-200 hover:scale-105 active:scale-95"
             >
-              <Settings className="w-7 h-7" />
+              <Settings className="w-6 h-6" />
             </Button>
           </div>
         </div>
