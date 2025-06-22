@@ -27,10 +27,16 @@ self.addEventListener('fetch', (event) => {
 
 // Handle push notifications
 self.addEventListener('push', (event) => {
+  console.log('Push event received:', event);
+  
   let data = {};
   
   if (event.data) {
-    data = event.data.json();
+    try {
+      data = event.data.json();
+    } catch (e) {
+      console.error('Error parsing push data:', e);
+    }
   }
   
   const title = data.title || 'Lingoose';
@@ -41,7 +47,8 @@ self.addEventListener('push', (event) => {
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
-      primaryKey: 1
+      primaryKey: data.id || 1,
+      url: data.url || '/'
     },
     actions: [
       {
@@ -54,7 +61,9 @@ self.addEventListener('push', (event) => {
         title: 'Close',
         icon: '/favicon.ico'
       }
-    ]
+    ],
+    requireInteraction: false,
+    silent: false
   };
   
   event.waitUntil(
@@ -64,13 +73,33 @@ self.addEventListener('push', (event) => {
 
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
+  console.log('Notification click received:', event);
+  
   event.notification.close();
   
-  if (event.action === 'explore') {
+  if (event.action === 'explore' || !event.action) {
     // Open the app
+    const urlToOpen = event.notification.data?.url || '/';
     event.waitUntil(
-      clients.openWindow('/')
+      clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then((clientList) => {
+          // Check if there's already a window/tab open with the target URL
+          for (const client of clientList) {
+            if (client.url === urlToOpen && 'focus' in client) {
+              return client.focus();
+            }
+          }
+          // If no existing window, open a new one
+          if (clients.openWindow) {
+            return clients.openWindow(urlToOpen);
+          }
+        })
     );
   }
-  // Close action is handled by closing the notification
+  // Close action is handled by closing the notification above
+});
+
+// Handle notification close
+self.addEventListener('notificationclose', (event) => {
+  console.log('Notification closed:', event);
 });

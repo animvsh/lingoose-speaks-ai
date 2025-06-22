@@ -40,7 +40,15 @@ export const useNotifications = () => {
   };
 
   const subscribe = async () => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "❌ Authentication Required",
+        description: "Please sign in to enable notifications.",
+        variant: "destructive",
+        className: "border-2 border-red-400 bg-red-50 text-red-800",
+      });
+      return;
+    }
     
     setLoading(true);
     try {
@@ -59,7 +67,7 @@ export const useNotifications = () => {
         applicationServerKey: vapidPublicKey
       });
 
-      // Save subscription to database - cast to Json type
+      // Save subscription to database - reference user_profiles table correctly
       const { error } = await supabase
         .from('subscriptions')
         .insert({
@@ -76,6 +84,7 @@ export const useNotifications = () => {
         className: "border-2 border-green-400 bg-green-50 text-green-800",
       });
     } catch (error: any) {
+      console.error('Subscription error:', error);
       toast({
         title: "❌ Subscription Failed",
         description: error.message || "Failed to subscribe to notifications.",
@@ -114,6 +123,7 @@ export const useNotifications = () => {
         className: "border-2 border-green-400 bg-green-50 text-green-800",
       });
     } catch (error: any) {
+      console.error('Unsubscribe error:', error);
       toast({
         title: "❌ Unsubscribe Failed",
         description: error.message || "Failed to unsubscribe from notifications.",
