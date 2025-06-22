@@ -1,10 +1,13 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Tables } from '@/integrations/supabase/types';
 
-type UserNodeProgress = Tables<'user_node_progress'>;
+// Mock progress data since the table was removed
+const mockProgress = [
+  { id: "1", user_id: "", node_id: "1", status: "completed", fluency_percentage: 100, last_practiced: new Date().toISOString(), practice_sessions: 5 },
+  { id: "2", user_id: "", node_id: "2", status: "in_progress", fluency_percentage: 75, last_practiced: new Date().toISOString(), practice_sessions: 3 },
+  { id: "3", user_id: "", node_id: "3", status: "available", fluency_percentage: 0, last_practiced: null, practice_sessions: 0 }
+];
 
 export const useUserNodeProgress = (courseId: string) => {
   const { user } = useAuth();
@@ -14,18 +17,8 @@ export const useUserNodeProgress = (courseId: string) => {
     queryKey: ['user-node-progress', user?.id, courseId],
     queryFn: async () => {
       if (!user) throw new Error('No user found');
-
-      const { data, error } = await supabase
-        .from('user_node_progress')
-        .select(`
-          *,
-          course_nodes!inner(course_id)
-        `)
-        .eq('user_id', user.id)
-        .eq('course_nodes.course_id', courseId);
-
-      if (error) throw error;
-      return data as (UserNodeProgress & { course_nodes: { course_id: string } })[];
+      // Return mock data since the table was removed
+      return mockProgress.map(p => ({ ...p, user_id: user.id }));
     },
     enabled: !!user && !!courseId,
   });
@@ -38,21 +31,16 @@ export const useUserNodeProgress = (courseId: string) => {
     }) => {
       if (!user) throw new Error('No user found');
 
-      const { data, error } = await supabase
-        .from('user_node_progress')
-        .upsert({
-          user_id: user.id,
-          node_id: nodeId,
-          status,
-          fluency_percentage: fluencyPercentage || 0,
-          last_practiced: new Date().toISOString(),
-          practice_sessions: 1,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      // Mock update since the table was removed - just return mock data
+      return {
+        id: nodeId,
+        user_id: user.id,
+        node_id: nodeId,
+        status,
+        fluency_percentage: fluencyPercentage || 0,
+        last_practiced: new Date().toISOString(),
+        practice_sessions: 1,
+      };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-node-progress'] });

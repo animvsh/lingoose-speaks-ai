@@ -1,10 +1,18 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Tables } from '@/integrations/supabase/types';
 
-type CallLog = Tables<'call_logs'>;
+// Mock call logs since the table was removed
+const mockCallLogs = [
+  {
+    id: "1",
+    user_id: "",
+    phone_number: "+1234567890",
+    call_status: "completed",
+    duration: 300,
+    created_at: new Date().toISOString()
+  }
+];
 
 export const useCallLogs = () => {
   const { user } = useAuth();
@@ -13,15 +21,8 @@ export const useCallLogs = () => {
     queryKey: ['call-logs', user?.id],
     queryFn: async () => {
       if (!user) throw new Error('No user found');
-
-      const { data, error } = await supabase
-        .from('call_logs')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as CallLog[];
+      // Return mock data since the call_logs table was removed
+      return mockCallLogs.map(log => ({ ...log, user_id: user.id }));
     },
     enabled: !!user,
   });
