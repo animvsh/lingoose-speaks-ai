@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -40,7 +41,22 @@ export const usePhoneAuth = () => {
       const formattedPhone = formatPhoneNumber(phoneNumber);
       console.log('Sending OTP to:', formattedPhone);
       
-      // Generate OTP
+      // Check if this is our test phone number
+      if (formattedPhone === '+16505188736') {
+        console.log('Test phone number detected, using test OTP: 123456');
+        
+        // Store a fixed OTP for the test number
+        const otpData: StoredOTP = {
+          otp: '123456',
+          phoneNumber: formattedPhone,
+          expiresAt: Date.now() + (10 * 60 * 1000) // 10 minutes from now
+        };
+        localStorage.setItem('phone_auth_otp', JSON.stringify(otpData));
+        
+        return { success: true };
+      }
+      
+      // Generate OTP for real phone numbers
       const otp = generateOTP();
       const expiresAt = Date.now() + (10 * 60 * 1000); // 10 minutes from now
       
@@ -116,7 +132,26 @@ export const usePhoneAuth = () => {
       // OTP is valid, clean up
       localStorage.removeItem('phone_auth_otp');
       
-      // Create a user session with phone number
+      // Check if this is our test phone number
+      if (formattedPhone === '+16505188736') {
+        console.log('Test phone number detected, signing in as test user');
+        
+        // Sign in as the test user using email and password
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: 'testuser@lingoose.app',
+          password: 'testpassword123'
+        });
+        
+        if (signInError) {
+          console.error('Test user sign in error:', signInError);
+          throw new Error('Failed to authenticate test user');
+        }
+        
+        console.log('Test user signed in successfully:', signInData);
+        return { success: true };
+      }
+      
+      // For real phone numbers, create/sign in normally
       const sanitizedPhone = formattedPhone.replace(/[^0-9]/g, '');
       const testEmail = `phone${sanitizedPhone}@lingoose.app`;
       const testPassword = 'phone_auth_secure_' + sanitizedPhone;
