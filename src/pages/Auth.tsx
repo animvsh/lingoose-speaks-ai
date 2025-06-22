@@ -201,6 +201,25 @@ const Auth = () => {
                 </form>
               </TabsContent>
             </Tabs>
+            
+            <div className="mt-6 text-center">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-slate-300" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-slate-500 font-bold">Or</span>
+                </div>
+              </div>
+              
+              <Button
+                onClick={() => window.location.href = '/phone-verification'}
+                className="w-full mt-4 bg-purple-400 hover:bg-purple-500 border-4 border-purple-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
+              >
+                <Phone className="w-5 h-5 mr-2" />
+                Sign In with Phone
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
