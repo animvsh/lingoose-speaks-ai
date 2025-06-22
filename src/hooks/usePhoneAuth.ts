@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -17,25 +16,47 @@ export const usePhoneAuth = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
+  const formatPhoneNumber = (phone: string): string => {
+    // Remove all non-digit characters
+    const cleaned = phone.replace(/\D/g, '');
+    
+    // Add + prefix if not present and number doesn't start with country code
+    if (!phone.startsWith('+')) {
+      // If it's a US number (10 digits), add +1
+      if (cleaned.length === 10) {
+        return `+1${cleaned}`;
+      }
+      // Otherwise add + to whatever they provided
+      return `+${cleaned}`;
+    }
+    
+    return phone;
+  };
+
   const sendOTP = async (phoneNumber: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     
     try {
+      const formattedPhone = formatPhoneNumber(phoneNumber);
+      console.log('Sending OTP to:', formattedPhone);
+      
       // Generate OTP
       const otp = generateOTP();
       const expiresAt = Date.now() + (10 * 60 * 1000); // 10 minutes from now
       
-      // Store OTP in localStorage (in production, you'd want to store this server-side)
+      // Store OTP in localStorage
       const otpData: StoredOTP = {
         otp,
-        phoneNumber,
+        phoneNumber: formattedPhone,
         expiresAt
       };
       localStorage.setItem('phone_auth_otp', JSON.stringify(otpData));
       
+      console.log('Generated OTP:', otp, 'for phone:', formattedPhone);
+      
       // Send SMS via Supabase edge function
       const { data, error } = await supabase.functions.invoke('send-sms', {
-        body: { phoneNumber, otp }
+        body: { phoneNumber: formattedPhone, otp }
       });
 
       if (error) {
@@ -44,6 +65,7 @@ export const usePhoneAuth = () => {
       }
 
       if (!data?.success) {
+        console.error('SMS sending failed:', data);
         throw new Error(data?.error || 'Failed to send SMS');
       }
 
@@ -54,7 +76,7 @@ export const usePhoneAuth = () => {
       console.error('Send OTP error:', error);
       return { 
         success: false, 
-        error: error.message || 'Failed to send verification code' 
+        error: error.message || 'Failed to send verification code. Please check your phone number and try again.' 
       };
     } finally {
       setIsLoading(false);
@@ -65,6 +87,8 @@ export const usePhoneAuth = () => {
     setIsLoading(true);
     
     try {
+      const formattedPhone = formatPhoneNumber(phoneNumber);
+      
       // Get stored OTP
       const storedData = localStorage.getItem('phone_auth_otp');
       if (!storedData) {
@@ -80,7 +104,7 @@ export const usePhoneAuth = () => {
       }
 
       // Check if phone number matches
-      if (otpData.phoneNumber !== phoneNumber) {
+      if (otpData.phoneNumber !== formattedPhone) {
         throw new Error('Phone number mismatch. Please try again.');
       }
 
@@ -93,9 +117,11 @@ export const usePhoneAuth = () => {
       localStorage.removeItem('phone_auth_otp');
       
       // Create a user session with phone number
-      // For demo purposes, we'll create a test account
-      const testEmail = `${phoneNumber.replace(/[^0-9]/g, '')}@phone.lingoose.app`;
-      const testPassword = 'phone_auth_' + phoneNumber.replace(/[^0-9]/g, '');
+      const sanitizedPhone = formattedPhone.replace(/[^0-9]/g, '');
+      const testEmail = `phone${sanitizedPhone}@lingoose.app`;
+      const testPassword = 'phone_auth_secure_' + sanitizedPhone;
+      
+      console.log('Attempting to sign in with email:', testEmail);
       
       // Try to sign in first
       let { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -104,6 +130,7 @@ export const usePhoneAuth = () => {
       });
       
       if (signInError && signInError.message.includes("Invalid login credentials")) {
+        console.log('User does not exist, creating new user...');
         // User doesn't exist, create them
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: testEmail,
@@ -111,14 +138,22 @@ export const usePhoneAuth = () => {
           options: {
             data: {
               full_name: "Phone User",
-              phone_number: phoneNumber
+              phone_number: formattedPhone
             }
           }
         });
         
-        if (signUpError) throw signUpError;
+        if (signUpError) {
+          console.error('Sign up error:', signUpError);
+          throw signUpError;
+        }
+        
+        console.log('User created successfully:', signUpData);
       } else if (signInError) {
+        console.error('Sign in error:', signInError);
         throw signInError;
+      } else {
+        console.log('User signed in successfully:', signInData);
       }
 
       return { success: true };

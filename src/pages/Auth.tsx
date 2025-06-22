@@ -22,32 +22,22 @@ const Auth = () => {
     // Basic phone number validation
     if (!phoneNumber.trim()) {
       toast({
-        title: "Phone number required",
-        description: "Please enter your phone number.",
+        title: "📱 Phone Number Required",
+        description: "Please enter your phone number to continue.",
         variant: "destructive",
+        className: "border-2 border-red-400 bg-red-50 text-red-800",
       });
       return;
     }
 
-    // Bypass auth for specific test phone number
-    if (phoneNumber === "6505188736") {
+    // Format phone number validation
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(phoneNumber.replace(/\s/g, ''))) {
       toast({
-        title: "Test Mode Activated!",
-        description: "Using test phone number - proceeding without SMS.",
-      });
-      
-      // Store test OTP for verification
-      const testOtpData = {
-        otp: "123456",
-        phoneNumber,
-        expiresAt: Date.now() + (10 * 60 * 1000)
-      };
-      localStorage.setItem('phone_auth_otp', JSON.stringify(testOtpData));
-      
-      setStep("otp");
-      toast({
-        title: "Test OTP: 123456",
-        description: "Use this code to complete test authentication.",
+        title: "❌ Invalid Phone Number",
+        description: "Please enter a valid phone number with country code (e.g., +1234567890).",
+        variant: "destructive",
+        className: "border-2 border-red-400 bg-red-50 text-red-800",
       });
       return;
     }
@@ -57,14 +47,16 @@ const Auth = () => {
     if (result.success) {
       setStep("otp");
       toast({
-        title: "Verification code sent!",
-        description: "Check your phone for the 6-digit code.",
+        title: "📨 Verification Code Sent!",
+        description: "Check your phone for the 6-digit code. It may take a minute to arrive.",
+        className: "border-2 border-green-400 bg-green-50 text-green-800",
       });
     } else {
       toast({
-        title: "Failed to send code",
-        description: result.error || "Please try again.",
+        title: "❌ Failed to Send Code",
+        description: result.error || "Please check your phone number and try again.",
         variant: "destructive",
+        className: "border-2 border-red-400 bg-red-50 text-red-800",
       });
     }
   };
@@ -74,9 +66,10 @@ const Auth = () => {
     
     if (otp.length !== 6) {
       toast({
-        title: "Invalid code",
-        description: "Please enter the complete 6-digit code.",
+        title: "❌ Invalid Code",
+        description: "Please enter the complete 6-digit verification code.",
         variant: "destructive",
+        className: "border-2 border-red-400 bg-red-50 text-red-800",
       });
       return;
     }
@@ -85,19 +78,40 @@ const Auth = () => {
     
     if (result.success) {
       toast({
-        title: "Welcome to Lingoose!",
-        description: "Phone verification successful. Redirecting...",
+        title: "🎉 Welcome to Lingoose!",
+        description: "Phone verification successful. Welcome aboard!",
+        className: "border-2 border-green-400 bg-green-50 text-green-800",
       });
       
-      // Small delay to show the success message
+      // Small delay to show the success message, then redirect
       setTimeout(() => {
         window.location.href = '/';
-      }, 1000);
+      }, 1500);
     } else {
       toast({
-        title: "Verification failed",
-        description: result.error || "Please try again.",
+        title: "❌ Verification Failed",
+        description: result.error || "Please check your code and try again.",
         variant: "destructive",
+        className: "border-2 border-red-400 bg-red-50 text-red-800",
+      });
+    }
+  };
+
+  const handleResendCode = async () => {
+    const result = await sendOTP(phoneNumber);
+    
+    if (result.success) {
+      toast({
+        title: "📨 New Code Sent!",
+        description: "A new verification code has been sent to your phone.",
+        className: "border-2 border-blue-400 bg-blue-50 text-blue-800",
+      });
+    } else {
+      toast({
+        title: "❌ Failed to Resend",
+        description: result.error || "Please try again in a moment.",
+        variant: "destructive",
+        className: "border-2 border-red-400 bg-red-50 text-red-800",
       });
     }
   };
@@ -141,17 +155,12 @@ const Auth = () => {
                     required
                   />
                 </div>
-                {phoneNumber === "6505188736" && (
-                  <div className="text-center p-2 bg-green-100 rounded-lg border border-green-300">
-                    <p className="text-green-700 text-sm font-bold">🧪 Test Mode: This number will bypass SMS and use OTP: 123456</p>
-                  </div>
-                )}
                 <Button
                   type="submit"
                   disabled={isLoading}
                   className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
                 >
-                  {isLoading ? "Sending..." : phoneNumber === "6505188736" ? "Sign In (Test Mode)" : "Send Verification Code"}
+                  {isLoading ? "Sending..." : "Send Verification Code"}
                 </Button>
               </form>
             ) : (
@@ -180,6 +189,16 @@ const Auth = () => {
                     className="w-full bg-green-400 hover:bg-green-500 border-4 border-green-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:rotate-1"
                   >
                     {isLoading ? "Verifying..." : "Sign In"}
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleResendCode}
+                    disabled={isLoading}
+                    className="w-full border-2 border-blue-300 rounded-xl font-bold text-blue-600 hover:bg-blue-50"
+                  >
+                    Resend Code
                   </Button>
                   
                   <Button
