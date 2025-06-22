@@ -1,10 +1,10 @@
-
 import { Button } from "@/components/ui/button";
-import { Home, Phone, CheckCircle, Settings, ArrowLeft, Star, Clock, Users, Target, Trophy, Flame } from "lucide-react";
-import LearningProgressTree from "./LearningProgressTree";
+import { Phone, Clock, CheckCircle, Home, Settings, ArrowLeft, Play, Mic, Users, MapPin, Coffee, Briefcase, Heart, ShoppingCart, Plane, GraduationCap, Car, Music, GameController2, Book } from "lucide-react";
+import DuckMascot from "./DuckMascot";
+import { useState } from "react";
+import AppBar from "./AppBar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 import { useUserActivityRatings } from "@/hooks/useUserActivityRatings";
 import { format } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
@@ -90,21 +90,11 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
-      {/* Header */}
-      <div className="px-6 pt-8 pb-6">
-        <div className="flex items-center justify-between">
-          <Button
-            onClick={() => onNavigate("home")}
-            className="w-12 h-12 bg-white hover:bg-gray-50 rounded-xl text-gray-700 shadow-sm border border-gray-200"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
-            PRACTICE HUB
-          </h1>
-          <div className="w-12 h-12"></div>
-        </div>
-      </div>
+      <AppBar 
+        title="PRACTICE HUB" 
+        onBack={() => onNavigate("home")} 
+        showBackButton={true} 
+      />
 
       <div className="px-6 space-y-6">
         {/* Welcome Section */}

@@ -1,243 +1,139 @@
-
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Home, Phone, CheckCircle, Settings, Target, Star, Lock, Play, CheckCircle2 } from "lucide-react";
+import { Target, TrendingUp, Star, Clock, CheckCircle, Zap, Trophy, Users, Home, Phone, Settings, ArrowLeft } from "lucide-react";
 import { useState } from "react";
+import AppBar from "./AppBar";
 
 interface FluencyMapCardProps {
   onNavigate: (view: string) => void;
 }
 
-// Empty courses and nodes since we don't have real data
-const mockCourses = [
-  {
-    id: "1",
-    name: "N/A",
-    language: "N/A",
-    description: "No courses available"
-  }
-];
-
-const mockNodes = [
-  { id: "1", name: "N/A", difficulty: "beginner" as const },
-  { id: "2", name: "N/A", difficulty: "beginner" as const },
-  { id: "3", name: "N/A", difficulty: "intermediate" as const },
-  { id: "4", name: "N/A", difficulty: "intermediate" as const },
-  { id: "5", name: "N/A", difficulty: "advanced" as const },
-  { id: "6", name: "N/A", difficulty: "advanced" as const }
-];
-
 const FluencyMapCard = ({ onNavigate }: FluencyMapCardProps) => {
-  const [selectedCourse, setSelectedCourse] = useState<string>("1");
-  const [nodeProgress, setNodeProgress] = useState<Record<string, { status: string; fluency: number }>>({
-    "1": { status: "locked", fluency: 0 },
-    "2": { status: "locked", fluency: 0 },
-    "3": { status: "locked", fluency: 0 },
-    "4": { status: "locked", fluency: 0 },
-    "5": { status: "locked", fluency: 0 },
-    "6": { status: "locked", fluency: 0 }
-  });
+  const [expandedCategory, setExpandedCategory] = useState(null);
 
-  const getNodeStatus = (nodeId: string) => {
-    return nodeProgress[nodeId]?.status || 'locked';
+  const toggleCategory = (category: any) => {
+    setExpandedCategory(expandedCategory === category ? null : category);
   };
 
-  const getFluencyPercentage = (nodeId: string) => {
-    return nodeProgress[nodeId]?.fluency || 0;
-  };
-
-  const getNodeColor = (status: string) => {
-    switch (status) {
-      case 'locked': return 'bg-gray-300 border-gray-400 text-gray-500';
-      case 'available': return 'bg-blue-400 border-blue-500 text-white hover:bg-blue-500 hover:-translate-y-1';
-      case 'in_progress': return 'bg-orange-400 border-orange-500 text-white hover:bg-orange-500 hover:-translate-y-1';
-      case 'completed': return 'bg-green-400 border-green-500 text-white hover:bg-green-500 hover:-translate-y-1';
-      case 'mastered': return 'bg-purple-400 border-purple-500 text-white hover:bg-purple-500 hover:-translate-y-1';
-      default: return 'bg-gray-300 border-gray-400 text-gray-500';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'locked': return <Lock className="w-5 h-5" />;
-      case 'available': return <Play className="w-5 h-5" />;
-      case 'in_progress': return <Target className="w-5 h-5" />;
-      case 'completed': return <CheckCircle2 className="w-5 h-5" />;
-      case 'mastered': return <Star className="w-5 h-5" />;
-      default: return <Lock className="w-5 h-5" />;
-    }
-  };
-
-  const handleNodeClick = (nodeId: string, currentStatus: string) => {
-    // All nodes are locked since we don't have real data
-    return;
-  };
-
-  const selectedCourseData = mockCourses.find(c => c.id === selectedCourse);
-  const completedCount = 0; // No completed courses
-  const inProgressCount = 0; // No courses in progress
-  const masteredCount = 0; // No mastered courses
+  const categories = [
+    {
+      name: "Basic Greetings",
+      skills: ["Hello", "Goodbye", "Thank You", "You're Welcome"],
+    },
+    {
+      name: "Everyday Conversations",
+      skills: ["How are you?", "What's your name?", "Where are you from?", "What do you do?"],
+    },
+    {
+      name: "Travel Phrases",
+      skills: ["Where is the bathroom?", "How much does this cost?", "Can you help me?", "I need a taxi"],
+    },
+    {
+      name: "Food & Drink",
+      skills: ["I'd like to order", "Water, please", "The bill, please", "Delicious!"],
+    },
+    {
+      name: "Emergency Phrases",
+      skills: ["Help!", "I need a doctor", "Call the police", "I'm lost"],
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-28">
-      <div className="px-6 pt-8">
+    <div className="min-h-screen bg-amber-50 pb-24">
+      <AppBar 
+        title="FLUENCY MAP" 
+        onBack={() => onNavigate("home")} 
+        showBackButton={true} 
+      />
+
+      <div className="px-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div
-            onClick={() => onNavigate("home")}
-            className="w-16 h-16 bg-orange-400 hover:bg-orange-500 rounded-2xl flex items-center justify-center border-4 border-white hover:border-orange-200 transition-all duration-300 cursor-pointer hover:-translate-y-1"
-          >
-            <ArrowLeft className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-black text-orange-500 uppercase tracking-wider drop-shadow-sm">
-            FLUENCY MAP 🗺️
-          </h1>
-          <div className="w-16 h-16"></div>
-        </div>
-
-        {/* Course Selection */}
-        <div className="bg-white rounded-3xl p-6 mb-8 border-4 border-gray-100 hover:border-orange-200 transition-all duration-300 hover:-translate-y-1">
-          <h2 className="font-black text-gray-800 mb-4 text-2xl uppercase tracking-wide">
-            {selectedCourseData?.name || 'N/A'} ✨
+        <div className="text-center mb-8">
+          <h2 className="text-4xl font-bold text-purple-600 mb-2 uppercase tracking-wide">
+            Fluency Map
           </h2>
-          <p className="text-gray-600 font-semibold text-base mb-6">
-            {selectedCourseData?.description}
+          <p className="text-xl font-semibold text-gray-700">
+            Explore your language skills
           </p>
-          <div className="flex space-x-3">
-            {mockCourses.map((course) => (
-              <Button
-                key={course.id}
-                onClick={() => setSelectedCourse(course.id)}
-                disabled
-                className={`px-6 py-3 rounded-2xl text-base font-black border-4 transition-all duration-300 bg-gray-200 text-gray-500 border-gray-300 cursor-not-allowed opacity-60`}
+        </div>
+
+        {/* Categories */}
+        <div className="space-y-4">
+          {categories.map((category, index) => (
+            <div key={index} className="bg-white rounded-3xl p-4 border-4 border-gray-200">
+              <div
+                className="flex items-center justify-between cursor-pointer"
+                onClick={() => toggleCategory(category)}
               >
-                {course.language} 🌟
-              </Button>
-            ))}
-          </div>
-        </div>
+                <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide">
+                  {category.name}
+                </h3>
+                <ChevronRight
+                  className={`w-6 h-6 text-gray-600 transition-transform duration-200 ${
+                    expandedCategory === category ? "rotate-90" : ""
+                  }`}
+                />
+              </div>
 
-        {/* Learning Tree Visualization */}
-        <div className="bg-white rounded-3xl p-8 mb-8 border-4 border-gray-100 min-h-[600px] relative overflow-hidden">
-          <h3 className="font-black text-gray-800 mb-8 text-2xl uppercase tracking-wide text-center">
-            Your Learning Journey 🌟
-          </h3>
-          
-          {/* Node Grid Layout */}
-          <div className="relative w-full h-[500px]">
-            {mockNodes.map((node) => {
-              const status = getNodeStatus(node.id);
-              const fluency = getFluencyPercentage(node.id);
-              
-              // Position nodes in a grid with some offset for visual appeal
-              const nodeIndex = mockNodes.indexOf(node);
-              const row = Math.floor(nodeIndex / 3);
-              const col = nodeIndex % 3;
-              const x = col * 120 + (row % 2) * 60; // Offset every other row
-              const y = row * 100;
-              
-              return (
-                <div
-                  key={node.id}
-                  className="absolute transition-all duration-300"
-                  style={{
-                    left: `${Math.min(x, 280)}px`,
-                    top: `${Math.min(y, 400)}px`,
-                  }}
-                >
-                  {/* Node Circle */}
-                  <div className={`w-20 h-20 rounded-2xl flex items-center justify-center font-black border-4 transition-all duration-300 ${getNodeColor(status)} cursor-not-allowed opacity-60`}>
-                    {getStatusIcon(status)}
-                  </div>
-                  
-                  {/* Node Label */}
-                  <div className="mt-3 text-center">
-                    <div className="text-sm font-black text-gray-500 max-w-[90px] leading-tight">
-                      {node.name}
-                    </div>
-                    <div className="text-sm text-gray-400 font-bold mt-1">
-                      N/A
-                    </div>
-                  </div>
-                  
-                  {/* Difficulty Badge */}
-                  <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full text-sm font-black flex items-center justify-center text-white border-2 border-white bg-gray-400`}>
-                    N
-                  </div>
+              {expandedCategory === category && (
+                <div className="mt-4 space-y-2">
+                  {category.skills.map((skill, skillIndex) => (
+                    <Button
+                      key={skillIndex}
+                      variant="outline"
+                      className="w-full justify-start text-sm font-medium"
+                    >
+                      <Target className="w-4 h-4 mr-2" />
+                      {skill}
+                    </Button>
+                  ))}
                 </div>
-              );
-            })}
-          </div>
+              )}
+            </div>
+          ))}
         </div>
 
-        {/* Progress Summary */}
-        <div className="bg-gradient-to-br from-gray-400 to-gray-500 rounded-3xl p-6 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-1">
-          <h3 className="font-black text-white mb-4 text-2xl uppercase tracking-wide">
-            Your Progress 🏆
-          </h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white/95 rounded-2xl p-4 text-center border-2 border-white/50">
-              <div className="text-2xl font-black text-gray-700">
-                N/A
-              </div>
-              <div className="text-xs text-gray-600 font-bold">COMPLETED ✅</div>
-            </div>
-            <div className="bg-white/95 rounded-2xl p-4 text-center border-2 border-white/50">
-              <div className="text-2xl font-black text-gray-700">
-                N/A
-              </div>
-              <div className="text-xs text-gray-600 font-bold">IN PROGRESS ⚡</div>
-            </div>
-            <div className="bg-white/95 rounded-2xl p-4 text-center border-2 border-white/50">
-              <div className="text-2xl font-black text-gray-700">
-                N/A
-              </div>
-              <div className="text-xs text-gray-600 font-bold">MASTERED 🌟</div>
-            </div>
-          </div>
-        </div>
+        {/* Start Learning Button */}
+        <Button
+          onClick={() => onNavigate("curriculum")}
+          className="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-6 text-xl rounded-3xl border-4 border-orange-500"
+        >
+          START LEARNING 🚀
+        </Button>
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white px-6 py-4 border-t-4 border-gray-100">
+      <div className="fixed bottom-0 left-0 right-0 bg-white px-6 py-4 border-t border-gray-100">
         <div className="max-w-md mx-auto">
-          <div className="flex justify-center space-x-3">
-            <Button 
-              variant="ghost" 
+          <div className="flex justify-center space-x-4">
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-0.5"
+              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <Home className="w-6 h-6" />
             </Button>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-0.5"
+              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <Phone className="w-6 h-6" />
             </Button>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-0.5"
+              className="w-14 h-14 bg-blue-400 rounded-2xl text-white"
             >
               <CheckCircle className="w-6 h-6" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate("fluency-map")}
-              className="w-14 h-14 bg-purple-400 rounded-2xl text-white border-4 border-white transition-all duration-300"
-            >
-              <Target className="w-6 h-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-0.5"
+              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <Settings className="w-6 h-6" />
             </Button>

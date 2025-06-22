@@ -1,5 +1,6 @@
 
 import { Button } from "@/components/ui/button";
+import { HelpCircle, MessageCircle, Mail, Phone as PhoneIcon, FileText, ExternalLink, ChevronRight, Home, Phone, CheckCircle, Settings, ArrowLeft, Book, Video, Users, Headphones } from "lucide-react";
 import { useState } from "react";
 import AppBar from "./AppBar";
 
@@ -34,10 +35,11 @@ const HelpSupportPage = ({ onNavigate }: HelpSupportPageProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-amber-50 pb-24">
       <AppBar 
-        title="HELP & SUPPORT"
-        onBack={() => onNavigate("settings")}
+        title="HELP & SUPPORT" 
+        onBack={() => onNavigate("settings")} 
+        showBackButton={true} 
       />
 
       <div className="px-6 space-y-6">

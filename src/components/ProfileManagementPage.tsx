@@ -1,13 +1,9 @@
-
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft } from "lucide-react";
+import { User, Edit3, Save, Camera, Mail, Phone as PhoneIcon, MapPin, Calendar, Home, Settings, ArrowLeft } from "lucide-react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import AppBar from "./AppBar";
 
 interface ProfileManagementPageProps {
   onNavigate: (view: string) => void;
@@ -15,232 +11,170 @@ interface ProfileManagementPageProps {
 
 const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
   const { user } = useAuth();
-  const { data: userProfile, refetch: refetchProfile } = useUserProfile();
-  const { toast } = useToast();
-  
-  // Profile form states
-  const [fullName, setFullName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [language, setLanguage] = useState("");
-  const [preferredCallTime, setPreferredCallTime] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
+  const { data: userProfile, isLoading, mutate } = useUserProfile();
 
-  // Update form values when userProfile changes
-  useEffect(() => {
-    if (userProfile) {
-      setFullName(userProfile.full_name || "");
-      setPhoneNumber(userProfile.phone_number || "");
-      setLanguage(userProfile.language || "hindi");
-      setPreferredCallTime(userProfile.preferred_call_time || "09:00");
-    }
-  }, [userProfile]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [fullName, setFullName] = useState(userProfile?.full_name || "");
+  const [email, setEmail] = useState(userProfile?.email || "");
+  const [phone, setPhone] = useState(userProfile?.phone || "");
+  const [location, setLocation] = useState(userProfile?.location || "");
+  const [birthdate, setBirthdate] = useState<Date | null>(userProfile?.birthdate ? new Date(userProfile.birthdate) : null);
 
-  const handleUpdateProfile = async () => {
-    if (!user) return;
+  const handleSaveProfile = async () => {
+    setIsEditing(false);
     
-    setIsUpdating(true);
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({
-          full_name: fullName,
-          phone_number: phoneNumber,
-          language: language,
-          preferred_call_time: preferredCallTime,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+    const profileData = {
+      full_name: fullName,
+      email: email,
+      phone: phone,
+      location: location,
+      birthdate: birthdate ? birthdate.toISOString() : null,
+    };
 
-      if (error) throw error;
-
-      // Refetch the profile to update the UI
-      await refetchProfile();
-
-      toast({
-        title: "✅ Profile Updated",
-        description: "Your profile has been updated successfully.",
-        className: "border-2 border-green-400 bg-green-50 text-green-800",
-      });
-    } catch (error: any) {
-      toast({
-        title: "❌ Update Failed",
-        description: error.message || "Failed to update profile.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const handleUpdatePassword = async () => {
-    if (!newPassword) {
-      toast({
-        title: "❌ Missing Password",
-        description: "Please enter a new password.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      toast({
-        title: "❌ Password Too Short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-      return;
-    }
-
-    setIsUpdating(true);
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) throw error;
-
-      setNewPassword("");
-      
-      toast({
-        title: "✅ Password Updated",
-        description: "Your password has been updated successfully.",
-        className: "border-2 border-green-400 bg-green-50 text-green-800",
-      });
-    } catch (error: any) {
-      toast({
-        title: "❌ Update Failed",
-        description: error.message || "Failed to update password.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-    } finally {
-      setIsUpdating(false);
-    }
+    mutate(profileData);
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="px-6 pt-8 pb-6">
-        <div className="flex items-center justify-between">
-          <Button
-            onClick={() => onNavigate("settings")}
-            className="w-14 h-14 bg-orange-500 hover:bg-orange-600 rounded-2xl text-white shadow-lg"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide">
-            PROFILE
-          </h1>
-          <div className="w-14 h-14"></div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-amber-50 pb-24">
+      <AppBar 
+        title="MY PROFILE" 
+        onBack={() => onNavigate("settings")} 
+        showBackButton={true} 
+      />
 
       <div className="px-6 space-y-6">
-        {/* Profile Information Section */}
-        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
-          <h3 className="font-bold text-gray-800 text-lg uppercase tracking-wide mb-4">
-            Profile Information
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
-              <Input
+        {/* Profile Header */}
+        <div className="text-center">
+          <div className="relative inline-block">
+            <div className="w-28 h-28 rounded-full bg-orange-400 flex items-center justify-center text-white text-4xl font-bold uppercase border-4 border-orange-500">
+              {userProfile?.full_name?.charAt(0) || "U"}
+            </div>
+            {isEditing && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute bottom-0 right-0 rounded-full shadow-md hover:bg-orange-100"
+              >
+                <Camera className="w-5 h-5 text-orange-600" />
+              </Button>
+            )}
+          </div>
+          <h2 className="text-3xl font-bold text-orange-600 mt-4">
+            {isEditing ? (
+              <input
+                type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="border-2 border-gray-300 rounded-xl font-medium"
-                placeholder="Enter your full name"
+                className="w-full text-center text-3xl font-bold text-orange-600 bg-transparent border-b-2 border-orange-300 focus:outline-none focus:border-orange-500"
               />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Phone Number</label>
-              <Input
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="border-2 border-gray-300 rounded-xl font-medium"
-                placeholder="Enter your phone number"
-              />
-            </div>
+            ) : (
+              fullName
+            )}
+          </h2>
+          <p className="text-gray-600">{user?.email}</p>
+        </div>
 
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Preferred Language</label>
-              <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger className="border-2 border-gray-300 rounded-xl font-medium">
-                  <SelectValue placeholder="Select your preferred language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="hindi">Hindi</SelectItem>
-                  <SelectItem value="english">English</SelectItem>
-                  <SelectItem value="spanish">Spanish</SelectItem>
-                  <SelectItem value="french">French</SelectItem>
-                  <SelectItem value="german">German</SelectItem>
-                  <SelectItem value="chinese">Chinese</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500 mt-1">Choose your preferred language for learning</p>
+        {/* Profile Details */}
+        <div className="space-y-4">
+          {/* Email */}
+          <div className="bg-white rounded-3xl p-4 border-2 border-gray-200">
+            <div className="flex items-center space-x-3">
+              <Mail className="w-5 h-5 text-gray-500" />
+              <div className="flex-1">
+                <label className="text-sm text-gray-500">Email</label>
+                {isEditing ? (
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-orange-500"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-800">{email}</p>
+                )}
+              </div>
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Preferred Call Time</label>
-              <Input
-                type="time"
-                value={preferredCallTime}
-                onChange={(e) => setPreferredCallTime(e.target.value)}
-                className="border-2 border-gray-300 rounded-xl font-medium"
-              />
-              <p className="text-xs text-gray-500 mt-1">Set your preferred time for daily practice calls</p>
+          {/* Phone */}
+          <div className="bg-white rounded-3xl p-4 border-2 border-gray-200">
+            <div className="flex items-center space-x-3">
+              <PhoneIcon className="w-5 h-5 text-gray-500" />
+              <div className="flex-1">
+                <label className="text-sm text-gray-500">Phone</label>
+                {isEditing ? (
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-orange-500"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-800">{phone || "Add phone number"}</p>
+                )}
+              </div>
             </div>
-            
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Email</label>
-              <Input
-                value={user?.email || ""}
-                disabled
-                className="border-2 border-gray-200 rounded-xl font-medium bg-gray-50"
-              />
-              <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+          </div>
+
+          {/* Location */}
+          <div className="bg-white rounded-3xl p-4 border-2 border-gray-200">
+            <div className="flex items-center space-x-3">
+              <MapPin className="w-5 h-5 text-gray-500" />
+              <div className="flex-1">
+                <label className="text-sm text-gray-500">Location</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-orange-500"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-800">{location || "Add location"}</p>
+                )}
+              </div>
             </div>
-            
-            <Button
-              onClick={handleUpdateProfile}
-              disabled={isUpdating || (!fullName.trim() && !phoneNumber.trim())}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl disabled:bg-gray-400"
-            >
-              {isUpdating ? "Updating..." : "Update Profile"}
-            </Button>
+          </div>
+
+          {/* Birthdate */}
+          <div className="bg-white rounded-3xl p-4 border-2 border-gray-200">
+            <div className="flex items-center space-x-3">
+              <Calendar className="w-5 h-5 text-gray-500" />
+              <div className="flex-1">
+                <label className="text-sm text-gray-500">Birthdate</label>
+                {isEditing ? (
+                  <input
+                    type="date"
+                    value={birthdate ? birthdate.toISOString().split('T')[0] : ''}
+                    onChange={(e) => setBirthdate(e.target.value ? new Date(e.target.value) : null)}
+                    className="w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-orange-500"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-800">{birthdate ? birthdate.toLocaleDateString() : "Add birthdate"}</p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Password Section */}
-        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
-          <h3 className="font-bold text-gray-800 text-lg uppercase tracking-wide mb-4">
-            Change Password
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">New Password</label>
-              <Input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="border-2 border-gray-300 rounded-xl font-medium"
-                placeholder="Enter new password (min 6 characters)"
-              />
-            </div>
-            
-            <Button
-              onClick={handleUpdatePassword}
-              disabled={isUpdating || newPassword.length < 6}
-              className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 rounded-xl disabled:bg-gray-400"
-            >
-              {isUpdating ? "Updating..." : "Update Password"}
+        {/* Action Buttons */}
+        <div className="flex justify-end space-x-4">
+          {isEditing ? (
+            <>
+              <Button variant="ghost" onClick={() => setIsEditing(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveProfile}>
+                <Save className="w-4 h-4 mr-2" />
+                Save
+              </Button>
+            </>
+          ) : (
+            <Button onClick={() => setIsEditing(true)}>
+              <Edit3 className="w-4 h-4 mr-2" />
+              Edit Profile
             </Button>
-          </div>
+          )}
         </div>
       </div>
     </div>

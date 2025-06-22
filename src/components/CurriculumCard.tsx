@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Home, CheckCircle, Settings, ArrowLeft, Phone, Target } from "lucide-react";
+import { CheckCircle, Clock, Home, Phone, Settings, ArrowLeft, Star, Trophy, Target, BookOpen, Users, Zap, Flame, Award, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import AppBar from "./AppBar";
 
 interface CurriculumCardProps {
   onNavigate: (view: string) => void;
@@ -15,7 +17,13 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-amber-50 pb-24">
+      <AppBar 
+        title="LEARNING PATH" 
+        onBack={() => onNavigate("home")} 
+        showBackButton={true} 
+      />
+
       {/* Header */}
       <div className="px-6 pt-8 pb-6">
         <div className="flex items-center justify-between">

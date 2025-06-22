@@ -1,165 +1,145 @@
-
 import { Button } from "@/components/ui/button";
-import { Home, CheckCircle, Settings, ChevronRight, Bell, Phone, User, HelpCircle, ArrowLeft, LogOut } from "lucide-react";
+import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star } from "lucide-react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useUserProfile } from "@/hooks/useUserProfile";
-import { useToast } from "@/hooks/use-toast";
+import AppBar from "./AppBar";
 
 interface SettingsCardProps {
   onNavigate: (view: string) => void;
 }
 
 const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
-  const { signOut, user } = useAuth();
-  const { data: userProfile } = useUserProfile();
-  const { toast } = useToast();
+  const { signOut } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "✅ Signed Out",
-        description: "You have been signed out successfully.",
-        className: "border-2 border-green-400 bg-green-50 text-green-800",
-      });
-    } catch (error) {
-      toast({
-        title: "❌ Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive",
-        className: "border-2 border-red-400 bg-red-50 text-red-800",
-      });
-    }
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  const toggleNotifications = () => {
+    setNotificationsEnabled(!notificationsEnabled);
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="px-6 pt-8 pb-6">
-        <div className="flex items-center justify-between">
-          <Button
-            onClick={() => onNavigate("home")}
-            className="w-14 h-14 bg-orange-500 hover:bg-orange-600 rounded-2xl text-white shadow-lg"
+    <div className="min-h-screen bg-amber-50 pb-24">
+      <AppBar 
+        title="SETTINGS" 
+        onBack={() => onNavigate("home")} 
+        showBackButton={true} 
+      />
+
+      <div className="px-6 space-y-6">
+        {/* Account Settings */}
+        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
+            Account
+          </h3>
+          <div 
+            className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none cursor-pointer"
+            onClick={() => onNavigate("profile-management")}
           >
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide">
-            SETTINGS
-          </h1>
-          <div className="w-14 h-14"></div>
-        </div>
-      </div>
-
-      <div className="px-6 space-y-4">
-        {/* Language Setting */}
-        <div className="bg-white rounded-3xl p-5 border-4 border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
-                <User className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Change Language</div>
-                <div className="text-sm text-gray-600 font-medium">Current: French (from English)</div>
-              </div>
+            <div className="flex items-center">
+              <User className="w-5 h-5 mr-3 text-orange-500" />
+              <span className="text-gray-700 font-medium">Profile Management</span>
             </div>
-            <ChevronRight className="w-6 h-6 text-gray-400" />
+            <ChevronRight className="w-4 h-4 text-gray-500" />
           </div>
         </div>
 
-        {/* Notifications Section */}
-        <div 
-          className="bg-white rounded-3xl p-5 border-4 border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-          onClick={() => onNavigate("notifications")}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
-                <Bell className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Notifications</div>
-                <div className="text-sm text-gray-600 font-medium">
-                  Manage push notifications
-                </div>
-              </div>
+        {/* App Settings */}
+        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
+            App Settings
+          </h3>
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+            <div className="flex items-center">
+              <Bell className="w-5 h-5 mr-3 text-blue-500" />
+              <span className="text-gray-700 font-medium">Notifications</span>
             </div>
-            <ChevronRight className="w-6 h-6 text-gray-400" />
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={toggleNotifications}
+            >
+              {notificationsEnabled ? "ON" : "OFF"}
+            </Button>
+          </div>
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+            <div className="flex items-center">
+              <Moon className="w-5 h-5 mr-3 text-purple-500" />
+              <span className="text-gray-700 font-medium">Dark Mode</span>
+            </div>
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={toggleDarkMode}
+            >
+              {isDarkMode ? "ON" : "OFF"}
+            </Button>
+          </div>
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+            <div className="flex items-center">
+              <Globe className="w-5 h-5 mr-3 text-green-500" />
+              <span className="text-gray-700 font-medium">Language</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-500" />
+          </div>
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+            <div className="flex items-center">
+              <Volume2 className="w-5 h-5 mr-3 text-orange-500" />
+              <span className="text-gray-700 font-medium">Audio Settings</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-500" />
+          </div>
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+            <div className="flex items-center">
+              <Smartphone className="w-5 h-5 mr-3 text-teal-500" />
+              <span className="text-gray-700 font-medium">Accessibility</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-500" />
           </div>
         </div>
 
-        {/* Profile Management Section */}
-        <div 
-          className="bg-white rounded-3xl p-5 border-4 border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-          onClick={() => onNavigate("profile-management")}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
-                <User className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Profile Management</div>
-                <div className="text-sm text-gray-600 font-medium">Update your information</div>
-              </div>
-            </div>
-            <ChevronRight className="w-6 h-6 text-gray-400" />
-          </div>
-        </div>
-
-        {/* Phone Management */}
-        <div className="bg-white rounded-3xl p-5 border-4 border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
-                <Phone className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">AI Conversation</div>
-                <div className="text-sm text-gray-600 font-medium">
-                  {userProfile?.phone_number || "Set up voice calls"}
-                </div>
-              </div>
-            </div>
-            <ChevronRight className="w-6 h-6 text-gray-400" />
-          </div>
-        </div>
-
-        {/* Help & Support Section */}
-        <div 
-          className="bg-white rounded-3xl p-5 border-4 border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-          onClick={() => onNavigate("help-support")}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-orange-400 rounded-2xl flex items-center justify-center">
-                <HelpCircle className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="font-bold text-gray-800 text-lg uppercase tracking-wide">Help & Support</div>
-                <div className="text-sm text-gray-600 font-medium">Get help or report issues</div>
-              </div>
-            </div>
-            <ChevronRight className="w-6 h-6 text-gray-400" />
-          </div>
-        </div>
-
-        {/* Sign Out Section */}
-        <div className="bg-red-50 rounded-3xl p-5 border-4 border-red-200">
-          <Button
-            onClick={handleSignOut}
-            className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-2xl flex items-center justify-center space-x-2"
+        {/* Support & About */}
+        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
+            Support
+          </h3>
+          <div 
+            onClick={() => onNavigate("help-support")}
+            className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none cursor-pointer"
           >
-            <LogOut className="w-5 h-5" />
-            <span>SIGN OUT</span>
-          </Button>
+            <div className="flex items-center">
+              <HelpCircle className="w-5 h-5 mr-3 text-purple-500" />
+              <span className="text-gray-700 font-medium">Help & Support</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-500" />
+          </div>
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+            <div className="flex items-center">
+              <Shield className="w-5 h-5 mr-3 text-yellow-500" />
+              <span className="text-gray-700 font-medium">Privacy Policy</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-500" />
+          </div>
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+            <div className="flex items-center">
+              <Star className="w-5 h-5 mr-3 text-orange-500" />
+              <span className="text-gray-700 font-medium">Rate Us</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-500" />
+          </div>
         </div>
 
-        {/* App Info */}
-        <div className="bg-purple-400 rounded-3xl p-6 border-4 border-purple-500 text-center">
-          <div className="text-white font-bold mb-2 uppercase tracking-wide">Lingoose v1.0.0</div>
-          <p className="text-white font-medium">🧡 Made with Love by Chaotic Geese</p>
-        </div>
+        {/* Logout */}
+        <Button 
+          onClick={() => signOut()}
+          className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-3xl transition-all duration-200"
+        >
+          <LogOut className="w-5 h-5 mr-2" />
+          Log Out
+        </Button>
       </div>
 
       {/* Bottom Navigation */}
@@ -170,7 +150,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-14 h-14 bg-blue-400 rounded-2xl text-white"
+              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <Home className="w-6 h-6" />
             </Button>
@@ -178,7 +158,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-14 h-14 bg-orange-400 rounded-2xl text-white"
+              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <Phone className="w-6 h-6" />
             </Button>
@@ -186,7 +166,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-14 h-14 bg-green-400 rounded-2xl text-white"
+              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <CheckCircle className="w-6 h-6" />
             </Button>
@@ -194,7 +174,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-14 h-14 bg-purple-400 rounded-2xl text-white"
+              className="w-14 h-14 bg-orange-400 rounded-2xl text-white"
             >
               <Settings className="w-6 h-6" />
             </Button>

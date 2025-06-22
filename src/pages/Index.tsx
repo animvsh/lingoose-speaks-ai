@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target } from "lucide-react";
@@ -267,7 +268,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
       <AppBar 
-        title="HOME"
+        title="DASHBOARD"
         showBackButton={false}
         showLogo={true}
       />
