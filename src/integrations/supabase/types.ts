@@ -591,6 +591,7 @@ export type Database = {
           full_name: string
           id: string
           language: string | null
+          last_conversation_summary: string | null
           phone_number: string
           preferred_call_time: string | null
           updated_at: string | null
@@ -601,6 +602,7 @@ export type Database = {
           full_name: string
           id?: string
           language?: string | null
+          last_conversation_summary?: string | null
           phone_number: string
           preferred_call_time?: string | null
           updated_at?: string | null
@@ -611,6 +613,7 @@ export type Database = {
           full_name?: string
           id?: string
           language?: string | null
+          last_conversation_summary?: string | null
           phone_number?: string
           preferred_call_time?: string | null
           updated_at?: string | null

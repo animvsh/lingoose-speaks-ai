@@ -7,12 +7,16 @@ import { useLearningUnits } from "@/hooks/useLearningUnits";
 import { useSkills } from "@/hooks/useSkills";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { useAuth } from "@/contexts/AuthContext";
+import SkillExplanationModal from "./SkillExplanationModal";
+import type { Tables } from "@/integrations/supabase/types";
 
 const LearningProgressTree = () => {
   const { user } = useAuth();
   const { data: outlines } = useLearningOutlines();
   const [expandedUnits, setExpandedUnits] = useState<Set<string>>(new Set());
   const [selectedOutline] = useState(outlines?.[0]); // Use first outline for demo
+  const [selectedSkill, setSelectedSkill] = useState<Tables<'skills'> | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const { data: units } = useLearningUnits(selectedOutline?.id || "");
   const { miniSkillScores } = useUserProgress();
@@ -25,6 +29,11 @@ const LearningProgressTree = () => {
       newExpanded.add(unitId);
     }
     setExpandedUnits(newExpanded);
+  };
+
+  const handleSkillClick = (skill: Tables<'skills'>) => {
+    setSelectedSkill(skill);
+    setIsModalOpen(true);
   };
 
   const getUnitProgress = (unitId: string) => {
@@ -133,17 +142,32 @@ const LearningProgressTree = () => {
 
               {/* Expanded Skills */}
               {isExpanded && (
-                <UnitSkills unitId={unit.id} isLocked={isLocked} />
+                <UnitSkills unitId={unit.id} isLocked={isLocked} onSkillClick={handleSkillClick} />
               )}
             </div>
           );
         })}
       </div>
+
+      {/* Skill Explanation Modal */}
+      <SkillExplanationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        skill={selectedSkill}
+      />
     </div>
   );
 };
 
-const UnitSkills = ({ unitId, isLocked }: { unitId: string; isLocked: boolean }) => {
+const UnitSkills = ({ 
+  unitId, 
+  isLocked, 
+  onSkillClick 
+}: { 
+  unitId: string; 
+  isLocked: boolean; 
+  onSkillClick: (skill: Tables<'skills'>) => void;
+}) => {
   const { data: skills } = useSkills(unitId);
 
   if (!skills) return null;
@@ -172,7 +196,11 @@ const UnitSkills = ({ unitId, isLocked }: { unitId: string; isLocked: boolean })
         const colorClass = getSkillColor(index);
         
         return (
-          <div key={skill.id} className={`${colorClass} rounded-2xl p-4 border-2 ${isLocked ? "opacity-60" : ""}`}>
+          <div 
+            key={skill.id} 
+            className={`${colorClass} rounded-2xl p-4 border-2 ${isLocked ? "opacity-60" : "cursor-pointer hover:scale-[1.02] transition-transform"}`}
+            onClick={() => !isLocked && onSkillClick(skill)}
+          >
             <div className="flex items-center space-x-3">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 isLocked ? "bg-gray-500" : isCompleted ? "bg-green-600" : "bg-gray-600"
@@ -189,6 +217,7 @@ const UnitSkills = ({ unitId, isLocked }: { unitId: string; isLocked: boolean })
                 <h5 className={`font-bold text-sm uppercase tracking-wide ${isLocked ? "text-gray-600" : "text-gray-800"}`}>
                   {skill.name}
                   {isLocked && <span className="text-xs ml-2 text-gray-500">(LOCKED)</span>}
+                  {!isLocked && <span className="text-xs ml-2 text-gray-500">(Click for details)</span>}
                 </h5>
                 <div className="w-full bg-white/50 h-2 rounded-full mt-2">
                   <div 
