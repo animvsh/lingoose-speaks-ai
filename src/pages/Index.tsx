@@ -4,7 +4,6 @@ import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Tar
 import DuckMascot from "@/components/DuckMascot";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
-import FluencyMapCard from "@/components/FluencyMapCard";
 import ProgressCard from "@/components/ProgressCard";
 import SettingsCard from "@/components/SettingsCard";
 import NotificationsPage from "@/components/NotificationsPage";
@@ -36,7 +35,7 @@ const Index = () => {
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
 
-  const navigatableViews = ["home", "activity", "progress", "curriculum", "fluency-map", "settings", "notifications", "profile-management", "help-support"];
+  const navigatableViews = ["home", "activity", "progress", "curriculum", "settings", "notifications", "profile-management", "help-support"];
 
   const handleSplashComplete = () => {
     if (!authLoading && !user) {
@@ -194,8 +193,6 @@ const Index = () => {
           return <ProgressView onNavigate={handleNavigation} />;
         case "curriculum":
           return <CurriculumView onNavigate={handleNavigation} />;
-        case "fluency-map":
-          return <FluencyMapView onNavigate={handleNavigation} />;
         case "settings":
           return <SettingsView onNavigate={handleNavigation} />;
         case "notifications":
@@ -374,17 +371,6 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
             </div>
           </div>
 
-          {/* Fluency Map Button */}
-          <div className={`transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-            <Button 
-              onClick={() => onNavigate("fluency-map")}
-              className="w-full bg-purple-400 hover:bg-purple-500 text-white font-bold py-6 text-xl rounded-3xl border-4 border-purple-500 mb-4"
-            >
-              <Target className="w-8 h-8 mr-3" />
-              EXPLORE FLUENCY MAP 🗺️
-            </Button>
-          </div>
-
           {/* Start Learning Button */}
           <div className={`transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
             <Button 
@@ -450,10 +436,6 @@ const ProgressView = ({ onNavigate }: { onNavigate: (view: string) => void }) =>
 
 const CurriculumView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
   <CurriculumCard onNavigate={onNavigate} />
-);
-
-const FluencyMapView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
-  <FluencyMapCard onNavigate={onNavigate} />
 );
 
 const SettingsView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
