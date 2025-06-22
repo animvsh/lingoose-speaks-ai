@@ -1,11 +1,34 @@
 
-import { CheckCircle, TrendingUp, Target, Clock } from "lucide-react";
+import { CheckCircle, TrendingUp, Target, Clock, MessageSquare } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PreviousActivitySectionProps {
   lastCall: any;
 }
 
 const PreviousActivitySection = ({ lastCall }: PreviousActivitySectionProps) => {
+  const { user } = useAuth();
+
+  // Fetch user profile for last conversation summary
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile', user?.id],
+    queryFn: async () => {
+      if (!user) throw new Error('No user found');
+
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('last_conversation_summary')
+        .eq('auth_user_id', user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
   if (!lastCall) {
     return (
       <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
@@ -99,6 +122,23 @@ const PreviousActivitySection = ({ lastCall }: PreviousActivitySectionProps) => 
             </div>
           )}
         </div>
+
+        {/* Conversation Summary Section */}
+        {userProfile?.last_conversation_summary && (
+          <div className="bg-blue-50 rounded-2xl p-4 border-2 border-blue-100">
+            <div className="flex items-center mb-3">
+              <div className="w-8 h-8 bg-blue-400 rounded-xl flex items-center justify-center mr-3">
+                <MessageSquare className="w-4 h-4 text-white" />
+              </div>
+              <h4 className="text-sm font-bold text-blue-800 uppercase tracking-wide">
+                Conversation Summary
+              </h4>
+            </div>
+            <p className="text-blue-700 text-sm font-medium leading-relaxed">
+              {userProfile.last_conversation_summary}
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-blue-50 rounded-2xl p-3 text-center border-2 border-blue-100">

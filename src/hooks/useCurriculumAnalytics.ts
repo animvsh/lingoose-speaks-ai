@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { subDays, isAfter, startOfWeek, endOfWeek } from "date-fns";
+import { subDays, isAfter } from "date-fns";
 
 // Define interfaces for better type safety
 interface SentimentAnalysis {
@@ -38,6 +38,28 @@ export const useCurriculumAnalytics = () => {
     queryFn: async () => {
       if (!user) {
         throw new Error('No user found');
+      }
+
+      // Fetch user skill scores to calculate native fluency
+      const { data: skillScores, error: skillError } = await supabase
+        .from('user_mini_skill_scores')
+        .select(`
+          *,
+          mini_skills (
+            *,
+            skills (
+              *,
+              learning_units (
+                *,
+                learning_outlines (*)
+              )
+            )
+          )
+        `)
+        .eq('user_id', user.id);
+
+      if (skillError) {
+        console.error('Error fetching skill scores:', skillError);
       }
 
       // Fetch VAPI call analysis data
@@ -89,25 +111,40 @@ export const useCurriculumAnalytics = () => {
         ? `${Math.floor(totalDurationMinutes / 60)}.${Math.round((totalDurationMinutes % 60) / 6)}h`
         : `${totalDurationMinutes}min`;
 
-      // Calculate fluency score from sentiment analysis and ratings
-      let fluencyScore = 0;
-      let avgRating = 0;
-      
-      if (allCallData.length > 0) {
-        const positiveCallsCount = allCallData.filter(call => {
-          const sentiment = call.sentiment_analysis as SentimentAnalysis | null;
-          return sentiment?.overall_sentiment === 'positive';
-        }).length;
-        fluencyScore = Math.round((positiveCallsCount / allCallData.length) * 100);
+      // Calculate native fluency score based on skill scores
+      let nativeFluencyScore = 0;
+      if (skillScores && skillScores.length > 0) {
+        const totalScore = skillScores.reduce((sum, score) => sum + score.score, 0);
+        const averageScore = totalScore / skillScores.length;
+        nativeFluencyScore = Math.round(averageScore);
+      } else {
+        // Fallback calculation using sentiment analysis and ratings
+        let fluencyScore = 0;
+        
+        if (allCallData.length > 0) {
+          const positiveCallsCount = allCallData.filter(call => {
+            const sentiment = call.sentiment_analysis as SentimentAnalysis | null;
+            return sentiment?.overall_sentiment === 'positive';
+          }).length;
+          fluencyScore = Math.round((positiveCallsCount / allCallData.length) * 100);
+        }
+        
+        if (allRatings.length > 0) {
+          const ratingsBasedScore = Math.round(
+            (allRatings.reduce((sum, rating) => sum + rating.rating, 0) / allRatings.length / 5) * 100
+          );
+          fluencyScore = fluencyScore > 0 ? Math.round((fluencyScore + ratingsBasedScore) / 2) : ratingsBasedScore;
+        }
+        
+        nativeFluencyScore = fluencyScore;
       }
-      
+
+      // Calculate average rating
+      let avgRating = 0;
       if (allRatings.length > 0) {
         avgRating = Math.round(
           allRatings.reduce((sum, rating) => sum + rating.rating, 0) / allRatings.length
         );
-        // If we have ratings, use them to adjust fluency score
-        const ratingsBasedScore = Math.round((avgRating / 5) * 100);
-        fluencyScore = fluencyScore > 0 ? Math.round((fluencyScore + ratingsBasedScore) / 2) : ratingsBasedScore;
       }
 
       // Calculate current streak
@@ -197,7 +234,7 @@ export const useCurriculumAnalytics = () => {
       return {
         totalCalls,
         talkTime,
-        fluencyScore,
+        fluencyScore: nativeFluencyScore,
         currentStreak: streak,
         thisWeekCalls,
         avgRating,
