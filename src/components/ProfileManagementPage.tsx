@@ -1,8 +1,10 @@
+
 import { Button } from "@/components/ui/button";
-import { User, Edit3, Save, Camera, Mail, Phone as PhoneIcon, MapPin, Calendar, Home, Settings, ArrowLeft } from "lucide-react";
+import { User, Edit3, Save, Camera, Phone as PhoneIcon, Clock, Home, Settings, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUpdateUserProfile } from "@/hooks/useUpdateUserProfile";
 import AppBar from "./AppBar";
 
 interface ProfileManagementPageProps {
@@ -11,27 +13,36 @@ interface ProfileManagementPageProps {
 
 const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
   const { user } = useAuth();
-  const { data: userProfile, isLoading, mutate } = useUserProfile();
+  const { data: userProfile, isLoading } = useUserProfile();
+  const updateProfileMutation = useUpdateUserProfile();
 
   const [isEditing, setIsEditing] = useState(false);
   const [fullName, setFullName] = useState(userProfile?.full_name || "");
-  const [email, setEmail] = useState(userProfile?.email || "");
-  const [phone, setPhone] = useState(userProfile?.phone || "");
-  const [location, setLocation] = useState(userProfile?.location || "");
-  const [birthdate, setBirthdate] = useState<Date | null>(userProfile?.birthdate ? new Date(userProfile.birthdate) : null);
+  const [phoneNumber, setPhoneNumber] = useState(userProfile?.phone_number || "");
+  const [language, setLanguage] = useState(userProfile?.language || "hindi");
+  const [preferredCallTime, setPreferredCallTime] = useState(userProfile?.preferred_call_time || "09:00:00");
+
+  // Update state when profile data loads
+  useState(() => {
+    if (userProfile) {
+      setFullName(userProfile.full_name || "");
+      setPhoneNumber(userProfile.phone_number || "");
+      setLanguage(userProfile.language || "hindi");
+      setPreferredCallTime(userProfile.preferred_call_time || "09:00:00");
+    }
+  });
 
   const handleSaveProfile = async () => {
     setIsEditing(false);
     
     const profileData = {
       full_name: fullName,
-      email: email,
-      phone: phone,
-      location: location,
-      birthdate: birthdate ? birthdate.toISOString() : null,
+      phone_number: phoneNumber,
+      language: language,
+      preferred_call_time: preferredCallTime,
     };
 
-    mutate(profileData);
+    updateProfileMutation.mutate(profileData);
   };
 
   return (
@@ -47,7 +58,7 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
         <div className="text-center">
           <div className="relative inline-block">
             <div className="w-28 h-28 rounded-full bg-orange-400 flex items-center justify-center text-white text-4xl font-bold uppercase border-4 border-orange-500">
-              {userProfile?.full_name?.charAt(0) || "U"}
+              {fullName?.charAt(0) || "U"}
             </div>
             {isEditing && (
               <Button
@@ -76,81 +87,64 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
 
         {/* Profile Details */}
         <div className="space-y-4">
-          {/* Email */}
-          <div className="bg-white rounded-3xl p-4 border-2 border-gray-200">
-            <div className="flex items-center space-x-3">
-              <Mail className="w-5 h-5 text-gray-500" />
-              <div className="flex-1">
-                <label className="text-sm text-gray-500">Email</label>
-                {isEditing ? (
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-orange-500"
-                  />
-                ) : (
-                  <p className="font-medium text-gray-800">{email}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Phone */}
+          {/* Phone Number */}
           <div className="bg-white rounded-3xl p-4 border-2 border-gray-200">
             <div className="flex items-center space-x-3">
               <PhoneIcon className="w-5 h-5 text-gray-500" />
               <div className="flex-1">
-                <label className="text-sm text-gray-500">Phone</label>
+                <label className="text-sm text-gray-500">Phone Number</label>
                 {isEditing ? (
                   <input
                     type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                     className="w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-orange-500"
                   />
                 ) : (
-                  <p className="font-medium text-gray-800">{phone || "Add phone number"}</p>
+                  <p className="font-medium text-gray-800">{phoneNumber || "Add phone number"}</p>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Location */}
+          {/* Language */}
           <div className="bg-white rounded-3xl p-4 border-2 border-gray-200">
             <div className="flex items-center space-x-3">
-              <MapPin className="w-5 h-5 text-gray-500" />
+              <User className="w-5 h-5 text-gray-500" />
               <div className="flex-1">
-                <label className="text-sm text-gray-500">Location</label>
+                <label className="text-sm text-gray-500">Language</label>
                 {isEditing ? (
-                  <input
-                    type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
                     className="w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-orange-500"
-                  />
+                  >
+                    <option value="hindi">Hindi</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="french">French</option>
+                  </select>
                 ) : (
-                  <p className="font-medium text-gray-800">{location || "Add location"}</p>
+                  <p className="font-medium text-gray-800 capitalize">{language}</p>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Birthdate */}
+          {/* Preferred Call Time */}
           <div className="bg-white rounded-3xl p-4 border-2 border-gray-200">
             <div className="flex items-center space-x-3">
-              <Calendar className="w-5 h-5 text-gray-500" />
+              <Clock className="w-5 h-5 text-gray-500" />
               <div className="flex-1">
-                <label className="text-sm text-gray-500">Birthdate</label>
+                <label className="text-sm text-gray-500">Preferred Call Time</label>
                 {isEditing ? (
                   <input
-                    type="date"
-                    value={birthdate ? birthdate.toISOString().split('T')[0] : ''}
-                    onChange={(e) => setBirthdate(e.target.value ? new Date(e.target.value) : null)}
+                    type="time"
+                    value={preferredCallTime}
+                    onChange={(e) => setPreferredCallTime(e.target.value)}
                     className="w-full bg-transparent border-b border-gray-300 focus:outline-none focus:border-orange-500"
                   />
                 ) : (
-                  <p className="font-medium text-gray-800">{birthdate ? birthdate.toLocaleDateString() : "Add birthdate"}</p>
+                  <p className="font-medium text-gray-800">{preferredCallTime}</p>
                 )}
               </div>
             </div>
@@ -164,9 +158,9 @@ const ProfileManagementPage = ({ onNavigate }: ProfileManagementPageProps) => {
               <Button variant="ghost" onClick={() => setIsEditing(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSaveProfile}>
+              <Button onClick={handleSaveProfile} disabled={updateProfileMutation.isPending}>
                 <Save className="w-4 h-4 mr-2" />
-                Save
+                {updateProfileMutation.isPending ? "Saving..." : "Save"}
               </Button>
             </>
           ) : (

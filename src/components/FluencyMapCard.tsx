@@ -1,5 +1,6 @@
+
 import { Button } from "@/components/ui/button";
-import { Target, TrendingUp, Star, Clock, CheckCircle, Zap, Trophy, Users, Home, Phone, Settings, ArrowLeft } from "lucide-react";
+import { Target, TrendingUp, Star, Clock, CheckCircle, Zap, Trophy, Users, Home, Phone, Settings, ArrowLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import AppBar from "./AppBar";
 
