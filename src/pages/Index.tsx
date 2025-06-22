@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target } from "lucide-react";
@@ -255,31 +256,40 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
   };
   
   return (
-    <div className="min-h-screen bg-stone-50 pb-24">
+    <div className="min-h-screen bg-yellow-50 pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-br from-orange-400 to-orange-500 px-6 py-8 mb-8 rounded-b-3xl">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <DuckMascot className="w-16 h-16 mr-4 transform hover:scale-110 transition-transform duration-200" />
-            <div>
-              <h1 className="text-2xl font-black text-white drop-shadow-sm">
-                Hey {userProfile?.full_name?.split(' ')[0] || 'there'}! 🌟
-              </h1>
-              <p className="text-orange-100 font-semibold">Ready to learn today?</p>
-            </div>
-          </div>
+      <div className="px-6 pt-8 pb-6">
+        <div className="flex items-center justify-between">
+          <div className="w-14 h-14"></div>
+          <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide">
+            HOME
+          </h1>
+          <div className="w-14 h-14"></div>
         </div>
       </div>
 
       <div className="px-6 space-y-6">
+        {/* Welcome Card */}
+        <div className="bg-orange-400 rounded-3xl p-6 border-4 border-orange-500">
+          <div className="flex items-center mb-4">
+            <DuckMascot className="w-16 h-16 mr-4" />
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-1">
+                Hey {userProfile?.full_name?.split(' ')[0] || 'there'}! 🌟
+              </h2>
+              <p className="text-orange-100 font-medium">Ready to learn today?</p>
+            </div>
+          </div>
+        </div>
+
         {/* Native Fluency Score Card */}
-        <div className={`bg-white rounded-3xl p-6 text-center border-4 border-gray-100 hover:border-orange-200 transition-all duration-300 hover:-translate-y-1 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+        <div className={`bg-white rounded-3xl p-6 text-center border-4 border-gray-200 transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <div className="mb-6">
-            <div className={`text-5xl font-black mb-3 ${getFluencyColor(nativeFluency)} transition-all duration-300`}>
+            <div className={`text-5xl font-bold mb-3 ${getFluencyColor(nativeFluency)} transition-all duration-300`}>
               {nativeFluency}%
             </div>
-            <h2 className="text-xl font-black text-gray-800 mb-2 tracking-tight">NATIVE FLUENCY</h2>
-            <p className="text-gray-600 font-semibold text-sm">Speech clarity, vocabulary, and flow</p>
+            <h2 className="text-xl font-bold text-gray-800 mb-2 uppercase tracking-wide">NATIVE FLUENCY</h2>
+            <p className="text-gray-600 font-medium text-sm">Speech clarity, vocabulary, and flow</p>
           </div>
           
           <div className="w-full bg-gray-200 h-4 rounded-full mb-6 overflow-hidden">
@@ -297,32 +307,32 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
         </div>
 
         {/* Today's Challenge */}
-        <div className={`bg-gradient-to-br from-blue-400 to-blue-500 rounded-3xl p-6 border-4 border-white hover:border-blue-200 transition-all duration-300 hover:-translate-y-1 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+        <div className={`bg-blue-400 rounded-3xl p-6 border-4 border-blue-500 transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <div className="flex items-center mb-4">
             <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mr-4">
               <Phone className="w-7 h-7 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-black text-white uppercase tracking-tight">
+              <h3 className="text-lg font-bold text-white uppercase tracking-wide">
                 TODAY'S CHALLENGE
               </h3>
-              <p className="text-blue-100 font-semibold text-sm">
+              <p className="text-blue-100 font-medium text-sm">
                 Hotel check-in conversation 🇪🇸
               </p>
             </div>
           </div>
           <Button 
             onClick={() => onNavigate("activity")}
-            className="w-full bg-white hover:bg-blue-50 text-blue-600 font-black py-4 text-lg rounded-2xl border-4 border-white hover:border-blue-100 transition-all duration-300 hover:-translate-y-0.5"
+            className="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold py-4 text-lg rounded-2xl transition-all duration-300"
           >
             START NOW ⚡
           </Button>
         </div>
 
-        {/* Improvements */}
+        {/* Improvements Card */}
         <div 
           onClick={() => onNavigate("progress")}
-          className={`bg-gradient-to-br from-green-400 to-green-500 rounded-3xl p-6 border-4 border-white hover:border-green-200 cursor-pointer transition-all duration-300 hover:-translate-y-1 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+          className={`bg-green-400 rounded-3xl p-6 border-4 border-green-500 cursor-pointer transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
@@ -330,10 +340,10 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
                 <Trophy className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-white uppercase tracking-tight">
+                <h3 className="text-lg font-bold text-white uppercase tracking-wide">
                   IMPROVEMENTS
                 </h3>
-                <p className="text-green-100 font-semibold text-sm">
+                <p className="text-green-100 font-medium text-sm">
                   Since last time
                 </p>
               </div>
@@ -342,28 +352,28 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white/95 rounded-2xl p-4 text-center border-2 border-white/50">
+            <div className="bg-white rounded-2xl p-4 text-center border-2 border-white">
               <div className="w-8 h-8 bg-purple-400 rounded-xl flex items-center justify-center mx-auto mb-2">
                 <Clock className="w-4 h-4 text-white" />
               </div>
-              <div className="text-xl font-black text-purple-700">8min</div>
+              <div className="text-xl font-bold text-purple-700">8min</div>
               <div className="text-xs text-purple-600 font-bold">TALK TIME</div>
             </div>
-            <div className="bg-white/95 rounded-2xl p-4 text-center border-2 border-white/50">
+            <div className="bg-white rounded-2xl p-4 text-center border-2 border-white">
               <div className="w-8 h-8 bg-pink-400 rounded-xl flex items-center justify-center mx-auto mb-2">
                 <Star className="w-4 h-4 text-white" />
               </div>
-              <div className="text-xl font-black text-pink-700">89%</div>
+              <div className="text-xl font-bold text-pink-700">89%</div>
               <div className="text-xs text-pink-600 font-bold">ENGAGEMENT</div>
             </div>
           </div>
         </div>
 
-        {/* New Fluency Map Button */}
+        {/* Fluency Map Button */}
         <div className={`transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <Button 
             onClick={() => onNavigate("fluency-map")}
-            className="w-full bg-gradient-to-r from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 text-white font-black py-6 text-xl rounded-3xl border-4 border-white hover:border-purple-200 transition-all duration-300 hover:-translate-y-1 mb-4"
+            className="w-full bg-purple-400 hover:bg-purple-500 text-white font-bold py-6 text-xl rounded-3xl border-4 border-purple-500 mb-4"
           >
             <Target className="w-8 h-8 mr-3" />
             EXPLORE FLUENCY MAP 🗺️
@@ -374,7 +384,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
         <div className={`transition-all duration-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
           <Button 
             onClick={() => onNavigate("curriculum")}
-            className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-black py-6 text-xl rounded-3xl border-4 border-white hover:border-orange-200 transition-all duration-300 hover:-translate-y-1"
+            className="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-6 text-xl rounded-3xl border-4 border-orange-500"
           >
             START LEARNING 🚀
           </Button>
@@ -382,14 +392,14 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white px-6 py-4 border-t-4 border-gray-100">
+      <div className="fixed bottom-0 left-0 right-0 bg-white px-6 py-4 border-t border-gray-100">
         <div className="max-w-md mx-auto">
-          <div className="flex justify-center space-x-3">
+          <div className="flex justify-center space-x-4">
             <Button 
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("home")}
-              className="w-14 h-14 bg-orange-400 hover:bg-orange-500 rounded-2xl text-white border-4 border-white hover:border-orange-200 transition-all duration-300 hover:-translate-y-0.5"
+              className="w-14 h-14 bg-orange-400 rounded-2xl text-white"
             >
               <Home className="w-6 h-6" />
             </Button>
@@ -397,7 +407,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("activity")}
-              className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-0.5"
+              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <Phone className="w-6 h-6" />
             </Button>
@@ -405,7 +415,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("curriculum")}
-              className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-0.5"
+              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <CheckCircle className="w-6 h-6" />
             </Button>
@@ -413,7 +423,7 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
               variant="ghost" 
               size="sm"
               onClick={() => onNavigate("settings")}
-              className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 border-4 border-white hover:border-gray-200 transition-all duration-300 hover:-translate-y-0.5"
+              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <Settings className="w-6 h-6" />
             </Button>
