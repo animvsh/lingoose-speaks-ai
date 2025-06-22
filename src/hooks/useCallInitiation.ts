@@ -14,40 +14,19 @@ export const useCallInitiation = () => {
         throw new Error('User or activity not found');
       }
 
-      // Get user profile - first try linked profile, then by phone number
-      let userProfile = null;
+      // Since we're using localStorage-based auth, the user object already contains the phone number
+      const phoneNumber = user.phone_number;
       
-      // Try to find profile linked to auth user
-      const { data: linkedProfile } = await supabase
-        .from('user_profiles')
-        .select('phone_number')
-        .eq('auth_user_id', user.id)
-        .single();
-
-      if (linkedProfile) {
-        userProfile = linkedProfile;
-      } else {
-        // Try to find by phone number from the current user profile
-        const userPhone = user.phone_number;
-        if (userPhone) {
-          const { data: phoneProfile } = await supabase
-            .from('user_profiles')
-            .select('phone_number')
-            .eq('phone_number', userPhone)
-            .single();
-          
-          userProfile = phoneProfile;
-        }
-      }
-
-      if (!userProfile?.phone_number) {
+      if (!phoneNumber) {
         throw new Error('Phone number not found. Please update your profile.');
       }
+
+      console.log('Starting call with phone number:', phoneNumber);
 
       // Start the call using the edge function
       const { data, error } = await supabase.functions.invoke('start-vapi-call', {
         body: {
-          phoneNumber: userProfile.phone_number,
+          phoneNumber: phoneNumber,
           userId: user.id,
           topic: currentActivity.description || currentActivity.name
         }
