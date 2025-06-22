@@ -2,8 +2,10 @@
 import React from 'react';
 import { useCallAnalysis } from '@/hooks/useCallAnalysis';
 import { CallAnalysisCard } from './CallAnalysisCard';
-import { Loader2, Phone, TrendingUp } from 'lucide-react';
+import { ManualCallDataFetch } from './ManualCallDataFetch';
+import { Loader2, Phone, TrendingUp, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const CallAnalysisPage: React.FC = () => {
   const { data: callAnalyses, isLoading, error } = useCallAnalysis();
@@ -41,6 +43,21 @@ export const CallAnalysisPage: React.FC = () => {
       <div>
         <h1 className="text-3xl font-bold mb-2">Call Analysis Dashboard</h1>
         <p className="text-gray-600">Review your conversation performance and insights</p>
+      </div>
+
+      {/* Trial Account Notice */}
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          <strong>Trial Account Notice:</strong> VAPI trial accounts can only call verified numbers. 
+          If you receive verification errors, contact support to verify your phone number or use a different verified number.
+          You can also manually fetch call data below if you have completed calls from verified numbers.
+        </AlertDescription>
+      </Alert>
+
+      {/* Manual Call Data Fetch */}
+      <div className="flex justify-center">
+        <ManualCallDataFetch />
       </div>
 
       {/* Summary Stats */}
@@ -95,8 +112,11 @@ export const CallAnalysisPage: React.FC = () => {
               <div className="text-center py-8">
                 <Phone className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No Call Analyses Yet</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 mb-4">
                   Make some practice calls to see your conversation analysis and insights here.
+                </p>
+                <p className="text-sm text-gray-500">
+                  If you've completed calls but don't see analysis data, use the manual fetch feature above with your VAPI call ID.
                 </p>
               </div>
             </CardContent>

@@ -722,6 +722,10 @@ export type Database = {
         Args: { p_user_id: string; p_summary: string }
         Returns: undefined
       }
+      update_last_convo: {
+        Args: { p_phone_number: string; p_summary: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
