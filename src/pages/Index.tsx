@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft } from "lucide-react";
+import { Phone, CheckCircle, Home, Settings, Trophy, Clock, Star, ArrowLeft, Target } from "lucide-react";
 import DuckMascot from "@/components/DuckMascot";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
+import FluencyMapCard from "@/components/FluencyMapCard";
 import ProgressCard from "@/components/ProgressCard";
 import SettingsCard from "@/components/SettingsCard";
 import AddToHomeScreen from "@/components/AddToHomeScreen";
@@ -130,6 +132,8 @@ const Index = () => {
           return <ProgressView onNavigate={handleNavigation} />;
         case "curriculum":
           return <CurriculumView onNavigate={handleNavigation} />;
+        case "fluency-map":
+          return <FluencyMapView onNavigate={handleNavigation} />;
         case "settings":
           return <SettingsView onNavigate={handleNavigation} />;
         default:
@@ -292,6 +296,17 @@ const HomeView = ({ onNavigate, userProfile, callLogs }: {
           </div>
         </div>
 
+        {/* New Fluency Map Button */}
+        <div className={`transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
+          <Button 
+            onClick={() => onNavigate("fluency-map")}
+            className="w-full bg-purple-500 hover:bg-purple-600 text-white font-black py-5 text-lg rounded-3xl shadow-[0_6px_0_0_#9333ea] hover:shadow-[0_3px_0_0_#9333ea] hover:translate-y-0.5 transition-all duration-100 border-0 mb-3"
+          >
+            <Target className="w-6 h-6 mr-2" />
+            EXPLORE FLUENCY MAP
+          </Button>
+        </div>
+
         {/* Start Learning Button */}
         <div className={`transition-all duration-100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
           <Button 
@@ -356,6 +371,10 @@ const ProgressView = ({ onNavigate }: { onNavigate: (view: string) => void }) =>
 
 const CurriculumView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
   <CurriculumCard onNavigate={onNavigate} />
+);
+
+const FluencyMapView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
+  <FluencyMapCard onNavigate={onNavigate} />
 );
 
 const SettingsView = ({ onNavigate }: { onNavigate: (view: string) => void }) => (
