@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Target, TrendingUp, Star, Clock, CheckCircle, Zap, Trophy, Users, Home, Phone, Settings, ArrowLeft, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -7,6 +6,7 @@ import LearningProgressTree from "./LearningProgressTree";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ActivityCardProps {
   onNavigate: (view: string) => void;
@@ -15,6 +15,7 @@ interface ActivityCardProps {
 const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Fetch the latest activity from database
   const { data: currentActivity, isLoading: isLoadingActivity } = useQuery({
@@ -112,6 +113,60 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
   const handleRegenerateActivity = () => {
     generateActivityMutation.mutate();
+  };
+
+  // Add call initiation mutation
+  const startCallMutation = useMutation({
+    mutationFn: async () => {
+      if (!user || !currentActivity) {
+        throw new Error('User or activity not found');
+      }
+
+      // Get user profile for phone number
+      const { data: userProfile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('phone_number')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError || !userProfile?.phone_number) {
+        throw new Error('Phone number not found. Please update your profile.');
+      }
+
+      // Start the call using the edge function
+      const { data, error } = await supabase.functions.invoke('start-vapi-call', {
+        body: {
+          phoneNumber: userProfile.phone_number,
+          userId: user.id,
+          topic: currentActivity.description || currentActivity.name
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to start call');
+      }
+
+      return data;
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Call Initiated! 📞",
+        description: "You should receive a call shortly. Answer to start your practice session!",
+      });
+      console.log('Call started successfully:', data);
+    },
+    onError: (error) => {
+      console.error('Failed to start call:', error);
+      toast({
+        title: "Call Failed",
+        description: error instanceof Error ? error.message : 'Failed to start practice call',
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleStartPractice = () => {
+    startCallMutation.mutate();
   };
 
   const lastCall = callLogs[0];
@@ -272,8 +327,12 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
               </div>
             </div>
 
-            <Button className="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold py-4 text-lg rounded-2xl transition-all duration-300">
-              START PRACTICE ⚡
+            <Button 
+              onClick={handleStartPractice}
+              disabled={startCallMutation.isPending}
+              className="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold py-4 text-lg rounded-2xl transition-all duration-300"
+            >
+              {startCallMutation.isPending ? 'STARTING CALL...' : 'START PRACTICE ⚡'}
             </Button>
           </div>
         </div>
