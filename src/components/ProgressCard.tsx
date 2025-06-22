@@ -138,7 +138,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
               className="w-14 h-14 bg-gray-200 hover:bg-gray-300 rounded-2xl text-gray-600 hover:text-gray-700 border-4 border-white hover:border-gray-200 transition-all duration-200"
             >
               <Settings className="w-6 h-6" />
-            </div>
+            </Button>
           </div>
         </div>
       </div>
