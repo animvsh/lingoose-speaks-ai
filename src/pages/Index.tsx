@@ -8,16 +8,12 @@ import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
 import SettingsCard from "@/components/SettingsCard";
 import ActivityDetailsView from "@/components/ActivityDetailsView";
-import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 
 const Index = () => {
   const { user, loading } = useAuth();
   const [currentView, setCurrentView] = useState("welcome");
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [activityDetailsData, setActivityDetailsData] = useState(null);
-
-  // Initialize swipe navigation
-  useSwipeNavigation(currentView, setCurrentView);
 
   useEffect(() => {
     if (!loading) {
@@ -65,11 +61,11 @@ const Index = () => {
   }
 
   if (currentView === "welcome") {
-    return <WelcomeScreen onNavigate={handleNavigate} />;
+    return <WelcomeScreen />;
   }
 
   if (currentView === "onboarding" && !isOnboarded) {
-    return <OnboardingFlow onComplete={handleOnboardingComplete} onNavigate={handleNavigate} />;
+    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
   }
 
   if (currentView === "home") {
