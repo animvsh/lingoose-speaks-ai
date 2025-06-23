@@ -10,6 +10,7 @@ import SettingsCard from "@/components/SettingsCard";
 import ActivityDetailsView from "@/components/ActivityDetailsView";
 import AnimatedBottomNav from "@/components/AnimatedBottomNav";
 import NavigationTransition from "@/components/NavigationTransition";
+import AppBar from "@/components/AppBar";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -62,8 +63,40 @@ const Index = () => {
       }
       setCurrentView(view);
       setIsTransitioning(false);
-    }, 50); // Reduced from 100ms to 50ms for faster response
+    }, 50);
   };
+
+  const handleBackNavigation = () => {
+    if (currentView === 'activity-details') {
+      setCurrentView('activity');
+    } else if (currentView !== 'home') {
+      setCurrentView('home');
+    }
+  };
+
+  const getAppBarTitle = () => {
+    switch (currentView) {
+      case 'activity':
+        return 'Activity';
+      case 'activity-details':
+        return 'Call Details';
+      case 'curriculum':
+        return 'Curriculum';
+      case 'settings':
+        return 'Settings';
+      default:
+        return 'Dashboard';
+    }
+  };
+
+  const shouldShowAppBar = () => {
+    return isOnboarded && user && 
+           currentView !== "welcome" && 
+           currentView !== "onboarding" && 
+           currentView !== "home";
+  };
+
+  const shouldShowBottomNav = isOnboarded && user && currentView !== "welcome" && currentView !== "onboarding";
 
   if (loading) {
     return (
@@ -76,7 +109,7 @@ const Index = () => {
         </div>
       </div>
     );
-  };
+  }
 
   const renderCurrentView = () => {
     if (currentView === "welcome") {
@@ -142,14 +175,26 @@ const Index = () => {
     );
   };
 
-  const shouldShowBottomNav = isOnboarded && user && currentView !== "welcome" && currentView !== "onboarding";
-
   return (
     <div className="min-h-screen bg-amber-50 relative">
-      <div className={`${shouldShowBottomNav ? "pb-24" : ""} relative z-0`}>
+      {/* Single App Bar - only shown when needed */}
+      {shouldShowAppBar() && (
+        <div className="relative z-10">
+          <AppBar 
+            title={getAppBarTitle()}
+            onBack={handleBackNavigation}
+            showBackButton={currentView !== 'home'}
+            showLogo={false}
+          />
+        </div>
+      )}
+      
+      {/* Main Content */}
+      <div className={`${shouldShowBottomNav ? "pb-24" : ""} ${shouldShowAppBar() ? "" : ""} relative z-0`}>
         {renderCurrentView()}
       </div>
       
+      {/* Bottom Navigation */}
       {shouldShowBottomNav && (
         <div className="relative z-50">
           <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
