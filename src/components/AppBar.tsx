@@ -12,7 +12,15 @@ interface AppBarProps {
 
 const AppBar = ({ title, onBack, showBackButton = true, showLogo = false }: AppBarProps) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 z-50 safe-area-bottom">
+    <div 
+      className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 safe-area-bottom"
+      style={{ 
+        position: 'fixed',
+        zIndex: 9999,
+        transform: 'translateZ(0)',
+        WebkitTransform: 'translateZ(0)'
+      }}
+    >
       <div className="px-6 py-4">
         <div className="flex items-center justify-between">
           {showBackButton && onBack ? (
