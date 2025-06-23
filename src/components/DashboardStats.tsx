@@ -1,7 +1,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Phone, Clock, TrendingUp, Calendar, Star, Target, Zap, Award, Trophy, Flame, Home, CheckCircle, Settings } from "lucide-react";
+import { Phone, Clock, TrendingUp, Calendar, Star, Target, Zap, Award, Trophy, Flame, Home, CheckCircle, Settings, BookOpen } from "lucide-react";
 import { useCurriculumAnalytics } from "@/hooks/useCurriculumAnalytics";
 import AppBar from "./AppBar";
 
@@ -214,6 +214,8 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
               size="sm"
               onClick={() => onNavigate("curriculum")}
               className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
+            >
+              <BookOpen className="w-6 h-6" />
             </Button>
             <Button
               variant="ghost"
