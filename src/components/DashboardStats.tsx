@@ -10,6 +10,14 @@ interface DashboardStatsProps {
 const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
   const { data: analytics, isLoading } = useCurriculumAnalytics();
 
+  const handleCardClick = (action?: () => void) => {
+    // Add haptic feedback
+    if ('vibrate' in navigator) {
+      navigator.vibrate(30);
+    }
+    if (action) action();
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-amber-50">
@@ -45,13 +53,23 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </p>
         </div>
 
-        {/* Main Stats Grid - 2x2 layout with cartoon style */}
+        {/* Main Stats Grid - 2x2 layout with enhanced interactions */}
         <div className="grid grid-cols-2 gap-4">
           {/* Total Calls - Bright Orange */}
-          <Card className="bg-orange-300 border-4 border-orange-600 rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in">
+          <Card 
+            className="bg-orange-300 border-4 border-orange-600 rounded-2xl overflow-hidden 
+                       transform transition-all duration-150 ease-out 
+                       hover:scale-105 active:scale-95 hover:shadow-xl 
+                       cursor-pointer select-none animate-fade-in"
+            onClick={() => handleCardClick(() => onNavigate('activity'))}
+            onTouchStart={() => {
+              if ('vibrate' in navigator) navigator.vibrate(25);
+            }}
+          >
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
-                <div className="w-12 h-12 bg-orange-600 border-3 border-orange-800 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-orange-600 border-3 border-orange-800 rounded-xl flex items-center justify-center
+                               transition-transform duration-150 group-hover:scale-110">
                   <Phone className="w-6 h-6 text-white" />
                 </div>
               </div>
@@ -68,10 +86,21 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </Card>
 
           {/* Talk Time - Bright Green */}
-          <Card className="bg-green-300 border-4 border-green-600 rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <Card 
+            className="bg-green-300 border-4 border-green-600 rounded-2xl overflow-hidden 
+                       transform transition-all duration-150 ease-out 
+                       hover:scale-105 active:scale-95 hover:shadow-xl 
+                       cursor-pointer select-none animate-fade-in" 
+            style={{ animationDelay: '0.05s' }}
+            onClick={() => handleCardClick(() => onNavigate('activity'))}
+            onTouchStart={() => {
+              if ('vibrate' in navigator) navigator.vibrate(25);
+            }}
+          >
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
-                <div className="w-12 h-12 bg-green-600 border-3 border-green-800 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-green-600 border-3 border-green-800 rounded-xl flex items-center justify-center
+                               transition-transform duration-150 group-hover:scale-110">
                   <Clock className="w-6 h-6 text-white" />
                 </div>
               </div>
@@ -88,10 +117,21 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </Card>
 
           {/* Native Fluency Score - Bright Yellow */}
-          <Card className="bg-yellow-300 border-4 border-yellow-600 rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <Card 
+            className="bg-yellow-300 border-4 border-yellow-600 rounded-2xl overflow-hidden 
+                       transform transition-all duration-150 ease-out 
+                       hover:scale-105 active:scale-95 hover:shadow-xl 
+                       cursor-pointer select-none animate-fade-in" 
+            style={{ animationDelay: '0.1s' }}
+            onClick={() => handleCardClick(() => onNavigate('curriculum'))}
+            onTouchStart={() => {
+              if ('vibrate' in navigator) navigator.vibrate(25);
+            }}
+          >
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
-                <div className="w-12 h-12 bg-yellow-600 border-3 border-yellow-800 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-yellow-600 border-3 border-yellow-800 rounded-xl flex items-center justify-center
+                               transition-transform duration-150 group-hover:scale-110">
                   <Award className="w-6 h-6 text-white" />
                 </div>
               </div>
@@ -108,10 +148,21 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </Card>
 
           {/* Current Streak - Bright Red */}
-          <Card className="bg-red-300 border-4 border-red-600 rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <Card 
+            className="bg-red-300 border-4 border-red-600 rounded-2xl overflow-hidden 
+                       transform transition-all duration-150 ease-out 
+                       hover:scale-105 active:scale-95 hover:shadow-xl 
+                       cursor-pointer select-none animate-fade-in" 
+            style={{ animationDelay: '0.15s' }}
+            onClick={() => handleCardClick(() => onNavigate('settings'))}
+            onTouchStart={() => {
+              if ('vibrate' in navigator) navigator.vibrate(25);
+            }}
+          >
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
-                <div className="w-12 h-12 bg-red-600 border-3 border-red-800 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-red-600 border-3 border-red-800 rounded-xl flex items-center justify-center
+                               transition-transform duration-150 group-hover:scale-110">
                   <Flame className="w-6 h-6 text-white" />
                 </div>
               </div>
@@ -128,11 +179,22 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </Card>
         </div>
 
-        {/* Achievement Banner - Cartoon style */}
-        <Card className="bg-purple-300 border-4 border-purple-600 rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.4s' }}>
+        {/* Achievement Banner - Enhanced interactions */}
+        <Card 
+          className="bg-purple-300 border-4 border-purple-600 rounded-2xl overflow-hidden 
+                     transform transition-all duration-150 ease-out 
+                     hover:scale-102 active:scale-98 hover:shadow-xl 
+                     cursor-pointer select-none animate-fade-in" 
+          style={{ animationDelay: '0.2s' }}
+          onClick={() => handleCardClick(() => onNavigate('activity'))}
+          onTouchStart={() => {
+            if ('vibrate' in navigator) navigator.vibrate(25);
+          }}
+        >
           <CardContent className="p-4">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-purple-600 border-3 border-purple-800 rounded-2xl flex items-center justify-center">
+              <div className="w-16 h-16 bg-purple-600 border-3 border-purple-800 rounded-2xl flex items-center justify-center
+                             transition-transform duration-150 hover:scale-110">
                 <Trophy className="w-8 h-8 text-white" />
               </div>
               <div className="flex-1">
@@ -154,10 +216,21 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </CardContent>
         </Card>
 
-        {/* Quick Stats Row - Bright cartoon colors */}
+        {/* Quick Stats Row - Enhanced with faster interactions */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-pink-300 border-4 border-pink-600 p-4 rounded-2xl text-center transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            <div className="w-10 h-10 bg-pink-600 border-3 border-pink-800 rounded-xl flex items-center justify-center mx-auto mb-3">
+          <div 
+            className="bg-pink-300 border-4 border-pink-600 p-4 rounded-2xl text-center 
+                       transform transition-all duration-150 ease-out 
+                       hover:scale-105 active:scale-95 hover:shadow-lg 
+                       cursor-pointer select-none animate-fade-in" 
+            style={{ animationDelay: '0.25s' }}
+            onClick={() => handleCardClick()}
+            onTouchStart={() => {
+              if ('vibrate' in navigator) navigator.vibrate(25);
+            }}
+          >
+            <div className="w-10 h-10 bg-pink-600 border-3 border-pink-800 rounded-xl flex items-center justify-center mx-auto mb-3
+                           transition-transform duration-150 hover:scale-110">
               <Star className="w-5 h-5 text-white" />
             </div>
             <div className="text-2xl font-black text-pink-900">
@@ -165,8 +238,20 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
             </div>
             <div className="text-sm text-pink-800 font-bold uppercase">Avg Rating</div>
           </div>
-          <div className="bg-blue-300 border-4 border-blue-600 p-4 rounded-2xl text-center transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="w-10 h-10 bg-blue-600 border-3 border-blue-800 rounded-xl flex items-center justify-center mx-auto mb-3">
+          
+          <div 
+            className="bg-blue-300 border-4 border-blue-600 p-4 rounded-2xl text-center 
+                       transform transition-all duration-150 ease-out 
+                       hover:scale-105 active:scale-95 hover:shadow-lg 
+                       cursor-pointer select-none animate-fade-in" 
+            style={{ animationDelay: '0.3s' }}
+            onClick={() => handleCardClick(() => onNavigate('curriculum'))}
+            onTouchStart={() => {
+              if ('vibrate' in navigator) navigator.vibrate(25);
+            }}
+          >
+            <div className="w-10 h-10 bg-blue-600 border-3 border-blue-800 rounded-xl flex items-center justify-center mx-auto mb-3
+                           transition-transform duration-150 hover:scale-110">
               <Target className="w-5 h-5 text-white" />
             </div>
             <div className="text-2xl font-black text-blue-900">
@@ -174,8 +259,20 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
             </div>
             <div className="text-sm text-blue-800 font-bold uppercase">Goal Progress</div>
           </div>
-          <div className="bg-teal-300 border-4 border-teal-600 p-4 rounded-2xl text-center transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.7s' }}>
-            <div className="w-10 h-10 bg-teal-600 border-3 border-teal-800 rounded-xl flex items-center justify-center mx-auto mb-3">
+          
+          <div 
+            className="bg-teal-300 border-4 border-teal-600 p-4 rounded-2xl text-center 
+                       transform transition-all duration-150 ease-out 
+                       hover:scale-105 active:scale-95 hover:shadow-lg 
+                       cursor-pointer select-none animate-fade-in" 
+            style={{ animationDelay: '0.35s' }}
+            onClick={() => handleCardClick()}
+            onTouchStart={() => {
+              if ('vibrate' in navigator) navigator.vibrate(25);
+            }}
+          >
+            <div className="w-10 h-10 bg-teal-600 border-3 border-teal-800 rounded-xl flex items-center justify-center mx-auto mb-3
+                           transition-transform duration-150 hover:scale-110">
               <Calendar className="w-5 h-5 text-white" />
             </div>
             <div className="text-2xl font-black text-teal-900">{currentStreak}</div>

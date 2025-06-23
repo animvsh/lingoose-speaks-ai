@@ -49,13 +49,14 @@ const Index = () => {
   const handleNavigate = (view: string, data?: any) => {
     setIsTransitioning(true);
     
+    // Faster transition for better responsiveness
     setTimeout(() => {
       if (view === 'activity-details' && data) {
         setActivityDetailsData(data);
       }
       setCurrentView(view);
       setIsTransitioning(false);
-    }, 150);
+    }, 100); // Reduced from 150ms to 100ms
   };
 
   if (loading) {
@@ -72,8 +73,9 @@ const Index = () => {
   }
 
   const renderCurrentView = () => {
-    const baseClasses = `transition-all duration-300 ease-in-out ${
-      isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+    // Faster, more responsive transitions
+    const baseClasses = `transition-all duration-200 ease-out ${
+      isTransitioning ? 'opacity-0 scale-98' : 'opacity-100 scale-100'
     }`;
 
     if (currentView === "welcome") {

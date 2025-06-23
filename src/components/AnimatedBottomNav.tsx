@@ -15,6 +15,14 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
     { view: "settings", icon: Settings, label: "Settings" }
   ];
 
+  const handleNavClick = (view: string) => {
+    // Add haptic feedback for mobile devices
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+    onNavigate(view);
+  };
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 z-50 safe-area-bottom">
       <div className="max-w-md mx-auto px-6 py-3">
@@ -27,18 +35,25 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
                 key={view}
                 variant="ghost"
                 size="sm"
-                onClick={() => onNavigate(view)}
+                onTouchStart={() => {
+                  // Immediate visual feedback on touch
+                  if ('vibrate' in navigator) {
+                    navigator.vibrate(25);
+                  }
+                }}
+                onClick={() => handleNavClick(view)}
                 className={`
-                  w-14 h-14 rounded-2xl transition-all duration-300 ease-in-out
-                  transform hover:scale-110 hover:shadow-lg mobile-touch-target
+                  w-14 h-14 rounded-2xl transition-all duration-150 ease-out
+                  transform active:scale-95 hover:scale-110 
+                  mobile-touch-target select-none
                   ${isActive 
-                    ? 'bg-blue-400 text-white shadow-lg scale-105' 
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                    ? 'bg-blue-400 text-white shadow-lg scale-105 shadow-blue-200' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300 active:bg-gray-400'
                   }
                 `}
                 aria-label={label}
               >
-                <Icon className="w-6 h-6" />
+                <Icon className={`w-6 h-6 transition-transform duration-150 ${isActive ? 'scale-110' : ''}`} />
               </Button>
             );
           })}
