@@ -1,5 +1,5 @@
 
-import { ArrowLeft, Clock, TrendingUp, Target, MessageSquare, BookOpen, Award, Calendar } from "lucide-react";
+import { ArrowLeft, Clock, TrendingUp, Target, MessageSquare, BookOpen, Award, Calendar, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,28 +82,13 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
         name: skill.skill_name,
         before: skill.before_score,
         after: skill.after_score,
-        improvement: skill.improvement
+        improvement: skill.improvement,
+        isReal: true
       }));
     }
 
-    // Fallback to mock data if no real analysis is available
-    const baseSkills = [
-      { name: "Greeting & Introductions", before: 65, after: 78, improvement: 13 },
-      { name: "Conversation Flow", before: 58, after: 72, improvement: 14 },
-      { name: "Vocabulary Usage", before: 71, after: 84, improvement: 13 },
-      { name: "Pronunciation", before: 62, after: 75, improvement: 13 }
-    ];
-
-    if (activityDetails?.rating?.rating) {
-      const rating = activityDetails.rating.rating;
-      return baseSkills.map(skill => ({
-        ...skill,
-        after: Math.round(skill.before + (rating * 3)),
-        improvement: Math.round(rating * 3)
-      }));
-    }
-
-    return baseSkills;
+    // Return empty array if no real data is available
+    return [];
   };
 
   if (isLoading) {
@@ -126,7 +111,7 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
 
   const skillsData = getSkillsTestedData();
   const hasRealTranscript = activityDetails?.callAnalysis?.transcript;
-  const hasRealSkillsAnalysis = activityDetails?.skillsAnalysis && activityDetails.skillsAnalysis.length > 0;
+  const hasRealSkillsAnalysis = skillsData.length > 0;
 
   return (
     <div className="min-h-screen bg-amber-50 pb-6">
@@ -187,43 +172,58 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
                 SKILLS TESTED & IMPROVED
               </h3>
               <p className="text-gray-600 font-medium text-sm">
-                {hasRealSkillsAnalysis ? 'Real analysis from your practice session' : 'Performance before and after this session'}
+                {hasRealSkillsAnalysis ? 'Real analysis from your practice session' : 'No skill analysis data available'}
               </p>
             </div>
           </div>
 
-          {hasRealSkillsAnalysis && (
-            <div className="mb-3 p-3 bg-green-50 rounded-2xl">
-              <p className="text-green-700 text-sm font-medium">
-                ✓ Analysis based on real conversation data from VAPI call
+          {hasRealSkillsAnalysis ? (
+            <>
+              <div className="mb-4 p-3 bg-green-50 rounded-2xl">
+                <p className="text-green-700 text-sm font-medium">
+                  ✓ Analysis based on real conversation data from VAPI call
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {skillsData.map((skill, index) => (
+                  <div key={index} className="bg-gray-50 rounded-2xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-bold text-gray-800">{skill.name}</span>
+                      <span className="text-green-600 font-bold">+{skill.improvement}%</span>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-1">
+                        <div className="text-xs text-gray-600 mb-1">Before: {skill.before}%</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-red-400 h-2 rounded-full" style={{ width: `${skill.before}%` }}></div>
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-xs text-gray-600 mb-1">After: {skill.after}%</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-green-400 h-2 rounded-full" style={{ width: `${skill.after}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-8 h-8 text-orange-500" />
+              </div>
+              <h4 className="text-lg font-bold text-gray-800 mb-2">No Skills Analysis Available</h4>
+              <p className="text-gray-600 mb-4">
+                Complete a practice call session to see detailed skill analysis here.
+              </p>
+              <p className="text-sm text-gray-500">
+                Your conversation will be analyzed to provide insights on greeting, conversation flow, vocabulary usage, and pronunciation.
               </p>
             </div>
           )}
-
-          <div className="space-y-4">
-            {skillsData.map((skill, index) => (
-              <div key={index} className="bg-gray-50 rounded-2xl p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-gray-800">{skill.name}</span>
-                  <span className="text-green-600 font-bold">+{skill.improvement}%</span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="flex-1">
-                    <div className="text-xs text-gray-600 mb-1">Before: {skill.before}%</div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-red-400 h-2 rounded-full" style={{ width: `${skill.before}%` }}></div>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-xs text-gray-600 mb-1">After: {skill.after}%</div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-400 h-2 rounded-full" style={{ width: `${skill.after}%` }}></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Conversation Transcript */}
@@ -244,9 +244,16 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
 
           <div className="bg-gray-50 rounded-2xl p-4 max-h-64 overflow-y-auto">
             {hasRealTranscript ? (
-              <pre className="text-sm text-gray-700 whitespace-pre-wrap font-medium leading-relaxed">
-                {activityDetails.callAnalysis.transcript}
-              </pre>
+              <>
+                <div className="mb-3 p-3 bg-green-50 rounded-2xl">
+                  <p className="text-green-700 text-sm font-medium">
+                    ✓ Real conversation transcript from VAPI call
+                  </p>
+                </div>
+                <pre className="text-sm text-gray-700 whitespace-pre-wrap font-medium leading-relaxed">
+                  {activityDetails.callAnalysis.transcript}
+                </pre>
+              </>
             ) : (
               <div className="text-center text-gray-500 py-8">
                 <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-300" />
@@ -297,6 +304,12 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
                   AI-powered conversation insights
                 </p>
               </div>
+            </div>
+
+            <div className="mb-3 p-3 bg-green-50 rounded-2xl">
+              <p className="text-green-700 text-sm font-medium">
+                ✓ Real sentiment analysis from VAPI call
+              </p>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
