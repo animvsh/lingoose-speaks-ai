@@ -1,14 +1,16 @@
 
-import { CheckCircle, TrendingUp, Target, Clock, MessageSquare } from "lucide-react";
+import { CheckCircle, TrendingUp, Target, Clock, MessageSquare, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 
 interface PreviousActivitySectionProps {
   previousActivity: any;
+  onNavigate: (view: string, data?: any) => void;
 }
 
-const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionProps) => {
+const PreviousActivitySection = ({ previousActivity, onNavigate }: PreviousActivitySectionProps) => {
   const { user } = useAuth();
 
   // Fetch user profile for last conversation summary
@@ -112,63 +114,6 @@ const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionPr
     enabled: !!user,
   });
 
-  // Test query to verify activities table access
-  const { data: activitiesTest } = useQuery({
-    queryKey: ['activities-test', user?.id],
-    queryFn: async () => {
-      console.log('Testing activities table access...');
-      
-      const { data, error, count } = await supabase
-        .from('activities')
-        .select('*', { count: 'exact' })
-        .limit(5);
-
-      console.log('Activities table test results:', {
-        data,
-        error,
-        count,
-        user_id: user?.id
-      });
-
-      if (error) {
-        console.error('Activities table access error:', error);
-      }
-
-      return { data, error, count };
-    },
-    enabled: !!user,
-  });
-
-  // Test query to verify user_activity_ratings access
-  const { data: ratingsTest } = useQuery({
-    queryKey: ['ratings-test', user?.id],
-    queryFn: async () => {
-      if (!user) return null;
-
-      console.log('Testing user_activity_ratings table access...');
-      
-      const { data, error, count } = await supabase
-        .from('user_activity_ratings')
-        .select('*', { count: 'exact' })
-        .eq('user_id', user.id)
-        .limit(5);
-
-      console.log('User activity ratings test results:', {
-        data,
-        error,
-        count,
-        user_id: user.id
-      });
-
-      if (error) {
-        console.error('User activity ratings access error:', error);
-      }
-
-      return { data, error, count };
-    },
-    enabled: !!user,
-  });
-
   // Use the fetched activity data instead of the prop
   const displayActivity = latestActivity || previousActivity;
 
@@ -176,9 +121,7 @@ const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionPr
     latestActivity,
     previousActivity,
     displayActivity,
-    isLoadingActivity,
-    activitiesTest,
-    ratingsTest
+    isLoadingActivity
   });
 
   if (isLoadingActivity) {
@@ -209,18 +152,14 @@ const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionPr
         <p className="text-gray-600 font-medium text-sm">
           Start your first conversation practice session
         </p>
-        {/* Debug info */}
-        <div className="mt-4 text-xs text-gray-500">
-          Debug: Activities: {activitiesTest?.count || 0}, Ratings: {ratingsTest?.count || 0}
-        </div>
       </div>
     );
   }
 
   const formatDuration = (durationSeconds: number) => {
     if (!durationSeconds) return 'N/A';
-    const minutes = Math.floor(durationSeconds / 60);
-    const seconds = durationSeconds % 60;
+    const minutes = Math.round(durationSeconds / 60);
+    const seconds = Math.round(durationSeconds % 60);
     return `${minutes}m ${seconds}s`;
   };
 
@@ -255,44 +194,59 @@ const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionPr
     return 'UNKNOWN';
   };
 
-  // Calculate performance score based on activity data
+  // Calculate performance score based on activity data (rounded)
   const getPerformanceScore = () => {
     if (displayActivity.rating) {
-      return displayActivity.rating.toString();
+      return Math.round(displayActivity.rating);
     }
     if (displayActivity.type === 'activity_available') return 'N/A';
-    return '3';
+    return 3;
   };
 
-  // Calculate engagement score
+  // Calculate engagement score (rounded)
   const getEngagementScore = () => {
     if (displayActivity.duration_seconds) {
-      return Math.min(Math.floor(displayActivity.duration_seconds / 60), 5).toString();
+      return Math.round(Math.min(displayActivity.duration_seconds / 60, 5));
     }
     if (displayActivity.estimated_duration_minutes) {
-      return Math.min(displayActivity.estimated_duration_minutes / 3, 5).toString();
+      return Math.round(Math.min(displayActivity.estimated_duration_minutes / 3, 5));
     }
     return 'N/A';
   };
 
+  const handleViewDetails = () => {
+    onNavigate('activity-details', displayActivity);
+  };
+
   return (
     <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200">
-      <div className="flex items-center mb-4">
-        <div className="w-14 h-14 bg-green-400 rounded-2xl flex items-center justify-center mr-4">
-          <CheckCircle className="w-7 h-7 text-white" />
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <div className="w-14 h-14 bg-green-400 rounded-2xl flex items-center justify-center mr-4">
+            <CheckCircle className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide">
+              PREVIOUS ACTIVITY
+            </h3>
+            <p className="text-gray-600 font-medium text-sm">
+              From activities table
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide">
-            PREVIOUS ACTIVITY
-          </h3>
-          <p className="text-gray-600 font-medium text-sm">
-            From activities table
-          </p>
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleViewDetails}
+          className="text-green-600 hover:text-green-700 hover:bg-green-100"
+        >
+          <ArrowRight className="w-5 h-5" />
+        </Button>
       </div>
 
       <div className="space-y-4">
-        <div className={`rounded-2xl p-4 border-2 ${getStatusBgColor(displayActivity.type)}`}>
+        <div className={`rounded-2xl p-4 border-2 ${getStatusBgColor(displayActivity.type)} cursor-pointer hover:opacity-80 transition-opacity`}
+             onClick={handleViewDetails}>
           <div className="flex items-center justify-between mb-2">
             <span className={`font-bold text-sm ${getStatusColor(displayActivity.type)}`}>
               {displayActivity.name || 'Practice Activity'}
@@ -325,9 +279,6 @@ const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionPr
               Difficulty: {displayActivity.difficulty_level}
             </div>
           )}
-          <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-50 mt-1`}>
-            Source: {displayActivity.source || 'activities_table'}
-          </div>
         </div>
 
         {/* Conversation Summary Section */}
@@ -367,18 +318,6 @@ const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionPr
             <div className="text-xs text-orange-600 font-bold uppercase">Engagement</div>
           </div>
         </div>
-
-        {/* Debug Information */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="bg-gray-100 rounded-2xl p-3 text-xs">
-            <div className="font-bold mb-1">Debug Info:</div>
-            <div>Activity Type: {displayActivity.type}</div>
-            <div>Activity ID: {displayActivity.id}</div>
-            <div>Source: {displayActivity.source}</div>
-            <div>Activities in DB: {activitiesTest?.count || 0}</div>
-            <div>User Ratings: {ratingsTest?.count || 0}</div>
-          </div>
-        )}
       </div>
     </div>
   );

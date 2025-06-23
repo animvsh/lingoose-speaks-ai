@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Trophy, Home, Phone, CheckCircle, Settings } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -202,8 +203,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     user: user?.id,
     isLoadingActivity,
     currentActivity: currentActivity?.id,
-    previousActivityData: previousActivityData?.type,
-    currentActivitySource: currentActivity?.source || 'database'
+    previousActivityData: previousActivityData?.type
   });
 
   if (isLoadingActivity || !currentActivity) {
@@ -241,7 +241,10 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
       <div className="px-6 space-y-6">
         {/* Previous Activity Section - Now properly sourced from activities table */}
-        <PreviousActivitySection previousActivity={previousActivityData} />
+        <PreviousActivitySection 
+          previousActivity={previousActivityData}
+          onNavigate={onNavigate}
+        />
 
         {/* Today's Activity */}
         <TodaysActivitySection 
