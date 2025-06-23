@@ -9,6 +9,7 @@ import CurriculumCard from "@/components/CurriculumCard";
 import SettingsCard from "@/components/SettingsCard";
 import ActivityDetailsView from "@/components/ActivityDetailsView";
 import AnimatedBottomNav from "@/components/AnimatedBottomNav";
+import NavigationTransition from "@/components/NavigationTransition";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -49,14 +50,19 @@ const Index = () => {
   const handleNavigate = (view: string, data?: any) => {
     setIsTransitioning(true);
     
-    // Faster transition for better responsiveness
+    // Immediate haptic feedback
+    if ('vibrate' in navigator) {
+      navigator.vibrate(25);
+    }
+    
+    // Ultra-fast transition for maximum responsiveness
     setTimeout(() => {
       if (view === 'activity-details' && data) {
         setActivityDetailsData(data);
       }
       setCurrentView(view);
       setIsTransitioning(false);
-    }, 100); // Reduced from 150ms to 100ms
+    }, 50); // Reduced from 100ms to 50ms for faster response
   };
 
   if (loading) {
@@ -70,87 +76,84 @@ const Index = () => {
         </div>
       </div>
     );
-  }
+  };
 
   const renderCurrentView = () => {
-    // Faster, more responsive transitions
-    const baseClasses = `transition-all duration-200 ease-out ${
-      isTransitioning ? 'opacity-0 scale-98' : 'opacity-100 scale-100'
-    }`;
-
     if (currentView === "welcome") {
       return (
-        <div className={baseClasses}>
+        <NavigationTransition isVisible={!isTransitioning} direction="fade">
           <WelcomeScreen onComplete={handleWelcomeComplete} />
-        </div>
+        </NavigationTransition>
       );
     }
 
     if (currentView === "onboarding" && !isOnboarded) {
       return (
-        <div className={baseClasses}>
+        <NavigationTransition isVisible={!isTransitioning} direction="slide-right">
           <OnboardingFlow onComplete={handleOnboardingComplete} />
-        </div>
+        </NavigationTransition>
       );
     }
 
     if (currentView === "home") {
       return (
-        <div className={baseClasses}>
+        <NavigationTransition isVisible={!isTransitioning} direction="fade">
           <DashboardStats onNavigate={handleNavigate} />
-        </div>
+        </NavigationTransition>
       );
     }
 
     if (currentView === "activity") {
       return (
-        <div className={baseClasses}>
+        <NavigationTransition isVisible={!isTransitioning} direction="slide-left">
           <ActivityCard onNavigate={handleNavigate} />
-        </div>
+        </NavigationTransition>
       );
     }
 
     if (currentView === "activity-details") {
       return (
-        <div className={baseClasses}>
+        <NavigationTransition isVisible={!isTransitioning} direction="scale">
           <ActivityDetailsView activity={activityDetailsData} onNavigate={handleNavigate} />
-        </div>
+        </NavigationTransition>
       );
     }
 
     if (currentView === "curriculum") {
       return (
-        <div className={baseClasses}>
+        <NavigationTransition isVisible={!isTransitioning} direction="slide-right">
           <CurriculumCard onNavigate={handleNavigate} />
-        </div>
+        </NavigationTransition>
       );
     }
 
     if (currentView === "settings") {
       return (
-        <div className={baseClasses}>
+        <NavigationTransition isVisible={!isTransitioning} direction="slide-left">
           <SettingsCard onNavigate={handleNavigate} />
-        </div>
+        </NavigationTransition>
       );
     }
 
     return (
-      <div className={baseClasses}>
+      <NavigationTransition isVisible={!isTransitioning} direction="fade">
         <DashboardStats onNavigate={handleNavigate} />
-      </div>
+      </NavigationTransition>
     );
   };
 
   const shouldShowBottomNav = isOnboarded && user && currentView !== "welcome" && currentView !== "onboarding";
 
   return (
-    <div className="min-h-screen bg-amber-50 overflow-hidden">
-      <div className={shouldShowBottomNav ? "pb-24" : ""}>
+    <div className="min-h-screen bg-amber-50 relative">
+      <div className={`${shouldShowBottomNav ? "pb-24" : ""} relative z-0`}>
         {renderCurrentView()}
       </div>
       
       {shouldShowBottomNav && (
-        <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
+        <div className="relative z-50">
+          <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
+        </div>
       )}
     </div>
   );

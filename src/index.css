@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -88,7 +89,9 @@
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     height: 100%;
-    overflow: hidden;
+    /* Enable smooth hardware acceleration */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     /* Disable scroll behavior for native feel */
     scroll-behavior: auto;
   }
@@ -102,6 +105,8 @@
     touch-action: manipulation;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
+    /* Enable hardware acceleration */
+    transform: translateZ(0);
     /* Prevent body scroll */
     position: fixed;
     width: 100%;
@@ -117,16 +122,22 @@
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height for mobile */
     position: relative;
-    /* Enable controlled scrolling */
+    /* Enable controlled scrolling with proper overflow handling */
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    /* Fix hover clipping issues */
+    contain: layout style;
+    isolation: isolate;
   }
   
   /* Ensure proper mobile interactions */
   button, a {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    /* Prevent hover clipping */
+    position: relative;
+    z-index: auto;
   }
   
   /* Improve mobile touch targets */
@@ -202,15 +213,20 @@ html {
 /* Smooth transitions for all interactive elements */
 @layer utilities {
   .transition-smooth {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .hover-lift {
-    transition: transform 0.2s ease-out;
+    transition: transform 0.1s ease-out;
+    /* Fix hover clipping */
+    overflow: visible;
+    position: relative;
+    z-index: 10;
   }
   
   .hover-lift:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.02);
+    z-index: 20;
   }
 
   /* Native app utilities */
@@ -222,4 +238,65 @@ html {
   .prevent-zoom {
     touch-action: manipulation;
   }
+
+  /* Hardware acceleration utilities */
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .transform-gpu {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  /* Fix container clipping for hover effects */
+  .overflow-visible {
+    overflow: visible !important;
+  }
+
+  .container-no-clip {
+    contain: none;
+    overflow: visible;
+    position: relative;
+    z-index: auto;
+  }
+
+  .hover-container {
+    /* Allow child elements to overflow for hover effects */
+    overflow: visible;
+    contain: layout;
+  }
+
+  .hover-element {
+    /* Ensure hover effects are not clipped */
+    position: relative;
+    z-index: 10;
+    overflow: visible;
+  }
+
+  .hover-element:hover {
+    z-index: 20;
+    overflow: visible;
+  }
+}
+
+/* Fix specific hover clipping issues */
+.card, .button, [role="button"] {
+  overflow: visible !important;
+  contain: layout style;
+}
+
+.card:hover, .button:hover, [role="button"]:hover {
+  overflow: visible !important;
+  z-index: 20;
+}
+
+/* Container queries and grid fixes */
+.grid, .flex {
+  /* Prevent clipping of child hover effects */
+  overflow: visible;
+}
+
+.grid > *, .flex > * {
+  overflow: visible;
 }
