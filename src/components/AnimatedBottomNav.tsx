@@ -16,8 +16,8 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 z-50">
-      <div className="max-w-md mx-auto px-6 py-4">
+    <div className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 z-50 safe-area-bottom">
+      <div className="max-w-md mx-auto px-6 py-3">
         <div className="flex justify-center space-x-4">
           {navItems.map(({ view, icon: Icon, label }) => {
             const isActive = currentView === view;
@@ -30,7 +30,7 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
                 onClick={() => onNavigate(view)}
                 className={`
                   w-14 h-14 rounded-2xl transition-all duration-300 ease-in-out
-                  transform hover:scale-110 hover:shadow-lg
+                  transform hover:scale-110 hover:shadow-lg mobile-touch-target
                   ${isActive 
                     ? 'bg-blue-400 text-white shadow-lg scale-105' 
                     : 'bg-gray-200 text-gray-600 hover:bg-gray-300'

@@ -8,6 +8,7 @@ import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
 import SettingsCard from "@/components/SettingsCard";
 import ActivityDetailsView from "@/components/ActivityDetailsView";
+import AnimatedBottomNav from "@/components/AnimatedBottomNav";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -138,9 +139,17 @@ const Index = () => {
     );
   };
 
+  const shouldShowBottomNav = isOnboarded && user && currentView !== "welcome" && currentView !== "onboarding";
+
   return (
     <div className="min-h-screen bg-amber-50 overflow-hidden">
-      {renderCurrentView()}
+      <div className={shouldShowBottomNav ? "pb-24" : ""}>
+        {renderCurrentView()}
+      </div>
+      
+      {shouldShowBottomNav && (
+        <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
+      )}
     </div>
   );
 };
