@@ -5,10 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface PreviousActivitySectionProps {
-  lastCall: any;
+  previousActivity: any;
 }
 
-const PreviousActivitySection = ({ lastCall }: PreviousActivitySectionProps) => {
+const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionProps) => {
   const { user } = useAuth();
 
   // Fetch user profile for last conversation summary
@@ -29,7 +29,7 @@ const PreviousActivitySection = ({ lastCall }: PreviousActivitySectionProps) => 
     enabled: !!user,
   });
 
-  if (!lastCall) {
+  if (!previousActivity) {
     return (
       <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
         <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -81,6 +81,24 @@ const PreviousActivitySection = ({ lastCall }: PreviousActivitySectionProps) => 
     }
   };
 
+  // Calculate performance score based on activity data
+  const getPerformanceScore = () => {
+    if (previousActivity.type === 'activity_rating' && previousActivity.rating) {
+      return previousActivity.rating.toString();
+    }
+    if (previousActivity.sentiment === 'positive') return '4';
+    if (previousActivity.sentiment === 'negative') return '1';
+    return '3';
+  };
+
+  // Calculate engagement score
+  const getEngagementScore = () => {
+    if (previousActivity.type === 'activity_rating') {
+      return Math.min(Math.floor((previousActivity.duration_seconds || 0) / 60), 5).toString();
+    }
+    return Math.floor((previousActivity.duration_seconds || 0) / 100).toString() || '2';
+  };
+
   return (
     <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200">
       <div className="flex items-center mb-4">
@@ -92,33 +110,38 @@ const PreviousActivitySection = ({ lastCall }: PreviousActivitySectionProps) => 
             PREVIOUS ACTIVITY
           </h3>
           <p className="text-gray-600 font-medium text-sm">
-            Last conversation session
+            Last practice session
           </p>
         </div>
       </div>
 
       <div className="space-y-4">
-        <div className={`rounded-2xl p-4 border-2 ${getStatusBgColor(lastCall.call_status)}`}>
+        <div className={`rounded-2xl p-4 border-2 ${getStatusBgColor(previousActivity.call_status)}`}>
           <div className="flex items-center justify-between mb-2">
-            <span className={`font-bold text-sm ${getStatusColor(lastCall.call_status)}`}>
-              {lastCall.scenario || 'Practice Session'}
+            <span className={`font-bold text-sm ${getStatusColor(previousActivity.call_status)}`}>
+              {previousActivity.activity_name || 'Practice Session'}
             </span>
-            <span className={`font-bold text-sm ${getStatusColor(lastCall.call_status)}`}>
-              {lastCall.call_status?.toUpperCase() || 'COMPLETED'}
+            <span className={`font-bold text-sm ${getStatusColor(previousActivity.call_status)}`}>
+              {previousActivity.call_status?.toUpperCase() || 'COMPLETED'}
             </span>
           </div>
           <div className="flex items-center justify-between mb-2">
-            <span className={`font-bold text-sm ${getStatusColor(lastCall.call_status)}`}>Duration</span>
-            <span className={`font-bold ${getStatusColor(lastCall.call_status)}`}>
-              {formatDuration(lastCall.duration_seconds || 0)}
+            <span className={`font-bold text-sm ${getStatusColor(previousActivity.call_status)}`}>Duration</span>
+            <span className={`font-bold ${getStatusColor(previousActivity.call_status)}`}>
+              {formatDuration(previousActivity.duration_seconds || 0)}
             </span>
           </div>
-          <div className={`text-xs ${getStatusColor(lastCall.call_status)} opacity-70`}>
-            Completed on {new Date(lastCall.created_at).toLocaleDateString()}
+          <div className={`text-xs ${getStatusColor(previousActivity.call_status)} opacity-70`}>
+            Completed on {new Date(previousActivity.completed_at).toLocaleDateString()}
           </div>
-          {lastCall.vapi_call_id && (
-            <div className={`text-xs ${getStatusColor(lastCall.call_status)} opacity-50 mt-1`}>
-              Call ID: {lastCall.vapi_call_id.substring(0, 8)}...
+          {previousActivity.activity_description && (
+            <div className={`text-xs ${getStatusColor(previousActivity.call_status)} opacity-60 mt-1`}>
+              {previousActivity.activity_description}
+            </div>
+          )}
+          {previousActivity.source && (
+            <div className={`text-xs ${getStatusColor(previousActivity.call_status)} opacity-50 mt-1`}>
+              Source: {previousActivity.source === 'user_activity' ? 'Activity Practice' : 'Voice Call'}
             </div>
           )}
         </div>
@@ -146,7 +169,7 @@ const PreviousActivitySection = ({ lastCall }: PreviousActivitySectionProps) => 
               <TrendingUp className="w-4 h-4 text-white" />
             </div>
             <div className="text-lg font-bold text-blue-700">
-              {lastCall.sentiment === 'positive' ? '4' : lastCall.sentiment === 'negative' ? '1' : '3'}
+              {getPerformanceScore()}
             </div>
             <div className="text-xs text-blue-600 font-bold uppercase">Performance</div>
           </div>
@@ -155,7 +178,7 @@ const PreviousActivitySection = ({ lastCall }: PreviousActivitySectionProps) => 
               <Target className="w-4 h-4 text-white" />
             </div>
             <div className="text-lg font-bold text-orange-700">
-              {lastCall.transcript ? Math.floor(lastCall.transcript.length / 100) : '2'}
+              {getEngagementScore()}
             </div>
             <div className="text-xs text-orange-600 font-bold uppercase">Engagement</div>
           </div>

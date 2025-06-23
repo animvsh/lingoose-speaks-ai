@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Trophy, Home, Phone, CheckCircle, Settings } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -69,52 +70,77 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     enabled: !!user
   });
 
-  // Fetch call logs from conversations table and vapi_call_analysis
-  const { data: callLogs = [] } = useQuery({
-    queryKey: ['call-logs', user?.id],
+  // Fetch previous activity data - combining call logs with user activity ratings
+  const { data: previousActivityData } = useQuery({
+    queryKey: ['previous-activity-data', user?.id],
     queryFn: async () => {
       if (!user) throw new Error('No user found');
 
-      // First try to get data from vapi_call_analysis (most complete data)
-      const { data: vapiAnalysis, error: vapiError } = await supabase
+      // Fetch the latest completed user activity rating
+      const { data: latestRating, error: ratingError } = await supabase
+        .from('user_activity_ratings')
+        .select(`
+          *,
+          activities (
+            name,
+            description,
+            estimated_duration_minutes
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('completed_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (ratingError) {
+        console.error('Error fetching latest activity rating:', ratingError);
+      }
+
+      // Fetch call analysis data as backup
+      const { data: callAnalysis, error: callError } = await supabase
         .from('vapi_call_analysis')
         .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-      if (!vapiError && vapiAnalysis && vapiAnalysis.length > 0) {
-        return vapiAnalysis.map(call => ({
-          id: call.id,
-          user_id: call.user_id,
-          phone_number: call.phone_number,
-          call_status: call.call_status || 'completed',
-          duration_seconds: call.call_duration || 0,
-          created_at: call.created_at,
-          vapi_call_id: call.vapi_call_id,
-          transcript: call.transcript,
-          sentiment: call.sentiment_analysis ? (call.sentiment_analysis as any)?.overall_sentiment : null
-        }));
+      if (callError) {
+        console.error('Error fetching call analysis:', callError);
       }
 
-      // Fallback to conversations table
-      const { data: conversations, error: convError } = await supabase
-        .from('conversations')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-      
-      if (convError) throw convError;
-      
-      return (conversations || []).map(conv => ({
-        id: conv.id,
-        user_id: conv.user_id,
-        phone_number: conv.conversation_data ? (conv.conversation_data as any)?.phone_number || '' : '',
-        call_status: conv.conversation_data ? (conv.conversation_data as any)?.status || 'completed' : 'completed',
-        duration_seconds: conv.duration_seconds || 300, // Default 5 minutes if not available
-        created_at: conv.created_at,
-        vapi_call_id: conv.conversation_data ? (conv.conversation_data as any)?.call_id : null,
-        scenario: conv.conversation_data ? (conv.conversation_data as any)?.scenario : null
-      }));
+      // Prefer activity rating data over call analysis
+      if (latestRating && latestRating.activities) {
+        return {
+          type: 'activity_rating',
+          id: latestRating.id,
+          activity_name: latestRating.activities.name,
+          activity_description: latestRating.activities.description,
+          duration_seconds: latestRating.duration_seconds || (latestRating.activities.estimated_duration_minutes * 60),
+          completed_at: latestRating.completed_at,
+          rating: latestRating.rating,
+          call_status: 'completed',
+          source: 'user_activity'
+        };
+      }
+
+      // Fallback to call analysis data
+      if (callAnalysis) {
+        return {
+          type: 'call_analysis',
+          id: callAnalysis.id,
+          activity_name: 'Phone Conversation',
+          activity_description: 'Voice conversation practice',
+          duration_seconds: callAnalysis.call_duration || 0,
+          completed_at: callAnalysis.created_at,
+          call_status: callAnalysis.call_status || 'completed',
+          vapi_call_id: callAnalysis.vapi_call_id,
+          sentiment: callAnalysis.sentiment_analysis ? (callAnalysis.sentiment_analysis as any)?.overall_sentiment : null,
+          source: 'call_analysis'
+        };
+      }
+
+      return null;
     },
     enabled: !!user
   });
@@ -130,15 +156,13 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       await startCall(currentActivity);
       
       // Refresh all relevant queries after starting a call
-      queryClient.invalidateQueries({ queryKey: ['call-logs'] });
+      queryClient.invalidateQueries({ queryKey: ['previous-activity-data'] });
       queryClient.invalidateQueries({ queryKey: ['curriculum-analytics'] });
       queryClient.invalidateQueries({ queryKey: ['user-activity-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['call-analysis'] });
       queryClient.invalidateQueries({ queryKey: ['latest-call-analysis'] });
     }
   };
-
-  const lastCall = callLogs[0];
 
   if (isLoadingActivity || !currentActivity) {
     return (
@@ -175,7 +199,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
       <div className="px-6 space-y-6">
         {/* Previous Activity Section */}
-        <PreviousActivitySection lastCall={lastCall} />
+        <PreviousActivitySection previousActivity={previousActivityData} />
 
         {/* Today's Activity */}
         <TodaysActivitySection 
