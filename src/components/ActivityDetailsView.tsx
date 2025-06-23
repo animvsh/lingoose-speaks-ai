@@ -81,27 +81,6 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
     return baseSkills;
   };
 
-  const getTranscript = () => {
-    if (activityDetails?.callAnalysis?.transcript) {
-      return activityDetails.callAnalysis.transcript;
-    }
-    
-    // Mock transcript based on activity
-    return `User: Hello, I'd like to check into my reservation.
-
-Receptionist: Good morning! Welcome to our hotel. May I have your last name and confirmation number?
-
-User: Yes, it's Smith, and my confirmation number is ABC123.
-
-Receptionist: Perfect! I have your reservation here. You're staying with us for 3 nights in a deluxe room. 
-
-User: That's correct. What time is checkout?
-
-Receptionist: Checkout is at 11 AM. Here's your room key and some information about our amenities. Enjoy your stay!
-
-User: Thank you very much!`;
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-amber-50">
@@ -121,7 +100,7 @@ User: Thank you very much!`;
   }
 
   const skillsData = getSkillsTestedData();
-  const transcript = getTranscript();
+  const hasRealTranscript = activityDetails?.callAnalysis?.transcript;
 
   return (
     <div className="min-h-screen bg-amber-50 pb-6">
@@ -224,15 +203,23 @@ User: Thank you very much!`;
                 CONVERSATION TRANSCRIPT
               </h3>
               <p className="text-gray-600 font-medium text-sm">
-                Full conversation from your practice session
+                {hasRealTranscript ? 'Real conversation from your practice session' : 'No conversation data available'}
               </p>
             </div>
           </div>
 
           <div className="bg-gray-50 rounded-2xl p-4 max-h-64 overflow-y-auto">
-            <pre className="text-sm text-gray-700 whitespace-pre-wrap font-medium leading-relaxed">
-              {transcript}
-            </pre>
+            {hasRealTranscript ? (
+              <pre className="text-sm text-gray-700 whitespace-pre-wrap font-medium leading-relaxed">
+                {activityDetails.callAnalysis.transcript}
+              </pre>
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p className="font-medium">No conversation transcript available</p>
+                <p className="text-sm">Complete a practice call to see your conversation here</p>
+              </div>
+            )}
           </div>
         </div>
 
