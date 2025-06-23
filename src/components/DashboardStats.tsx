@@ -1,9 +1,9 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Phone, Clock, TrendingUp, Calendar, Star, Target, Zap, Award, Trophy, Flame, Home, CheckCircle, Settings, BookOpen } from "lucide-react";
+import { Phone, Clock, TrendingUp, Calendar, Star, Target, Zap, Award, Trophy, Flame } from "lucide-react";
 import { useCurriculumAnalytics } from "@/hooks/useCurriculumAnalytics";
 import AppBar from "./AppBar";
+import AnimatedBottomNav from "./AnimatedBottomNav";
 
 interface DashboardStatsProps {
   onNavigate: (view: string) => void;
@@ -41,7 +41,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
       
       <div className="px-6 space-y-6">
         {/* Welcome Header */}
-        <div className="text-center pt-4">
+        <div className="text-center pt-4 animate-fade-in">
           <h2 className="text-3xl font-bold text-orange-600 mb-2 uppercase tracking-wide">
             WELCOME BACK!
           </h2>
@@ -53,7 +53,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
         {/* Main Stats Grid - 2x2 layout with cartoon style */}
         <div className="grid grid-cols-2 gap-4">
           {/* Total Calls - Bright Orange */}
-          <Card className="bg-orange-300 border-4 border-orange-600 rounded-2xl overflow-hidden">
+          <Card className="bg-orange-300 border-4 border-orange-600 rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in">
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="w-12 h-12 bg-orange-600 border-3 border-orange-800 rounded-xl flex items-center justify-center">
@@ -73,7 +73,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </Card>
 
           {/* Talk Time - Bright Green */}
-          <Card className="bg-green-300 border-4 border-green-600 rounded-2xl overflow-hidden">
+          <Card className="bg-green-300 border-4 border-green-600 rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.1s' }}>
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="w-12 h-12 bg-green-600 border-3 border-green-800 rounded-xl flex items-center justify-center">
@@ -93,7 +93,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </Card>
 
           {/* Native Fluency Score - Bright Yellow */}
-          <Card className="bg-yellow-300 border-4 border-yellow-600 rounded-2xl overflow-hidden">
+          <Card className="bg-yellow-300 border-4 border-yellow-600 rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="w-12 h-12 bg-yellow-600 border-3 border-yellow-800 rounded-xl flex items-center justify-center">
@@ -113,7 +113,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </Card>
 
           {/* Current Streak - Bright Red */}
-          <Card className="bg-red-300 border-4 border-red-600 rounded-2xl overflow-hidden">
+          <Card className="bg-red-300 border-4 border-red-600 rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="w-12 h-12 bg-red-600 border-3 border-red-800 rounded-xl flex items-center justify-center">
@@ -134,7 +134,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
         </div>
 
         {/* Achievement Banner - Cartoon style */}
-        <Card className="bg-purple-300 border-4 border-purple-600 rounded-2xl overflow-hidden">
+        <Card className="bg-purple-300 border-4 border-purple-600 rounded-2xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <CardContent className="p-4">
             <div className="flex items-center space-x-4">
               <div className="w-16 h-16 bg-purple-600 border-3 border-purple-800 rounded-2xl flex items-center justify-center">
@@ -161,7 +161,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
 
         {/* Quick Stats Row - Bright cartoon colors */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-pink-300 border-4 border-pink-600 p-4 rounded-2xl text-center">
+          <div className="bg-pink-300 border-4 border-pink-600 p-4 rounded-2xl text-center transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.5s' }}>
             <div className="w-10 h-10 bg-pink-600 border-3 border-pink-800 rounded-xl flex items-center justify-center mx-auto mb-3">
               <Star className="w-5 h-5 text-white" />
             </div>
@@ -170,7 +170,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
             </div>
             <div className="text-sm text-pink-800 font-bold uppercase">Avg Rating</div>
           </div>
-          <div className="bg-blue-300 border-4 border-blue-600 p-4 rounded-2xl text-center">
+          <div className="bg-blue-300 border-4 border-blue-600 p-4 rounded-2xl text-center transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.6s' }}>
             <div className="w-10 h-10 bg-blue-600 border-3 border-blue-800 rounded-xl flex items-center justify-center mx-auto mb-3">
               <Target className="w-5 h-5 text-white" />
             </div>
@@ -179,7 +179,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
             </div>
             <div className="text-sm text-blue-800 font-bold uppercase">Goal Progress</div>
           </div>
-          <div className="bg-teal-300 border-4 border-teal-600 p-4 rounded-2xl text-center">
+          <div className="bg-teal-300 border-4 border-teal-600 p-4 rounded-2xl text-center transform transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fade-in" style={{ animationDelay: '0.7s' }}>
             <div className="w-10 h-10 bg-teal-600 border-3 border-teal-800 rounded-xl flex items-center justify-center mx-auto mb-3">
               <Calendar className="w-5 h-5 text-white" />
             </div>
@@ -189,45 +189,8 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation - Fixed positioning */}
-      <div className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 z-50">
-        <div className="max-w-md mx-auto px-6 py-4">
-          <div className="flex justify-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate("home")}
-              className="w-14 h-14 bg-blue-400 rounded-2xl text-white"
-            >
-              <Home className="w-6 h-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate("activity")}
-              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
-            >
-              <Phone className="w-6 h-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate("curriculum")}
-              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
-            >
-              <BookOpen className="w-6 h-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate("settings")}
-              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
-            >
-              <Settings className="w-6 h-6" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      {/* Animated Bottom Navigation */}
+      <AnimatedBottomNav currentView="home" onNavigate={onNavigate} />
     </div>
   );
 };

@@ -14,6 +14,7 @@ const Index = () => {
   const [currentView, setCurrentView] = useState("welcome");
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [activityDetailsData, setActivityDetailsData] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -40,11 +41,20 @@ const Index = () => {
     }
   };
 
+  const handleWelcomeComplete = () => {
+    setCurrentView("onboarding");
+  };
+
   const handleNavigate = (view: string, data?: any) => {
-    if (view === 'activity-details' && data) {
-      setActivityDetailsData(data);
-    }
-    setCurrentView(view);
+    setIsTransitioning(true);
+    
+    setTimeout(() => {
+      if (view === 'activity-details' && data) {
+        setActivityDetailsData(data);
+      }
+      setCurrentView(view);
+      setIsTransitioning(false);
+    }, 150);
   };
 
   if (loading) {
@@ -60,35 +70,79 @@ const Index = () => {
     );
   }
 
-  if (currentView === "welcome") {
-    return <WelcomeScreen />;
-  }
+  const renderCurrentView = () => {
+    const baseClasses = `transition-all duration-300 ease-in-out ${
+      isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+    }`;
 
-  if (currentView === "onboarding" && !isOnboarded) {
-    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
-  }
+    if (currentView === "welcome") {
+      return (
+        <div className={baseClasses}>
+          <WelcomeScreen onComplete={handleWelcomeComplete} />
+        </div>
+      );
+    }
 
-  if (currentView === "home") {
-    return <DashboardStats onNavigate={handleNavigate} />;
-  }
+    if (currentView === "onboarding" && !isOnboarded) {
+      return (
+        <div className={baseClasses}>
+          <OnboardingFlow onComplete={handleOnboardingComplete} />
+        </div>
+      );
+    }
 
-  if (currentView === "activity") {
-    return <ActivityCard onNavigate={handleNavigate} />;
-  }
+    if (currentView === "home") {
+      return (
+        <div className={baseClasses}>
+          <DashboardStats onNavigate={handleNavigate} />
+        </div>
+      );
+    }
 
-  if (currentView === "activity-details") {
-    return <ActivityDetailsView activity={activityDetailsData} onNavigate={handleNavigate} />;
-  }
+    if (currentView === "activity") {
+      return (
+        <div className={baseClasses}>
+          <ActivityCard onNavigate={handleNavigate} />
+        </div>
+      );
+    }
 
-  if (currentView === "curriculum") {
-    return <CurriculumCard onNavigate={handleNavigate} />;
-  }
+    if (currentView === "activity-details") {
+      return (
+        <div className={baseClasses}>
+          <ActivityDetailsView activity={activityDetailsData} onNavigate={handleNavigate} />
+        </div>
+      );
+    }
 
-  if (currentView === "settings") {
-    return <SettingsCard onNavigate={handleNavigate} />;
-  }
+    if (currentView === "curriculum") {
+      return (
+        <div className={baseClasses}>
+          <CurriculumCard onNavigate={handleNavigate} />
+        </div>
+      );
+    }
 
-  return <DashboardStats onNavigate={handleNavigate} />;
+    if (currentView === "settings") {
+      return (
+        <div className={baseClasses}>
+          <SettingsCard onNavigate={handleNavigate} />
+        </div>
+      );
+    }
+
+    return (
+      <div className={baseClasses}>
+        <DashboardStats onNavigate={handleNavigate} />
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-amber-50 overflow-hidden">
+      {renderCurrentView()}
+    </div>
+  );
 };
 
 export default Index;
