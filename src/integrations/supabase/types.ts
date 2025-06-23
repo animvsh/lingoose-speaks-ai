@@ -685,6 +685,56 @@ export type Database = {
           },
         ]
       }
+      vapi_skill_analysis: {
+        Row: {
+          after_score: number
+          analysis_details: Json | null
+          before_score: number
+          confidence_score: number | null
+          created_at: string
+          id: string
+          improvement: number
+          skill_name: string
+          updated_at: string
+          user_id: string
+          vapi_call_analysis_id: string
+        }
+        Insert: {
+          after_score?: number
+          analysis_details?: Json | null
+          before_score?: number
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          improvement?: number
+          skill_name: string
+          updated_at?: string
+          user_id: string
+          vapi_call_analysis_id: string
+        }
+        Update: {
+          after_score?: number
+          analysis_details?: Json | null
+          before_score?: number
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          improvement?: number
+          skill_name?: string
+          updated_at?: string
+          user_id?: string
+          vapi_call_analysis_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vapi_skill_analysis_vapi_call_analysis_id_fkey"
+            columns: ["vapi_call_analysis_id"]
+            isOneToOne: false
+            referencedRelation: "vapi_call_analysis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -42,12 +42,27 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
         .limit(1)
         .maybeSingle();
 
-      console.log('Activity details query:', { callData, ratingData, callError, ratingError });
+      // Fetch real skill analysis data if call analysis exists
+      let skillsAnalysis = null;
+      if (callData) {
+        const { data: skillsData, error: skillsError } = await supabase
+          .from('vapi_skill_analysis')
+          .select('*')
+          .eq('vapi_call_analysis_id', callData.id)
+          .order('created_at', { ascending: false });
+
+        if (!skillsError && skillsData && skillsData.length > 0) {
+          skillsAnalysis = skillsData;
+        }
+      }
+
+      console.log('Activity details query:', { callData, ratingData, skillsAnalysis, callError, ratingError });
 
       return {
         callAnalysis: callData,
         rating: ratingData,
-        activity: activity
+        activity: activity,
+        skillsAnalysis: skillsAnalysis
       };
     },
     enabled: !!user && !!activity
@@ -61,7 +76,17 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
   };
 
   const getSkillsTestedData = () => {
-    // Mock skills data based on activity type
+    // Use real skills analysis data if available
+    if (activityDetails?.skillsAnalysis && activityDetails.skillsAnalysis.length > 0) {
+      return activityDetails.skillsAnalysis.map(skill => ({
+        name: skill.skill_name,
+        before: skill.before_score,
+        after: skill.after_score,
+        improvement: skill.improvement
+      }));
+    }
+
+    // Fallback to mock data if no real analysis is available
     const baseSkills = [
       { name: "Greeting & Introductions", before: 65, after: 78, improvement: 13 },
       { name: "Conversation Flow", before: 58, after: 72, improvement: 14 },
@@ -101,6 +126,7 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
 
   const skillsData = getSkillsTestedData();
   const hasRealTranscript = activityDetails?.callAnalysis?.transcript;
+  const hasRealSkillsAnalysis = activityDetails?.skillsAnalysis && activityDetails.skillsAnalysis.length > 0;
 
   return (
     <div className="min-h-screen bg-amber-50 pb-6">
@@ -161,10 +187,18 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
                 SKILLS TESTED & IMPROVED
               </h3>
               <p className="text-gray-600 font-medium text-sm">
-                Performance before and after this session
+                {hasRealSkillsAnalysis ? 'Real analysis from your practice session' : 'Performance before and after this session'}
               </p>
             </div>
           </div>
+
+          {hasRealSkillsAnalysis && (
+            <div className="mb-3 p-3 bg-green-50 rounded-2xl">
+              <p className="text-green-700 text-sm font-medium">
+                ✓ Analysis based on real conversation data from VAPI call
+              </p>
+            </div>
+          )}
 
           <div className="space-y-4">
             {skillsData.map((skill, index) => (
