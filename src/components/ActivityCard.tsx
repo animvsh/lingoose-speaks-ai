@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Trophy, Home, Phone, CheckCircle, Settings } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -27,6 +26,8 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     queryFn: async () => {
       if (!user) throw new Error('No user found');
 
+      console.log('Fetching current activity for user:', user.id);
+
       // Get the first active activity (we'll treat this as the current activity)
       const { data, error } = await supabase
         .from('activities')
@@ -36,12 +37,16 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         .limit(1)
         .single();
       
+      console.log('Current activity query result:', { data, error });
+
       if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching current activity:', error);
         throw error;
       }
 
       // If no activity found, return a default one
       if (!data) {
+        console.log('No active activity found, returning default');
         return {
           id: null,
           name: "Hotel check-in conversation",
@@ -57,6 +62,8 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         };
       }
 
+      console.log('Active activity found:', data);
+
       return {
         ...data,
         skills: [
@@ -70,27 +77,48 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
     enabled: !!user
   });
 
-  // Fetch previous activity data - combining call logs with user activity ratings
+  // Enhanced previous activity data fetching with better logging
   const { data: previousActivityData } = useQuery({
     queryKey: ['previous-activity-data', user?.id],
     queryFn: async () => {
       if (!user) throw new Error('No user found');
 
-      // Fetch the latest completed user activity rating
+      console.log('Fetching previous activity data for user:', user.id);
+
+      // Test activities table access first
+      const { data: activitiesCount, error: activitiesError } = await supabase
+        .from('activities')
+        .select('id', { count: 'exact', head: true });
+
+      console.log('Activities table test:', { count: activitiesCount, error: activitiesError });
+
+      // Test user_activity_ratings table access
+      const { data: ratingsCount, error: ratingsError } = await supabase
+        .from('user_activity_ratings')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      console.log('User activity ratings test:', { count: ratingsCount, error: ratingsError });
+
+      // Fetch the latest completed user activity rating with activity details
       const { data: latestRating, error: ratingError } = await supabase
         .from('user_activity_ratings')
         .select(`
           *,
           activities (
+            id,
             name,
             description,
-            estimated_duration_minutes
+            estimated_duration_minutes,
+            difficulty_level
           )
         `)
         .eq('user_id', user.id)
         .order('completed_at', { ascending: false })
         .limit(1)
         .maybeSingle();
+
+      console.log('Latest activity rating query:', { data: latestRating, error: ratingError });
 
       if (ratingError) {
         console.error('Error fetching latest activity rating:', ratingError);
@@ -105,12 +133,15 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         .limit(1)
         .maybeSingle();
 
+      console.log('Call analysis query:', { data: callAnalysis, error: callError });
+
       if (callError) {
         console.error('Error fetching call analysis:', callError);
       }
 
       // Prefer activity rating data over call analysis
       if (latestRating && latestRating.activities) {
+        console.log('Using activity rating data as previous activity');
         return {
           type: 'activity_rating',
           id: latestRating.id,
@@ -126,6 +157,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
       // Fallback to call analysis data
       if (callAnalysis) {
+        console.log('Using call analysis data as previous activity');
         return {
           type: 'call_analysis',
           id: callAnalysis.id,
@@ -140,6 +172,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         };
       }
 
+      console.log('No previous activity data found');
       return null;
     },
     enabled: !!user
@@ -157,12 +190,21 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       
       // Refresh all relevant queries after starting a call
       queryClient.invalidateQueries({ queryKey: ['previous-activity-data'] });
+      queryClient.invalidateQueries({ queryKey: ['latest-completed-activity'] });
       queryClient.invalidateQueries({ queryKey: ['curriculum-analytics'] });
       queryClient.invalidateQueries({ queryKey: ['user-activity-ratings'] });
       queryClient.invalidateQueries({ queryKey: ['call-analysis'] });
       queryClient.invalidateQueries({ queryKey: ['latest-call-analysis'] });
     }
   };
+
+  console.log('ActivityCard render state:', {
+    user: user?.id,
+    isLoadingActivity,
+    currentActivity: currentActivity?.id,
+    previousActivityData: previousActivityData?.type,
+    currentActivitySource: currentActivity?.source || 'database'
+  });
 
   if (isLoadingActivity || !currentActivity) {
     return (
@@ -198,7 +240,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
       />
 
       <div className="px-6 space-y-6">
-        {/* Previous Activity Section */}
+        {/* Previous Activity Section - Now properly sourced from activities table */}
         <PreviousActivitySection previousActivity={previousActivityData} />
 
         {/* Today's Activity */}

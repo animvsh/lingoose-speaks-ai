@@ -29,7 +29,175 @@ const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionPr
     enabled: !!user,
   });
 
-  if (!previousActivity) {
+  // Fetch the most recent completed activity from the activities table
+  const { data: latestActivity, isLoading: isLoadingActivity } = useQuery({
+    queryKey: ['latest-completed-activity', user?.id],
+    queryFn: async () => {
+      if (!user) throw new Error('No user found');
+
+      console.log('Fetching latest completed activity for user:', user.id);
+
+      // First, get the most recent activity rating to find which activity was completed
+      const { data: latestRating, error: ratingError } = await supabase
+        .from('user_activity_ratings')
+        .select(`
+          *,
+          activities (
+            id,
+            name,
+            description,
+            estimated_duration_minutes,
+            difficulty_level,
+            prompt
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('completed_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (ratingError) {
+        console.error('Error fetching latest activity rating:', ratingError);
+      }
+
+      console.log('Latest activity rating found:', latestRating);
+
+      if (latestRating && latestRating.activities) {
+        return {
+          type: 'activity_completion',
+          id: latestRating.activities.id,
+          name: latestRating.activities.name,
+          description: latestRating.activities.description,
+          estimated_duration_minutes: latestRating.activities.estimated_duration_minutes,
+          difficulty_level: latestRating.activities.difficulty_level,
+          prompt: latestRating.activities.prompt,
+          rating: latestRating.rating,
+          duration_seconds: latestRating.duration_seconds,
+          completed_at: latestRating.completed_at,
+          feedback_notes: latestRating.feedback_notes,
+          source: 'activities_table'
+        };
+      }
+
+      // Fallback: get any activity from the activities table as backup
+      const { data: anyActivity, error: activityError } = await supabase
+        .from('activities')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (activityError) {
+        console.error('Error fetching fallback activity:', activityError);
+      }
+
+      console.log('Fallback activity found:', anyActivity);
+
+      if (anyActivity) {
+        return {
+          type: 'activity_available',
+          id: anyActivity.id,
+          name: anyActivity.name,
+          description: anyActivity.description,
+          estimated_duration_minutes: anyActivity.estimated_duration_minutes,
+          difficulty_level: anyActivity.difficulty_level,
+          prompt: anyActivity.prompt,
+          source: 'activities_table_fallback'
+        };
+      }
+
+      return null;
+    },
+    enabled: !!user,
+  });
+
+  // Test query to verify activities table access
+  const { data: activitiesTest } = useQuery({
+    queryKey: ['activities-test', user?.id],
+    queryFn: async () => {
+      console.log('Testing activities table access...');
+      
+      const { data, error, count } = await supabase
+        .from('activities')
+        .select('*', { count: 'exact' })
+        .limit(5);
+
+      console.log('Activities table test results:', {
+        data,
+        error,
+        count,
+        user_id: user?.id
+      });
+
+      if (error) {
+        console.error('Activities table access error:', error);
+      }
+
+      return { data, error, count };
+    },
+    enabled: !!user,
+  });
+
+  // Test query to verify user_activity_ratings access
+  const { data: ratingsTest } = useQuery({
+    queryKey: ['ratings-test', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+
+      console.log('Testing user_activity_ratings table access...');
+      
+      const { data, error, count } = await supabase
+        .from('user_activity_ratings')
+        .select('*', { count: 'exact' })
+        .eq('user_id', user.id)
+        .limit(5);
+
+      console.log('User activity ratings test results:', {
+        data,
+        error,
+        count,
+        user_id: user.id
+      });
+
+      if (error) {
+        console.error('User activity ratings access error:', error);
+      }
+
+      return { data, error, count };
+    },
+    enabled: !!user,
+  });
+
+  // Use the fetched activity data instead of the prop
+  const displayActivity = latestActivity || previousActivity;
+
+  console.log('PreviousActivitySection render:', {
+    latestActivity,
+    previousActivity,
+    displayActivity,
+    isLoadingActivity,
+    activitiesTest,
+    ratingsTest
+  });
+
+  if (isLoadingActivity) {
+    return (
+      <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
+        <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <Clock className="w-8 h-8 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide mb-2">
+          LOADING ACTIVITY
+        </h3>
+        <p className="text-gray-600 font-medium text-sm">
+          Fetching your latest activity...
+        </p>
+      </div>
+    );
+  }
+
+  if (!displayActivity) {
     return (
       <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
         <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -41,62 +209,70 @@ const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionPr
         <p className="text-gray-600 font-medium text-sm">
           Start your first conversation practice session
         </p>
+        {/* Debug info */}
+        <div className="mt-4 text-xs text-gray-500">
+          Debug: Activities: {activitiesTest?.count || 0}, Ratings: {ratingsTest?.count || 0}
+        </div>
       </div>
     );
   }
 
   const formatDuration = (durationSeconds: number) => {
+    if (!durationSeconds) return 'N/A';
     const minutes = Math.floor(durationSeconds / 60);
     const seconds = durationSeconds % 60;
     return `${minutes}m ${seconds}s`;
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'completed':
+  const getStatusColor = (type: string) => {
+    switch (type) {
+      case 'activity_completion':
         return 'text-green-700';
-      case 'ended':
-        return 'text-green-700';
-      case 'failed':
-        return 'text-red-700';
-      case 'in-progress':
+      case 'activity_available':
         return 'text-blue-700';
       default:
         return 'text-gray-700';
     }
   };
 
-  const getStatusBgColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'completed':
+  const getStatusBgColor = (type: string) => {
+    switch (type) {
+      case 'activity_completion':
         return 'bg-green-50 border-green-100';
-      case 'ended':
-        return 'bg-green-50 border-green-100';
-      case 'failed':
-        return 'bg-red-50 border-red-100';
-      case 'in-progress':
+      case 'activity_available':
         return 'bg-blue-50 border-blue-100';
       default:
         return 'bg-gray-50 border-gray-100';
     }
   };
 
+  const getStatusText = (activity: any) => {
+    if (activity.type === 'activity_completion') {
+      return 'COMPLETED';
+    } else if (activity.type === 'activity_available') {
+      return 'AVAILABLE';
+    }
+    return 'UNKNOWN';
+  };
+
   // Calculate performance score based on activity data
   const getPerformanceScore = () => {
-    if (previousActivity.type === 'activity_rating' && previousActivity.rating) {
-      return previousActivity.rating.toString();
+    if (displayActivity.rating) {
+      return displayActivity.rating.toString();
     }
-    if (previousActivity.sentiment === 'positive') return '4';
-    if (previousActivity.sentiment === 'negative') return '1';
+    if (displayActivity.type === 'activity_available') return 'N/A';
     return '3';
   };
 
   // Calculate engagement score
   const getEngagementScore = () => {
-    if (previousActivity.type === 'activity_rating') {
-      return Math.min(Math.floor((previousActivity.duration_seconds || 0) / 60), 5).toString();
+    if (displayActivity.duration_seconds) {
+      return Math.min(Math.floor(displayActivity.duration_seconds / 60), 5).toString();
     }
-    return Math.floor((previousActivity.duration_seconds || 0) / 100).toString() || '2';
+    if (displayActivity.estimated_duration_minutes) {
+      return Math.min(displayActivity.estimated_duration_minutes / 3, 5).toString();
+    }
+    return 'N/A';
   };
 
   return (
@@ -110,40 +286,48 @@ const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionPr
             PREVIOUS ACTIVITY
           </h3>
           <p className="text-gray-600 font-medium text-sm">
-            Last practice session
+            From activities table
           </p>
         </div>
       </div>
 
       <div className="space-y-4">
-        <div className={`rounded-2xl p-4 border-2 ${getStatusBgColor(previousActivity.call_status)}`}>
+        <div className={`rounded-2xl p-4 border-2 ${getStatusBgColor(displayActivity.type)}`}>
           <div className="flex items-center justify-between mb-2">
-            <span className={`font-bold text-sm ${getStatusColor(previousActivity.call_status)}`}>
-              {previousActivity.activity_name || 'Practice Session'}
+            <span className={`font-bold text-sm ${getStatusColor(displayActivity.type)}`}>
+              {displayActivity.name || 'Practice Activity'}
             </span>
-            <span className={`font-bold text-sm ${getStatusColor(previousActivity.call_status)}`}>
-              {previousActivity.call_status?.toUpperCase() || 'COMPLETED'}
+            <span className={`font-bold text-sm ${getStatusColor(displayActivity.type)}`}>
+              {getStatusText(displayActivity)}
             </span>
           </div>
           <div className="flex items-center justify-between mb-2">
-            <span className={`font-bold text-sm ${getStatusColor(previousActivity.call_status)}`}>Duration</span>
-            <span className={`font-bold ${getStatusColor(previousActivity.call_status)}`}>
-              {formatDuration(previousActivity.duration_seconds || 0)}
+            <span className={`font-bold text-sm ${getStatusColor(displayActivity.type)}`}>Duration</span>
+            <span className={`font-bold ${getStatusColor(displayActivity.type)}`}>
+              {displayActivity.duration_seconds 
+                ? formatDuration(displayActivity.duration_seconds)
+                : `~${displayActivity.estimated_duration_minutes || 10}min`
+              }
             </span>
           </div>
-          <div className={`text-xs ${getStatusColor(previousActivity.call_status)} opacity-70`}>
-            Completed on {new Date(previousActivity.completed_at).toLocaleDateString()}
-          </div>
-          {previousActivity.activity_description && (
-            <div className={`text-xs ${getStatusColor(previousActivity.call_status)} opacity-60 mt-1`}>
-              {previousActivity.activity_description}
+          {displayActivity.completed_at && (
+            <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-70`}>
+              Completed on {new Date(displayActivity.completed_at).toLocaleDateString()}
             </div>
           )}
-          {previousActivity.source && (
-            <div className={`text-xs ${getStatusColor(previousActivity.call_status)} opacity-50 mt-1`}>
-              Source: {previousActivity.source === 'user_activity' ? 'Activity Practice' : 'Voice Call'}
+          {displayActivity.description && (
+            <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-60 mt-1`}>
+              {displayActivity.description}
             </div>
           )}
+          {displayActivity.difficulty_level && (
+            <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-50 mt-1`}>
+              Difficulty: {displayActivity.difficulty_level}
+            </div>
+          )}
+          <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-50 mt-1`}>
+            Source: {displayActivity.source || 'activities_table'}
+          </div>
         </div>
 
         {/* Conversation Summary Section */}
@@ -183,6 +367,18 @@ const PreviousActivitySection = ({ previousActivity }: PreviousActivitySectionPr
             <div className="text-xs text-orange-600 font-bold uppercase">Engagement</div>
           </div>
         </div>
+
+        {/* Debug Information */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="bg-gray-100 rounded-2xl p-3 text-xs">
+            <div className="font-bold mb-1">Debug Info:</div>
+            <div>Activity Type: {displayActivity.type}</div>
+            <div>Activity ID: {displayActivity.id}</div>
+            <div>Source: {displayActivity.source}</div>
+            <div>Activities in DB: {activitiesTest?.count || 0}</div>
+            <div>User Ratings: {ratingsTest?.count || 0}</div>
+          </div>
+        )}
       </div>
     </div>
   );
