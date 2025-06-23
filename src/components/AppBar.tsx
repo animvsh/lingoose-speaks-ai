@@ -13,12 +13,18 @@ interface AppBarProps {
 const AppBar = ({ title, onBack, showBackButton = true, showLogo = false }: AppBarProps) => {
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 safe-area-bottom"
+      className="bg-amber-50 border-t border-gray-100 safe-area-bottom"
       style={{ 
         position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
         zIndex: 9999,
-        transform: 'translateZ(0)',
-        WebkitTransform: 'translateZ(0)'
+        transform: 'translate3d(0, 0, 0)',
+        WebkitTransform: 'translate3d(0, 0, 0)',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        willChange: 'transform'
       }}
     >
       <div className="px-6 py-4">
