@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import WelcomeScreen from "@/components/WelcomeScreen";
@@ -176,26 +175,24 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-amber-50 relative">
-      {/* Single App Bar - only shown when needed */}
-      {shouldShowAppBar() && (
-        <div className="relative z-10">
-          <AppBar 
-            title={getAppBarTitle()}
-            onBack={handleBackNavigation}
-            showBackButton={currentView !== 'home'}
-            showLogo={false}
-          />
-        </div>
-      )}
-      
+    <div className="min-h-screen bg-amber-50 relative">      
       {/* Main Content */}
-      <div className={`${shouldShowBottomNav ? "pb-24" : ""} ${shouldShowAppBar() ? "" : ""} relative z-0`}>
+      <div className={`${shouldShowBottomNav && !shouldShowAppBar() ? "pb-24" : ""} ${shouldShowAppBar() ? "pb-20" : ""} relative z-0`}>
         {renderCurrentView()}
       </div>
       
-      {/* Bottom Navigation */}
-      {shouldShowBottomNav && (
+      {/* App Bar - fixed at bottom when needed */}
+      {shouldShowAppBar() && (
+        <AppBar 
+          title={getAppBarTitle()}
+          onBack={handleBackNavigation}
+          showBackButton={currentView !== 'home'}
+          showLogo={false}
+        />
+      )}
+      
+      {/* Bottom Navigation - only show when app bar is not shown */}
+      {shouldShowBottomNav && !shouldShowAppBar() && (
         <div className="relative z-50">
           <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
         </div>
