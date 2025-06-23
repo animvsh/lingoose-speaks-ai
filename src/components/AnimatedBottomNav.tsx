@@ -47,7 +47,7 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
                   transform active:scale-95 hover:scale-110 
                   mobile-touch-target select-none
                   ${isActive 
-                    ? 'bg-blue-400 text-white shadow-lg scale-105 shadow-blue-200' 
+                    ? 'bg-blue-400 text-white scale-105' 
                     : 'bg-gray-200 text-gray-600 hover:bg-gray-300 active:bg-gray-400'
                   }
                 `}

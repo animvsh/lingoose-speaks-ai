@@ -42,7 +42,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
 
   return (
     <div className="min-h-screen bg-amber-50">
-      <div className="px-6 space-y-6 pb-6 pt-8">
+      <div className="px-6 space-y-6 pb-6 pt-8 overflow-hidden">
         {/* Welcome Header */}
         <div className="text-center pt-4 animate-fade-in">
           <h2 className="text-3xl font-bold text-orange-600 mb-2 uppercase tracking-wide">
@@ -54,12 +54,12 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
         </div>
 
         {/* Main Stats Grid - 2x2 layout with enhanced interactions */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 overflow-hidden">
           {/* Total Calls - Bright Orange */}
           <Card 
             className="bg-orange-300 border-4 border-orange-600 rounded-2xl overflow-hidden 
                        transform transition-all duration-150 ease-out 
-                       hover:scale-105 active:scale-95 hover:shadow-xl 
+                       hover:scale-105 active:scale-95
                        cursor-pointer select-none animate-fade-in"
             onClick={() => handleCardClick(() => onNavigate('activity'))}
             onTouchStart={() => {
@@ -89,7 +89,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           <Card 
             className="bg-green-300 border-4 border-green-600 rounded-2xl overflow-hidden 
                        transform transition-all duration-150 ease-out 
-                       hover:scale-105 active:scale-95 hover:shadow-xl 
+                       hover:scale-105 active:scale-95
                        cursor-pointer select-none animate-fade-in" 
             style={{ animationDelay: '0.05s' }}
             onClick={() => handleCardClick(() => onNavigate('activity'))}
@@ -120,7 +120,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           <Card 
             className="bg-yellow-300 border-4 border-yellow-600 rounded-2xl overflow-hidden 
                        transform transition-all duration-150 ease-out 
-                       hover:scale-105 active:scale-95 hover:shadow-xl 
+                       hover:scale-105 active:scale-95
                        cursor-pointer select-none animate-fade-in" 
             style={{ animationDelay: '0.1s' }}
             onClick={() => handleCardClick(() => onNavigate('curriculum'))}
@@ -151,7 +151,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           <Card 
             className="bg-red-300 border-4 border-red-600 rounded-2xl overflow-hidden 
                        transform transition-all duration-150 ease-out 
-                       hover:scale-105 active:scale-95 hover:shadow-xl 
+                       hover:scale-105 active:scale-95
                        cursor-pointer select-none animate-fade-in" 
             style={{ animationDelay: '0.15s' }}
             onClick={() => handleCardClick(() => onNavigate('settings'))}
@@ -179,11 +179,11 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </Card>
         </div>
 
-        {/* Achievement Banner - Enhanced interactions */}
+        {/* Achievement Banner */}
         <Card 
           className="bg-purple-300 border-4 border-purple-600 rounded-2xl overflow-hidden 
                      transform transition-all duration-150 ease-out 
-                     hover:scale-102 active:scale-98 hover:shadow-xl 
+                     hover:scale-102 active:scale-98
                      cursor-pointer select-none animate-fade-in" 
           style={{ animationDelay: '0.2s' }}
           onClick={() => handleCardClick(() => onNavigate('activity'))}
@@ -192,23 +192,23 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           }}
         >
           <CardContent className="p-4">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 overflow-hidden">
               <div className="w-16 h-16 bg-purple-600 border-3 border-purple-800 rounded-2xl flex items-center justify-center
-                             transition-transform duration-150 hover:scale-110">
+                             transition-transform duration-150 hover:scale-110 flex-shrink-0">
                 <Trophy className="w-8 h-8 text-white" />
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-black text-purple-900 mb-2 uppercase tracking-wide">
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <h3 className="text-xl font-black text-purple-900 mb-2 uppercase tracking-wide truncate">
                   {totalCalls > 0 ? `Great Progress! 🎉` : `Ready to Start? 🚀`}
                 </h3>
-                <p className="text-purple-800 font-bold">
+                <p className="text-purple-800 font-bold truncate">
                   {totalCalls > 0 
                     ? `You've completed ${totalCalls} practice sessions!`
                     : `Start your first conversation to see your progress here!`
                   }
                 </p>
               </div>
-              <div className="text-right">
+              <div className="text-right flex-shrink-0">
                 <div className="text-3xl font-black text-purple-900">{avgRating > 0 ? avgRating : 'N/A'}</div>
                 <div className="text-sm text-purple-800 font-bold uppercase">avg rating</div>
               </div>
@@ -216,13 +216,13 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </CardContent>
         </Card>
 
-        {/* Quick Stats Row - Enhanced with faster interactions */}
-        <div className="grid grid-cols-3 gap-4">
+        {/* Quick Stats Row */}
+        <div className="grid grid-cols-3 gap-4 overflow-hidden">
           <div 
             className="bg-pink-300 border-4 border-pink-600 p-4 rounded-2xl text-center 
                        transform transition-all duration-150 ease-out 
-                       hover:scale-105 active:scale-95 hover:shadow-lg 
-                       cursor-pointer select-none animate-fade-in" 
+                       hover:scale-105 active:scale-95
+                       cursor-pointer select-none animate-fade-in overflow-hidden" 
             style={{ animationDelay: '0.25s' }}
             onClick={() => handleCardClick()}
             onTouchStart={() => {
@@ -242,8 +242,8 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           <div 
             className="bg-blue-300 border-4 border-blue-600 p-4 rounded-2xl text-center 
                        transform transition-all duration-150 ease-out 
-                       hover:scale-105 active:scale-95 hover:shadow-lg 
-                       cursor-pointer select-none animate-fade-in" 
+                       hover:scale-105 active:scale-95
+                       cursor-pointer select-none animate-fade-in overflow-hidden" 
             style={{ animationDelay: '0.3s' }}
             onClick={() => handleCardClick(() => onNavigate('curriculum'))}
             onTouchStart={() => {
@@ -263,8 +263,8 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           <div 
             className="bg-teal-300 border-4 border-teal-600 p-4 rounded-2xl text-center 
                        transform transition-all duration-150 ease-out 
-                       hover:scale-105 active:scale-95 hover:shadow-lg 
-                       cursor-pointer select-none animate-fade-in" 
+                       hover:scale-105 active:scale-95
+                       cursor-pointer select-none animate-fade-in overflow-hidden" 
             style={{ animationDelay: '0.35s' }}
             onClick={() => handleCardClick()}
             onTouchStart={() => {

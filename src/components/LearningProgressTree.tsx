@@ -65,22 +65,22 @@ const LearningProgressTree = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-hidden">
       {/* Header */}
       <div className="bg-purple-400 rounded-3xl p-6 border-4 border-purple-500">
         <div className="flex items-center">
           <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center mr-4">
             <Target className="w-7 h-7 text-white" />
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-white uppercase tracking-wide">LEARNING PROGRESS</h3>
-            <p className="text-purple-100 font-medium text-sm">{selectedOutline.name}</p>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wide truncate">LEARNING PROGRESS</h3>
+            <p className="text-purple-100 font-medium text-sm truncate">{selectedOutline.name}</p>
           </div>
         </div>
       </div>
 
       {/* Units */}
-      <div className="space-y-4">
+      <div className="space-y-4 overflow-hidden">
         {units.map((unit, index) => {
           const progress = getUnitProgress(unit.id);
           const isExpanded = expandedUnits.has(unit.id);
@@ -88,17 +88,16 @@ const LearningProgressTree = () => {
           const colors = getUnitColor(index);
           
           return (
-            <div key={unit.id} className="relative">
+            <div key={unit.id} className="relative overflow-hidden">
               <div 
-                className={`${colors.bg} rounded-3xl p-6 border-4 ${colors.border} ${
-                  "cursor-pointer hover:scale-[1.02] transition-transform"
-                }`}
+                className={`${colors.bg} rounded-3xl p-6 border-4 ${colors.border} 
+                           cursor-pointer hover:scale-[1.02] transition-transform overflow-hidden`}
                 onClick={() => toggleUnit(unit.id)}
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-4 flex-1">
+                  <div className="flex items-start space-x-4 flex-1 min-w-0 overflow-hidden">
                     {/* Progress Circle */}
-                    <div className={`w-16 h-16 ${colors.icon} rounded-2xl flex items-center justify-center border-2 ${colors.border}`}>
+                    <div className={`w-16 h-16 ${colors.icon} rounded-2xl flex items-center justify-center border-2 ${colors.border} flex-shrink-0`}>
                       {isLocked ? (
                         <Lock className="w-6 h-6 text-white" />
                       ) : progress === 100 ? (
@@ -109,11 +108,11 @@ const LearningProgressTree = () => {
                     </div>
 
                     {/* Unit Info */}
-                    <div className="flex-1 min-w-0">
-                      <h4 className={`font-bold text-lg ${isLocked ? "text-gray-600" : "text-white"} uppercase tracking-wide`}>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <h4 className={`font-bold text-lg ${isLocked ? "text-gray-600" : "text-white"} uppercase tracking-wide truncate`}>
                         {unit.name}
                       </h4>
-                      <p className={`text-sm font-medium ${isLocked ? "text-gray-500" : colors.text.replace('800', '100')}`}>
+                      <p className={`text-sm font-medium ${isLocked ? "text-gray-500" : colors.text.replace('800', '100')} truncate`}>
                         {unit.description}
                       </p>
                       
@@ -130,7 +129,7 @@ const LearningProgressTree = () => {
                   </div>
 
                   {/* Expand Arrow */}
-                  <div className="ml-4 flex items-center">
+                  <div className="ml-4 flex items-center flex-shrink-0">
                     {isExpanded ? (
                       <ChevronDown className="w-6 h-6 text-white" />
                     ) : (
@@ -189,7 +188,7 @@ const UnitSkills = ({
   };
 
   return (
-    <div className="ml-4 mt-4 space-y-3">
+    <div className="ml-4 mt-4 space-y-3 overflow-hidden">
       {skills.map((skill, index) => {
         const progress = getSkillProgress(skill.id, index);
         const isCompleted = progress >= 80;
@@ -198,11 +197,13 @@ const UnitSkills = ({
         return (
           <div 
             key={skill.id} 
-            className={`${colorClass} rounded-2xl p-4 border-2 ${isLocked ? "opacity-60" : "cursor-pointer hover:scale-[1.02] transition-transform"}`}
+            className={`${colorClass} rounded-2xl p-4 border-2 overflow-hidden ${
+              isLocked ? "opacity-60" : "cursor-pointer hover:scale-[1.02] transition-transform"
+            }`}
             onClick={() => !isLocked && onSkillClick(skill)}
           >
-            <div className="flex items-center space-x-3">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+            <div className="flex items-center space-x-3 min-w-0">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                 isLocked ? "bg-gray-500" : isCompleted ? "bg-green-600" : "bg-gray-600"
               }`}>
                 {isLocked ? (
@@ -213,13 +214,13 @@ const UnitSkills = ({
                   <span className="text-sm font-bold text-white">{index + 1}</span>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <h5 className={`font-bold text-sm uppercase tracking-wide ${isLocked ? "text-gray-600" : "text-gray-800"}`}>
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <h5 className={`font-bold text-sm uppercase tracking-wide truncate ${isLocked ? "text-gray-600" : "text-gray-800"}`}>
                   {skill.name}
                   {isLocked && <span className="text-xs ml-2 text-gray-500">(LOCKED)</span>}
                   {!isLocked && <span className="text-xs ml-2 text-gray-500">(Click for details)</span>}
                 </h5>
-                <div className="w-full bg-white/50 h-2 rounded-full mt-2">
+                <div className="w-full bg-white/50 h-2 rounded-full mt-2 overflow-hidden">
                   <div 
                     className={`h-2 rounded-full transition-all duration-300 ${
                       isLocked ? "bg-gray-400" : 
@@ -229,7 +230,7 @@ const UnitSkills = ({
                   ></div>
                 </div>
               </div>
-              <span className={`text-sm font-bold ${isLocked ? "text-gray-600" : "text-gray-800"}`}>
+              <span className={`text-sm font-bold flex-shrink-0 ${isLocked ? "text-gray-600" : "text-gray-800"}`}>
                 {progress}%
               </span>
             </div>
