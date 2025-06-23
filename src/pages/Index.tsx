@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import WelcomeScreen from "@/components/WelcomeScreen";
@@ -108,7 +109,7 @@ const Index = () => {
         </div>
       </div>
     );
-  }
+  };
 
   const renderCurrentView = () => {
     if (currentView === "welcome") {
@@ -175,9 +176,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-amber-50 relative">      
-      {/* Main Content */}
-      <div className={`${shouldShowBottomNav && !shouldShowAppBar() ? "pb-24" : ""} ${shouldShowAppBar() ? "pb-20" : ""} relative z-0`}>
+    <div className="min-h-screen bg-amber-50">      
+      {/* Main Content with proper bottom spacing */}
+      <div className={`min-h-screen ${shouldShowBottomNav ? "pb-24" : ""} ${shouldShowAppBar() ? "pb-24" : ""}`}>
         {renderCurrentView()}
       </div>
       
@@ -193,9 +194,7 @@ const Index = () => {
       
       {/* Bottom Navigation - only show when app bar is not shown */}
       {shouldShowBottomNav && !shouldShowAppBar() && (
-        <div className="relative z-50">
-          <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
-        </div>
+        <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
       )}
     </div>
   );
