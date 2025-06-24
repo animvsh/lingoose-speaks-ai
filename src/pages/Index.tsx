@@ -176,9 +176,12 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-amber-50">      
-      {/* Main Content with proper bottom spacing */}
-      <div className={`min-h-screen ${shouldShowBottomNav ? "pb-24" : ""} ${shouldShowAppBar() ? "pb-24" : ""}`}>
+    <div className="min-h-screen bg-amber-50 relative">      
+      {/* Main Content with proper bottom spacing and scrollable container */}
+      <div 
+        className={`min-h-screen ${shouldShowBottomNav ? "pb-24" : ""} ${shouldShowAppBar() ? "pb-24" : ""}`}
+        style={{ position: 'relative', zIndex: 1 }}
+      >
         {renderCurrentView()}
       </div>
       
