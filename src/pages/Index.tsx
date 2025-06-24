@@ -9,8 +9,6 @@ import CurriculumCard from "@/components/CurriculumCard";
 import SettingsCard from "@/components/SettingsCard";
 import ActivityDetailsView from "@/components/ActivityDetailsView";
 import AnimatedBottomNav from "@/components/AnimatedBottomNav";
-import NavigationTransition from "@/components/NavigationTransition";
-import AppBar from "@/components/AppBar";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -51,52 +49,15 @@ const Index = () => {
   const handleNavigate = (view: string, data?: any) => {
     setIsTransitioning(true);
     
-    // Immediate haptic feedback
-    if ('vibrate' in navigator) {
-      navigator.vibrate(25);
-    }
-    
-    // Ultra-fast transition for maximum responsiveness
+    // Faster transition for better responsiveness
     setTimeout(() => {
       if (view === 'activity-details' && data) {
         setActivityDetailsData(data);
       }
       setCurrentView(view);
       setIsTransitioning(false);
-    }, 50);
+    }, 100); // Reduced from 150ms to 100ms
   };
-
-  const handleBackNavigation = () => {
-    if (currentView === 'activity-details') {
-      setCurrentView('activity');
-    } else if (currentView !== 'home') {
-      setCurrentView('home');
-    }
-  };
-
-  const getAppBarTitle = () => {
-    switch (currentView) {
-      case 'activity':
-        return 'Activity';
-      case 'activity-details':
-        return 'Call Details';
-      case 'curriculum':
-        return 'Curriculum';
-      case 'settings':
-        return 'Settings';
-      default:
-        return 'Dashboard';
-    }
-  };
-
-  const shouldShowAppBar = () => {
-    return isOnboarded && user && 
-           currentView !== "welcome" && 
-           currentView !== "onboarding" && 
-           currentView !== "home";
-  };
-
-  const shouldShowBottomNav = isOnboarded && user && currentView !== "welcome" && currentView !== "onboarding";
 
   if (loading) {
     return (
@@ -109,94 +70,86 @@ const Index = () => {
         </div>
       </div>
     );
-  };
+  }
 
   const renderCurrentView = () => {
+    // Faster, more responsive transitions
+    const baseClasses = `transition-all duration-200 ease-out ${
+      isTransitioning ? 'opacity-0 scale-98' : 'opacity-100 scale-100'
+    }`;
+
     if (currentView === "welcome") {
       return (
-        <NavigationTransition isVisible={!isTransitioning} direction="fade">
+        <div className={baseClasses}>
           <WelcomeScreen onComplete={handleWelcomeComplete} />
-        </NavigationTransition>
+        </div>
       );
     }
 
     if (currentView === "onboarding" && !isOnboarded) {
       return (
-        <NavigationTransition isVisible={!isTransitioning} direction="slide-right">
+        <div className={baseClasses}>
           <OnboardingFlow onComplete={handleOnboardingComplete} />
-        </NavigationTransition>
+        </div>
       );
     }
 
     if (currentView === "home") {
       return (
-        <NavigationTransition isVisible={!isTransitioning} direction="fade">
+        <div className={baseClasses}>
           <DashboardStats onNavigate={handleNavigate} />
-        </NavigationTransition>
+        </div>
       );
     }
 
     if (currentView === "activity") {
       return (
-        <NavigationTransition isVisible={!isTransitioning} direction="slide-left">
+        <div className={baseClasses}>
           <ActivityCard onNavigate={handleNavigate} />
-        </NavigationTransition>
+        </div>
       );
     }
 
     if (currentView === "activity-details") {
       return (
-        <NavigationTransition isVisible={!isTransitioning} direction="scale">
+        <div className={baseClasses}>
           <ActivityDetailsView activity={activityDetailsData} onNavigate={handleNavigate} />
-        </NavigationTransition>
+        </div>
       );
     }
 
     if (currentView === "curriculum") {
       return (
-        <NavigationTransition isVisible={!isTransitioning} direction="slide-right">
+        <div className={baseClasses}>
           <CurriculumCard onNavigate={handleNavigate} />
-        </NavigationTransition>
+        </div>
       );
     }
 
     if (currentView === "settings") {
       return (
-        <NavigationTransition isVisible={!isTransitioning} direction="slide-left">
+        <div className={baseClasses}>
           <SettingsCard onNavigate={handleNavigate} />
-        </NavigationTransition>
+        </div>
       );
     }
 
     return (
-      <NavigationTransition isVisible={!isTransitioning} direction="fade">
+      <div className={baseClasses}>
         <DashboardStats onNavigate={handleNavigate} />
-      </NavigationTransition>
+      </div>
     );
   };
 
+  const shouldShowBottomNav = isOnboarded && user && currentView !== "welcome" && currentView !== "onboarding";
+
   return (
-    <div className="min-h-screen bg-amber-50 relative">      
-      {/* Main Content with proper bottom spacing and scrollable container */}
-      <div 
-        className={`min-h-screen ${shouldShowBottomNav ? "pb-24" : ""} ${shouldShowAppBar() ? "pb-24" : ""}`}
-        style={{ position: 'relative', zIndex: 1 }}
-      >
+    <div className="min-h-screen bg-amber-50 overflow-hidden">
+      <div className={shouldShowBottomNav ? "pb-24" : ""}>
         {renderCurrentView()}
       </div>
       
-      {/* App Bar - fixed at bottom when needed */}
-      {shouldShowAppBar() && (
-        <AppBar 
-          title={getAppBarTitle()}
-          onBack={handleBackNavigation}
-          showBackButton={currentView !== 'home'}
-          showLogo={false}
-        />
-      )}
-      
-      {/* Bottom Navigation - only show when app bar is not shown */}
-      {shouldShowBottomNav && !shouldShowAppBar() && (
+      {shouldShowBottomNav && (
         <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
       )}
     </div>

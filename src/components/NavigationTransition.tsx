@@ -13,38 +13,38 @@ const NavigationTransition = ({
   direction = 'fade' 
 }: NavigationTransitionProps) => {
   const getTransitionClasses = () => {
-    const baseClasses = "transition-all duration-150 ease-out transform-gpu";
+    const baseClasses = "transition-all duration-300 ease-in-out";
     
     switch (direction) {
       case 'slide-right':
         return `${baseClasses} ${
           isVisible 
-            ? 'translate-x-0 opacity-100 scale-100' 
-            : 'translate-x-8 opacity-0 scale-98'
+            ? 'translate-x-0 opacity-100' 
+            : 'translate-x-full opacity-0'
         }`;
       case 'slide-left':
         return `${baseClasses} ${
           isVisible 
-            ? 'translate-x-0 opacity-100 scale-100' 
-            : '-translate-x-8 opacity-0 scale-98'
+            ? 'translate-x-0 opacity-100' 
+            : '-translate-x-full opacity-0'
         }`;
       case 'scale':
         return `${baseClasses} ${
           isVisible 
             ? 'scale-100 opacity-100' 
-            : 'scale-96 opacity-0'
+            : 'scale-95 opacity-0'
         }`;
       default: // fade
         return `${baseClasses} ${
           isVisible 
-            ? 'opacity-100 translate-y-0 scale-100' 
-            : 'opacity-0 translate-y-1 scale-99'
+            ? 'opacity-100 translate-y-0' 
+            : 'opacity-0 translate-y-2'
         }`;
     }
   };
 
   return (
-    <div className={`${getTransitionClasses()} will-change-transform`}>
+    <div className={getTransitionClasses()}>
       {children}
     </div>
   );
