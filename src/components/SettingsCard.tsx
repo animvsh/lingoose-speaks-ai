@@ -4,6 +4,7 @@ import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, Ch
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
+import { posthogService } from "@/services/posthog";
 import AppBar from "./AppBar";
 
 interface SettingsCardProps {
@@ -60,6 +61,25 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
     
     setLastTestEvent(`${eventName} at ${timestamp}`);
     console.log('PostHog test event sent:', eventName, timestamp);
+  };
+
+  const handleManualEvent = () => {
+    const timestamp = new Date().toLocaleTimeString();
+    
+    // Direct PostHog service call like your example
+    if (posthogService) {
+      posthogService.capture('my event', 'manual_test_user', { 
+        property: 'value',
+        timestamp: timestamp,
+        source: 'manual_debug_test'
+      });
+      
+      setLastTestEvent(`'my event' with property: 'value' at ${timestamp}`);
+      console.log('Manual PostHog event sent: my event', { property: 'value', timestamp });
+    } else {
+      console.warn('PostHog service not available');
+      setLastTestEvent('PostHog service not available');
+    }
   };
 
   const handleAddToHomeScreen = async () => {
@@ -137,7 +157,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
         {/* Analytics Debug Section */}
         <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
           <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
-            Analytics Debug
+            Analytics Debug ⚡
           </h3>
           
           <div className="space-y-4">
@@ -158,7 +178,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
             <div className="flex items-center justify-between py-3 border-b border-gray-200">
               <div className="flex items-center">
                 <Bug className="w-5 h-5 mr-3 text-blue-500" />
-                <span className="text-gray-700 font-medium">Test Event</span>
+                <span className="text-gray-700 font-medium">Hook Test Event</span>
               </div>
               <Button 
                 variant="outline" 
@@ -167,7 +187,23 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
                 disabled={!isInitialized}
                 className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 disabled:opacity-50"
               >
-                Send Test
+                Send Hook Test
+              </Button>
+            </div>
+            
+            <div className="flex items-center justify-between py-3 border-b border-gray-200">
+              <div className="flex items-center">
+                <Settings className="w-5 h-5 mr-3 text-purple-500" />
+                <span className="text-gray-700 font-medium">Manual Event Test</span>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleManualEvent}
+                disabled={!isInitialized}
+                className="bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100 disabled:opacity-50"
+              >
+                Send Manual Event
               </Button>
             </div>
             
@@ -184,7 +220,10 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
             
             <div className="bg-yellow-50 rounded-lg p-3">
               <p className="text-sm text-yellow-800">
-                <strong>Tracked Events:</strong> Sign up, Sign in, Sign out, OTP sends, Activity starts, Profile updates
+                <strong>Manual Event Format:</strong> posthog.capture('my event', {`{ property: 'value' }`})
+              </p>
+              <p className="text-xs text-yellow-600 mt-1">
+                The "Send Manual Event" button sends exactly this format to PostHog
               </p>
             </div>
           </div>
