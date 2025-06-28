@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,12 +21,8 @@ function App() {
     const POSTHOG_API_KEY = 'phc_gWiJt0Hk9hP4ZNfBCWmqKiMwQOHvxowdJtxQ49jGu8J';
     const POSTHOG_HOST = 'https://us.i.posthog.com';
     
-    if (POSTHOG_API_KEY && POSTHOG_API_KEY !== 'your-posthog-api-key-here') {
-      initializePostHog(POSTHOG_API_KEY, POSTHOG_HOST);
-      console.log('PostHog initialized with API key');
-    } else {
-      console.warn('PostHog API key not configured');
-    }
+    initializePostHog(POSTHOG_API_KEY, POSTHOG_HOST);
+    console.log('PostHog initialized with API key');
 
     // Show splash screen for at least 2 seconds to mask any initial loading
     const timer = setTimeout(() => {
