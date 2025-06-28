@@ -6,19 +6,31 @@ import { useAuth } from '@/contexts/AuthContext';
 export const usePostHog = () => {
   const { user } = useAuth();
 
-  const capture = useCallback((event: string, properties?: Record<string, any>) => {
+  const capture = useCallback(async (event: string, properties?: Record<string, any>) => {
     if (!posthogService) {
       console.warn('PostHog not initialized');
-      return;
+      return false;
     }
 
     const distinctId = user?.id || user?.phone_number || 'anonymous';
-    posthogService.capture(event, distinctId, {
-      user_id: user?.id,
-      phone_number: user?.phone_number,
-      full_name: user?.full_name,
-      ...properties
-    });
+    
+    try {
+      const success = await posthogService.capture(event, distinctId, {
+        user_id: user?.id,
+        phone_number: user?.phone_number,
+        full_name: user?.full_name,
+        ...properties
+      });
+
+      if (!success) {
+        console.warn(`Failed to send PostHog event: ${event}`);
+      }
+      
+      return success;
+    } catch (error) {
+      console.error('PostHog capture error:', error);
+      return false;
+    }
   }, [user]);
 
   const captureQueued = useCallback((event: string, properties?: Record<string, any>) => {
@@ -36,14 +48,14 @@ export const usePostHog = () => {
     });
   }, [user]);
 
-  const identify = useCallback((properties?: Record<string, any>) => {
+  const identify = useCallback(async (properties?: Record<string, any>) => {
     if (!posthogService || !user) {
       console.warn('PostHog not initialized or user not available');
-      return;
+      return false;
     }
 
     const distinctId = user.id || user.phone_number;
-    posthogService.identify(distinctId, {
+    return await posthogService.identify(distinctId, {
       user_id: user.id,
       phone_number: user.phone_number,
       full_name: user.full_name,
@@ -53,14 +65,14 @@ export const usePostHog = () => {
     });
   }, [user]);
 
-  const pageView = useCallback((properties?: Record<string, any>) => {
+  const pageView = useCallback(async (properties?: Record<string, any>) => {
     if (!posthogService) {
       console.warn('PostHog not initialized');
-      return;
+      return false;
     }
 
     const distinctId = user?.id || user?.phone_number || 'anonymous';
-    posthogService.pageView(distinctId, {
+    return await posthogService.pageView(distinctId, {
       user_id: user?.id,
       phone_number: user?.phone_number,
       full_name: user?.full_name,
@@ -203,6 +215,10 @@ export const usePostHog = () => {
     });
   }, [user]);
 
+  const getDebugInfo = useCallback(() => {
+    return posthogService?.getDebugInfo() || { error: 'PostHog not initialized' };
+  }, []);
+
   return {
     capture,
     captureQueued,
@@ -240,6 +256,7 @@ export const usePostHog = () => {
     
     // Debug
     testWebhook,
+    getDebugInfo,
     isInitialized: posthogService?.getInitializationStatus() ?? false
   };
 };

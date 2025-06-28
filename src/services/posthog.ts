@@ -23,6 +23,8 @@ class PostHogService {
   private readonly BATCH_SIZE = 10;
   private readonly BATCH_TIMEOUT = 5000; // 5 seconds
   private isInitialized: boolean = false;
+  private retryAttempts: number = 3;
+  private retryDelay: number = 1000;
 
   constructor(apiKey: string, host: string = 'https://us.i.posthog.com') {
     this.apiKey = apiKey;
@@ -34,6 +36,54 @@ class PostHogService {
   // Check if PostHog is properly initialized
   getInitializationStatus(): boolean {
     return this.isInitialized && !!this.apiKey;
+  }
+
+  // Enhanced fetch with retry logic and better error handling
+  private async fetchWithRetry(url: string, options: RequestInit, retries: number = this.retryAttempts): Promise<Response> {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        console.log(`PostHog request attempt ${attempt}/${retries} to ${url}`);
+        
+        const response = await fetch(url, {
+          ...options,
+          mode: 'cors',
+          credentials: 'omit', // Don't send credentials for CORS
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            ...options.headers
+          }
+        });
+
+        if (response.ok) {
+          console.log(`PostHog request successful on attempt ${attempt}`);
+          return response;
+        }
+
+        console.warn(`PostHog request failed with status ${response.status} on attempt ${attempt}`);
+        
+        // If it's the last attempt, throw the error
+        if (attempt === retries) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, this.retryDelay * attempt));
+        
+      } catch (error) {
+        console.error(`PostHog request attempt ${attempt} failed:`, error);
+        
+        // If it's the last attempt, throw the error
+        if (attempt === retries) {
+          throw error;
+        }
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, this.retryDelay * attempt));
+      }
+    }
+    
+    throw new Error('All retry attempts failed');
   }
 
   // Test method using webhook.site for debugging
@@ -54,34 +104,26 @@ class PostHogService {
     console.log('Sending test event to webhook.site:', eventData);
 
     try {
-      const response = await fetch(webhookUrl, {
+      const response = await this.fetchWithRetry(webhookUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(eventData)
       });
 
-      console.log('Webhook test response:', response.status, response.statusText);
-      
-      if (!response.ok) {
-        console.error('Webhook test failed:', response.status, response.statusText);
-      } else {
-        console.log('Webhook test successful - your integration code is working!');
-      }
+      console.log('Webhook test successful - your integration code is working!');
     } catch (error) {
       console.error('Webhook test error:', error);
     }
   }
 
-  // Send a single event immediately
-  async capture(event: string, distinctId: string, properties?: Record<string, any>): Promise<void> {
+  // Send a single event with improved error handling
+  async capture(event: string, distinctId: string, properties?: Record<string, any>): Promise<boolean> {
     if (!this.isInitialized || !this.apiKey) {
       console.error('PostHog not properly initialized');
-      return;
+      return false;
     }
 
-    const eventData: PostHogEvent = {
+    const eventData = {
+      api_key: this.apiKey,
       event,
       distinct_id: distinctId,
       properties: {
@@ -95,34 +137,37 @@ class PostHogService {
     console.log('Sending PostHog event:', { event, distinctId, properties });
 
     try {
-      const response = await fetch(`${this.host}/i/v0/e/`, {
+      // Try the standard PostHog endpoint first
+      await this.fetchWithRetry(`${this.host}/capture/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          api_key: this.apiKey,
-          ...eventData
-        }),
-        mode: 'cors' // Explicitly set CORS mode
+        body: JSON.stringify(eventData)
       });
 
-      console.log('PostHog response:', response.status, response.statusText);
-
-      if (!response.ok) {
-        console.error('PostHog event failed:', response.status, response.statusText);
-        const responseText = await response.text();
-        console.error('Response body:', responseText);
-      } else {
-        console.log('PostHog event sent successfully');
-      }
+      console.log('PostHog event sent successfully via /capture/');
+      return true;
     } catch (error) {
-      console.error('PostHog capture error:', error);
-      console.error('This could be due to ad blockers, CORS issues, or network problems');
+      console.warn('Failed to send via /capture/, trying /e/ endpoint:', error);
+      
+      // Fallback to the alternative endpoint
+      try {
+        await this.fetchWithRetry(`${this.host}/e/`, {
+          method: 'POST',
+          body: JSON.stringify(eventData)
+        });
+
+        console.log('PostHog event sent successfully via /e/');
+        return true;
+      } catch (fallbackError) {
+        console.error('All PostHog endpoints failed:', fallbackError);
+        
+        // Queue the event for later retry
+        this.captureQueued(event, distinctId, properties);
+        return false;
+      }
     }
   }
 
-  // Add event to queue for batching
+  // Add event to queue for batching with improved error handling
   captureQueued(event: string, distinctId: string, properties?: Record<string, any>): void {
     if (!this.isInitialized || !this.apiKey) {
       console.error('PostHog not properly initialized');
@@ -141,6 +186,7 @@ class PostHogService {
     };
 
     this.eventQueue.push(eventData);
+    console.log(`Event queued for batch sending. Queue size: ${this.eventQueue.length}`);
 
     // Send batch if we reach the batch size
     if (this.eventQueue.length >= this.BATCH_SIZE) {
@@ -151,7 +197,7 @@ class PostHogService {
     }
   }
 
-  // Send all queued events in a batch
+  // Send all queued events in a batch with improved error handling
   private async flushBatch(): Promise<void> {
     if (this.eventQueue.length === 0) return;
 
@@ -172,24 +218,21 @@ class PostHogService {
       timestamp: event.timestamp
     }));
 
+    console.log(`Flushing batch of ${batchEvents.length} events`);
+
     try {
-      const response = await fetch(`${this.host}/batch/`, {
+      await this.fetchWithRetry(`${this.host}/batch/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           api_key: this.apiKey,
           batch: batchEvents
-        }),
-        mode: 'cors'
+        })
       });
 
-      if (!response.ok) {
-        console.error('PostHog batch failed:', response.status, response.statusText);
-      }
+      console.log('PostHog batch sent successfully');
     } catch (error) {
-      console.error('PostHog batch error:', error);
+      console.error('PostHog batch failed completely, events lost:', error);
+      // In a production app, you might want to store failed events locally
     }
   }
 
@@ -201,17 +244,17 @@ class PostHogService {
     }, this.BATCH_TIMEOUT);
   }
 
-  // Identify a user
-  async identify(distinctId: string, properties?: Record<string, any>): Promise<void> {
-    await this.capture('$identify', distinctId, {
+  // Identify a user with improved error handling
+  async identify(distinctId: string, properties?: Record<string, any>): Promise<boolean> {
+    return await this.capture('$identify', distinctId, {
       $set: properties,
       ...properties
     });
   }
 
-  // Track page view
-  async pageView(distinctId: string, properties?: Record<string, any>): Promise<void> {
-    await this.capture('$pageview', distinctId, {
+  // Track page view with improved error handling
+  async pageView(distinctId: string, properties?: Record<string, any>): Promise<boolean> {
+    return await this.capture('$pageview', distinctId, {
       $current_url: window.location.href,
       $pathname: window.location.pathname,
       $title: document.title,
@@ -223,6 +266,17 @@ class PostHogService {
   async flush(): Promise<void> {
     await this.flushBatch();
   }
+
+  // Get debug information
+  getDebugInfo(): any {
+    return {
+      initialized: this.isInitialized,
+      apiKey: this.apiKey ? this.apiKey.substring(0, 10) + '...' : 'Not set',
+      host: this.host,
+      queueSize: this.eventQueue.length,
+      hasBatchTimeout: !!this.batchTimeout
+    };
+  }
 }
 
 // Create a singleton instance
@@ -232,6 +286,7 @@ export const initializePostHog = (apiKey: string, host?: string) => {
   console.log('Initializing PostHog with API key:', apiKey.substring(0, 10) + '...');
   posthogService = new PostHogService(apiKey, host);
   console.log('PostHog service created successfully');
+  console.log('PostHog debug info:', posthogService.getDebugInfo());
   return posthogService;
 };
 
