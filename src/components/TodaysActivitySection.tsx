@@ -2,6 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Phone, RefreshCw } from "lucide-react";
 import { usePostHog } from "@/hooks/usePostHog";
+import { useEngagementTracking } from "@/hooks/useEngagementTracking";
+import { useLearningAnalytics } from "@/hooks/useLearningAnalytics";
 
 interface TodaysActivitySectionProps {
   currentActivity: any;
@@ -19,6 +21,8 @@ const TodaysActivitySection = ({
   isStartingCall 
 }: TodaysActivitySectionProps) => {
   const { trackPracticeStart, trackActivityRegenerate } = usePostHog();
+  const { trackTap } = useEngagementTracking();
+  const { trackLearningSessionStart } = useLearningAnalytics();
 
   const getRatingColor = (rating: number) => {
     if (rating < 40) return "text-red-600";
@@ -33,11 +37,30 @@ const TodaysActivitySection = ({
   };
 
   const handleRegenerateActivity = () => {
+    trackTap('regenerate_activity', 'todays_activity', {
+      activity_id: currentActivity.id,
+      activity_name: currentActivity.name
+    });
     trackActivityRegenerate(currentActivity);
     onRegenerateActivity();
   };
 
   const handleStartPractice = () => {
+    trackTap('start_practice', 'todays_activity', {
+      activity_id: currentActivity.id,
+      activity_name: currentActivity.name,
+      difficulty: currentActivity.difficulty_level || 'medium'
+    });
+
+    // Track learning session start
+    const sessionId = trackLearningSessionStart({
+      activityId: currentActivity.id,
+      activityName: currentActivity.name,
+      startTime: Date.now(),
+      difficulty: currentActivity.difficulty_level || 'medium',
+      skillsTargeted: currentActivity.skills?.map((s: any) => s.name) || []
+    });
+
     trackPracticeStart(currentActivity);
     onStartPractice();
   };

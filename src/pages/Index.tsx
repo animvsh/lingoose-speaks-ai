@@ -1,6 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
+import { useSessionTracking } from "@/hooks/useSessionTracking";
+import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import DashboardStats from "@/components/DashboardStats";
@@ -16,6 +19,8 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { trackNavigation, trackScreenView, trackOnboardingComplete, identify } = usePostHog();
+  const { trackPageView } = useSessionTracking();
+  const { trackScreenTime } = useEngagementTracking();
   const [currentView, setCurrentView] = useState("welcome");
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [activityDetailsData, setActivityDetailsData] = useState(null);
@@ -36,16 +41,19 @@ const Index = () => {
           setIsOnboarded(true);
           setCurrentView("home");
           trackScreenView("dashboard");
+          trackPageView("dashboard");
         } else {
           setCurrentView("onboarding");
           trackScreenView("onboarding");
+          trackPageView("onboarding");
         }
       } else {
         setCurrentView("welcome");
         trackScreenView("welcome");
+        trackPageView("welcome");
       }
     }
-  }, [user, loading, identify, trackScreenView]);
+  }, [user, loading, identify, trackScreenView, trackPageView]);
 
   const handleOnboardingComplete = () => {
     if (user) {
@@ -54,6 +62,7 @@ const Index = () => {
       setCurrentView("home");
       trackOnboardingComplete();
       trackScreenView("dashboard");
+      trackPageView("dashboard");
     }
   };
 
@@ -68,8 +77,9 @@ const Index = () => {
     const previousView = currentView;
     setIsTransitioning(true);
     
-    // Track navigation
+    // Track navigation and screen time
     trackNavigation(previousView, view);
+    trackScreenTime(view);
     
     // Faster transition for better responsiveness
     setTimeout(() => {
@@ -79,8 +89,9 @@ const Index = () => {
       setCurrentView(view);
       setIsTransitioning(false);
       
-      // Track screen view
+      // Track screen view and page view
       trackScreenView(view, data ? { activity_id: data.id } : {});
+      trackPageView(view, data ? { activity_id: data.id } : {});
     }, 100); // Reduced from 150ms to 100ms
   };
 

@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Home, Phone, BookOpen, Settings } from "lucide-react";
+import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 
 interface AnimatedBottomNavProps {
   currentView: string;
@@ -8,6 +9,8 @@ interface AnimatedBottomNavProps {
 }
 
 const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) => {
+  const { trackTap } = useEngagementTracking();
+  
   const navItems = [
     { view: "home", icon: Home, label: "Home" },
     { view: "activity", icon: Phone, label: "Activity" },
@@ -15,11 +18,19 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
     { view: "settings", icon: Settings, label: "Settings" }
   ];
 
-  const handleNavClick = (view: string) => {
+  const handleNavClick = (view: string, label: string) => {
     // Add haptic feedback for mobile devices
     if ('vibrate' in navigator) {
       navigator.vibrate(50);
     }
+    
+    // Track the tap interaction
+    trackTap('bottom_nav', 'navigation', {
+      target_screen: view,
+      previous_screen: currentView,
+      nav_label: label
+    });
+    
     onNavigate(view);
   };
 
@@ -41,7 +52,7 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
                     navigator.vibrate(25);
                   }
                 }}
-                onClick={() => handleNavClick(view)}
+                onClick={() => handleNavClick(view, label)}
                 className={`
                   w-14 h-14 rounded-2xl transition-all duration-150 ease-out
                   transform active:scale-95 hover:scale-110 

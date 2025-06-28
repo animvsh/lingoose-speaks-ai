@@ -3,11 +3,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePostHog } from './usePostHog';
+import { useLearningAnalytics } from './useLearningAnalytics';
 
 export const useCurrentActivity = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { trackActivityRegenerate, trackError } = usePostHog();
+  const { trackDifficultyAdjustment } = useLearningAnalytics();
 
   const { data: currentActivity, isLoading, error } = useQuery({
     queryKey: ['current-activity', user?.id],
@@ -35,6 +37,7 @@ export const useCurrentActivity = () => {
           name: "Hotel check-in conversation",
           description: "Practice checking into a hotel 🏨",
           estimated_duration_minutes: 15,
+          difficulty_level: "medium",
           prompt: "You are checking into a hotel. Practice greeting the receptionist, providing your reservation details, asking about amenities, and completing the check-in process.",
           skills: [
             { name: "Greeting phrases", rating: 65 },
@@ -64,6 +67,8 @@ export const useCurrentActivity = () => {
         throw new Error('User or current activity not found');
       }
 
+      console.log('Regenerating activity with enhanced analytics tracking');
+
       const response = await supabase.functions.invoke('generate-activity', {
         body: { 
           currentActivity: currentActivity.name,
@@ -81,7 +86,19 @@ export const useCurrentActivity = () => {
     },
     onSuccess: (data) => {
       console.log('Activity regenerated successfully:', data);
+      
+      // Enhanced tracking with learning analytics
       trackActivityRegenerate(currentActivity, data);
+      
+      // Track difficulty adjustment if applicable
+      if (data && data.difficulty_level !== currentActivity.difficulty_level) {
+        trackDifficultyAdjustment(
+          currentActivity.difficulty_level || 'medium',
+          data.difficulty_level || 'medium',
+          'user_request'
+        );
+      }
+      
       // Invalidate and refetch the current activity
       queryClient.invalidateQueries({ queryKey: ['current-activity', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['activities'] });
