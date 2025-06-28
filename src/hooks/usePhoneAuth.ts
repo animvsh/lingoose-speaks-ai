@@ -24,42 +24,71 @@ export const usePhoneAuth = () => {
     return phone;
   };
 
-  const findExistingProfile = async (phoneNumber: string) => {
-    try {
-      console.log('Looking for existing profile with phone:', phoneNumber);
-      
-      const { data: existingProfile, error: findError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('phone_number', phoneNumber)
-        .maybeSingle();
-
-      if (findError) {
-        console.error('Error finding profile:', findError);
-        return null;
-      }
-
-      if (existingProfile) {
-        console.log('Found existing profile:', existingProfile.id);
-        return existingProfile;
-      }
-
-      console.log('No existing profile found');
-      return null;
-    } catch (error) {
-      console.error('Error in findExistingProfile:', error);
-      return null;
-    }
-  };
-
-  const signInWithPhone = async (phoneNumber: string): Promise<{ success: boolean; error?: string; isNewUser?: boolean }> => {
+  const sendOTP = async (phoneNumber: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     
     try {
       const formattedPhone = formatPhoneNumber(phoneNumber);
-      console.log('Looking up profile for phone:', formattedPhone);
+      console.log('Sending OTP to:', formattedPhone);
       
-      // First check if profile exists
+      const { data, error } = await supabase.functions.invoke('twilio-verify', {
+        body: {
+          action: 'send',
+          phoneNumber: formattedPhone
+        }
+      });
+
+      if (error) {
+        console.error('Send OTP error:', error);
+        throw new Error(error.message || 'Failed to send verification code');
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to send verification code');
+      }
+
+      console.log('OTP sent successfully');
+      return { success: true };
+      
+    } catch (error: any) {
+      console.error('Send OTP error:', error);
+      return { 
+        success: false, 
+        error: error.message || 'Failed to send verification code' 
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyOTP = async (phoneNumber: string, code: string): Promise<{ success: boolean; error?: string; isNewUser?: boolean }> => {
+    setIsLoading(true);
+    
+    try {
+      const formattedPhone = formatPhoneNumber(phoneNumber);
+      console.log('Verifying OTP for:', formattedPhone);
+      
+      // First verify the OTP with Twilio
+      const { data, error } = await supabase.functions.invoke('twilio-verify', {
+        body: {
+          action: 'verify',
+          phoneNumber: formattedPhone,
+          code: code
+        }
+      });
+
+      if (error) {
+        console.error('Verify OTP error:', error);
+        throw new Error(error.message || 'Failed to verify code');
+      }
+
+      if (!data.success || !data.verified) {
+        throw new Error(data.error || 'Invalid verification code');
+      }
+
+      console.log('OTP verified successfully, checking user profile...');
+
+      // Check if profile exists
       const { data: existingProfile, error: findError } = await supabase
         .from('user_profiles')
         .select('*')
@@ -102,8 +131,6 @@ export const usePhoneAuth = () => {
 
       // Store the profile info in localStorage to simulate being "logged in"
       localStorage.setItem('current_user_profile', JSON.stringify(profile));
-      
-      // Also store a simple flag to indicate they're authenticated
       localStorage.setItem('phone_authenticated', 'true');
       localStorage.setItem('phone_number', formattedPhone);
 
@@ -111,20 +138,19 @@ export const usePhoneAuth = () => {
       return { success: true, isNewUser };
       
     } catch (error: any) {
-      console.error('Phone sign in error:', error);
+      console.error('Verify OTP error:', error);
       return { 
         success: false, 
-        error: error.message || 'Failed to sign in with phone number' 
+        error: error.message || 'Failed to verify code' 
       };
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Keep the old method names for compatibility
-  const sendOTP = signInWithPhone;
-  const verifyOTP = async (_phoneNumber: string, _otp: string) => {
-    return { success: true }; // OTP verification is no longer needed
+  // For backward compatibility
+  const signInWithPhone = async (phoneNumber: string) => {
+    return sendOTP(phoneNumber);
   };
 
   return {
