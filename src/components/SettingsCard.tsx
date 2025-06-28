@@ -1,10 +1,10 @@
+
 import { Button } from "@/components/ui/button";
 import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus, UserPlus, Bug, Activity } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
 import { posthogService } from "@/services/posthog";
-import AppBar from "./AppBar";
 
 interface SettingsCardProps {
   onNavigate: (view: string) => void;
@@ -157,11 +157,24 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
 
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
-      <AppBar 
-        title="SETTINGS" 
-        onBack={() => onNavigate("home")} 
-        showBackButton={true} 
-      />
+      <div className="px-6 pt-8 pb-6">
+        <div className="flex items-center justify-between">
+          <Button
+            onClick={() => onNavigate("home")}
+            className="w-14 h-14 bg-orange-500 hover:bg-orange-600 rounded-2xl text-white shadow-lg"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </Button>
+          
+          <div className="flex items-center justify-center flex-1">
+            <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide text-center">
+              SETTINGS
+            </h1>
+          </div>
+          
+          <div className="w-14 h-14"></div>
+        </div>
+      </div>
 
       <div className="px-6 space-y-6">
         {/* Account Settings */}
