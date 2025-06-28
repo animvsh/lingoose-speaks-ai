@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus, UserPlus, Bug, Activity } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -13,12 +12,13 @@ interface SettingsCardProps {
 
 const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   const { signOut } = useAuth();
-  const { capture, isInitialized } = usePostHog();
+  const { capture, testWebhook, isInitialized } = usePostHog();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [lastTestEvent, setLastTestEvent] = useState<string>('');
+  const [webhookUrl, setWebhookUrl] = useState<string>('');
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -80,6 +80,18 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
       console.warn('PostHog service not available');
       setLastTestEvent('PostHog service not available');
     }
+  };
+
+  const handleWebhookTest = () => {
+    if (!webhookUrl) {
+      alert('Please enter a webhook.site URL first');
+      return;
+    }
+    
+    const timestamp = new Date().toLocaleTimeString();
+    testWebhook(webhookUrl);
+    setLastTestEvent(`Webhook test sent to ${webhookUrl} at ${timestamp}`);
+    console.log('Webhook test sent to:', webhookUrl);
   };
 
   const handleAddToHomeScreen = async () => {
@@ -175,6 +187,30 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               </span>
             </div>
             
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  placeholder="Enter webhook.site URL for testing"
+                  value={webhookUrl}
+                  onChange={(e) => setWebhookUrl(e.target.value)}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleWebhookTest}
+                  disabled={!isInitialized || !webhookUrl}
+                  className="bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100"
+                >
+                  Test Webhook
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500">
+                Go to webhook.site, copy the URL, and paste it above to test if your integration code works
+              </p>
+            </div>
+            
             <div className="flex items-center justify-between py-3 border-b border-gray-200">
               <div className="flex items-center">
                 <Bug className="w-5 h-5 mr-3 text-blue-500" />
@@ -220,11 +256,14 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
             
             <div className="bg-yellow-50 rounded-lg p-3">
               <p className="text-sm text-yellow-800">
-                <strong>Manual Event Format:</strong> posthog.capture('my event', {`{ property: 'value' }`})
+                <strong>Troubleshooting Steps:</strong>
               </p>
-              <p className="text-xs text-yellow-600 mt-1">
-                The "Send Manual Event" button sends exactly this format to PostHog
-              </p>
+              <ul className="text-xs text-yellow-700 mt-1 space-y-1">
+                <li>1. Test with webhook.site URL above</li>
+                <li>2. Check browser console for errors</li>
+                <li>3. Disable ad blockers</li>
+                <li>4. Check Network tab in DevTools</li>
+              </ul>
             </div>
           </div>
         </div>

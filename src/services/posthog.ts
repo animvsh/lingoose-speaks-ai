@@ -22,14 +22,65 @@ class PostHogService {
   private batchTimeout: NodeJS.Timeout | null = null;
   private readonly BATCH_SIZE = 10;
   private readonly BATCH_TIMEOUT = 5000; // 5 seconds
+  private isInitialized: boolean = false;
 
   constructor(apiKey: string, host: string = 'https://us.i.posthog.com') {
     this.apiKey = apiKey;
     this.host = host.replace(/\/$/, ''); // Remove trailing slash
+    this.isInitialized = true;
+    console.log('PostHog Service initialized with:', { apiKey: this.apiKey.substring(0, 10) + '...', host: this.host });
+  }
+
+  // Check if PostHog is properly initialized
+  getInitializationStatus(): boolean {
+    return this.isInitialized && !!this.apiKey;
+  }
+
+  // Test method using webhook.site for debugging
+  async testWithWebhook(webhookUrl: string, event: string, distinctId: string, properties?: Record<string, any>): Promise<void> {
+    const eventData = {
+      api_key: this.apiKey,
+      event,
+      distinct_id: distinctId,
+      properties: {
+        ...properties,
+        $current_url: window.location.href,
+        $pathname: window.location.pathname,
+        $timestamp: new Date().toISOString(),
+        test_mode: true
+      }
+    };
+
+    console.log('Sending test event to webhook.site:', eventData);
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(eventData)
+      });
+
+      console.log('Webhook test response:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        console.error('Webhook test failed:', response.status, response.statusText);
+      } else {
+        console.log('Webhook test successful - your integration code is working!');
+      }
+    } catch (error) {
+      console.error('Webhook test error:', error);
+    }
   }
 
   // Send a single event immediately
   async capture(event: string, distinctId: string, properties?: Record<string, any>): Promise<void> {
+    if (!this.isInitialized || !this.apiKey) {
+      console.error('PostHog not properly initialized');
+      return;
+    }
+
     const eventData: PostHogEvent = {
       event,
       distinct_id: distinctId,
@@ -41,6 +92,8 @@ class PostHogService {
       }
     };
 
+    console.log('Sending PostHog event:', { event, distinctId, properties });
+
     try {
       const response = await fetch(`${this.host}/i/v0/e/`, {
         method: 'POST',
@@ -50,19 +103,32 @@ class PostHogService {
         body: JSON.stringify({
           api_key: this.apiKey,
           ...eventData
-        })
+        }),
+        mode: 'cors' // Explicitly set CORS mode
       });
+
+      console.log('PostHog response:', response.status, response.statusText);
 
       if (!response.ok) {
         console.error('PostHog event failed:', response.status, response.statusText);
+        const responseText = await response.text();
+        console.error('Response body:', responseText);
+      } else {
+        console.log('PostHog event sent successfully');
       }
     } catch (error) {
       console.error('PostHog capture error:', error);
+      console.error('This could be due to ad blockers, CORS issues, or network problems');
     }
   }
 
   // Add event to queue for batching
   captureQueued(event: string, distinctId: string, properties?: Record<string, any>): void {
+    if (!this.isInitialized || !this.apiKey) {
+      console.error('PostHog not properly initialized');
+      return;
+    }
+
     const eventData: PostHogEvent = {
       event,
       distinct_id: distinctId,
@@ -115,7 +181,8 @@ class PostHogService {
         body: JSON.stringify({
           api_key: this.apiKey,
           batch: batchEvents
-        })
+        }),
+        mode: 'cors'
       });
 
       if (!response.ok) {
@@ -162,7 +229,9 @@ class PostHogService {
 export let posthogService: PostHogService | null = null;
 
 export const initializePostHog = (apiKey: string, host?: string) => {
+  console.log('Initializing PostHog with API key:', apiKey.substring(0, 10) + '...');
   posthogService = new PostHogService(apiKey, host);
+  console.log('PostHog service created successfully');
   return posthogService;
 };
 

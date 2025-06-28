@@ -68,11 +68,27 @@ export const usePostHog = () => {
     });
   }, [user]);
 
+  const testWebhook = useCallback((webhookUrl: string) => {
+    if (!posthogService) {
+      console.warn('PostHog not initialized');
+      return;
+    }
+
+    const distinctId = user?.id || user?.phone_number || 'webhook_test_user';
+    posthogService.testWithWebhook(webhookUrl, 'webhook_test_event', distinctId, {
+      user_id: user?.id,
+      phone_number: user?.phone_number,
+      full_name: user?.full_name,
+      test_source: 'settings_debug_panel'
+    });
+  }, [user]);
+
   return {
     capture,
     captureQueued,
     identify,
     pageView,
-    isInitialized: !!posthogService
+    testWebhook,
+    isInitialized: posthogService?.getInitializationStatus() ?? false
   };
 };
