@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePostHog } from "@/hooks/usePostHog";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import DashboardStats from "@/components/DashboardStats";
@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { trackNavigation, trackScreenView, trackOnboardingComplete, identify } = usePostHog();
   const [currentView, setCurrentView] = useState("welcome");
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [activityDetailsData, setActivityDetailsData] = useState(null);
@@ -23,36 +24,52 @@ const Index = () => {
   useEffect(() => {
     if (!loading) {
       if (user) {
+        // Identify user in PostHog
+        identify({
+          user_type: 'authenticated',
+          onboarding_completed: localStorage.getItem(`onboarding_complete_${user.id}`) ? true : false
+        });
+
         // Check if user has completed onboarding
         const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.id}`);
         if (onboardingComplete) {
           setIsOnboarded(true);
           setCurrentView("home");
+          trackScreenView("dashboard");
         } else {
           setCurrentView("onboarding");
+          trackScreenView("onboarding");
         }
       } else {
         setCurrentView("welcome");
+        trackScreenView("welcome");
       }
     }
-  }, [user, loading]);
+  }, [user, loading, identify, trackScreenView]);
 
   const handleOnboardingComplete = () => {
     if (user) {
       localStorage.setItem(`onboarding_complete_${user.id}`, "true");
       setIsOnboarded(true);
       setCurrentView("home");
+      trackOnboardingComplete();
+      trackScreenView("dashboard");
     }
   };
 
   const handleWelcomeComplete = () => {
     console.log('Welcome completed, navigating to auth');
+    trackNavigation("welcome", "auth");
     // Navigate to the auth page instead of trying to go to onboarding without a user
     navigate('/auth');
   };
 
   const handleNavigate = (view: string, data?: any) => {
+    const previousView = currentView;
     setIsTransitioning(true);
+    
+    // Track navigation
+    trackNavigation(previousView, view);
     
     // Faster transition for better responsiveness
     setTimeout(() => {
@@ -61,6 +78,9 @@ const Index = () => {
       }
       setCurrentView(view);
       setIsTransitioning(false);
+      
+      // Track screen view
+      trackScreenView(view, data ? { activity_id: data.id } : {});
     }, 100); // Reduced from 150ms to 100ms
   };
 

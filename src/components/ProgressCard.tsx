@@ -2,7 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { Home, Clock, CheckCircle, Settings, Star, Trophy, ArrowLeft, Phone, Users, BookOpen } from "lucide-react";
 import { useUserActivityRatings } from "@/hooks/useUserActivityRatings";
-import { useMemo } from "react";
+import { usePostHog } from "@/hooks/usePostHog";
+import { useMemo, useEffect } from "react";
 import AppBar from "./AppBar";
 
 interface ProgressCardProps {
@@ -11,6 +12,7 @@ interface ProgressCardProps {
 
 const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
   const { ratings } = useUserActivityRatings();
+  const { trackProgressView, trackNavigation } = usePostHog();
 
   // Simple overview stats
   const overviewStats = useMemo(() => {
@@ -37,11 +39,21 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
     };
   }, [ratings]);
 
+  useEffect(() => {
+    // Track progress view when component mounts
+    trackProgressView(overviewStats);
+  }, [trackProgressView, overviewStats]);
+
+  const handleNavigate = (view: string) => {
+    trackNavigation('progress', view);
+    onNavigate(view);
+  };
+
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
       <AppBar 
         title="PROGRESS" 
-        onBack={() => onNavigate("home")} 
+        onBack={() => handleNavigate("home")} 
         showBackButton={true} 
       />
 
@@ -122,7 +134,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
             </div>
           </div>
           <Button 
-            onClick={() => onNavigate("curriculum")}
+            onClick={() => handleNavigate("curriculum")}
             className="w-full bg-white hover:bg-orange-50 text-orange-600 font-bold py-3 text-lg rounded-2xl"
           >
             VIEW ANALYTICS →
@@ -140,7 +152,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
               Begin your language learning journey to see your progress here!
             </p>
             <Button 
-              onClick={() => onNavigate("activity")}
+              onClick={() => handleNavigate("activity")}
               className="bg-orange-400 hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-2xl"
             >
               START FIRST SESSION
@@ -156,7 +168,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => onNavigate("home")}
+              onClick={() => handleNavigate("home")}
               className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <Home className="w-6 h-6" />
@@ -164,7 +176,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => onNavigate("activity")}
+              onClick={() => handleNavigate("activity")}
               className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <Phone className="w-6 h-6" />
@@ -172,7 +184,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => onNavigate("curriculum")}
+              onClick={() => handleNavigate("curriculum")}
               className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
             >
               <CheckCircle className="w-6 h-6" />
@@ -180,7 +192,7 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={() => onNavigate("settings")}
+              onClick={() => handleNavigate("settings")}
               className="w-14 h-14 bg-blue-400 rounded-2xl text-white"
             >
               <Settings className="w-6 h-6" />

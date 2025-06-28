@@ -2,10 +2,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePostHog } from './usePostHog';
 
 export const useCurrentActivity = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { trackActivityRegenerate, trackError } = usePostHog();
 
   const { data: currentActivity, isLoading, error } = useQuery({
     queryKey: ['current-activity', user?.id],
@@ -79,12 +81,17 @@ export const useCurrentActivity = () => {
     },
     onSuccess: (data) => {
       console.log('Activity regenerated successfully:', data);
+      trackActivityRegenerate(currentActivity, data);
       // Invalidate and refetch the current activity
       queryClient.invalidateQueries({ queryKey: ['current-activity', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['activities'] });
     },
     onError: (error) => {
       console.error('Failed to regenerate activity:', error);
+      trackError(error.message, 'activity_regeneration', { 
+        user_id: user?.id,
+        activity_id: currentActivity?.id 
+      });
     }
   });
 

@@ -12,7 +12,7 @@ interface SettingsCardProps {
 
 const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   const { signOut } = useAuth();
-  const { capture, testWebhook, isInitialized } = usePostHog();
+  const { capture, testWebhook, isInitialized, trackSettingsInteraction, trackFeatureUsage, trackAuthEvent } = usePostHog();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
@@ -43,11 +43,15 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   }, []);
 
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    trackSettingsInteraction('toggle', 'dark_mode', newMode);
   };
 
   const toggleNotifications = () => {
-    setNotificationsEnabled(!notificationsEnabled);
+    const newState = !notificationsEnabled;
+    setNotificationsEnabled(newState);
+    trackSettingsInteraction('toggle', 'notifications', newState);
   };
 
   const handleTestEvent = () => {
@@ -61,6 +65,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
     
     setLastTestEvent(`${eventName} at ${timestamp}`);
     console.log('PostHog test event sent:', eventName, timestamp);
+    trackFeatureUsage('debug_panel', 'test_event');
   };
 
   const handleManualEvent = () => {
@@ -76,6 +81,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
       
       setLastTestEvent(`'my event' with property: 'value' at ${timestamp}`);
       console.log('Manual PostHog event sent: my event', { property: 'value', timestamp });
+      trackFeatureUsage('debug_panel', 'manual_event');
     } else {
       console.warn('PostHog service not available');
       setLastTestEvent('PostHog service not available');
@@ -92,10 +98,12 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
     testWebhook(webhookUrl);
     setLastTestEvent(`Webhook test sent to ${webhookUrl} at ${timestamp}`);
     console.log('Webhook test sent to:', webhookUrl);
+    trackFeatureUsage('debug_panel', 'webhook_test', { webhook_url: webhookUrl });
   };
 
   const handleAddToHomeScreen = async () => {
     console.log('Add to home screen clicked from settings');
+    trackFeatureUsage('pwa', 'add_to_homescreen_attempt');
     
     if (deferredPrompt) {
       try {
@@ -103,17 +111,22 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
         const { outcome } = await deferredPrompt.userChoice;
         console.log(`User response to install prompt: ${outcome}`);
         
+        trackFeatureUsage('pwa', 'install_prompt_response', { outcome });
+        
         if (outcome === 'accepted') {
           setShowAddToHomeScreen(false);
           localStorage.setItem('pwaInstalled', 'true');
+          trackFeatureUsage('pwa', 'installed_successfully');
         }
         
         setDeferredPrompt(null);
       } catch (error) {
         console.error('Error showing install prompt:', error);
+        trackFeatureUsage('pwa', 'install_error', { error: error.message });
       }
     } else {
       // Show manual instructions
+      trackFeatureUsage('pwa', 'manual_instructions_shown');
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       const isAndroid = /Android/.test(navigator.userAgent);
       
@@ -128,6 +141,18 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
       
       alert(instructions);
     }
+  };
+
+  const handleLogout = () => {
+    trackAuthEvent('logout');
+    signOut();
+  };
+
+  const handleNavigationClick = (destination: string, feature?: string) => {
+    if (feature) {
+      trackFeatureUsage('settings_navigation', feature);
+    }
+    onNavigate(destination);
   };
 
   return (
@@ -146,7 +171,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
           </h3>
           <div 
             className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none cursor-pointer"
-            onClick={() => onNavigate("profile-management")}
+            onClick={() => handleNavigationClick("profile-management", "profile_management")}
           >
             <div className="flex items-center">
               <User className="w-5 h-5 mr-3 text-orange-500" />
@@ -156,7 +181,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
           </div>
           <div 
             className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none cursor-pointer"
-            onClick={() => onNavigate("add-supervisor")}
+            onClick={() => handleNavigationClick("add-supervisor", "add_supervisor")}
           >
             <div className="flex items-center">
               <UserPlus className="w-5 h-5 mr-3 text-purple-500" />
@@ -346,7 +371,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
             Support
           </h3>
           <div 
-            onClick={() => onNavigate("help-support")}
+            onClick={() => handleNavigationClick("help-support", "help_support")}
             className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none cursor-pointer"
           >
             <div className="flex items-center">
@@ -373,7 +398,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
 
         {/* Logout */}
         <Button 
-          onClick={() => signOut()}
+          onClick={handleLogout}
           className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-3xl transition-all duration-200"
         >
           <LogOut className="w-5 h-5 mr-2" />

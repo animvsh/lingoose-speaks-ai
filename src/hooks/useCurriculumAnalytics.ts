@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePostHog } from "./usePostHog";
 import { subDays, isAfter } from "date-fns";
 
 // Define interfaces for better type safety
@@ -32,6 +33,7 @@ interface ActivityRating {
 
 export const useCurriculumAnalytics = () => {
   const { user } = useAuth();
+  const { trackAnalyticsView } = usePostHog();
   
   return useQuery({
     queryKey: ['curriculum-analytics', user?.id],
@@ -231,7 +233,7 @@ export const useCurriculumAnalytics = () => {
         }
       }
 
-      return {
+      const analyticsData = {
         totalCalls,
         talkTime,
         fluencyScore: nativeFluencyScore,
@@ -244,6 +246,11 @@ export const useCurriculumAnalytics = () => {
         activityRatingsCount: allRatings.length,
         lastActivity: allDates[0] ? new Date(allDates[0]) : null
       };
+
+      // Track analytics view
+      trackAnalyticsView('curriculum_analytics', analyticsData);
+
+      return analyticsData;
     },
     enabled: !!user,
     refetchInterval: 30000, // Refetch every 30 seconds to catch new data

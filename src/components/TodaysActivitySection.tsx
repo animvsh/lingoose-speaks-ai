@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Phone, RefreshCw } from "lucide-react";
+import { usePostHog } from "@/hooks/usePostHog";
 
 interface TodaysActivitySectionProps {
   currentActivity: any;
@@ -17,6 +18,8 @@ const TodaysActivitySection = ({
   isRegenerating, 
   isStartingCall 
 }: TodaysActivitySectionProps) => {
+  const { trackPracticeStart, trackActivityRegenerate } = usePostHog();
+
   const getRatingColor = (rating: number) => {
     if (rating < 40) return "text-red-600";
     if (rating < 70) return "text-orange-600";
@@ -27,6 +30,16 @@ const TodaysActivitySection = ({
     if (rating < 40) return "bg-red-50 border-red-100";
     if (rating < 70) return "bg-orange-50 border-orange-100";
     return "bg-green-50 border-green-100";
+  };
+
+  const handleRegenerateActivity = () => {
+    trackActivityRegenerate(currentActivity);
+    onRegenerateActivity();
+  };
+
+  const handleStartPractice = () => {
+    trackPracticeStart(currentActivity);
+    onStartPractice();
   };
 
   return (
@@ -46,7 +59,7 @@ const TodaysActivitySection = ({
           </div>
         </div>
         <Button
-          onClick={onRegenerateActivity}
+          onClick={handleRegenerateActivity}
           disabled={isRegenerating}
           variant="ghost"
           size="sm"
@@ -78,7 +91,7 @@ const TodaysActivitySection = ({
         </div>
 
         <Button 
-          onClick={onStartPractice}
+          onClick={handleStartPractice}
           disabled={isStartingCall}
           className="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold py-4 text-lg rounded-2xl transition-all duration-300"
         >
