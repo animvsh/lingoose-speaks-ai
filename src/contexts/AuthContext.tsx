@@ -43,6 +43,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const profile = JSON.parse(userProfile);
         setUser(profile);
         console.log('Restored user session:', profile.phone_number);
+        
+        // Track user session restored
+        setTimeout(() => {
+          import('@/services/posthog').then(({ posthogService }) => {
+            if (posthogService) {
+              posthogService.capture('user_session_restored', profile.id || profile.phone_number, {
+                phone_number: profile.phone_number,
+                full_name: profile.full_name,
+                language: profile.language
+              });
+            }
+          });
+        }, 1000);
       } catch (error) {
         console.error('Error parsing stored user profile:', error);
         // Clear invalid data
@@ -57,6 +70,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      // Track sign out event
+      if (user) {
+        import('@/services/posthog').then(({ posthogService }) => {
+          if (posthogService) {
+            posthogService.capture('user_signed_out', user.id || user.phone_number, {
+              phone_number: user.phone_number,
+              full_name: user.full_name
+            });
+          }
+        });
+      }
+
       // Set loading state to show smooth transition
       setLoading(true);
       

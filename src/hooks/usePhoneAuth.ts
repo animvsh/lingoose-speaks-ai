@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -31,6 +30,17 @@ export const usePhoneAuth = () => {
       const formattedPhone = formatPhoneNumber(phoneNumber);
       console.log('Sending OTP to:', formattedPhone);
       
+      // Track OTP send attempt
+      setTimeout(() => {
+        import('@/services/posthog').then(({ posthogService }) => {
+          if (posthogService) {
+            posthogService.captureQueued('otp_send_attempted', formattedPhone, {
+              phone_number: formattedPhone
+            });
+          }
+        });
+      }, 100);
+      
       const { data, error } = await supabase.functions.invoke('twilio-verify', {
         body: {
           action: 'send',
@@ -40,14 +50,51 @@ export const usePhoneAuth = () => {
 
       if (error) {
         console.error('Send OTP error:', error);
+        
+        // Track OTP send failure
+        setTimeout(() => {
+          import('@/services/posthog').then(({ posthogService }) => {
+            if (posthogService) {
+              posthogService.captureQueued('otp_send_failed', formattedPhone, {
+                phone_number: formattedPhone,
+                error: error.message
+              });
+            }
+          });
+        }, 100);
+        
         throw new Error(error.message || 'Failed to send verification code');
       }
 
       if (!data.success) {
+        // Track OTP send failure
+        setTimeout(() => {
+          import('@/services/posthog').then(({ posthogService }) => {
+            if (posthogService) {
+              posthogService.captureQueued('otp_send_failed', formattedPhone, {
+                phone_number: formattedPhone,
+                error: data.error
+              });
+            }
+          });
+        }, 100);
+        
         throw new Error(data.error || 'Failed to send verification code');
       }
 
       console.log('OTP sent successfully');
+      
+      // Track OTP send success
+      setTimeout(() => {
+        import('@/services/posthog').then(({ posthogService }) => {
+          if (posthogService) {
+            posthogService.captureQueued('otp_send_success', formattedPhone, {
+              phone_number: formattedPhone
+            });
+          }
+        });
+      }, 100);
+      
       return { success: true };
       
     } catch (error: any) {
@@ -68,6 +115,17 @@ export const usePhoneAuth = () => {
       const formattedPhone = formatPhoneNumber(phoneNumber);
       console.log('Verifying OTP for:', formattedPhone);
       
+      // Track OTP verification attempt
+      setTimeout(() => {
+        import('@/services/posthog').then(({ posthogService }) => {
+          if (posthogService) {
+            posthogService.captureQueued('otp_verify_attempted', formattedPhone, {
+              phone_number: formattedPhone
+            });
+          }
+        });
+      }, 100);
+      
       // First verify the OTP with Twilio
       const { data, error } = await supabase.functions.invoke('twilio-verify', {
         body: {
@@ -79,10 +137,35 @@ export const usePhoneAuth = () => {
 
       if (error) {
         console.error('Verify OTP error:', error);
+        
+        // Track OTP verification failure
+        setTimeout(() => {
+          import('@/services/posthog').then(({ posthogService }) => {
+            if (posthogService) {
+              posthogService.captureQueued('otp_verify_failed', formattedPhone, {
+                phone_number: formattedPhone,
+                error: error.message
+              });
+            }
+          });
+        }, 100);
+        
         throw new Error(error.message || 'Failed to verify code');
       }
 
       if (!data.success || !data.verified) {
+        // Track OTP verification failure
+        setTimeout(() => {
+          import('@/services/posthog').then(({ posthogService }) => {
+            if (posthogService) {
+              posthogService.captureQueued('otp_verify_failed', formattedPhone, {
+                phone_number: formattedPhone,
+                error: data.error || 'Invalid code'
+              });
+            }
+          });
+        }, 100);
+        
         throw new Error(data.error || 'Invalid verification code');
       }
 
@@ -106,6 +189,20 @@ export const usePhoneAuth = () => {
       if (existingProfile) {
         console.log('Found existing profile:', existingProfile.id);
         profile = existingProfile;
+        
+        // Track returning user login
+        setTimeout(() => {
+          import('@/services/posthog').then(({ posthogService }) => {
+            if (posthogService) {
+              posthogService.capture('user_signed_in', profile.id, {
+                phone_number: profile.phone_number,
+                full_name: profile.full_name,
+                language: profile.language,
+                is_new_user: false
+              });
+            }
+          });
+        }, 500);
       } else {
         console.log('Creating new profile for new user...');
         isNewUser = true;
@@ -127,6 +224,20 @@ export const usePhoneAuth = () => {
         
         profile = newProfile;
         console.log('Created new profile:', profile.id);
+        
+        // Track new user signup
+        setTimeout(() => {
+          import('@/services/posthog').then(({ posthogService }) => {
+            if (posthogService) {
+              posthogService.capture('user_signed_up', profile.id, {
+                phone_number: profile.phone_number,
+                full_name: profile.full_name,
+                language: profile.language,
+                is_new_user: true
+              });
+            }
+          });
+        }, 500);
       }
 
       // Store the profile info in localStorage to simulate being "logged in"

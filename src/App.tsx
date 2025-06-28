@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import SplashScreen from "./components/SplashScreen";
 import { useState, useEffect } from "react";
+import { initializePostHog } from "@/services/posthog";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,17 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
+    // Initialize PostHog - Replace with your actual API key
+    const POSTHOG_API_KEY = 'your-posthog-api-key-here';
+    const POSTHOG_HOST = 'https://us.i.posthog.com'; // Change to eu.i.posthog.com for EU
+    
+    if (POSTHOG_API_KEY && POSTHOG_API_KEY !== 'your-posthog-api-key-here') {
+      initializePostHog(POSTHOG_API_KEY, POSTHOG_HOST);
+      console.log('PostHog initialized');
+    } else {
+      console.warn('PostHog API key not configured');
+    }
+
     // Show splash screen for at least 2 seconds to mask any initial loading
     const timer = setTimeout(() => {
       setShowSplash(false);
