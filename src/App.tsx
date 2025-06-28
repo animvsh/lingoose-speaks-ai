@@ -18,13 +18,13 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    // Initialize PostHog - Replace with your actual API key
-    const POSTHOG_API_KEY = 'your-posthog-api-key-here';
-    const POSTHOG_HOST = 'https://us.i.posthog.com'; // Change to eu.i.posthog.com for EU
+    // Initialize PostHog with your actual API key
+    const POSTHOG_API_KEY = 'phc_gWiJt0Hk9hP4ZNfBCWmqKiMwQOHvxowdJtxQ49jGu8J';
+    const POSTHOG_HOST = 'https://us.i.posthog.com';
     
     if (POSTHOG_API_KEY && POSTHOG_API_KEY !== 'your-posthog-api-key-here') {
       initializePostHog(POSTHOG_API_KEY, POSTHOG_HOST);
-      console.log('PostHog initialized');
+      console.log('PostHog initialized with API key');
     } else {
       console.warn('PostHog API key not configured');
     }
