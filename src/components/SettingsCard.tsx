@@ -1,8 +1,9 @@
 
 import { Button } from "@/components/ui/button";
-import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus, UserPlus } from "lucide-react";
+import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus, UserPlus, Bug, Activity } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePostHog } from "@/hooks/usePostHog";
 import AppBar from "./AppBar";
 
 interface SettingsCardProps {
@@ -11,10 +12,12 @@ interface SettingsCardProps {
 
 const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
   const { signOut } = useAuth();
+  const { capture, isInitialized } = usePostHog();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [lastTestEvent, setLastTestEvent] = useState<string>('');
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -44,6 +47,19 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
 
   const toggleNotifications = () => {
     setNotificationsEnabled(!notificationsEnabled);
+  };
+
+  const handleTestEvent = () => {
+    const timestamp = new Date().toLocaleTimeString();
+    const eventName = 'debug_test_event';
+    
+    capture(eventName, {
+      test_timestamp: timestamp,
+      source: 'settings_debug_panel'
+    });
+    
+    setLastTestEvent(`${eventName} at ${timestamp}`);
+    console.log('PostHog test event sent:', eventName, timestamp);
   };
 
   const handleAddToHomeScreen = async () => {
@@ -115,6 +131,62 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
               <span className="text-gray-700 font-medium">Add Supervisor</span>
             </div>
             <ChevronRight className="w-4 h-4 text-gray-500" />
+          </div>
+        </div>
+
+        {/* Analytics Debug Section */}
+        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+          <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
+            Analytics Debug
+          </h3>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between py-3 border-b border-gray-200">
+              <div className="flex items-center">
+                <Activity className="w-5 h-5 mr-3 text-green-500" />
+                <span className="text-gray-700 font-medium">PostHog Status</span>
+              </div>
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                isInitialized 
+                  ? 'bg-green-100 text-green-700' 
+                  : 'bg-red-100 text-red-700'
+              }`}>
+                {isInitialized ? 'Connected' : 'Not Connected'}
+              </span>
+            </div>
+            
+            <div className="flex items-center justify-between py-3 border-b border-gray-200">
+              <div className="flex items-center">
+                <Bug className="w-5 h-5 mr-3 text-blue-500" />
+                <span className="text-gray-700 font-medium">Test Event</span>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleTestEvent}
+                disabled={!isInitialized}
+                className="bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 disabled:opacity-50"
+              >
+                Send Test
+              </Button>
+            </div>
+            
+            {lastTestEvent && (
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-sm text-gray-600">
+                  <strong>Last test event:</strong> {lastTestEvent}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Check browser console for detailed logs
+                </p>
+              </div>
+            )}
+            
+            <div className="bg-yellow-50 rounded-lg p-3">
+              <p className="text-sm text-yellow-800">
+                <strong>Tracked Events:</strong> Sign up, Sign in, Sign out, OTP sends, Activity starts, Profile updates
+              </p>
+            </div>
           </div>
         </div>
 
