@@ -81,45 +81,13 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
           </CardContent>
         </Card>
 
-        {/* Today's Activity Summary */}
+        {/* Main Learning CTA - Direct to activity */}
         <Card 
-          className="bg-gradient-to-br from-green-400 to-teal-500 border-4 border-green-600 rounded-2xl overflow-visible 
-                     transform transition-all duration-150 ease-out 
-                     hover:scale-102 active:scale-98
-                     cursor-pointer select-none animate-fade-in" 
-          style={{ animationDelay: '0.15s' }}
-          onClick={() => handleCardClick(() => onNavigate('activity'))}
-          onTouchStart={() => {
-            if ('vibrate' in navigator) navigator.vibrate(25);
-          }}
-        >
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-white/20 border-3 border-white/30 rounded-2xl flex items-center justify-center flex-shrink-0">
-                <Calendar className="w-8 h-8 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-xl font-black text-white mb-2 uppercase tracking-wide">
-                  Today's Activity
-                </h3>
-                <p className="text-green-100 font-bold text-sm">
-                  {totalCalls > 0 
-                    ? `Continue your learning journey - ${currentStreak} day streak!`
-                    : "Start your first conversation practice session"
-                  }
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Start Learning Button */}
-        <Card 
-          className="bg-gradient-to-br from-orange-400 to-red-500 border-4 border-orange-600 rounded-2xl overflow-visible 
+          className="bg-gradient-to-br from-blue-400 to-purple-500 border-4 border-blue-600 rounded-2xl overflow-visible 
                      transform transition-all duration-150 ease-out 
                      hover:scale-105 active:scale-95
                      cursor-pointer select-none animate-fade-in shadow-2xl" 
-          style={{ animationDelay: '0.2s' }}
+          style={{ animationDelay: '0.15s' }}
           onClick={() => handleCardClick(() => onNavigate('activity'))}
           onTouchStart={() => {
             if ('vibrate' in navigator) navigator.vibrate(30);
@@ -131,10 +99,13 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
                 <Zap className="w-12 h-12 text-white" />
               </div>
               <h3 className="text-3xl font-black text-white mb-4 uppercase tracking-wide">
-                START LEARNING
+                SEE WHAT YOU'RE LEARNING TODAY
               </h3>
-              <p className="text-orange-100 font-bold text-lg">
-                Begin your Hindi conversation practice now!
+              <p className="text-blue-100 font-bold text-lg">
+                {totalCalls > 0 
+                  ? `Continue your ${currentStreak} day learning streak!`
+                  : "Start your Hindi conversation practice journey"
+                }
               </p>
             </div>
           </CardContent>

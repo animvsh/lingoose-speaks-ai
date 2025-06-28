@@ -8,24 +8,16 @@ import PreviousActivitySection from "./PreviousActivitySection";
 import TodaysActivitySection from "./TodaysActivitySection";
 import { useCallInitiation } from "@/hooks/useCallInitiation";
 import { useActivityGeneration } from "@/hooks/useActivityGeneration";
+
 interface ActivityCardProps {
   onNavigate: (view: string) => void;
 }
-const ActivityCard = ({
-  onNavigate
-}: ActivityCardProps) => {
-  const {
-    user
-  } = useAuth();
+
+const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
-  const {
-    startCall,
-    isStartingCall
-  } = useCallInitiation();
-  const {
-    regenerateActivity,
-    isRegenerating
-  } = useActivityGeneration();
+  const { startCall, isStartingCall } = useCallInitiation();
+  const { regenerateActivity, isRegenerating } = useActivityGeneration();
 
   // Fetch the latest activity from database
   const {
@@ -207,44 +199,37 @@ const ActivityCard = ({
     },
     enabled: !!user
   });
+
   const handleRegenerateActivity = () => {
     if (currentActivity) {
       regenerateActivity(currentActivity);
     }
   };
+
   const handleStartPractice = async () => {
     if (currentActivity) {
       await startCall(currentActivity);
 
       // Refresh all relevant queries after starting a call
-      queryClient.invalidateQueries({
-        queryKey: ['previous-activity-data']
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['latest-completed-activity']
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['curriculum-analytics']
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['user-activity-ratings']
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['call-analysis']
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['latest-call-analysis']
-      });
+      queryClient.invalidateQueries({ queryKey: ['previous-activity-data'] });
+      queryClient.invalidateQueries({ queryKey: ['latest-completed-activity'] });
+      queryClient.invalidateQueries({ queryKey: ['curriculum-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ['user-activity-ratings'] });
+      queryClient.invalidateQueries({ queryKey: ['call-analysis'] });
+      queryClient.invalidateQueries({ queryKey: ['latest-call-analysis'] });
     }
   };
+
   console.log('ActivityCard render state:', {
     user: user?.id,
     isLoadingActivity,
     currentActivity: currentActivity?.id,
     previousActivityData: previousActivityData?.type
   });
+
   if (isLoadingActivity || !currentActivity) {
-    return <div className="min-h-screen bg-amber-50">
+    return (
+      <div className="min-h-screen bg-amber-50">
         <div className="px-6 pt-6">
           <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
             <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
@@ -258,15 +243,29 @@ const ActivityCard = ({
             </p>
           </div>
         </div>
-      </div>;
+      </div>
+    );
   }
-  return <div className="min-h-screen bg-amber-50 pb-28">
-      <div className="px-6 space-y-6 pt-6">
-        {/* Previous Activity Section - Now properly sourced from activities table */}
-        <PreviousActivitySection previousActivity={previousActivityData} onNavigate={onNavigate} />
 
-        {/* Today's Activity */}
-        <TodaysActivitySection currentActivity={currentActivity} onRegenerateActivity={handleRegenerateActivity} onStartPractice={handleStartPractice} isRegenerating={isRegenerating} isStartingCall={isStartingCall} />
+  return (
+    <div className="min-h-screen bg-amber-50 pb-28">
+      <div className="px-6 space-y-6 pt-6">
+        {/* Previous Activity Section */}
+        <PreviousActivitySection 
+          previousActivity={previousActivityData} 
+          onNavigate={onNavigate} 
+        />
+
+        {/* Main Learning Section - with relative positioning for button */}
+        <div className="relative">
+          <TodaysActivitySection 
+            currentActivity={currentActivity} 
+            onRegenerateActivity={handleRegenerateActivity} 
+            onStartPractice={handleStartPractice} 
+            isRegenerating={isRegenerating} 
+            isStartingCall={isStartingCall} 
+          />
+        </div>
 
         {/* Learning Progress Tree */}
         <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200">
@@ -286,11 +285,8 @@ const ActivityCard = ({
           <LearningProgressTree />
         </div>
       </div>
-
-      {/* Bottom Navigation - Single instance */}
-      <div className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 z-50">
-        
-      </div>
-    </div>;
+    </div>
+  );
 };
+
 export default ActivityCard;

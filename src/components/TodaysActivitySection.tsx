@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Phone, RefreshCw } from "lucide-react";
+import { Phone, RefreshCw, Zap } from "lucide-react";
 import { usePostHog } from "@/hooks/usePostHog";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import { useLearningAnalytics } from "@/hooks/useLearningAnalytics";
@@ -66,46 +66,53 @@ const TodaysActivitySection = ({
   };
 
   return (
-    <div className="bg-blue-400 rounded-3xl p-6 border-4 border-blue-500">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mr-4">
-            <Phone className="w-7 h-7 text-white" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-white uppercase tracking-wide">
-              TODAY'S ACTIVITY
-            </h3>
-            <p className="text-blue-100 font-medium text-sm">
-              {currentActivity.description}
-            </p>
-          </div>
+    <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl p-8 border-4 border-blue-600 shadow-2xl">
+      {/* Header with main learning message */}
+      <div className="text-center mb-8">
+        <div className="w-20 h-20 bg-white/20 border-4 border-white/30 rounded-3xl flex items-center justify-center mx-auto mb-6">
+          <Zap className="w-10 h-10 text-white" />
         </div>
+        <h2 className="text-3xl font-black text-white mb-3 uppercase tracking-wide">
+          WHAT YOU'RE LEARNING TODAY
+        </h2>
+        <div className="bg-white/10 rounded-2xl p-4 mb-4">
+          <h3 className="text-xl font-bold text-white mb-2">
+            {currentActivity.name}
+          </h3>
+          <p className="text-blue-100 font-medium text-lg">
+            {currentActivity.description}
+          </p>
+        </div>
+      </div>
+
+      {/* Regenerate button positioned at top right */}
+      <div className="absolute top-4 right-4">
         <Button
           onClick={handleRegenerateActivity}
           disabled={isRegenerating}
           variant="ghost"
           size="sm"
-          className="text-white hover:bg-blue-500 p-2"
+          className="text-white hover:bg-white/20 p-2 rounded-xl"
           title="Generate new activity"
         >
           <RefreshCw className={`w-5 h-5 ${isRegenerating ? 'animate-spin' : ''}`} />
         </Button>
       </div>
 
-      <div className="space-y-4">
-        <div className="bg-white rounded-2xl p-4 border-2 border-white">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-blue-700 font-bold text-sm uppercase tracking-wide">Skills Tested</span>
-            <span className="text-blue-600 font-bold text-sm">{currentActivity.estimated_duration_minutes || 15} min</span>
+      <div className="space-y-6">
+        {/* Skills section */}
+        <div className="bg-white/90 rounded-2xl p-6 border-2 border-white">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-blue-700 font-bold text-lg uppercase tracking-wide">Skills You'll Practice</span>
+            <span className="text-blue-600 font-bold text-lg">{currentActivity.estimated_duration_minutes || 15} min</span>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             {currentActivity.skills?.map((skill: any, index: number) => (
-              <div key={index} className={`rounded-xl p-2 border ${getRatingBgColor(skill.rating)}`}>
-                <div className="text-xs font-bold text-blue-700 uppercase tracking-wide">
+              <div key={index} className={`rounded-xl p-3 border-2 ${getRatingBgColor(skill.rating)}`}>
+                <div className="text-sm font-bold text-blue-700 uppercase tracking-wide mb-1">
                   {skill.name}
                 </div>
-                <div className={`text-sm font-bold ${getRatingColor(skill.rating)}`}>
+                <div className={`text-lg font-bold ${getRatingColor(skill.rating)}`}>
                   {skill.rating}/100
                 </div>
               </div>
@@ -113,12 +120,23 @@ const TodaysActivitySection = ({
           </div>
         </div>
 
+        {/* Main CTA Button */}
         <Button 
           onClick={handleStartPractice}
           disabled={isStartingCall}
-          className="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold py-4 text-lg rounded-2xl transition-all duration-300"
+          className="w-full bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 text-white font-black py-6 text-2xl rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-xl border-4 border-orange-600"
         >
-          {isStartingCall ? 'STARTING CALL...' : 'START PRACTICE ⚡'}
+          {isStartingCall ? (
+            <>
+              <Phone className="w-6 h-6 mr-3 animate-pulse" />
+              STARTING CALL...
+            </>
+          ) : (
+            <>
+              <Zap className="w-6 h-6 mr-3" />
+              START LEARNING NOW!
+            </>
+          )}
         </Button>
       </div>
     </div>

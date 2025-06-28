@@ -81,18 +81,22 @@ const Index = () => {
     trackNavigation(previousView, view);
     trackScreenTime(view);
     
-    // Faster transition for better responsiveness
+    // Enhanced transition with better timing
     setTimeout(() => {
       if (view === 'activity-details' && data) {
         setActivityDetailsData(data);
       }
       setCurrentView(view);
-      setIsTransitioning(false);
+      
+      // Stagger the transition completion for smoother effect
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 50);
       
       // Track screen view and page view
       trackScreenView(view, data ? { activity_id: data.id } : {});
       trackPageView(view, data ? { activity_id: data.id } : {});
-    }, 100); // Reduced from 150ms to 100ms
+    }, 150);
   };
 
   if (loading) {
@@ -106,12 +110,14 @@ const Index = () => {
         </div>
       </div>
     );
-  }
+  };
 
   const renderCurrentView = () => {
-    // Faster, more responsive transitions
-    const baseClasses = `transition-all duration-200 ease-out ${
-      isTransitioning ? 'opacity-0 scale-98' : 'opacity-100 scale-100'
+    // Enhanced page transitions with scale and fade effects
+    const baseClasses = `transition-all duration-300 ease-in-out transform ${
+      isTransitioning 
+        ? 'opacity-0 scale-95 translate-y-4' 
+        : 'opacity-100 scale-100 translate-y-0'
     }`;
 
     if (currentView === "welcome") {
