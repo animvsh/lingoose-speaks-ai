@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Trophy, Home, Phone, CheckCircle, Settings } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,36 +8,44 @@ import PreviousActivitySection from "./PreviousActivitySection";
 import TodaysActivitySection from "./TodaysActivitySection";
 import { useCallInitiation } from "@/hooks/useCallInitiation";
 import { useActivityGeneration } from "@/hooks/useActivityGeneration";
-
 interface ActivityCardProps {
   onNavigate: (view: string) => void;
 }
-
-const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
-  const { user } = useAuth();
+const ActivityCard = ({
+  onNavigate
+}: ActivityCardProps) => {
+  const {
+    user
+  } = useAuth();
   const queryClient = useQueryClient();
-  const { startCall, isStartingCall } = useCallInitiation();
-  const { regenerateActivity, isRegenerating } = useActivityGeneration();
+  const {
+    startCall,
+    isStartingCall
+  } = useCallInitiation();
+  const {
+    regenerateActivity,
+    isRegenerating
+  } = useActivityGeneration();
 
   // Fetch the latest activity from database
-  const { data: currentActivity, isLoading: isLoadingActivity } = useQuery({
+  const {
+    data: currentActivity,
+    isLoading: isLoadingActivity
+  } = useQuery({
     queryKey: ['current-activity', user?.id],
     queryFn: async () => {
       if (!user) throw new Error('No user found');
-
       console.log('Fetching current activity for user:', user.id);
 
       // Get the first active activity (we'll treat this as the current activity)
-      const { data, error } = await supabase
-        .from('activities')
-        .select('*')
-        .eq('is_active', true)
-        .order('activity_order')
-        .limit(1)
-        .single();
-      
-      console.log('Current activity query result:', { data, error });
-
+      const {
+        data,
+        error
+      } = await supabase.from('activities').select('*').eq('is_active', true).order('activity_order').limit(1).single();
+      console.log('Current activity query result:', {
+        data,
+        error
+      });
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching current activity:', error);
         throw error;
@@ -53,57 +60,82 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           description: "Practice checking into a hotel 🏨",
           estimated_duration_minutes: 15,
           prompt: "You are checking into a hotel. Practice greeting the receptionist, providing your reservation details, asking about amenities, and completing the check-in process.",
-          skills: [
-            { name: "Greeting phrases", rating: 65 },
-            { name: "Personal information", rating: 78 },
-            { name: "Room preferences", rating: 42 },
-            { name: "Payment discussion", rating: 89 }
-          ]
+          skills: [{
+            name: "Greeting phrases",
+            rating: 65
+          }, {
+            name: "Personal information",
+            rating: 78
+          }, {
+            name: "Room preferences",
+            rating: 42
+          }, {
+            name: "Payment discussion",
+            rating: 89
+          }]
         };
       }
-
       console.log('Active activity found:', data);
-
       return {
         ...data,
-        skills: [
-          { name: "Greeting phrases", rating: 65 },
-          { name: "Personal information", rating: 78 },
-          { name: "Room preferences", rating: 42 },
-          { name: "Payment discussion", rating: 89 }
-        ]
+        skills: [{
+          name: "Greeting phrases",
+          rating: 65
+        }, {
+          name: "Personal information",
+          rating: 78
+        }, {
+          name: "Room preferences",
+          rating: 42
+        }, {
+          name: "Payment discussion",
+          rating: 89
+        }]
       };
     },
     enabled: !!user
   });
 
   // Enhanced previous activity data fetching with better logging
-  const { data: previousActivityData } = useQuery({
+  const {
+    data: previousActivityData
+  } = useQuery({
     queryKey: ['previous-activity-data', user?.id],
     queryFn: async () => {
       if (!user) throw new Error('No user found');
-
       console.log('Fetching previous activity data for user:', user.id);
 
       // Test activities table access first
-      const { data: activitiesCount, error: activitiesError } = await supabase
-        .from('activities')
-        .select('id', { count: 'exact', head: true });
-
-      console.log('Activities table test:', { count: activitiesCount, error: activitiesError });
+      const {
+        data: activitiesCount,
+        error: activitiesError
+      } = await supabase.from('activities').select('id', {
+        count: 'exact',
+        head: true
+      });
+      console.log('Activities table test:', {
+        count: activitiesCount,
+        error: activitiesError
+      });
 
       // Test user_activity_ratings table access
-      const { data: ratingsCount, error: ratingsError } = await supabase
-        .from('user_activity_ratings')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-
-      console.log('User activity ratings test:', { count: ratingsCount, error: ratingsError });
+      const {
+        data: ratingsCount,
+        error: ratingsError
+      } = await supabase.from('user_activity_ratings').select('id', {
+        count: 'exact',
+        head: true
+      }).eq('user_id', user.id);
+      console.log('User activity ratings test:', {
+        count: ratingsCount,
+        error: ratingsError
+      });
 
       // Fetch the latest completed user activity rating with activity details
-      const { data: latestRating, error: ratingError } = await supabase
-        .from('user_activity_ratings')
-        .select(`
+      const {
+        data: latestRating,
+        error: ratingError
+      } = await supabase.from('user_activity_ratings').select(`
           *,
           activities (
             id,
@@ -112,29 +144,28 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
             estimated_duration_minutes,
             difficulty_level
           )
-        `)
-        .eq('user_id', user.id)
-        .order('completed_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      console.log('Latest activity rating query:', { data: latestRating, error: ratingError });
-
+        `).eq('user_id', user.id).order('completed_at', {
+        ascending: false
+      }).limit(1).maybeSingle();
+      console.log('Latest activity rating query:', {
+        data: latestRating,
+        error: ratingError
+      });
       if (ratingError) {
         console.error('Error fetching latest activity rating:', ratingError);
       }
 
       // Fetch call analysis data as backup
-      const { data: callAnalysis, error: callError } = await supabase
-        .from('vapi_call_analysis')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      console.log('Call analysis query:', { data: callAnalysis, error: callError });
-
+      const {
+        data: callAnalysis,
+        error: callError
+      } = await supabase.from('vapi_call_analysis').select('*').eq('user_id', user.id).order('created_at', {
+        ascending: false
+      }).limit(1).maybeSingle();
+      console.log('Call analysis query:', {
+        data: callAnalysis,
+        error: callError
+      });
       if (callError) {
         console.error('Error fetching call analysis:', callError);
       }
@@ -147,7 +178,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           id: latestRating.id,
           activity_name: latestRating.activities.name,
           activity_description: latestRating.activities.description,
-          duration_seconds: latestRating.duration_seconds || (latestRating.activities.estimated_duration_minutes * 60),
+          duration_seconds: latestRating.duration_seconds || latestRating.activities.estimated_duration_minutes * 60,
           completed_at: latestRating.completed_at,
           rating: latestRating.rating,
           call_status: 'completed',
@@ -171,43 +202,49 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
           source: 'call_analysis'
         };
       }
-
       console.log('No previous activity data found');
       return null;
     },
     enabled: !!user
   });
-
   const handleRegenerateActivity = () => {
     if (currentActivity) {
       regenerateActivity(currentActivity);
     }
   };
-
   const handleStartPractice = async () => {
     if (currentActivity) {
       await startCall(currentActivity);
-      
+
       // Refresh all relevant queries after starting a call
-      queryClient.invalidateQueries({ queryKey: ['previous-activity-data'] });
-      queryClient.invalidateQueries({ queryKey: ['latest-completed-activity'] });
-      queryClient.invalidateQueries({ queryKey: ['curriculum-analytics'] });
-      queryClient.invalidateQueries({ queryKey: ['user-activity-ratings'] });
-      queryClient.invalidateQueries({ queryKey: ['call-analysis'] });
-      queryClient.invalidateQueries({ queryKey: ['latest-call-analysis'] });
+      queryClient.invalidateQueries({
+        queryKey: ['previous-activity-data']
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['latest-completed-activity']
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['curriculum-analytics']
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['user-activity-ratings']
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['call-analysis']
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['latest-call-analysis']
+      });
     }
   };
-
   console.log('ActivityCard render state:', {
     user: user?.id,
     isLoadingActivity,
     currentActivity: currentActivity?.id,
     previousActivityData: previousActivityData?.type
   });
-
   if (isLoadingActivity || !currentActivity) {
-    return (
-      <div className="min-h-screen bg-amber-50">
+    return <div className="min-h-screen bg-amber-50">
         <div className="px-6 pt-6">
           <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
             <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
@@ -221,27 +258,15 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
             </p>
           </div>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-amber-50 pb-28">
+  return <div className="min-h-screen bg-amber-50 pb-28">
       <div className="px-6 space-y-6 pt-6">
         {/* Previous Activity Section - Now properly sourced from activities table */}
-        <PreviousActivitySection 
-          previousActivity={previousActivityData}
-          onNavigate={onNavigate}
-        />
+        <PreviousActivitySection previousActivity={previousActivityData} onNavigate={onNavigate} />
 
         {/* Today's Activity */}
-        <TodaysActivitySection 
-          currentActivity={currentActivity}
-          onRegenerateActivity={handleRegenerateActivity}
-          onStartPractice={handleStartPractice}
-          isRegenerating={isRegenerating}
-          isStartingCall={isStartingCall}
-        />
+        <TodaysActivitySection currentActivity={currentActivity} onRegenerateActivity={handleRegenerateActivity} onStartPractice={handleStartPractice} isRegenerating={isRegenerating} isStartingCall={isStartingCall} />
 
         {/* Learning Progress Tree */}
         <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200">
@@ -264,45 +289,8 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
       {/* Bottom Navigation - Single instance */}
       <div className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 z-50">
-        <div className="max-w-md mx-auto px-6 py-4">
-          <div className="flex justify-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate("home")}
-              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
-            >
-              <Home className="w-6 h-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate("activity")}
-              className="w-14 h-14 bg-blue-400 rounded-2xl text-white"
-            >
-              <Phone className="w-6 h-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate("curriculum")}
-              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
-            >
-              <CheckCircle className="w-6 h-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate("settings")}
-              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
-            >
-              <Settings className="w-6 h-6" />
-            </Button>
-          </div>
-        </div>
+        
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default ActivityCard;
