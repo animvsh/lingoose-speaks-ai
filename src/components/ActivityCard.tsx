@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Trophy, Home, Phone, CheckCircle, Settings } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -261,7 +262,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         </div>
       </div>
 
-      {/* Bottom Navigation - Fixed positioning */}
+      {/* Bottom Navigation - Single instance */}
       <div className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 z-50">
         <div className="max-w-md mx-auto px-6 py-4">
           <div className="flex justify-center space-x-4">
