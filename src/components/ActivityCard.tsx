@@ -1,10 +1,8 @@
-
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Trophy, Home, Phone, CheckCircle, Settings } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import AppBar from "./AppBar";
 import LearningProgressTree from "./LearningProgressTree";
 import PreviousActivitySection from "./PreviousActivitySection";
 import TodaysActivitySection from "./TodaysActivitySection";
@@ -209,11 +207,6 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   if (isLoadingActivity || !currentActivity) {
     return (
       <div className="min-h-screen bg-amber-50">
-        <AppBar 
-          title="ACTIVITY" 
-          onBack={() => onNavigate("home")} 
-          showBackButton={true} 
-        />
         <div className="px-6 pt-6">
           <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
             <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
@@ -233,13 +226,7 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
   return (
     <div className="min-h-screen bg-amber-50 pb-28">
-      <AppBar 
-        title="ACTIVITY" 
-        onBack={() => onNavigate("home")} 
-        showBackButton={true} 
-      />
-
-      <div className="px-6 space-y-6">
+      <div className="px-6 space-y-6 pt-6">
         {/* Previous Activity Section - Now properly sourced from activities table */}
         <PreviousActivitySection 
           previousActivity={previousActivityData}
