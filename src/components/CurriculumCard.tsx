@@ -1,9 +1,7 @@
-
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Clock, Home, Phone, Settings, Star, Trophy, Target, TrendingUp, Flame, BarChart3 } from "lucide-react";
 import { useCurriculumAnalytics } from "@/hooks/useCurriculumAnalytics";
 import { useMemo } from "react";
-import AppBar from "./AppBar";
 
 interface CurriculumCardProps {
   onNavigate: (view: string) => void;
@@ -46,12 +44,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-amber-50 pb-24">
-        <AppBar 
-          title="THIS WEEK" 
-          onBack={() => onNavigate("home")} 
-          showBackButton={true} 
-        />
-        <div className="px-6 space-y-6">
+        <div className="px-6 space-y-6 pt-6">
           <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
             <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
               <BarChart3 className="w-8 h-8 text-gray-400" />
@@ -70,13 +63,7 @@ const CurriculumCard = ({ onNavigate }: CurriculumCardProps) => {
 
   return (
     <div className="min-h-screen bg-amber-50 pb-24">
-      <AppBar 
-        title="THIS WEEK" 
-        onBack={() => onNavigate("home")} 
-        showBackButton={true} 
-      />
-
-      <div className="px-6 space-y-6">
+      <div className="px-6 space-y-6 pt-6">
         {/* Analytics Header */}
         <div className="text-center mb-8">
           <h2 className="text-4xl font-bold text-orange-600 mb-2 uppercase tracking-wide">
