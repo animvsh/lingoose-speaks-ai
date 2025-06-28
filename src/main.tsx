@@ -5,19 +5,35 @@ import './index.css'
 import posthog from 'posthog-js'
 import { PostHogProvider } from 'posthog-js/react'
 
-// Initialize PostHog
-if (import.meta.env.VITE_PUBLIC_POSTHOG_KEY) {
+// Initialize PostHog only if key is provided and we're in browser environment
+if (typeof window !== 'undefined' && import.meta.env.VITE_PUBLIC_POSTHOG_KEY) {
   posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
     api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
-    // Optional: Configure additional settings
     autocapture: true,
     capture_pageview: true,
-    debug: import.meta.env.DEV, // Enable debug mode in development
+    debug: import.meta.env.DEV,
+    loaded: (posthog) => {
+      if (import.meta.env.DEV) console.log('PostHog loaded successfully')
+    }
   })
 }
 
-createRoot(document.getElementById("root")!).render(
-  <PostHogProvider client={posthog}>
-    <App />
-  </PostHogProvider>
-);
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("Root element not found");
+
+const root = createRoot(rootElement);
+
+// Conditionally wrap with PostHogProvider only if PostHog is properly initialized
+const AppWithProviders = () => {
+  if (typeof window !== 'undefined' && import.meta.env.VITE_PUBLIC_POSTHOG_KEY && posthog.__loaded) {
+    return (
+      <PostHogProvider client={posthog}>
+        <App />
+      </PostHogProvider>
+    );
+  }
+  
+  return <App />;
+};
+
+root.render(<AppWithProviders />);
