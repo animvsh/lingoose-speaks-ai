@@ -9,9 +9,11 @@ import CurriculumCard from "@/components/CurriculumCard";
 import SettingsCard from "@/components/SettingsCard";
 import ActivityDetailsView from "@/components/ActivityDetailsView";
 import AnimatedBottomNav from "@/components/AnimatedBottomNav";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState("welcome");
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [activityDetailsData, setActivityDetailsData] = useState(null);
@@ -43,7 +45,9 @@ const Index = () => {
   };
 
   const handleWelcomeComplete = () => {
-    setCurrentView("onboarding");
+    console.log('Welcome completed, navigating to auth');
+    // Navigate to the auth page instead of trying to go to onboarding without a user
+    navigate('/auth');
   };
 
   const handleNavigate = (view: string, data?: any) => {
