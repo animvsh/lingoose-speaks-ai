@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -9,7 +10,7 @@ interface SettingsCardProps {
 }
 
 const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
-  const { logout } = useAuth();
+  const { signOut } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [showAddToHomeScreen, setShowAddToHomeScreen] = useState(false);
@@ -212,7 +213,7 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
 
         {/* Logout */}
         <Button 
-          onClick={() => logout()}
+          onClick={() => signOut()}
           className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-3xl transition-all duration-200"
         >
           <LogOut className="w-5 h-5 mr-2" />

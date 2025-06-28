@@ -1,85 +1,101 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { UserProfile } from '@/types';
-import { useAnalytics } from '@/hooks/useAnalytics';
 
-interface AuthContextProps {
-  user: UserProfile | null;
-  loading: boolean;
-  login: (userProfile: UserProfile) => void;
-  logout: () => void;
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+
+interface UserProfile {
+  id: string;
+  full_name: string;
+  phone_number: string;
+  language: string;
+  created_at: string;
+  updated_at: string;
 }
 
-const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+interface AuthContextType {
+  user: UserProfile | null;
+  session: any; // Keep for compatibility
+  loading: boolean;
+  signOut: () => Promise<void>;
+}
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { trackEvent, identifyUser } = useAnalytics();
-
-  useEffect(() => {
-    const storedProfile = localStorage.getItem('current_user_profile');
-    const phoneAuthenticated = localStorage.getItem('phone_authenticated');
-
-    if (storedProfile && phoneAuthenticated === 'true') {
-      const userProfile = JSON.parse(storedProfile) as UserProfile;
-      setUser(userProfile);
-    }
-
-    setLoading(false);
-  }, []);
-
-  const login = (userProfile: UserProfile) => {
-    setUser(userProfile);
-    localStorage.setItem('current_user_profile', JSON.stringify(userProfile));
-    localStorage.setItem('phone_authenticated', 'true');
-    
-    // Track login event
-    trackEvent('user_login', {
-      user_id: userProfile.id,
-      phone_number: userProfile.phone_number,
-      language: userProfile.language
-    });
-    
-    // Identify user for PostHog
-    identifyUser(userProfile.id, {
-      phone_number: userProfile.phone_number,
-      full_name: userProfile.full_name,
-      language: userProfile.language
-    });
-  };
-
-  const logout = () => {
-    if (user) {
-      trackEvent('user_logout', {
-        user_id: user.id
-      });
-    }
-    
-    setUser(null);
-    localStorage.removeItem('current_user_profile');
-    localStorage.removeItem('phone_authenticated');
-    localStorage.removeItem('phone_number');
-  };
-
-  const value: AuthContextProps = {
-    user,
-    loading,
-    login,
-    logout,
-  };
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Check if user is authenticated via phone
+    const isAuthenticated = localStorage.getItem('phone_authenticated');
+    const userProfile = localStorage.getItem('current_user_profile');
+    
+    if (isAuthenticated === 'true' && userProfile) {
+      try {
+        const profile = JSON.parse(userProfile);
+        setUser(profile);
+        console.log('Restored user session:', profile.phone_number);
+      } catch (error) {
+        console.error('Error parsing stored user profile:', error);
+        // Clear invalid data
+        localStorage.removeItem('phone_authenticated');
+        localStorage.removeItem('current_user_profile');
+        localStorage.removeItem('phone_number');
+      }
+    }
+    
+    setLoading(false);
+  }, []);
+
+  const signOut = async () => {
+    try {
+      // Set loading state to show smooth transition
+      setLoading(true);
+      
+      // Clear localStorage immediately
+      localStorage.removeItem('phone_authenticated');
+      localStorage.removeItem('current_user_profile');
+      localStorage.removeItem('phone_number');
+      
+      // Clear state immediately
+      setUser(null);
+      
+      toast({
+        title: "Signed out",
+        description: "You have been signed out successfully.",
+      });
+      
+      // Use replace instead of href to avoid the white screen
+      window.location.replace('/auth');
+      
+    } catch (error: any) {
+      console.error('Sign out failed:', error);
+      
+      // Force cleanup even if there's an error
+      localStorage.removeItem('phone_authenticated');
+      localStorage.removeItem('current_user_profile');
+      localStorage.removeItem('phone_number');
+      setUser(null);
+      
+      // Still redirect even on error
+      window.location.replace('/auth');
+    }
+  };
+
+  const value = {
+    user,
+    session: user ? { user } : null, // Create a fake session for compatibility
+    loading,
+    signOut,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
