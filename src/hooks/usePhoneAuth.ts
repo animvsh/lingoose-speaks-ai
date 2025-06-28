@@ -1,11 +1,12 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 export const usePhoneAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { trackEvent } = useAnalytics();
 
   const formatPhoneNumber = (phone: string): string => {
     // Remove all non-digit characters
@@ -31,6 +32,11 @@ export const usePhoneAuth = () => {
       const formattedPhone = formatPhoneNumber(phoneNumber);
       console.log('Sending OTP to:', formattedPhone);
       
+      // Track OTP send attempt
+      trackEvent('otp_send_attempted', {
+        phone_number_hash: btoa(formattedPhone) // Hash for privacy
+      });
+      
       const { data, error } = await supabase.functions.invoke('twilio-verify', {
         body: {
           action: 'send',
@@ -40,14 +46,25 @@ export const usePhoneAuth = () => {
 
       if (error) {
         console.error('Send OTP error:', error);
+        trackEvent('otp_send_failed', {
+          error_message: error.message,
+          phone_number_hash: btoa(formattedPhone)
+        });
         throw new Error(error.message || 'Failed to send verification code');
       }
 
       if (!data.success) {
+        trackEvent('otp_send_failed', {
+          error_message: data.error,
+          phone_number_hash: btoa(formattedPhone)
+        });
         throw new Error(data.error || 'Failed to send verification code');
       }
 
       console.log('OTP sent successfully');
+      trackEvent('otp_send_success', {
+        phone_number_hash: btoa(formattedPhone)
+      });
       return { success: true };
       
     } catch (error: any) {
@@ -68,6 +85,11 @@ export const usePhoneAuth = () => {
       const formattedPhone = formatPhoneNumber(phoneNumber);
       console.log('Verifying OTP for:', formattedPhone);
       
+      // Track OTP verification attempt
+      trackEvent('otp_verify_attempted', {
+        phone_number_hash: btoa(formattedPhone)
+      });
+      
       // First verify the OTP with Twilio
       const { data, error } = await supabase.functions.invoke('twilio-verify', {
         body: {
@@ -79,10 +101,18 @@ export const usePhoneAuth = () => {
 
       if (error) {
         console.error('Verify OTP error:', error);
+        trackEvent('otp_verify_failed', {
+          error_message: error.message,
+          phone_number_hash: btoa(formattedPhone)
+        });
         throw new Error(error.message || 'Failed to verify code');
       }
 
       if (!data.success || !data.verified) {
+        trackEvent('otp_verify_failed', {
+          error_message: data.error || 'Invalid code',
+          phone_number_hash: btoa(formattedPhone)
+        });
         throw new Error(data.error || 'Invalid verification code');
       }
 
@@ -106,6 +136,10 @@ export const usePhoneAuth = () => {
       if (existingProfile) {
         console.log('Found existing profile:', existingProfile.id);
         profile = existingProfile;
+        trackEvent('user_login_success', {
+          user_id: profile.id,
+          is_returning_user: true
+        });
       } else {
         console.log('Creating new profile for new user...');
         isNewUser = true;
@@ -127,6 +161,11 @@ export const usePhoneAuth = () => {
         
         profile = newProfile;
         console.log('Created new profile:', profile.id);
+        trackEvent('user_signup_success', {
+          user_id: profile.id,
+          is_new_user: true,
+          signup_method: 'phone'
+        });
       }
 
       // Store the profile info in localStorage to simulate being "logged in"
