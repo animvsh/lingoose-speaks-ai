@@ -9,6 +9,7 @@ import CurriculumCard from "@/components/CurriculumCard";
 import SettingsCard from "@/components/SettingsCard";
 import ActivityDetailsView from "@/components/ActivityDetailsView";
 import AnimatedBottomNav from "@/components/AnimatedBottomNav";
+import AddSupervisorForm from "@/components/AddSupervisorForm";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
@@ -138,6 +139,14 @@ const Index = () => {
       );
     }
 
+    if (currentView === "add-supervisor") {
+      return (
+        <div className={baseClasses}>
+          <AddSupervisorForm onClose={() => handleNavigate("settings")} />
+        </div>
+      );
+    }
+
     return (
       <div className={baseClasses}>
         <DashboardStats onNavigate={handleNavigate} />
@@ -145,7 +154,7 @@ const Index = () => {
     );
   };
 
-  const shouldShowBottomNav = isOnboarded && user && currentView !== "welcome" && currentView !== "onboarding";
+  const shouldShowBottomNav = isOnboarded && user && currentView !== "welcome" && currentView !== "onboarding" && currentView !== "add-supervisor";
 
   return (
     <div className="min-h-screen bg-amber-50 overflow-hidden">

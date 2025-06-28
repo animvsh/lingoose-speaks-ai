@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus } from "lucide-react";
+import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus, UserPlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import AppBar from "./AppBar";
@@ -103,6 +103,16 @@ const SettingsCard = ({ onNavigate }: SettingsCardProps) => {
             <div className="flex items-center">
               <User className="w-5 h-5 mr-3 text-orange-500" />
               <span className="text-gray-700 font-medium">Profile Management</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-500" />
+          </div>
+          <div 
+            className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none cursor-pointer"
+            onClick={() => onNavigate("add-supervisor")}
+          >
+            <div className="flex items-center">
+              <UserPlus className="w-5 h-5 mr-3 text-purple-500" />
+              <span className="text-gray-700 font-medium">Add Supervisor</span>
             </div>
             <ChevronRight className="w-4 h-4 text-gray-500" />
           </div>
