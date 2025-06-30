@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Heart, Star, Zap } from "lucide-react";
 import DuckMascot from "./DuckMascot";
+import SimpleOnboardingFlow from "./SimpleOnboardingFlow";
 
 interface WelcomeScreenProps {
   onComplete: () => void;
@@ -10,10 +11,20 @@ interface WelcomeScreenProps {
 
 const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [phoneNumber] = useState(() => localStorage.getItem('phone_number') || '');
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  const handleStartJourney = () => {
+    setShowOnboarding(true);
+  };
+
+  if (showOnboarding) {
+    return <SimpleOnboardingFlow onComplete={onComplete} phoneNumber={phoneNumber} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 flex items-center justify-center p-6">
@@ -64,7 +75,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
 
           {/* Enhanced CTA Button */}
           <Button
-            onClick={onComplete}
+            onClick={handleStartJourney}
             className="w-full bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 hover:from-orange-600 hover:via-pink-600 hover:to-purple-600 text-white font-black py-6 text-2xl rounded-3xl border-4 border-orange-600 shadow-2xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden uppercase tracking-wide"
           >
             <div className="absolute inset-0 bg-white bg-opacity-20 animate-pulse"></div>

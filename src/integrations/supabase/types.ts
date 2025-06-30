@@ -600,6 +600,7 @@ export type Database = {
           last_conversation_summary: string | null
           phone_number: string
           preferred_call_time: string | null
+          proficiency_level: number | null
           updated_at: string | null
         }
         Insert: {
@@ -611,6 +612,7 @@ export type Database = {
           last_conversation_summary?: string | null
           phone_number: string
           preferred_call_time?: string | null
+          proficiency_level?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -622,6 +624,7 @@ export type Database = {
           last_conversation_summary?: string | null
           phone_number?: string
           preferred_call_time?: string | null
+          proficiency_level?: number | null
           updated_at?: string | null
         }
         Relationships: []
