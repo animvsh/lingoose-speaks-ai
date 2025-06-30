@@ -269,33 +269,39 @@ export type Database = {
       pronunciation_results: {
         Row: {
           audio_url: string | null
+          call_id: string | null
           created_at: string | null
-          details: Json | null
           id: string
-          language: string | null
+          language_id: string | null
           overall_score: number | null
           post_id: string | null
-          text: string | null
+          text_content: string | null
+          user_id: string | null
+          word_scores: Json | null
         }
         Insert: {
           audio_url?: string | null
+          call_id?: string | null
           created_at?: string | null
-          details?: Json | null
           id?: string
-          language?: string | null
+          language_id?: string | null
           overall_score?: number | null
           post_id?: string | null
-          text?: string | null
+          text_content?: string | null
+          user_id?: string | null
+          word_scores?: Json | null
         }
         Update: {
           audio_url?: string | null
+          call_id?: string | null
           created_at?: string | null
-          details?: Json | null
           id?: string
-          language?: string | null
+          language_id?: string | null
           overall_score?: number | null
           post_id?: string | null
-          text?: string | null
+          text_content?: string | null
+          user_id?: string | null
+          word_scores?: Json | null
         }
         Relationships: []
       }

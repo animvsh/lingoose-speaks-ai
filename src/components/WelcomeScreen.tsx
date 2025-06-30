@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Sparkles, Globe, Zap } from "lucide-react";
+import { Sparkles, Heart, Star, Zap } from "lucide-react";
 import DuckMascot from "./DuckMascot";
 
 interface WelcomeScreenProps {
@@ -9,150 +9,76 @@ interface WelcomeScreenProps {
 }
 
 const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
-  const [showPWAPrompt, setShowPWAPrompt] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      console.log('PWA install prompt available');
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setIsInstallable(true);
-      setShowPWAPrompt(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                        (window.navigator as any).standalone === true ||
-                        document.referrer.includes('android-app://');
-                        
-    console.log('Is standalone:', isStandalone);
-    
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile && !isStandalone) {
-      setShowPWAPrompt(true);
-    }
-
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(console.error);
-    }
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
+    setIsVisible(true);
   }, []);
 
-  const handleAddToHomeScreen = async () => {
-    console.log('Add to home screen clicked');
-    
-    if (deferredPrompt && isInstallable) {
-      console.log('Using deferred prompt');
-      try {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to install prompt: ${outcome}`);
-        
-        if (outcome === 'accepted') {
-          setShowPWAPrompt(false);
-          localStorage.setItem('pwaInstalled', 'true');
-        }
-        
-        setDeferredPrompt(null);
-        setIsInstallable(false);
-      } catch (error) {
-        console.error('Error showing install prompt:', error);
-      }
-    } else {
-      // Store the global prompt for later use
-      (window as any).showAddToHomeScreenInstructions = true;
-      onComplete();
-    }
-  };
-
-  const handleSkipInstall = () => {
-    localStorage.setItem('addToHomeScreenSkipped', 'true');
-    onComplete();
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-pink-50 p-6">
-      <div className="max-w-md mx-auto">
-        <div className="space-y-8 py-8">
-          <div className="text-center space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 flex items-center justify-center p-6">
+      <div className={`w-full max-w-md transition-all duration-1000 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+        <div className="text-center space-y-8">
+          {/* Animated Duck with decorative elements */}
+          <div className="relative">
+            <div className="absolute -top-4 -left-8 w-12 h-12 bg-orange-400 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.5s' }}>
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div className="absolute -top-2 -right-6 w-10 h-10 bg-pink-400 rounded-full flex items-center justify-center animate-pulse">
+              <Heart className="w-5 h-5 text-white" />
+            </div>
+            <DuckMascot className="w-32 h-32 mx-auto animate-bounce" />
+            <div className="absolute -bottom-4 -right-8 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center animate-spin">
+              <Star className="w-4 h-4 text-orange-800" />
+            </div>
+          </div>
+
+          {/* Main Welcome Message */}
+          <div className="space-y-6">
             <div className="relative">
-              <DuckMascot className="mx-auto animate-bounce" />
-              <div className="absolute -top-2 -right-2 w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center animate-pulse">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
+              <h1 className="text-5xl font-black text-orange-600 mb-4 uppercase tracking-wide transform -rotate-1">
+                NAMASTE! 🙏
+              </h1>
+              <div className="absolute -top-2 -right-4 w-6 h-6 bg-orange-400 rounded-full animate-ping"></div>
             </div>
             
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 leading-tight">
-                  Namaste! 🙏
-                </h1>
-                <div className="bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-                  <p className="text-xl sm:text-2xl font-bold leading-relaxed">
-                    Your AI Hindi Teacher
-                  </p>
-                  <p className="text-lg sm:text-xl font-semibold">
-                    (who happens to be a goose)
-                  </p>
-                </div>
+            <div className="bg-gradient-to-r from-blue-400 to-purple-500 rounded-3xl p-6 border-4 border-blue-600 shadow-2xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-white bg-opacity-10 animate-pulse"></div>
+              <div className="relative z-10">
+                <h2 className="text-2xl font-black text-white mb-3 uppercase tracking-wide">
+                  YOUR AI HINDI TEACHER
+                </h2>
+                <p className="text-blue-100 font-bold text-lg">
+                  Who happens to be a super smart goose! 🦆
+                </p>
               </div>
+            </div>
 
-              <div className="grid grid-cols-3 gap-4 my-8">
-                <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-orange-100">
-                  <Globe className="w-8 h-8 mx-auto mb-2 text-orange-500" />
-                  <p className="text-sm font-semibold text-slate-700">Conversational</p>
-                </div>
-                <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-pink-100">
-                  <Zap className="w-8 h-8 mx-auto mb-2 text-pink-500" />
-                  <p className="text-sm font-semibold text-slate-700">Interactive</p>
-                </div>
-                <div className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-purple-100">
-                  <Sparkles className="w-8 h-8 mx-auto mb-2 text-purple-500" />
-                  <p className="text-sm font-semibold text-slate-700">Personalized</p>
-                </div>
-              </div>
-
-              <p className="text-lg text-slate-600 font-medium">
-                Ready to start your Hindi journey?
+            {/* Fun tagline */}
+            <div className="bg-white rounded-2xl p-4 border-4 border-orange-200 shadow-lg">
+              <p className="text-orange-700 font-black text-xl italic">
+                "Let's quack the code of Hindi together!"
               </p>
             </div>
+          </div>
 
-            <div className="space-y-4">
-              {showPWAPrompt && (
-                <Button 
-                  onClick={handleAddToHomeScreen}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-6 px-8 rounded-3xl text-lg transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl transform shadow-xl"
-                >
-                  <Plus className="w-6 h-6 mr-3" />
-                  Add to Home Screen
-                </Button>
-              )}
-
-              <Button 
-                onClick={showPWAPrompt ? handleSkipInstall : onComplete}
-                variant={showPWAPrompt ? "outline" : "default"}
-                className={`w-full font-bold py-6 px-8 rounded-3xl text-xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl transform shadow-xl ${
-                  showPWAPrompt 
-                    ? "border-2 border-orange-300 text-orange-600 hover:bg-orange-50 bg-white/80 backdrop-blur-sm" 
-                    : "bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white"
-                }`}
-              >
-                <Sparkles className="w-6 h-6 mr-3" />
-                {showPWAPrompt ? "Skip & Continue" : "Start Learning"}
-              </Button>
+          {/* Enhanced CTA Button */}
+          <Button
+            onClick={onComplete}
+            className="w-full bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 hover:from-orange-600 hover:via-pink-600 hover:to-purple-600 text-white font-black py-6 text-2xl rounded-3xl border-4 border-orange-600 shadow-2xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden uppercase tracking-wide"
+          >
+            <div className="absolute inset-0 bg-white bg-opacity-20 animate-pulse"></div>
+            <div className="relative z-10 flex items-center justify-center">
+              <Zap className="w-8 h-8 mr-3 animate-bounce" />
+              START MY JOURNEY!
+              <Sparkles className="w-8 h-8 ml-3 animate-spin" />
             </div>
+          </Button>
 
-            <div className="flex items-center justify-center space-x-2 text-sm text-slate-500 font-medium bg-white/50 backdrop-blur-sm rounded-full px-4 py-2 border border-slate-200">
-              <span className="text-2xl">🇮🇳</span>
-              <span>Focused on Hindi conversation practice</span>
-            </div>
+          {/* Fun footer message */}
+          <div className="text-center p-4 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl border-3 border-yellow-200 shadow-lg">
+            <DuckMascot size="sm" className="w-6 h-6 inline-block mr-2" />
+            <span className="text-orange-700 font-bold">Ready to become fluent in Hindi? Let's go! 🚀</span>
           </div>
         </div>
       </div>
