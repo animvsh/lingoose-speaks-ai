@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
@@ -14,6 +13,7 @@ import ActivityDetailsView from "@/components/ActivityDetailsView";
 import AnimatedBottomNav from "@/components/AnimatedBottomNav";
 import AddSupervisorForm from "@/components/AddSupervisorForm";
 import ProUpgradeCard from "@/components/ProUpgradeCard";
+import StripeTestingPanel from "@/components/StripeTestingPanel";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
@@ -26,6 +26,7 @@ const Index = () => {
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [activityDetailsData, setActivityDetailsData] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showTestingPanel, setShowTestingPanel] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -140,7 +141,28 @@ const Index = () => {
     if (currentView === "home") {
       return (
         <div className={baseClasses}>
-          <DashboardStats onNavigate={handleNavigate} />
+          <div className="space-y-4">
+            {/* Toggle button for testing panel */}
+            {user && (
+              <div className="flex justify-end p-4">
+                <button
+                  onClick={() => setShowTestingPanel(!showTestingPanel)}
+                  className="text-sm bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-1 rounded-full transition-colors"
+                >
+                  {showTestingPanel ? 'Hide' : 'Show'} Stripe Testing
+                </button>
+              </div>
+            )}
+            
+            {/* Testing Panel */}
+            {showTestingPanel && user && (
+              <div className="px-4">
+                <StripeTestingPanel />
+              </div>
+            )}
+            
+            <DashboardStats onNavigate={handleNavigate} />
+          </div>
         </div>
       );
     }
