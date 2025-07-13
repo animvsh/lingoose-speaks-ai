@@ -22,7 +22,8 @@ const validateUserName = (name: string): boolean => {
 
 const logSecurityEvent = async (action: string, phoneNumber: string, details: any = {}) => {
   try {
-    await supabase.from('security_audit_logs').insert({
+    // Use untyped insert to bypass TypeScript checks for security_audit_logs table
+    await (supabase as any).from('security_audit_logs').insert({
       phone_number: phoneNumber,
       action,
       details,
