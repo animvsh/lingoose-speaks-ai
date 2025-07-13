@@ -13,11 +13,13 @@ export const useSubscriptionCheck = () => {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['subscription-check', user?.email],
+    queryKey: ['subscription-check', user?.phone_number],
     queryFn: async (): Promise<SubscriptionData> => {
-      console.log('🔄 Checking subscription status for user:', user?.email);
+      console.log('🔄 Checking subscription status for user:', user?.phone_number);
       
-      const { data, error } = await supabase.functions.invoke('check-subscription');
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        body: { phone_number: user?.phone_number }
+      });
       
       console.log('📦 Subscription check response:', { data, error });
       
@@ -35,7 +37,7 @@ export const useSubscriptionCheck = () => {
       console.log('✅ Subscription status:', result);
       return result;
     },
-    enabled: !!user?.email,
+    enabled: !!user?.phone_number,
     staleTime: 30000, // Cache for 30 seconds
     refetchInterval: 60000, // Refetch every minute
   });

@@ -93,8 +93,8 @@ const StripeTestingPanel = () => {
           <h3 className="font-semibold text-gray-800">Current Status</h3>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">User Email:</span>
-              <p className="font-medium">{user.email}</p>
+              <span className="text-gray-600">User Phone:</span>
+              <p className="font-medium">{user.phone_number}</p>
             </div>
             <div>
               <span className="text-gray-600">Subscription Status:</span>
@@ -189,7 +189,8 @@ const StripeTestingPanel = () => {
             {JSON.stringify({
               user: {
                 id: user.id,
-                email: user.email
+                phone_number: user.phone_number,
+                full_name: user.full_name
               },
               subscription: subscription,
               isLoading: isLoading,
