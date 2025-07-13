@@ -5,10 +5,11 @@ import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, Phone, CheckCircle, FileText, Shield } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link, useNavigate } from "react-router-dom";
+import WelcomeScreen from "@/components/WelcomeScreen";
 
 const Landing = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const navigate = useNavigate();
+  const [showWelcome, setShowWelcome] = useState(false);
   
   const testimonials = [
     {
@@ -87,8 +88,17 @@ const Landing = () => {
   }, [totalSlides]);
 
   const handleStartNow = () => {
-    navigate('/app');
+    setShowWelcome(true);
   };
+
+  const handleWelcomeComplete = () => {
+    // This will be handled by WelcomeScreen component
+    setShowWelcome(false);
+  };
+
+  if (showWelcome) {
+    return <WelcomeScreen onComplete={handleWelcomeComplete} />;
+  }
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
