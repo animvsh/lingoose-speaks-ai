@@ -134,26 +134,26 @@ const Landing = () => {
   
   return (
     <div className="min-h-screen w-full bg-background">
-      {/* Header */}
+      {/* Header - optimized for desktop */}
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <img 
               src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png" 
               alt="Bol Logo" 
-              className="h-16 w-auto object-contain hover:scale-105 transition-transform duration-200" 
+              className="h-12 md:h-16 w-auto object-contain hover:scale-105 transition-transform duration-200" 
             />
           </div>
           <div className="flex items-center space-x-4">
             <Button
               onClick={handleSignIn}
               variant="outline"
-              className="hidden sm:flex items-center bg-white hover:bg-gray-50 border-2 border-primary text-primary font-bold py-2 px-4 rounded-xl transition-all duration-200"
+              className="flex items-center bg-white hover:bg-gray-50 border-2 border-primary text-primary font-bold py-2 px-4 rounded-xl transition-all duration-200 text-sm md:text-base"
             >
               <LogIn className="w-4 h-4 mr-2" />
               Sign In
             </Button>
-            <div className="hidden sm:flex items-center space-x-8 text-sm font-semibold text-foreground">
+            <div className="hidden lg:flex items-center space-x-8 text-sm font-semibold text-foreground">
               <a href="#why" className="hover:text-primary transition-colors">Why Bol</a>
               <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
               <a href="#faqs" className="hover:text-primary transition-colors">FAQs</a>
@@ -162,48 +162,50 @@ const Landing = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-12 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6 text-foreground">
-            Teach your kids Hindi.<br />
-            <span className="text-primary">Without nagging.</span>
-          </h1>
-          
-          <div className="space-y-4 text-lg sm:text-xl mb-8 text-muted-foreground">
-            <p className="font-semibold">Daily 1-on-1 calls. No apps. No worksheets.</p>
-            <p className="font-semibold">Just one slightly pushy desi sheep.</p>
-            <p className="font-black text-2xl text-primary">$4/week. Cancel anytime.</p>
-          </div>
-
-          <div className="mb-12 flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              onClick={handleStartNow}
-              className="warm-button font-black text-xl px-12 py-6 text-white soft-shadow"
-            >
-              <Phone className="w-6 h-6 mr-3" />
-              START NOW! 🚀
-            </Button>
+      {/* Hero Section - responsive for desktop */}
+      <section className="container mx-auto px-4 py-8 md:py-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8 md:mb-12">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6 text-foreground">
+              Teach your kids Hindi.<br />
+              <span className="text-primary">Without nagging.</span>
+            </h1>
             
-            <Button
-              onClick={handleSignIn}
-              variant="outline"
-              className="bg-white hover:bg-gray-50 border-2 border-primary text-primary font-black text-xl px-12 py-6 rounded-xl transition-all duration-200"
-            >
-              <LogIn className="w-6 h-6 mr-3" />
-              Sign In
-            </Button>
+            <div className="space-y-4 text-base sm:text-lg md:text-xl mb-8 text-muted-foreground">
+              <p className="font-semibold">Daily 1-on-1 calls. No apps. No worksheets.</p>
+              <p className="font-semibold">Just one slightly pushy desi sheep.</p>
+              <p className="font-black text-xl md:text-2xl text-primary">$4/week. Cancel anytime.</p>
+            </div>
+
+            <div className="mb-8 md:mb-12 flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button 
+                onClick={handleStartNow}
+                className="warm-button font-black text-lg md:text-xl px-8 md:px-12 py-4 md:py-6 text-white soft-shadow"
+              >
+                <Phone className="w-5 md:w-6 h-5 md:h-6 mr-3" />
+                START NOW! 🚀
+              </Button>
+              
+              <Button
+                onClick={handleSignIn}
+                variant="outline"
+                className="bg-white hover:bg-gray-50 border-2 border-primary text-primary font-black text-lg md:text-xl px-8 md:px-12 py-4 md:py-6 rounded-xl transition-all duration-200"
+              >
+                <LogIn className="w-5 md:w-6 h-5 md:h-6 mr-3" />
+                Sign In
+              </Button>
+            </div>
+
+            <p className="text-xs md:text-sm mt-4 max-w-md mx-auto text-muted-foreground">
+              By clicking Start Now, you consent to the{' '}
+              <Link to="/terms-of-service" className="hover:underline font-semibold text-primary">Terms of Service</Link> and{' '}
+              <Link to="/privacy-policy" className="hover:underline font-semibold text-primary">Privacy Policy</Link>.
+            </p>
           </div>
 
-          <p className="text-sm mt-4 max-w-md mx-auto text-muted-foreground">
-            By clicking Start Now, you consent to the{' '}
-            <Link to="/terms-of-service" className="hover:underline font-semibold text-primary">Terms of Service</Link> and{' '}
-            <Link to="/privacy-policy" className="hover:underline font-semibold text-primary">Privacy Policy</Link>.
-          </p>
-
-          {/* Hero Image */}
-          <div className="relative max-w-lg mx-auto">
-            <div className="warm-card p-8 soft-shadow">
+          {/* Hero Image - responsive */}
+          <div className="relative max-w-sm md:max-w-lg mx-auto">
+            <div className="warm-card p-6 md:p-8 soft-shadow">
               <img 
                 src="/lovable-uploads/b0e951c1-f59e-468b-afbb-83bef5734b90.png" 
                 alt="Learning character with headphones" 
@@ -215,8 +217,8 @@ const Landing = () => {
       </section>
 
       {/* Why Bol Works */}
-      <section id="why" className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-foreground">
+      <section id="why" className="container mx-auto px-4 py-12 md:py-16">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-8 md:mb-12 text-foreground">
           Why Bol Works
         </h2>
         
@@ -248,10 +250,10 @@ const Landing = () => {
                 <img 
                   src={item.image} 
                   alt={item.title}
-                  className="w-20 h-20 object-contain"
+                  className="w-16 md:w-20 h-16 md:h-20 object-contain"
                 />
               </div>
-              <h3 className="text-lg font-black mb-3 text-foreground">{item.title}</h3>
+              <h3 className="text-base md:text-lg font-black mb-3 text-foreground">{item.title}</h3>
               <p className="text-sm font-medium text-muted-foreground">{item.desc}</p>
             </Card>
           ))}
@@ -259,15 +261,15 @@ const Landing = () => {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl lg:text-4xl font-black mb-8 text-foreground">💸 Simple Pricing</h2>
+      <section id="pricing" className="container mx-auto px-4 py-12 md:py-16 text-center">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-black mb-8 text-foreground">💸 Simple Pricing</h2>
         
         <div className="inline-block">
-          <Card className="warm-card p-10 soft-shadow">
-            <div className="text-6xl font-black mb-4 text-foreground">
-              $4<span className="text-3xl text-muted-foreground">/week</span>
+          <Card className="warm-card p-8 md:p-10 soft-shadow">
+            <div className="text-4xl md:text-6xl font-black mb-4 text-foreground">
+              $4<span className="text-2xl md:text-3xl text-muted-foreground">/week</span>
             </div>
-            <ul className="text-lg space-y-3 font-semibold text-muted-foreground">
+            <ul className="text-base md:text-lg space-y-3 font-semibold text-muted-foreground">
               <li className="flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
                 Daily 1-on-1 calls 📞

@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
 import { useSessionTracking } from "@/hooks/useSessionTracking";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
+import { useIsDesktop } from "@/hooks/use-mobile";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import DashboardStats from "@/components/DashboardStats";
 import ActivityCard from "@/components/ActivityCard";
@@ -14,11 +14,13 @@ import AnimatedBottomNav from "@/components/AnimatedBottomNav";
 import AddSupervisorForm from "@/components/AddSupervisorForm";
 import ProUpgradeCard from "@/components/ProUpgradeCard";
 import StripeTestingPanel from "@/components/StripeTestingPanel";
+import DesktopExperienceMessage from "@/components/DesktopExperienceMessage";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const isDesktop = useIsDesktop();
   const { trackNavigation, trackScreenView, trackOnboardingComplete, identify } = usePostHog();
   const { trackPageView } = useSessionTracking();
   const { trackScreenTime } = useEngagementTracking();
@@ -104,7 +106,12 @@ const Index = () => {
         </div>
       </div>
     );
-  };
+  }
+
+  // Show desktop message if user is authenticated, onboarded, and on desktop
+  if (user && isOnboarded && isDesktop) {
+    return <DesktopExperienceMessage />;
+  }
 
   const renderCurrentView = () => {
     // Enhanced page transitions with scale and fade effects
