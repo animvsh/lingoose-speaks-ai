@@ -224,6 +224,7 @@ export const usePostHog = () => {
     captureQueued,
     identify,
     pageView,
+    trackPageView: pageView, // Add alias for trackPageView
     
     // Learning & Practice
     trackPracticeStart,
