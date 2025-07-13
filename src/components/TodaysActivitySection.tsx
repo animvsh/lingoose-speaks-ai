@@ -1,9 +1,10 @@
 
 import { Button } from "@/components/ui/button";
-import { Phone, RefreshCw, Zap } from "lucide-react";
+import { Phone, RefreshCw, Zap, Clock, AlertTriangle } from "lucide-react";
 import { usePostHog } from "@/hooks/usePostHog";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import { useLearningAnalytics } from "@/hooks/useLearningAnalytics";
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 
 interface TodaysActivitySectionProps {
   currentActivity: any;
@@ -23,6 +24,7 @@ const TodaysActivitySection = ({
   const { trackPracticeStart, trackActivityRegenerate } = usePostHog();
   const { trackTap } = useEngagementTracking();
   const { trackLearningSessionStart } = useLearningAnalytics();
+  const { data: subscriptionStatus } = useSubscriptionStatus();
 
   const getRatingColor = (rating: number) => {
     if (rating < 40) return "text-red-600";
@@ -65,6 +67,9 @@ const TodaysActivitySection = ({
     onStartPractice();
   };
 
+  const canStartCall = subscriptionStatus?.has_minutes;
+  const minutesRemaining = subscriptionStatus?.minutes_remaining || 0;
+
   return (
     <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl p-8 border-4 border-blue-600 shadow-2xl">
       {/* Header with main learning message */}
@@ -83,6 +88,28 @@ const TodaysActivitySection = ({
             {currentActivity.description}
           </p>
         </div>
+
+        {/* Usage Status Display */}
+        {subscriptionStatus && (
+          <div className="bg-white/10 rounded-2xl p-4 mb-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Clock className="w-5 h-5 text-white" />
+              <span className="text-white font-bold">
+                {minutesRemaining.toFixed(1)} minutes remaining this week
+              </span>
+            </div>
+            {!canStartCall && (
+              <div className="flex items-center justify-center gap-2 text-red-200">
+                <AlertTriangle className="w-4 h-4" />
+                <span className="text-sm">
+                  {subscriptionStatus.subscription_status === 'free_trial' 
+                    ? 'Free trial expired or limit reached' 
+                    : 'Weekly limit reached'}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Regenerate button positioned at top right */}
@@ -123,13 +150,25 @@ const TodaysActivitySection = ({
         {/* Main CTA Button */}
         <Button 
           onClick={handleStartPractice}
-          disabled={isStartingCall}
-          className="w-full bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 text-white font-black py-6 text-2xl rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-xl border-4 border-orange-600"
+          disabled={isStartingCall || !canStartCall}
+          className={`w-full ${
+            canStartCall 
+              ? 'bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600' 
+              : 'bg-gray-400 hover:bg-gray-500 cursor-not-allowed'
+          } text-white font-black py-6 text-2xl rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-xl border-4 ${
+            canStartCall ? 'border-orange-600' : 'border-gray-500'
+          }`}
+          title={!canStartCall ? 'No minutes remaining - upgrade or wait for weekly reset' : ''}
         >
           {isStartingCall ? (
             <>
               <Phone className="w-6 h-6 mr-3 animate-pulse" />
               STARTING CALL...
+            </>
+          ) : !canStartCall ? (
+            <>
+              <AlertTriangle className="w-6 h-6 mr-3" />
+              NO MINUTES REMAINING
             </>
           ) : (
             <>
@@ -138,6 +177,20 @@ const TodaysActivitySection = ({
             </>
           )}
         </Button>
+
+        {!canStartCall && subscriptionStatus?.needs_upgrade && (
+          <div className="text-center">
+            <p className="text-white/80 text-sm mb-2">
+              Need more practice time? Upgrade for unlimited weekly minutes!
+            </p>
+            <Button 
+              variant="outline" 
+              className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+            >
+              Upgrade to Pro
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

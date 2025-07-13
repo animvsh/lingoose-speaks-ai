@@ -34,7 +34,8 @@ serve(async (req) => {
       phoneNumber, 
       userId, 
       topic = "Hindi conversation practice",
-      lastConversationSummary = null 
+      lastConversationSummary = null,
+      maxDurationSeconds = 1500 // Default 25 minutes
     } = await req.json()
     
     if (!phoneNumber || !userId) {
@@ -43,6 +44,39 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    // Initialize Supabase client with service role for usage checking
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    // Check if user has available minutes before proceeding
+    console.log('Checking available minutes for phone:', phoneNumber);
+    const { data: minutesCheck, error: minutesError } = await supabase.rpc('check_available_minutes', {
+      p_phone_number: phoneNumber
+    });
+
+    if (minutesError) {
+      console.error('Error checking available minutes:', minutesError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to check available minutes' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const availableMinutes = minutesCheck?.[0];
+    if (!availableMinutes?.has_minutes) {
+      const errorMsg = availableMinutes?.subscription_status === 'free_trial' 
+        ? 'Your free trial has expired or you\'ve reached your limit. Please upgrade to continue.'
+        : 'You\'ve reached your weekly limit. Your minutes will reset next week.';
+      
+      return new Response(
+        JSON.stringify({ error: errorMsg }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    console.log('User has available minutes:', availableMinutes.minutes_remaining);
 
     const vapiApiKey = Deno.env.get('VAPI_API_KEY')
     
@@ -79,6 +113,7 @@ serve(async (req) => {
     console.log(`Formatted phone number (E.164): ${formattedPhoneNumber}`);
     console.log(`Topic: ${topic}`);
     console.log(`Last conversation summary: ${lastConversationSummary}`);
+    console.log(`Max duration seconds: ${maxDurationSeconds}`);
 
     // Prepare variable values for the assistant
     const variableValues: any = {
@@ -94,7 +129,8 @@ serve(async (req) => {
     const requestBody = {
       assistantId: "d3c48fab-0d85-4e6e-9f22-076b9e3c537c",
       assistantOverrides: {
-        variableValues: variableValues
+        variableValues: variableValues,
+        maxDurationSeconds: maxDurationSeconds // Add duration limit to prevent overuse
       },
       phoneNumberId: "84d220a6-8dd1-4808-b31e-a6364ce98885",
       customer: {
@@ -180,11 +216,6 @@ serve(async (req) => {
       )
     }
 
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseKey)
-
     // Get the first available learning outline to use as outline_id
     const { data: outline, error: outlineError } = await supabase
       .from('learning_outlines')
@@ -209,6 +240,7 @@ serve(async (req) => {
           status: 'initiated',
           scenario: topic,
           last_conversation_summary: lastConversationSummary,
+          max_duration_seconds: maxDurationSeconds,
           vapi_response: vapiData
         }
       })
@@ -225,7 +257,8 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         callId: vapiData.id, 
-        message: 'Call initiated successfully' 
+        message: 'Call initiated successfully',
+        maxDurationSeconds: maxDurationSeconds
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
