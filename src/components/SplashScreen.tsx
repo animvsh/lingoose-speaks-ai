@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import DuckMascot from "./DuckMascot";
+import BolMascot from "./BolMascot";
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -44,10 +44,10 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       <div className={`text-center relative z-10 transition-all duration-700 transform ${
         showContent ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
       }`}>
-        {/* Duck mascot with app-style background */}
+        {/* Sheep mascot with app-style background */}
         <div className="relative mb-8">
           <div className="w-32 h-32 bg-orange-200 rounded-3xl flex items-center justify-center mx-auto border-4 border-gray-200 shadow-lg">
-            <DuckMascot 
+            <BolMascot 
               size="lg" 
               className="w-20 h-20 animate-bounce" 
             />
@@ -57,7 +57,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         {/* App title matching the app's style */}
         <div className="mb-8">
           <h1 className="text-5xl font-black text-orange-600 uppercase tracking-wider mb-3 transform -rotate-1">
-            Lingoose
+            BOL
           </h1>
           <div className="w-24 h-2 bg-orange-400 mx-auto rounded-full"></div>
         </div>

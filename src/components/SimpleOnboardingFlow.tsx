@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronRight, ArrowLeft, Sparkles, Heart, Star } from "lucide-react";
-import DuckMascot from "./DuckMascot";
+import BolMascot from "./BolMascot";
 import { useCreateUserProfile } from "@/hooks/useCreateUserProfile";
 
 interface SimpleOnboardingFlowProps {
@@ -96,7 +95,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
             <div className="w-full max-w-md">
               <div className="text-center mb-8">
                 <div className="relative mb-6">
-                  <DuckMascot className="w-24 h-24 mx-auto animate-bounce" />
+                  <BolMascot className="w-24 h-24 mx-auto animate-bounce" />
                   <div className="absolute -top-2 -right-4 w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center animate-pulse">
                     <Heart className="w-4 h-4 text-white" />
                   </div>
@@ -137,7 +136,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
 
               <div className="text-center mt-6 p-4 bg-white rounded-2xl border-3 border-orange-200 shadow-lg">
-                <DuckMascot size="sm" className="w-6 h-6 inline-block mr-2" />
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-orange-700 font-bold">Nice to meet you! 🌟</span>
               </div>
             </div>
@@ -207,7 +206,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
 
               <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-purple-200 shadow-lg">
-                <DuckMascot size="sm" className="w-6 h-6 inline-block mr-2" />
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-purple-700 font-bold">
                   {createUserProfile.isPending ? "Creating your profile..." : "Choose your current level! 🎯"}
                 </span>

@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X, Plus, Share, Download, Smartphone } from "lucide-react";
-import DuckMascot from "./DuckMascot";
+import BolMascot from "./BolMascot";
 
 interface AddToHomeScreenProps {
   onDismiss: () => void;
@@ -130,7 +129,7 @@ const AddToHomeScreen = ({ onDismiss }: AddToHomeScreenProps) => {
       <Card className="w-full bg-white p-6 rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300">
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center space-x-3">
-            <DuckMascot size="sm" className="w-8 h-8" />
+            <BolMascot size="sm" className="w-8 h-8" />
             <h3 className="text-xl font-bold text-slate-800">
               Add to Home Screen
             </h3>
@@ -148,7 +147,7 @@ const AddToHomeScreen = ({ onDismiss }: AddToHomeScreenProps) => {
         <div className="mb-6">
           <div className="bg-gradient-to-r from-orange-100 to-pink-100 rounded-2xl p-4 mb-4 border-2 border-orange-200">
             <p className="text-orange-800 font-semibold text-center">
-              🦆 Get instant access to your Hindi learning journey!
+              🐏 Get instant access to your Hindi learning journey!
             </p>
           </div>
           {getInstructions()}

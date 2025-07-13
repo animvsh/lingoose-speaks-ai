@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Volume2, Sparkles, ArrowLeft, Heart, Zap, Star } from "lucide-react";
-import DuckMascot from "./DuckMascot";
+import BolMascot from "./BolMascot";
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -62,12 +62,12 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
       case 0:
         return (
           <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 pb-8">
-            {/* Header with animated duck */}
+            {/* Header with animated sheep */}
             <div className="px-6 pt-8 pb-6">
               <div className="flex items-center justify-center">
                 <div className="text-center">
                   <div className="relative">
-                    <DuckMascot className="w-24 h-24 mx-auto mb-4 animate-bounce" />
+                    <BolMascot className="w-24 h-24 mx-auto mb-4 animate-bounce" />
                     <div className="absolute -top-2 -right-4 w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center animate-pulse">
                       <Heart className="w-4 h-4 text-white" />
                     </div>
@@ -128,7 +128,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
               {/* Fun footer message */}
               <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-orange-200 shadow-lg">
-                <DuckMascot size="sm" className="w-6 h-6 inline-block mr-2" />
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-orange-700 font-bold">Choose what excites you most! 🌟</span>
               </div>
             </div>
@@ -212,7 +212,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
               {/* Fun footer message */}
               <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-purple-200 shadow-lg">
-                <DuckMascot size="sm" className="w-6 h-6 inline-block mr-2" />
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-purple-700 font-bold">Pick your perfect teaching vibe! ✨</span>
               </div>
             </div>
@@ -269,7 +269,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
                 <div className="absolute inset-0 bg-white bg-opacity-10 animate-pulse"></div>
                 <div className="relative z-10">
                   <div className="relative mb-6">
-                    <DuckMascot className="w-24 h-24 mx-auto animate-bounce" />
+                    <BolMascot className="w-24 h-24 mx-auto animate-bounce" />
                     <div className="absolute -top-2 -right-8 w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center animate-spin">
                       <Sparkles className="w-5 h-5 text-yellow-800" />
                     </div>
@@ -287,7 +287,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               {/* Profile Summary Card with enhanced design */}
               <div className="bg-white rounded-3xl p-8 border-4 border-blue-200 shadow-2xl relative">
                 <div className="absolute top-4 right-4">
-                  <DuckMascot size="sm" className="w-8 h-8 opacity-20" />
+                  <BolMascot size="sm" className="w-8 h-8 opacity-20" />
                 </div>
                 <div className="flex items-center justify-center space-x-4 mb-6">
                   <div className={`w-20 h-20 bg-gradient-to-br ${selectedGoalData?.color} rounded-3xl flex items-center justify-center text-4xl shadow-xl border-3 border-white`}>
