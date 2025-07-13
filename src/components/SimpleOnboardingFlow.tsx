@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronRight, ArrowLeft, Sparkles, Heart, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 import BolMascot from "./BolMascot";
 import { useCreateUserProfile } from "@/hooks/useCreateUserProfile";
 
@@ -14,6 +16,7 @@ interface SimpleOnboardingFlowProps {
 const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [fullName, setFullName] = useState("");
+  const [hasConsented, setHasConsented] = useState(false);
   const [proficiencyLevel, setProficiencyLevel] = useState<number | null>(null);
   
   const createUserProfile = useCreateUserProfile();
@@ -59,7 +62,9 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
   const handleNext = () => {
     if (currentStep === 0 && fullName.trim()) {
       setCurrentStep(1);
-    } else if (currentStep === 1 && proficiencyLevel) {
+    } else if (currentStep === 1 && hasConsented) {
+      setCurrentStep(2);
+    } else if (currentStep === 2 && proficiencyLevel) {
       // Create user profile
       createUserProfile.mutate({
         phone_number: phoneNumber,
@@ -157,9 +162,85 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
                 <div className="text-center">
                   <div className="relative">
                     <h1 className="text-4xl font-black text-purple-600 tracking-wide uppercase transform rotate-1">
-                      Your Hindi Level? 📚
+                      Consent & Terms 📋
                     </h1>
                     <Sparkles className="absolute -top-2 -right-4 w-6 h-6 text-purple-400 animate-spin" />
+                  </div>
+                  <p className="text-slate-700 font-bold text-lg">Just a quick agreement!</p>
+                </div>
+                <div className="w-14 h-14"></div>
+              </div>
+            </div>
+
+            <div className="px-6 space-y-6">
+              <div className="bg-white rounded-3xl p-8 border-4 border-purple-200 shadow-2xl">
+                <div className="text-center mb-6">
+                  <BolMascot className="w-16 h-16 mx-auto mb-4" />
+                  <h2 className="text-2xl font-black text-purple-600 mb-2">Almost there, {fullName}! 🎉</h2>
+                  <p className="text-slate-600 font-semibold">We need your consent to get started</p>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="flex items-start space-x-4 p-4 bg-purple-50 rounded-2xl border-2 border-purple-200">
+                    <Checkbox
+                      id="consent"
+                      checked={hasConsented}
+                      onCheckedChange={(checked) => setHasConsented(checked as boolean)}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <Label htmlFor="consent" className="text-sm font-bold text-slate-700 leading-relaxed cursor-pointer">
+                        By checking this box, I agree to receive daily calls and text messages from Bol at the number provided, including via automated systems. I also agree to the{' '}
+                        <Link to="/privacy-policy" className="text-purple-600 hover:text-purple-800 underline font-black">
+                          Privacy Policy
+                        </Link>{' '}
+                        and{' '}
+                        <Link to="/terms-of-service" className="text-purple-600 hover:text-purple-800 underline font-black">
+                          Terms of Service
+                        </Link>
+                        . Consent is not required as a condition of purchase. Message & data rates may apply. You may opt out anytime by replying STOP or contacting us.
+                      </Label>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={handleNext}
+                    disabled={!hasConsented}
+                    className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-black py-6 text-xl rounded-2xl border-3 border-purple-400 shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:scale-100"
+                  >
+                    <div className="flex items-center justify-center">
+                      I Agree - Continue
+                      <ChevronRight className="w-6 h-6 ml-2" />
+                    </div>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="text-center p-4 bg-white rounded-2xl border-3 border-purple-200 shadow-lg">
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
+                <span className="text-purple-700 font-bold">Your privacy matters to us! 🔒</span>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 pb-8">
+            <div className="px-6 pt-8 pb-6">
+              <div className="flex items-center justify-between">
+                <Button
+                  onClick={handleBack}
+                  className="w-14 h-14 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-2xl text-white shadow-xl border-3 border-green-400 transition-all duration-300"
+                >
+                  <ArrowLeft className="w-6 h-6" />
+                </Button>
+                <div className="text-center">
+                  <div className="relative">
+                    <h1 className="text-4xl font-black text-green-600 tracking-wide uppercase transform -rotate-1">
+                      Your Hindi Level? 📚
+                    </h1>
+                    <Sparkles className="absolute -top-2 -right-4 w-6 h-6 text-green-400 animate-spin" />
                   </div>
                   <p className="text-slate-700 font-bold text-lg">How well do you know Hindi?</p>
                 </div>
@@ -177,13 +258,13 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
                     className={`w-full p-5 rounded-3xl text-left transition-all duration-300 border-4 transform hover:scale-[1.02] hover:shadow-xl ${
                       proficiencyLevel === level.level 
                         ? `bg-gradient-to-r ${level.color} border-white text-white shadow-2xl scale-[1.02] animate-pulse` 
-                        : 'bg-white border-purple-200 hover:border-purple-300 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 shadow-lg'
+                        : 'bg-white border-green-200 hover:border-green-300 hover:bg-gradient-to-r hover:from-green-50 hover:to-blue-50 shadow-lg'
                     }`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="flex items-center space-x-4">
                       <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl transition-all shadow-lg ${
-                        proficiencyLevel === level.level ? 'bg-white bg-opacity-20 shadow-inner transform scale-110' : 'bg-gradient-to-br from-purple-100 to-blue-100'
+                        proficiencyLevel === level.level ? 'bg-white bg-opacity-20 shadow-inner transform scale-110' : 'bg-gradient-to-br from-green-100 to-blue-100'
                       }`}>
                         {level.emoji}
                       </div>
@@ -197,7 +278,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
                       </div>
                       <div className={`transition-all ${proficiencyLevel === level.level ? 'animate-bounce' : ''}`}>
                         <Star className={`w-6 h-6 transition-all ${
-                          proficiencyLevel === level.level ? 'text-white' : 'text-purple-400'
+                          proficiencyLevel === level.level ? 'text-white' : 'text-green-400'
                         }`} />
                       </div>
                     </div>
@@ -205,9 +286,9 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
                 ))}
               </div>
 
-              <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-purple-200 shadow-lg">
+              <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-green-200 shadow-lg">
                 <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
-                <span className="text-purple-700 font-bold">
+                <span className="text-green-700 font-bold">
                   {createUserProfile.isPending ? "Creating your profile..." : "Choose your current level! 🎯"}
                 </span>
               </div>
