@@ -114,7 +114,7 @@ const Landing = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <img 
-              src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png" 
+              src="/lovable-uploads/585adb06-92d0-4a3a-87cc-fb71d70d8f29.png" 
               alt="Bol Logo" 
               className="h-16 w-auto object-contain mx-auto mb-4 hover:scale-110 transition-transform duration-300" 
             />
@@ -139,7 +139,7 @@ const Landing = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <img 
-              src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png" 
+              src="/lovable-uploads/585adb06-92d0-4a3a-87cc-fb71d70d8f29.png" 
               alt="Bol Logo" 
               className="h-12 md:h-16 w-auto object-contain hover:scale-105 transition-transform duration-200" 
             />
@@ -440,7 +440,7 @@ const Landing = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-center space-x-3">
             <img 
-              src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png" 
+              src="/lovable-uploads/585adb06-92d0-4a3a-87cc-fb71d70d8f29.png" 
               alt="Bol Logo" 
               className="h-10 w-auto object-contain" 
             />

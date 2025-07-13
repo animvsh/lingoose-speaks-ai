@@ -16,8 +16,8 @@ const BolMascot = ({ className, size = "lg" }: BolMascotProps) => {
   return (
     <div className={cn("relative", sizeClasses[size], className)}>
       <img 
-        src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png"
-        alt="Bol Mascot"
+        src="/lovable-uploads/585adb06-92d0-4a3a-87cc-fb71d70d8f29.png"
+        alt="Bol Logo"
         className="w-full h-full object-contain hover:scale-110 transition-transform duration-200 soft-shadow rounded-xl"
       />
     </div>

@@ -11,7 +11,7 @@ const DesktopExperienceMessage = () => {
           {/* Bol Logo */}
           <div className="mb-8">
             <img 
-              src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png" 
+              src="/lovable-uploads/585adb06-92d0-4a3a-87cc-fb71d70d8f29.png" 
               alt="Bol Logo" 
               className="h-20 w-auto object-contain mx-auto mb-4" 
             />

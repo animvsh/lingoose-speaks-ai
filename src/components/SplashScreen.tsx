@@ -44,7 +44,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       <div className={`text-center relative z-10 transition-all duration-700 transform ${
         showContent ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
       }`}>
-        {/* Sheep mascot with app-style background */}
+        {/* Main logo with app-style background */}
         <div className="relative mb-8">
           <div className="w-32 h-32 bg-orange-200 rounded-3xl flex items-center justify-center mx-auto border-4 border-gray-200 shadow-lg">
             <BolMascot 
