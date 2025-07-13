@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,9 +66,19 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
     } else if (currentStep === 1 && hasConsented) {
       setCurrentStep(2);
     } else if (currentStep === 2 && proficiencyLevel) {
+      // Ensure we have a valid phone number
+      const validPhoneNumber = phoneNumber && phoneNumber.trim() ? phoneNumber.trim() : `+1${Date.now()}`;
+      
+      console.log('Creating profile with:', {
+        phone_number: validPhoneNumber,
+        full_name: fullName.trim(),
+        proficiency_level: proficiencyLevel,
+        language: 'hindi'
+      });
+
       // Create user profile
       createUserProfile.mutate({
-        phone_number: phoneNumber,
+        phone_number: validPhoneNumber,
         full_name: fullName.trim(),
         proficiency_level: proficiencyLevel,
         language: 'hindi'
@@ -96,8 +107,8 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
     switch (currentStep) {
       case 0:
         return (
-          <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 flex items-center justify-center p-6">
-            <div className="w-full max-w-md">
+          <div className="w-full min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 flex items-center justify-center p-4">
+            <div className="w-full max-w-md mx-auto">
               <div className="text-center mb-8">
                 <div className="relative mb-6">
                   <BolMascot className="w-24 h-24 mx-auto animate-bounce" />
@@ -150,34 +161,34 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
 
       case 1:
         return (
-          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 pb-8">
-            <div className="px-6 pt-8 pb-6">
-              <div className="flex items-center justify-between">
+          <div className="w-full min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50">
+            <div className="px-4 pt-8 pb-6">
+              <div className="flex items-center justify-between max-w-md mx-auto">
                 <Button
                   onClick={handleBack}
                   className="w-14 h-14 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-2xl text-white shadow-xl border-3 border-purple-400 transition-all duration-300"
                 >
                   <ArrowLeft className="w-6 h-6" />
                 </Button>
-                <div className="text-center">
+                <div className="text-center flex-1 px-4">
                   <div className="relative">
-                    <h1 className="text-4xl font-black text-purple-600 tracking-wide uppercase transform rotate-1">
+                    <h1 className="text-3xl sm:text-4xl font-black text-purple-600 tracking-wide uppercase transform rotate-1">
                       Consent & Terms 📋
                     </h1>
                     <Sparkles className="absolute -top-2 -right-4 w-6 h-6 text-purple-400 animate-spin" />
                   </div>
-                  <p className="text-slate-700 font-bold text-lg">Just a quick agreement!</p>
+                  <p className="text-slate-700 font-bold text-base sm:text-lg">Just a quick agreement!</p>
                 </div>
                 <div className="w-14 h-14"></div>
               </div>
             </div>
 
-            <div className="px-6 space-y-6">
-              <div className="bg-white rounded-3xl p-8 border-4 border-purple-200 shadow-2xl">
+            <div className="px-4 space-y-6 max-w-md mx-auto pb-8">
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border-4 border-purple-200 shadow-2xl">
                 <div className="text-center mb-6">
                   <BolMascot className="w-16 h-16 mx-auto mb-4" />
-                  <h2 className="text-2xl font-black text-purple-600 mb-2">Almost there, {fullName}! 🎉</h2>
-                  <p className="text-slate-600 font-semibold">We need your consent to get started</p>
+                  <h2 className="text-xl sm:text-2xl font-black text-purple-600 mb-2">Almost there, {fullName}! 🎉</h2>
+                  <p className="text-slate-600 font-semibold text-sm sm:text-base">We need your consent to get started</p>
                 </div>
 
                 <div className="space-y-6">
@@ -186,10 +197,10 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
                       id="consent"
                       checked={hasConsented}
                       onCheckedChange={(checked) => setHasConsented(checked as boolean)}
-                      className="mt-1"
+                      className="mt-1 flex-shrink-0"
                     />
                     <div className="flex-1">
-                      <Label htmlFor="consent" className="text-sm font-bold text-slate-700 leading-relaxed cursor-pointer">
+                      <Label htmlFor="consent" className="text-xs sm:text-sm font-bold text-slate-700 leading-relaxed cursor-pointer">
                         By checking this box, I agree to receive daily calls and text messages from Bol at the number provided, including via automated systems. I also agree to the{' '}
                         <Link to="/privacy-policy" className="text-purple-600 hover:text-purple-800 underline font-black">
                           Privacy Policy
@@ -206,7 +217,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
                   <Button
                     onClick={handleNext}
                     disabled={!hasConsented}
-                    className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-black py-6 text-xl rounded-2xl border-3 border-purple-400 shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:scale-100"
+                    className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-black py-6 text-lg sm:text-xl rounded-2xl border-3 border-purple-400 shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:scale-100"
                   >
                     <div className="flex items-center justify-center">
                       I Agree - Continue
@@ -218,7 +229,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
 
               <div className="text-center p-4 bg-white rounded-2xl border-3 border-purple-200 shadow-lg">
                 <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
-                <span className="text-purple-700 font-bold">Your privacy matters to us! 🔒</span>
+                <span className="text-purple-700 font-bold text-sm sm:text-base">Your privacy matters to us! 🔒</span>
               </div>
             </div>
           </div>
@@ -226,58 +237,58 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
 
       case 2:
         return (
-          <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 pb-8">
-            <div className="px-6 pt-8 pb-6">
-              <div className="flex items-center justify-between">
+          <div className="w-full min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+            <div className="px-4 pt-8 pb-6">
+              <div className="flex items-center justify-between max-w-md mx-auto">
                 <Button
                   onClick={handleBack}
                   className="w-14 h-14 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-2xl text-white shadow-xl border-3 border-green-400 transition-all duration-300"
                 >
                   <ArrowLeft className="w-6 h-6" />
                 </Button>
-                <div className="text-center">
+                <div className="text-center flex-1 px-4">
                   <div className="relative">
-                    <h1 className="text-4xl font-black text-green-600 tracking-wide uppercase transform -rotate-1">
+                    <h1 className="text-3xl sm:text-4xl font-black text-green-600 tracking-wide uppercase transform -rotate-1">
                       Your Hindi Level? 📚
                     </h1>
                     <Sparkles className="absolute -top-2 -right-4 w-6 h-6 text-green-400 animate-spin" />
                   </div>
-                  <p className="text-slate-700 font-bold text-lg">How well do you know Hindi?</p>
+                  <p className="text-slate-700 font-bold text-base sm:text-lg">How well do you know Hindi?</p>
                 </div>
                 <div className="w-14 h-14"></div>
               </div>
             </div>
 
-            <div className="px-6 space-y-4">
+            <div className="px-4 space-y-4 max-w-md mx-auto pb-8">
               <div className="space-y-4">
                 {proficiencyLevels.map((level, index) => (
                   <button
                     key={level.level}
                     onClick={() => handleProficiencySelect(level.level)}
                     disabled={createUserProfile.isPending}
-                    className={`w-full p-5 rounded-3xl text-left transition-all duration-300 border-4 transform hover:scale-[1.02] hover:shadow-xl ${
+                    className={`w-full p-4 sm:p-5 rounded-3xl text-left transition-all duration-300 border-4 transform hover:scale-[1.02] hover:shadow-xl ${
                       proficiencyLevel === level.level 
                         ? `bg-gradient-to-r ${level.color} border-white text-white shadow-2xl scale-[1.02] animate-pulse` 
                         : 'bg-white border-green-200 hover:border-green-300 hover:bg-gradient-to-r hover:from-green-50 hover:to-blue-50 shadow-lg'
                     }`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl transition-all shadow-lg ${
+                    <div className="flex items-center space-x-3 sm:space-x-4">
+                      <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl transition-all shadow-lg ${
                         proficiencyLevel === level.level ? 'bg-white bg-opacity-20 shadow-inner transform scale-110' : 'bg-gradient-to-br from-green-100 to-blue-100'
                       }`}>
                         {level.emoji}
                       </div>
                       <div className="flex-1">
-                        <div className="font-black text-xl mb-2 uppercase tracking-wide">{level.title}</div>
-                        <div className={`text-sm font-bold ${
+                        <div className="font-black text-lg sm:text-xl mb-1 sm:mb-2 uppercase tracking-wide">{level.title}</div>
+                        <div className={`text-xs sm:text-sm font-bold ${
                           proficiencyLevel === level.level ? 'text-white text-opacity-90' : 'text-slate-600'
                         }`}>
                           {level.desc}
                         </div>
                       </div>
                       <div className={`transition-all ${proficiencyLevel === level.level ? 'animate-bounce' : ''}`}>
-                        <Star className={`w-6 h-6 transition-all ${
+                        <Star className={`w-5 h-5 sm:w-6 sm:h-6 transition-all ${
                           proficiencyLevel === level.level ? 'text-white' : 'text-green-400'
                         }`} />
                       </div>
@@ -288,7 +299,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
 
               <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-green-200 shadow-lg">
                 <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
-                <span className="text-green-700 font-bold">
+                <span className="text-green-700 font-bold text-sm sm:text-base">
                   {createUserProfile.isPending ? "Creating your profile..." : "Choose your current level! 🎯"}
                 </span>
               </div>
@@ -302,7 +313,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full">
       {renderStep()}
     </div>
   );
