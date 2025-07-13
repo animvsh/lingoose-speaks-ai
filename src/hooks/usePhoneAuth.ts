@@ -360,6 +360,7 @@ export const usePhoneAuth = () => {
     sendOTP,
     verifyOTP,
     signInWithPhone,
-    isLoading
+    isLoading,
+    formatPhoneNumber // Export this helper function
   };
 };

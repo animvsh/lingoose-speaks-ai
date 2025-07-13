@@ -1,28 +1,42 @@
 
 {
-  "name": "Bol - AI Hindi Learning",
-  "short_name": "Bol",
-  "description": "Learn Hindi through AI-powered phone conversations",
+  "name": "BOL - AI Hindi Learning",
+  "short_name": "BOL",
+  "description": "Master Hindi through AI-powered phone conversations with BOL, your personal Hindi learning companion",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FEF3C7",
   "theme_color": "#F59E0B",
   "orientation": "portrait-primary",
   "scope": "/",
-  "categories": ["education", "language"],
+  "categories": ["education", "language", "productivity"],
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/lovable-uploads/bffc16a0-a627-446a-bf2b-ff86182ebeea.png",
+      "src": "/lovable-uploads/585adb06-92d0-4a3a-87cc-fb71d70d8f29.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/lovable-uploads/bffc16a0-a627-446a-bf2b-ff86182ebeea.png",
+      "src": "/lovable-uploads/585adb06-92d0-4a3a-87cc-fb71d70d8f29.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Learning",
+      "short_name": "Learn",
+      "description": "Begin your Hindi learning session",
+      "url": "/app",
+      "icons": [
+        {
+          "src": "/lovable-uploads/585adb06-92d0-4a3a-87cc-fb71d70d8f29.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ]
 }
