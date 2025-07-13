@@ -2,9 +2,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Phone, CheckCircle, FileText, Shield } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Link, useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight, Phone, CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import WelcomeScreen from "@/components/WelcomeScreen";
 
 const Landing = () => {
@@ -83,7 +82,7 @@ const Landing = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % totalSlides);
-    }, 3000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [totalSlides]);
 
@@ -92,7 +91,6 @@ const Landing = () => {
   };
 
   const handleWelcomeComplete = () => {
-    // This will be handled by WelcomeScreen component
     setShowWelcome(false);
   };
 
@@ -101,53 +99,45 @@ const Landing = () => {
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 overflow-visible">
-      {/* Floating decorative elements */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-20 left-10 w-8 h-8 bg-orange-300 rounded-full animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }}></div>
-        <div className="absolute top-40 right-20 w-6 h-6 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}></div>
-        <div className="absolute bottom-40 left-20 w-10 h-10 bg-amber-300 rounded-full animate-bounce" style={{ animationDelay: '2s', animationDuration: '5s' }}></div>
-        <div className="absolute bottom-20 right-10 w-7 h-7 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '3.5s' }}></div>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
       {/* Header */}
-      <header className="container mx-auto px-4 py-6 relative z-10">
+      <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3 animate-wiggle">
+          <div className="flex items-center space-x-3">
             <img 
               src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png" 
               alt="Bol Logo" 
-              className="h-16 w-auto object-contain hover:scale-110 transition-transform duration-300" 
+              className="h-16 w-auto object-contain hover:scale-105 transition-transform duration-200" 
             />
           </div>
           <div className="hidden sm:flex items-center space-x-8 text-sm font-bold text-amber-800">
-            <a href="#why" className="hover:text-orange-600 transition-colors hover:scale-110 transform duration-200">Why Bol</a>
-            <a href="#pricing" className="hover:text-orange-600 transition-colors hover:scale-110 transform duration-200">Pricing</a>
-            <a href="#faqs" className="hover:text-orange-600 transition-colors hover:scale-110 transform duration-200">FAQs</a>
+            <a href="#why" className="hover:text-orange-600 transition-colors">Why Bol</a>
+            <a href="#pricing" className="hover:text-orange-600 transition-colors">Pricing</a>
+            <a href="#faqs" className="hover:text-orange-600 transition-colors">FAQs</a>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-12 relative z-10 text-center">
+      <section className="container mx-auto px-4 py-12 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight text-amber-800 mb-6 animate-bounce">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight text-amber-800 mb-6">
             Teach your kids Hindi.<br />
-            <span className="text-orange-600 animate-pulse">Without nagging.</span>
+            <span className="text-orange-600">Without nagging.</span>
           </h1>
           
-          <div className="space-y-4 text-lg sm:text-xl text-amber-700 mb-8 animate-fade-in">
+          <div className="space-y-4 text-lg sm:text-xl text-amber-700 mb-8">
             <p className="font-bold">Daily 1-on-1 calls. No apps. No worksheets.</p>
             <p className="font-bold">Just one slightly pushy desi sheep.</p>
-            <p className="font-black text-orange-700 text-2xl animate-pulse">$4/week. Cancel anytime.</p>
+            <p className="font-black text-orange-700 text-2xl">$4/week. Cancel anytime.</p>
           </div>
 
           <div className="mb-12">
             <Button 
               onClick={handleStartNow}
-              className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 hover:from-orange-600 hover:via-pink-600 hover:to-purple-600 text-white font-black text-xl px-12 py-6 rounded-full shadow-2xl transform hover:scale-110 hover:rotate-3 transition-all duration-300 animate-pulse border-4 border-orange-600"
+              className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 hover:from-orange-600 hover:via-pink-600 hover:to-purple-600 text-white font-black text-xl px-12 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
             >
-              <Phone className="w-6 h-6 mr-3 animate-bounce" />
+              <Phone className="w-6 h-6 mr-3" />
               START NOW! 🚀
             </Button>
             <p className="text-sm text-amber-600 mt-4 max-w-md mx-auto">
@@ -159,11 +149,11 @@ const Landing = () => {
 
           {/* Hero Image */}
           <div className="relative max-w-lg mx-auto">
-            <div className="bg-gradient-to-br from-orange-100 to-amber-100 rounded-3xl p-8 border-4 border-orange-200 shadow-2xl hover:scale-105 transition-transform duration-300 animate-float">
+            <div className="bg-gradient-to-br from-orange-100 to-amber-100 rounded-3xl p-8 border-4 border-orange-200 shadow-xl">
               <img 
                 src="/lovable-uploads/b0e951c1-f59e-468b-afbb-83bef5734b90.png" 
                 alt="Learning character with headphones" 
-                className="w-full h-auto object-contain animate-wiggle"
+                className="w-full h-auto object-contain"
               />
             </div>
           </div>
@@ -171,12 +161,12 @@ const Landing = () => {
       </section>
 
       {/* Why Bol Works */}
-      <section id="why" className="container mx-auto px-4 py-16 relative z-10">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800 animate-bounce">
+      <section id="why" className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800">
           Why Bol Works
         </h2>
         
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto overflow-visible">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
           {[
             { 
               title: "Made for ABCDs", 
@@ -199,13 +189,12 @@ const Landing = () => {
               image: "/lovable-uploads/a4122ad1-cbc2-4bd9-beae-8eda0bbf6aff.png"
             }
           ].map((item, index) => (
-            <Card key={index} className="bg-white/80 backdrop-blur-sm p-6 text-center border-4 border-orange-200 rounded-3xl hover:shadow-2xl transition-all duration-300 hover:scale-110 hover:rotate-2 transform hover-safe overflow-visible group">
+            <Card key={index} className="bg-white/80 backdrop-blur-sm p-6 text-center border-4 border-orange-200 rounded-3xl hover:shadow-xl transition-all duration-200 hover:scale-105">
               <div className="mb-4 flex justify-center">
                 <img 
                   src={item.image} 
                   alt={item.title}
-                  className="w-20 h-20 object-contain animate-bounce group-hover:animate-spin transition-all duration-300"
-                  style={{ animationDelay: `${index * 0.2}s` }}
+                  className="w-20 h-20 object-contain"
                 />
               </div>
               <h3 className="text-lg font-black text-amber-800 mb-3">{item.title}</h3>
@@ -216,24 +205,24 @@ const Landing = () => {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="container mx-auto px-4 py-16 relative z-10 text-center">
-        <h2 className="text-3xl lg:text-4xl font-black text-amber-800 mb-8 animate-wiggle">💸 Simple Pricing</h2>
+      <section id="pricing" className="container mx-auto px-4 py-16 text-center">
+        <h2 className="text-3xl lg:text-4xl font-black text-amber-800 mb-8">💸 Simple Pricing</h2>
         
         <div className="inline-block">
-          <Card className="bg-gradient-to-br from-amber-100 to-orange-100 p-10 border-4 border-orange-300 rounded-3xl shadow-2xl hover:scale-110 hover:rotate-3 transition-all duration-300 transform">
-            <div className="text-6xl font-black text-amber-800 mb-4 animate-pulse">
+          <Card className="bg-gradient-to-br from-amber-100 to-orange-100 p-10 border-4 border-orange-300 rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-200">
+            <div className="text-6xl font-black text-amber-800 mb-4">
               $4<span className="text-3xl text-amber-700">/week</span>
             </div>
             <ul className="text-lg text-amber-700 space-y-3 font-bold">
-              <li className="flex items-center justify-center animate-bounce" style={{ animationDelay: '0s' }}>
+              <li className="flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
                 Daily 1-on-1 calls 📞
               </li>
-              <li className="flex items-center justify-center animate-bounce" style={{ animationDelay: '0.2s' }}>
+              <li className="flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
                 No tech headaches 🤯
               </li>
-              <li className="flex items-center justify-center animate-bounce" style={{ animationDelay: '0.4s' }}>
+              <li className="flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
                 Cancel anytime ✨
               </li>
@@ -243,23 +232,23 @@ const Landing = () => {
       </section>
 
       {/* How It Works */}
-      <section className="container mx-auto px-4 py-16 relative z-10">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800 animate-bounce">
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800">
           How Bol Works
         </h2>
         
         {/* Process Flow */}
         <div className="max-w-4xl mx-auto mb-12 text-center">
-          <div className="flex justify-center items-center space-x-8 mb-8 overflow-visible">
-            <div className="text-center animate-bounce" style={{ animationDelay: '0s' }}>
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-200 to-amber-200 rounded-2xl flex items-center justify-center mb-3 border-3 border-orange-300 hover:scale-110 transition-transform duration-300">
+          <div className="flex justify-center items-center space-x-8 mb-8">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-orange-200 to-amber-200 rounded-2xl flex items-center justify-center mb-3 border-3 border-orange-300">
                 <span className="text-2xl">✅</span>
               </div>
               <p className="font-black text-amber-800">Sign up</p>
             </div>
-            <div className="text-orange-400 text-2xl animate-pulse">→</div>
-            <div className="text-center animate-bounce" style={{ animationDelay: '0.5s' }}>
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-200 to-amber-200 rounded-2xl flex items-center justify-center mb-3 border-3 border-orange-300 hover:scale-110 transition-transform duration-300">
+            <div className="text-orange-400 text-2xl">→</div>
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-orange-200 to-amber-200 rounded-2xl flex items-center justify-center mb-3 border-3 border-orange-300">
                 <img 
                   src="/lovable-uploads/540d4461-c8f0-47eb-b512-91bee9ecf029.png" 
                   alt="Get calls" 
@@ -268,9 +257,9 @@ const Landing = () => {
               </div>
               <p className="font-black text-amber-800">Get a call<br />every day</p>
             </div>
-            <div className="text-orange-400 text-2xl animate-pulse">→</div>
-            <div className="text-center animate-bounce" style={{ animationDelay: '1s' }}>
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-200 to-amber-200 rounded-2xl flex items-center justify-center mb-3 border-3 border-orange-300 hover:scale-110 transition-transform duration-300">
+            <div className="text-orange-400 text-2xl">→</div>
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-orange-200 to-amber-200 rounded-2xl flex items-center justify-center mb-3 border-3 border-orange-300">
                 <span className="text-2xl">🗣️</span>
               </div>
               <p className="font-black text-amber-800">Speak<br />confidently</p>
@@ -278,13 +267,13 @@ const Landing = () => {
           </div>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto overflow-visible">
-          <Card className="bg-white/80 backdrop-blur-sm p-8 border-4 border-orange-200 rounded-3xl hover:scale-110 hover:rotate-2 transition-all duration-300 transform hover-safe overflow-visible group">
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <Card className="bg-white/80 backdrop-blur-sm p-8 border-4 border-orange-200 rounded-3xl hover:shadow-xl transition-shadow duration-200">
             <div className="w-16 h-16 mb-4 flex justify-center">
               <img 
                 src="/lovable-uploads/2759d760-66ad-49a1-b514-506532516fda.png" 
                 alt="Daily Progress Reports"
-                className="w-16 h-16 object-contain animate-bounce group-hover:animate-spin"
+                className="w-16 h-16 object-contain"
               />
             </div>
             <h3 className="text-xl font-black text-amber-800 mb-3">Daily Progress Reports</h3>
@@ -294,12 +283,12 @@ const Landing = () => {
             </p>
           </Card>
           
-          <Card className="bg-white/80 backdrop-blur-sm p-8 border-4 border-orange-200 rounded-3xl hover:scale-110 hover:rotate-2 transition-all duration-300 transform hover-safe overflow-visible group">
+          <Card className="bg-white/80 backdrop-blur-sm p-8 border-4 border-orange-200 rounded-3xl hover:shadow-xl transition-shadow duration-200">
             <div className="w-16 h-16 mb-4 flex justify-center">
               <img 
                 src="/lovable-uploads/3fba8058-0143-452a-823e-e925bb333097.png" 
                 alt="Scenario-Based Learning"
-                className="w-16 h-16 object-contain animate-bounce group-hover:animate-spin"
+                className="w-16 h-16 object-contain"
               />
             </div>
             <h3 className="text-xl font-black text-amber-800 mb-3">Scenario-Based Learning</h3>
@@ -312,8 +301,8 @@ const Landing = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="container mx-auto px-4 py-16 relative z-10">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800 animate-wiggle">
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800">
           What Devi Parents Say 🇮🇳
         </h2>
         
@@ -322,13 +311,13 @@ const Landing = () => {
           <div className="flex justify-center gap-4 mb-6">
             <button
               onClick={() => setCurrentTestimonial((prev) => (prev - 1 + totalSlides) % totalSlides)}
-              className="p-2 rounded-full bg-orange-200 hover:bg-orange-300 transition-all duration-300 hover:scale-110"
+              className="p-2 rounded-full bg-orange-200 hover:bg-orange-300 transition-colors duration-200"
             >
               <ChevronLeft className="w-5 h-5 text-amber-700" />
             </button>
             <button
               onClick={() => setCurrentTestimonial((prev) => (prev + 1) % totalSlides)}
-              className="p-2 rounded-full bg-orange-200 hover:bg-orange-300 transition-all duration-300 hover:scale-110"
+              className="p-2 rounded-full bg-orange-200 hover:bg-orange-300 transition-colors duration-200"
             >
               <ChevronRight className="w-5 h-5 text-amber-700" />
             </button>
@@ -354,9 +343,9 @@ const Landing = () => {
                     .map((testimonial, index) => (
                       <Card 
                         key={`${slideIndex}-${index}`}
-                        className="flex-1 max-w-sm p-6 bg-white/80 backdrop-blur-sm border-4 border-orange-200 rounded-2xl hover:scale-105 hover:rotate-1 transition-all duration-300 transform"
+                        className="flex-1 max-w-sm p-6 bg-white/80 backdrop-blur-sm border-4 border-orange-200 rounded-2xl hover:shadow-lg transition-shadow duration-200"
                       >
-                        <div className="text-2xl mb-3 animate-bounce">💬</div>
+                        <div className="text-2xl mb-3">💬</div>
                         <blockquote className="text-sm text-amber-800 mb-4 italic font-bold">
                           "{testimonial.quote}"
                         </blockquote>
@@ -374,8 +363,8 @@ const Landing = () => {
       </section>
 
       {/* FAQs */}
-      <section id="faqs" className="container mx-auto px-4 py-16 relative z-10">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800 animate-bounce">
+      <section id="faqs" className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800">
           FAQs
         </h2>
         <div className="max-w-3xl mx-auto space-y-6">
@@ -396,9 +385,9 @@ const Landing = () => {
               icon: "👨‍👩‍👧‍👦"
             }
           ].map((faq, index) => (
-            <Card key={index} className="bg-white/80 backdrop-blur-sm p-6 border-4 border-orange-200 rounded-2xl hover:scale-105 hover:rotate-1 transition-all duration-300 transform">
+            <Card key={index} className="bg-white/80 backdrop-blur-sm p-6 border-4 border-orange-200 rounded-2xl hover:shadow-lg transition-shadow duration-200">
               <div className="flex items-start gap-4">
-                <div className="text-2xl animate-bounce" style={{ animationDelay: `${index * 0.2}s` }}>{faq.icon}</div>
+                <div className="text-2xl">{faq.icon}</div>
                 <div className="flex-1">
                   <h3 className="font-black text-lg text-amber-800 mb-2">{faq.question}</h3>
                   <p className="text-amber-700 font-bold">{faq.answer}</p>
@@ -410,13 +399,13 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="container mx-auto px-4 py-12 text-center border-t border-orange-200 relative z-10">
+      <footer className="container mx-auto px-4 py-12 text-center border-t border-orange-200">
         <div className="space-y-4">
-          <div className="flex items-center justify-center space-x-3 animate-wiggle">
+          <div className="flex items-center justify-center space-x-3">
             <img 
               src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png" 
               alt="Bol Logo" 
-              className="h-10 w-auto object-contain hover:scale-110 transition-transform duration-300" 
+              className="h-10 w-auto object-contain" 
             />
           </div>
           <div className="text-amber-700 space-y-2 font-bold">

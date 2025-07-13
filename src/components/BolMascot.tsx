@@ -14,16 +14,12 @@ const BolMascot = ({ className, size = "lg" }: BolMascotProps) => {
   };
 
   return (
-    <div className={cn("relative hover-safe", sizeClasses[size], className)}>
+    <div className={cn("relative", sizeClasses[size], className)}>
       <img 
         src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png"
         alt="Bol Mascot"
-        className="w-full h-full object-contain animate-bounce hover:animate-wiggle transition-all duration-300 hover:scale-110 hover:rotate-12 cartoon-shadow hover:cartoon-shadow-hover"
-        style={{ animationDuration: "3s" }}
+        className="w-full h-full object-contain hover:scale-110 transition-transform duration-200 shadow-lg rounded-lg"
       />
-      {/* Floating decorative elements around mascot */}
-      <div className="absolute -top-2 -right-2 w-4 h-4 bg-orange-400 rounded-full animate-bounce opacity-70" style={{ animationDelay: '0.5s' }}></div>
-      <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-yellow-400 rounded-full animate-bounce opacity-70" style={{ animationDelay: '1s' }}></div>
     </div>
   );
 };
