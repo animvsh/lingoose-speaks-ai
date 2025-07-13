@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,15 +13,15 @@ const Landing = () => {
     {
       quote: "Finally, my son can talk to his nani properly. She's so happy she cries every time he calls her.",
       author: "Priya Sharma, Texas",
-      role: "Software Engineer",
+      role: "Software Engineer", 
       duration: "8 months",
       company: "Meta"
     },
     {
       quote: "The daily reports show exactly what they're learning. My daughter went from zero Hindi to having full conversations in 3 months.",
-      author: "Rajesh Patel, California", 
+      author: "Rajesh Patel, California",
       role: "Cardiologist",
-      duration: "8 months",
+      duration: "8 months", 
       company: "Stanford Medical"
     },
     {
@@ -239,31 +238,12 @@ const Landing = () => {
         
         {/* Process Flow */}
         <div className="max-w-4xl mx-auto mb-12 text-center">
-          <div className="flex justify-center items-center space-x-8 mb-8">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-200 to-amber-200 rounded-2xl flex items-center justify-center mb-3 border-3 border-orange-300">
-                <span className="text-2xl">✅</span>
-              </div>
-              <p className="font-black text-amber-800">Sign up</p>
-            </div>
-            <div className="text-orange-400 text-2xl">→</div>
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-200 to-amber-200 rounded-2xl flex items-center justify-center mb-3 border-3 border-orange-300">
-                <img 
-                  src="/lovable-uploads/540d4461-c8f0-47eb-b512-91bee9ecf029.png" 
-                  alt="Get calls" 
-                  className="w-16 h-16 object-contain"
-                />
-              </div>
-              <p className="font-black text-amber-800">Get a call<br />every day</p>
-            </div>
-            <div className="text-orange-400 text-2xl">→</div>
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-200 to-amber-200 rounded-2xl flex items-center justify-center mb-3 border-3 border-orange-300">
-                <span className="text-2xl">🗣️</span>
-              </div>
-              <p className="font-black text-amber-800">Speak<br />confidently</p>
-            </div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-4 border-orange-200 shadow-xl">
+            <img 
+              src="/lovable-uploads/ae3ff9ea-2f29-4a46-ac08-13a756e28a34.png" 
+              alt="How Bol Works Process Flow Diagram" 
+              className="w-full h-auto object-contain"
+            />
           </div>
         </div>
         
