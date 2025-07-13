@@ -108,7 +108,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
       case 0:
         return (
           <div className="w-full min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-md mx-auto">
+            <div className="w-full">
               <div className="text-center mb-8">
                 <div className="relative mb-6">
                   <BolMascot className="w-24 h-24 mx-auto animate-bounce" />
@@ -122,7 +122,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
                 <p className="text-slate-700 font-bold text-lg">Let's get to know you better!</p>
               </div>
 
-              <div className="bg-white rounded-3xl p-8 border-4 border-orange-200 shadow-2xl">
+              <div className="bg-white rounded-3xl p-8 border-4 border-orange-200 shadow-2xl mx-4">
                 <div className="space-y-6">
                   <div>
                     <Label htmlFor="fullName" className="text-lg font-bold text-slate-700 mb-3 block">
@@ -151,7 +151,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
                 </div>
               </div>
 
-              <div className="text-center mt-6 p-4 bg-white rounded-2xl border-3 border-orange-200 shadow-lg">
+              <div className="text-center mt-6 p-4 bg-white rounded-2xl border-3 border-orange-200 shadow-lg mx-4">
                 <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-orange-700 font-bold">Nice to meet you! 🌟</span>
               </div>
@@ -163,7 +163,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
         return (
           <div className="w-full min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50">
             <div className="px-4 pt-8 pb-6">
-              <div className="flex items-center justify-between max-w-md mx-auto">
+              <div className="flex items-center justify-between">
                 <Button
                   onClick={handleBack}
                   className="w-14 h-14 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-2xl text-white shadow-xl border-3 border-purple-400 transition-all duration-300"
@@ -183,7 +183,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
             </div>
 
-            <div className="px-4 space-y-6 max-w-md mx-auto pb-8">
+            <div className="px-4 space-y-6 pb-8">
               <div className="bg-white rounded-3xl p-6 sm:p-8 border-4 border-purple-200 shadow-2xl">
                 <div className="text-center mb-6">
                   <BolMascot className="w-16 h-16 mx-auto mb-4" />
@@ -239,7 +239,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
         return (
           <div className="w-full min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
             <div className="px-4 pt-8 pb-6">
-              <div className="flex items-center justify-between max-w-md mx-auto">
+              <div className="flex items-center justify-between">
                 <Button
                   onClick={handleBack}
                   className="w-14 h-14 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-2xl text-white shadow-xl border-3 border-green-400 transition-all duration-300"
@@ -259,7 +259,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
             </div>
 
-            <div className="px-4 space-y-4 max-w-md mx-auto pb-8">
+            <div className="px-4 space-y-4 pb-8">
               <div className="space-y-4">
                 {proficiencyLevels.map((level, index) => (
                   <button
