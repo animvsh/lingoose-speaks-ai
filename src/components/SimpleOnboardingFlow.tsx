@@ -17,6 +17,7 @@ interface SimpleOnboardingFlowProps {
 const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [fullName, setFullName] = useState("");
+  const [userPhoneNumber, setUserPhoneNumber] = useState(phoneNumber || "");
   const [hasConsented, setHasConsented] = useState(false);
   const [proficiencyLevel, setProficiencyLevel] = useState<number | null>(null);
   
@@ -63,11 +64,13 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
   const handleNext = () => {
     if (currentStep === 0 && fullName.trim()) {
       setCurrentStep(1);
-    } else if (currentStep === 1 && hasConsented) {
+    } else if (currentStep === 1 && userPhoneNumber.trim()) {
       setCurrentStep(2);
-    } else if (currentStep === 2 && proficiencyLevel) {
+    } else if (currentStep === 2 && hasConsented) {
+      setCurrentStep(3);
+    } else if (currentStep === 3 && proficiencyLevel) {
       // Ensure we have a valid phone number
-      const validPhoneNumber = phoneNumber && phoneNumber.trim() ? phoneNumber.trim() : `+1${Date.now()}`;
+      const validPhoneNumber = userPhoneNumber.trim() || `+1${Date.now()}`;
       
       console.log('Creating profile with:', {
         phone_number: validPhoneNumber,
@@ -161,6 +164,74 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
 
       case 1:
         return (
+          <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-indigo-50">
+            <div className="px-4 pt-8 pb-6">
+              <div className="flex items-center justify-between">
+                <Button
+                  onClick={handleBack}
+                  className="w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-2xl text-white shadow-xl border-3 border-blue-400 transition-all duration-300"
+                >
+                  <ArrowLeft className="w-6 h-6" />
+                </Button>
+                <div className="text-center flex-1 px-4">
+                  <div className="relative">
+                    <h1 className="text-3xl sm:text-4xl font-black text-blue-600 tracking-wide uppercase transform rotate-1">
+                      Your Phone Number 📱
+                    </h1>
+                    <Sparkles className="absolute -top-2 -right-4 w-6 h-6 text-blue-400 animate-spin" />
+                  </div>
+                  <p className="text-slate-700 font-bold text-base sm:text-lg">We'll use this to call you for lessons!</p>
+                </div>
+                <div className="w-14 h-14"></div>
+              </div>
+            </div>
+
+            <div className="px-4 space-y-6 pb-8">
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border-4 border-blue-200 shadow-2xl">
+                <div className="text-center mb-6">
+                  <BolMascot className="w-16 h-16 mx-auto mb-4" />
+                  <h2 className="text-xl sm:text-2xl font-black text-blue-600 mb-2">Great, {fullName}! 🎉</h2>
+                  <p className="text-slate-600 font-semibold text-sm sm:text-base">What's your phone number?</p>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <Label htmlFor="phoneNumber" className="text-lg font-bold text-slate-700 mb-3 block">
+                      Phone Number
+                    </Label>
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      value={userPhoneNumber}
+                      onChange={(e) => setUserPhoneNumber(e.target.value)}
+                      placeholder="Enter your phone number"
+                      className="text-lg py-4 px-6 rounded-2xl border-3 border-blue-200 focus:border-blue-400 font-semibold"
+                    />
+                  </div>
+
+                  <Button
+                    onClick={handleNext}
+                    disabled={!userPhoneNumber.trim()}
+                    className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-black py-6 text-lg sm:text-xl rounded-2xl border-3 border-blue-400 shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:scale-100"
+                  >
+                    <div className="flex items-center justify-center">
+                      Continue
+                      <ChevronRight className="w-6 h-6 ml-2" />
+                    </div>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="text-center p-4 bg-white rounded-2xl border-3 border-blue-200 shadow-lg">
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
+                <span className="text-blue-700 font-bold text-sm sm:text-base">We'll call you for fun Hindi lessons! 📞</span>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
           <div className="w-full min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50">
             <div className="px-4 pt-8 pb-6">
               <div className="flex items-center justify-between">
@@ -187,7 +258,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               <div className="bg-white rounded-3xl p-6 sm:p-8 border-4 border-purple-200 shadow-2xl">
                 <div className="text-center mb-6">
                   <BolMascot className="w-16 h-16 mx-auto mb-4" />
-                  <h2 className="text-xl sm:text-2xl font-black text-purple-600 mb-2">Almost there, {fullName}! 🎉</h2>
+                  <h2 className="text-xl sm:text-2xl font-black text-purple-600 mb-2">Almost there! 🎉</h2>
                   <p className="text-slate-600 font-semibold text-sm sm:text-base">We need your consent to get started</p>
                 </div>
 
@@ -235,7 +306,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
           </div>
         );
 
-      case 2:
+      case 3:
         return (
           <div className="w-full min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
             <div className="px-4 pt-8 pb-6">
