@@ -3,6 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Phone, Clock, TrendingUp, Calendar, Star, Target, Zap, Award, Trophy, Flame } from "lucide-react";
 import { useCurriculumAnalytics } from "@/hooks/useCurriculumAnalytics";
 import { useCurrentActivity } from "@/hooks/useCurrentActivity";
+import ProUpgradeCard from "@/components/ProUpgradeCard";
+import SubscriptionStatusCard from "@/components/SubscriptionStatusCard";
 
 interface DashboardStatsProps {
   onNavigate: (view: string) => void;
@@ -191,6 +193,12 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
             <div className="text-xl font-black text-teal-900">{currentStreak}</div>
             <div className="text-xs text-teal-800 font-bold uppercase">Day Streak</div>
           </div>
+        </div>
+
+        {/* Subscription Management Section */}
+        <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <ProUpgradeCard />
+          <SubscriptionStatusCard />
         </div>
       </div>
     </div>

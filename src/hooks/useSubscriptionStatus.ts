@@ -30,7 +30,7 @@ export const useSubscriptionStatus = () => {
         throw error;
       }
 
-      return data[0] || {
+      return (Array.isArray(data) ? data[0] : data) || {
         has_minutes: false,
         minutes_used: 0,
         minutes_remaining: 0,

@@ -13,6 +13,7 @@ import SettingsCard from "@/components/SettingsCard";
 import ActivityDetailsView from "@/components/ActivityDetailsView";
 import AnimatedBottomNav from "@/components/AnimatedBottomNav";
 import AddSupervisorForm from "@/components/AddSupervisorForm";
+import ProUpgradeCard from "@/components/ProUpgradeCard";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
