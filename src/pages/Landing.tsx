@@ -1,14 +1,13 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, Phone, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import WelcomeScreen from "@/components/WelcomeScreen";
+import SimpleOnboardingFlow from "@/components/SimpleOnboardingFlow";
 
 const Landing = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [showWelcome, setShowWelcome] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   const testimonials = [
     {
@@ -87,15 +86,16 @@ const Landing = () => {
   }, [totalSlides]);
 
   const handleStartNow = () => {
-    setShowWelcome(true);
+    setShowOnboarding(true);
   };
 
-  const handleWelcomeComplete = () => {
-    setShowWelcome(false);
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
   };
 
-  if (showWelcome) {
-    return <WelcomeScreen onComplete={handleWelcomeComplete} />;
+  if (showOnboarding) {
+    const phoneNumber = localStorage.getItem('phone_number') || '';
+    return <SimpleOnboardingFlow onComplete={handleOnboardingComplete} phoneNumber={phoneNumber} />;
   }
   
   return (

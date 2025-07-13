@@ -1,9 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
 import { useSessionTracking } from "@/hooks/useSessionTracking";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
-import WelcomeScreen from "@/components/WelcomeScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import DashboardStats from "@/components/DashboardStats";
 import ActivityCard from "@/components/ActivityCard";
@@ -22,7 +22,7 @@ const Index = () => {
   const { trackNavigation, trackScreenView, trackOnboardingComplete, identify } = usePostHog();
   const { trackPageView } = useSessionTracking();
   const { trackScreenTime } = useEngagementTracking();
-  const [currentView, setCurrentView] = useState("welcome");
+  const [currentView, setCurrentView] = useState("onboarding");
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [activityDetailsData, setActivityDetailsData] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -50,12 +50,11 @@ const Index = () => {
           trackPageView("onboarding");
         }
       } else {
-        setCurrentView("welcome");
-        trackScreenView("welcome");
-        trackPageView("welcome");
+        // Redirect to auth if no user
+        navigate('/auth');
       }
     }
-  }, [user, loading, identify, trackScreenView, trackPageView]);
+  }, [user, loading, identify, trackScreenView, trackPageView, navigate]);
 
   const handleOnboardingComplete = () => {
     if (user) {
@@ -66,13 +65,6 @@ const Index = () => {
       trackScreenView("dashboard");
       trackPageView("dashboard");
     }
-  };
-
-  const handleWelcomeComplete = () => {
-    console.log('Welcome completed, navigating to auth');
-    trackNavigation("welcome", "auth");
-    // Navigate to the auth page instead of trying to go to onboarding without a user
-    navigate('/auth');
   };
 
   const handleNavigate = (view: string, data?: any) => {
@@ -121,14 +113,6 @@ const Index = () => {
         ? 'opacity-0 scale-95 translate-y-4' 
         : 'opacity-100 scale-100 translate-y-0'
     }`;
-
-    if (currentView === "welcome") {
-      return (
-        <div className={baseClasses}>
-          <WelcomeScreen onComplete={handleWelcomeComplete} />
-        </div>
-      );
-    }
 
     if (currentView === "onboarding" && !isOnboarded) {
       return (
@@ -214,7 +198,7 @@ const Index = () => {
     );
   };
 
-  const shouldShowBottomNav = isOnboarded && user && currentView !== "welcome" && currentView !== "onboarding" && currentView !== "add-supervisor";
+  const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor";
 
   return (
     <div className="min-h-screen bg-amber-50 overflow-hidden">
