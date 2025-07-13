@@ -108,7 +108,7 @@ export const usePhoneAuth = () => {
     }
   };
 
-  const verifyOTP = async (phoneNumber: string, code: string): Promise<{ success: boolean; error?: string; isNewUser?: boolean }> => {
+  const verifyOTP = async (phoneNumber: string, code: string): Promise<{ success: boolean; error?: string; isNewUser?: boolean; accountDetected?: boolean }> => {
     setIsLoading(true);
     
     try {
@@ -185,10 +185,12 @@ export const usePhoneAuth = () => {
 
       let profile;
       let isNewUser = false;
+      let accountDetected = false;
 
       if (existingProfile) {
         console.log('Found existing profile:', existingProfile.id);
         profile = existingProfile;
+        accountDetected = true;
         
         // Track returning user login
         setTimeout(() => {
@@ -198,11 +200,29 @@ export const usePhoneAuth = () => {
                 phone_number: profile.phone_number,
                 full_name: profile.full_name,
                 language: profile.language,
-                is_new_user: false
+                is_new_user: false,
+                account_detected: true
               });
             }
           });
         }, 500);
+
+        // Store the profile info and redirect to dashboard
+        localStorage.setItem('current_user_profile', JSON.stringify(profile));
+        localStorage.setItem('phone_authenticated', 'true');
+        localStorage.setItem('phone_number', formattedPhone);
+
+        // Show account detected message
+        toast({
+          title: "Account detected!",
+          description: `Welcome back, ${profile.full_name}! Logging you into your account.`,
+        });
+
+        // Redirect to dashboard
+        setTimeout(() => {
+          window.location.href = '/app';
+        }, 1500);
+
       } else {
         console.log('Creating new profile for new user...');
         isNewUser = true;
@@ -240,13 +260,8 @@ export const usePhoneAuth = () => {
         }, 500);
       }
 
-      // Store the profile info in localStorage to simulate being "logged in"
-      localStorage.setItem('current_user_profile', JSON.stringify(profile));
-      localStorage.setItem('phone_authenticated', 'true');
-      localStorage.setItem('phone_number', formattedPhone);
-
-      console.log('Phone authentication successful, isNewUser:', isNewUser);
-      return { success: true, isNewUser };
+      console.log('Phone authentication successful, isNewUser:', isNewUser, 'accountDetected:', accountDetected);
+      return { success: true, isNewUser, accountDetected };
       
     } catch (error: any) {
       console.error('Verify OTP error:', error);

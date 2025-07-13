@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,6 +86,10 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
         language: 'hindi'
       }, {
         onSuccess: () => {
+          // Redirect to dashboard after successful profile creation
+          setTimeout(() => {
+            window.location.href = '/app';
+          }, 1000);
           onComplete();
         }
       });

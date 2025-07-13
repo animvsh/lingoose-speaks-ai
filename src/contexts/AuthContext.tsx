@@ -56,6 +56,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           });
         }, 1000);
+
+        // If user is authenticated and on landing page, redirect to app
+        if (window.location.pathname === '/') {
+          window.location.href = '/app';
+        }
       } catch (error) {
         console.error('Error parsing stored user profile:', error);
         // Clear invalid data

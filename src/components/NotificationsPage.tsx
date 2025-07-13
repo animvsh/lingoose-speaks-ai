@@ -42,7 +42,7 @@ const NotificationsPage = ({ onNavigate }: NotificationsPageProps) => {
         showBackButton={true} 
       />
 
-      <div className="px-6 space-y-4">
+      <div className="w-full max-w-md mx-auto px-6 space-y-4">
         {notifications.length > 0 ? (
           notifications.map((notification) => (
             <div
