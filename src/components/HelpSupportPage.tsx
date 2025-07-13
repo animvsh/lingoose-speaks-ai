@@ -1,7 +1,9 @@
 
 import { Button } from "@/components/ui/button";
 import { HelpCircle, MessageCircle, Mail, Phone as PhoneIcon, FileText, ExternalLink, ChevronRight, Home, Phone, CheckCircle, Settings, ArrowLeft, Book, Video, Users, Headphones } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
+import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import AppBar from "./AppBar";
 
 interface HelpSupportPageProps {
@@ -10,6 +12,20 @@ interface HelpSupportPageProps {
 
 const HelpSupportPage = ({ onNavigate }: HelpSupportPageProps) => {
   const [showFAQ, setShowFAQ] = useState(false);
+  const { trackSwipe } = useEngagementTracking();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleSwipe = (direction: 'left' | 'right') => {
+    trackSwipe(direction, 'help-support');
+    
+    if (direction === 'right') {
+      // Swipe right goes back to settings
+      onNavigate("settings");
+    }
+  };
+
+  // Setup swipe navigation
+  useSwipeNavigation(containerRef, handleSwipe);
 
   const faqItems = [
     {
@@ -35,7 +51,7 @@ const HelpSupportPage = ({ onNavigate }: HelpSupportPageProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-amber-50 pb-24">
+    <div ref={containerRef} className="min-h-screen bg-amber-50 pb-24">
       <AppBar 
         title="HELP & SUPPORT" 
         onBack={() => onNavigate("settings")} 
@@ -43,6 +59,11 @@ const HelpSupportPage = ({ onNavigate }: HelpSupportPageProps) => {
       />
 
       <div className="px-6 space-y-6">
+        {/* Swipe hint */}
+        <div className="text-center py-2">
+          <p className="text-xs text-gray-500">💡 Swipe right to go back to settings</p>
+        </div>
+
         {/* FAQ Section */}
         <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
           <div className="flex items-center justify-between mb-4">

@@ -1,7 +1,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Bell, Clock, CheckCircle, X, Home, Phone, Settings, ArrowLeft, Trophy } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
+import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import AppBar from "./AppBar";
 
 interface NotificationsPageProps {
@@ -30,12 +32,27 @@ const NotificationsPage = ({ onNavigate }: NotificationsPageProps) => {
     },
   ]);
 
+  const { trackSwipe } = useEngagementTracking();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleSwipe = (direction: 'left' | 'right') => {
+    trackSwipe(direction, 'notifications');
+    
+    if (direction === 'right') {
+      // Swipe right goes back to settings
+      onNavigate("settings");
+    }
+  };
+
+  // Setup swipe navigation
+  useSwipeNavigation(containerRef, handleSwipe);
+
   const handleClearNotification = (id: number) => {
     setNotifications(notifications.filter((notification) => notification.id !== id));
   };
 
   return (
-    <div className="min-h-screen bg-amber-50 pb-24">
+    <div ref={containerRef} className="min-h-screen bg-amber-50 pb-24">
       <AppBar 
         title="NOTIFICATIONS" 
         onBack={() => onNavigate("settings")} 
@@ -43,6 +60,11 @@ const NotificationsPage = ({ onNavigate }: NotificationsPageProps) => {
       />
 
       <div className="w-full max-w-md mx-auto px-6 space-y-4">
+        {/* Swipe hint */}
+        <div className="text-center py-2">
+          <p className="text-xs text-gray-500">💡 Swipe right to go back to settings</p>
+        </div>
+
         {notifications.length > 0 ? (
           notifications.map((notification) => (
             <div

@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
 import { useSessionTracking } from "@/hooks/useSessionTracking";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useIsDesktop } from "@/hooks/use-mobile";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import DashboardStats from "@/components/DashboardStats";
@@ -23,12 +24,43 @@ const Index = () => {
   const isDesktop = useIsDesktop();
   const { trackNavigation, trackScreenView, trackOnboardingComplete, identify } = usePostHog();
   const { trackPageView } = useSessionTracking();
-  const { trackScreenTime } = useEngagementTracking();
+  const { trackScreenTime, trackSwipe } = useEngagementTracking();
   const [currentView, setCurrentView] = useState("onboarding");
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [activityDetailsData, setActivityDetailsData] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showTestingPanel, setShowTestingPanel] = useState(false);
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Define navigation order for swipe gestures
+  const navigationOrder = ["home", "activity", "curriculum", "settings"];
+  
+  const handleSwipe = (direction: 'left' | 'right') => {
+    if (currentView === "onboarding" || currentView === "add-supervisor" || currentView === "activity-details") {
+      return; // Don't allow swiping on these screens
+    }
+
+    trackSwipe(direction, currentView);
+    
+    const currentIndex = navigationOrder.indexOf(currentView);
+    if (currentIndex === -1) return;
+
+    let newIndex;
+    if (direction === 'left') {
+      // Swipe left = go to next screen
+      newIndex = (currentIndex + 1) % navigationOrder.length;
+    } else {
+      // Swipe right = go to previous screen
+      newIndex = currentIndex === 0 ? navigationOrder.length - 1 : currentIndex - 1;
+    }
+    
+    const newView = navigationOrder[newIndex];
+    handleNavigate(newView);
+  };
+
+  // Setup swipe navigation
+  useSwipeNavigation(containerRef, handleSwipe);
 
   useEffect(() => {
     if (!loading) {
@@ -208,7 +240,7 @@ const Index = () => {
   const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor";
 
   return (
-    <div className="min-h-screen w-full bg-amber-50 overflow-hidden">
+    <div ref={containerRef} className="min-h-screen w-full bg-amber-50 overflow-hidden">
       <div className={`w-full ${shouldShowBottomNav ? "pb-24" : ""}`}>
         {renderCurrentView()}
       </div>

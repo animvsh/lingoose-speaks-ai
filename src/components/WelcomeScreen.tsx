@@ -1,7 +1,9 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Heart, Star, Zap } from "lucide-react";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
+import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import BolMascot from "./BolMascot";
 import SimpleOnboardingFlow from "./SimpleOnboardingFlow";
 
@@ -13,6 +15,20 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [phoneNumber] = useState(() => localStorage.getItem('phone_number') || '');
+  const { trackSwipe } = useEngagementTracking();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleSwipe = (direction: 'left' | 'right') => {
+    trackSwipe(direction, 'welcome');
+    
+    if (direction === 'left') {
+      // Swipe left to start journey
+      handleStartJourney();
+    }
+  };
+
+  // Setup swipe navigation
+  useSwipeNavigation(containerRef, handleSwipe);
 
   useEffect(() => {
     setIsVisible(true);
@@ -27,7 +43,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative">
+    <div ref={containerRef} className="min-h-screen bg-background flex items-center justify-center p-6 relative">
       <div className={`w-full max-w-md transition-all duration-1000 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
         <div className="text-center space-y-8">
           {/* Animated Mascot with decorative elements */}
@@ -70,6 +86,11 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
               <p className="text-primary font-black text-2xl italic">
                 "Let's break the language barrier together!"
               </p>
+            </div>
+
+            {/* Swipe hint */}
+            <div className="text-center py-2">
+              <p className="text-xs text-muted-foreground">💡 Swipe left or tap button to start your journey!</p>
             </div>
           </div>
 
