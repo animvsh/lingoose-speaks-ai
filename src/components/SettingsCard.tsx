@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
 import { posthogService } from "@/services/posthog";
+
 interface SettingsCardProps {
   onNavigate: (view: string) => void;
 }
+
 const SettingsCard = ({
   onNavigate
 }: SettingsCardProps) => {
@@ -27,6 +29,7 @@ const SettingsCard = ({
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [lastTestEvent, setLastTestEvent] = useState<string>('');
   const [webhookUrl, setWebhookUrl] = useState<string>('');
+
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -44,16 +47,19 @@ const SettingsCard = ({
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
+
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
     trackSettingsInteraction('toggle', 'dark_mode', newMode);
   };
+
   const toggleNotifications = () => {
     const newState = !notificationsEnabled;
     setNotificationsEnabled(newState);
     trackSettingsInteraction('toggle', 'notifications', newState);
   };
+
   const handleTestEvent = () => {
     const timestamp = new Date().toLocaleTimeString();
     const eventName = 'debug_test_event';
@@ -65,6 +71,7 @@ const SettingsCard = ({
     console.log('PostHog test event sent:', eventName, timestamp);
     trackFeatureUsage('debug_panel', 'test_event');
   };
+
   const handleManualEvent = () => {
     const timestamp = new Date().toLocaleTimeString();
 
@@ -86,6 +93,7 @@ const SettingsCard = ({
       setLastTestEvent('PostHog service not available');
     }
   };
+
   const handleWebhookTest = () => {
     if (!webhookUrl) {
       alert('Please enter a webhook.site URL first');
@@ -99,6 +107,7 @@ const SettingsCard = ({
       webhook_url: webhookUrl
     });
   };
+
   const handleAddToHomeScreen = async () => {
     console.log('Add to home screen clicked from settings');
     trackFeatureUsage('pwa', 'add_to_homescreen_attempt');
@@ -140,16 +149,19 @@ const SettingsCard = ({
       alert(instructions);
     }
   };
+
   const handleLogout = () => {
     trackAuthEvent('logout');
     signOut();
   };
+
   const handleNavigationClick = (destination: string, feature?: string) => {
     if (feature) {
       trackFeatureUsage('settings_navigation', feature);
     }
     onNavigate(destination);
   };
+
   return <div className="min-h-screen bg-amber-50 pb-24">
       <div className="px-6 pt-8 pb-6">
         <div className="flex items-center justify-between">
@@ -167,9 +179,9 @@ const SettingsCard = ({
         </div>
       </div>
 
-      <div className="px-6 space-y-6">
+      <div className="w-full space-y-6">
         {/* Account Settings */}
-        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+        <div className="w-full bg-white p-6 border-4 border-gray-200">
           <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
             Account
           </h3>
@@ -190,7 +202,7 @@ const SettingsCard = ({
         </div>
 
         {/* Analytics Debug Section */}
-        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+        <div className="w-full bg-white p-6 border-4 border-gray-200">
           <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
             Analytics Debug ⚡
           </h3>
@@ -262,7 +274,7 @@ const SettingsCard = ({
         </div>
 
         {/* App Settings */}
-        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+        <div className="w-full bg-white p-6 border-4 border-gray-200">
           <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
             App Settings
           </h3>
@@ -319,7 +331,7 @@ const SettingsCard = ({
         </div>
 
         {/* Support & About */}
-        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
+        <div className="w-full bg-white p-6 border-4 border-gray-200">
           <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
             Support
           </h3>
@@ -347,14 +359,17 @@ const SettingsCard = ({
         </div>
 
         {/* Logout */}
-        <Button onClick={handleLogout} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-3xl transition-all duration-200">
-          <LogOut className="w-5 h-5 mr-2" />
-          Log Out
-        </Button>
+        <div className="w-full px-6">
+          <Button onClick={handleLogout} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-3xl transition-all duration-200">
+            <LogOut className="w-5 h-5 mr-2" />
+            Log Out
+          </Button>
+        </div>
       </div>
 
       {/* Bottom Navigation */}
       
     </div>;
 };
+
 export default SettingsCard;
