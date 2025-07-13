@@ -66,6 +66,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
   }
 }
 
@@ -91,11 +92,11 @@
   }
 
   .cartoon-button {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-full font-bold text-lg transition-all duration-300 hover:scale-110 hover:rotate-3 hover:-translate-y-1;
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-full font-bold text-lg transition-all duration-300 hover:scale-110 hover:rotate-3 hover:-translate-y-1 border-4 border-primary/30;
   }
 
   .playful-card {
-    @apply bg-gradient-to-br from-card to-accent/10 border-4 border-primary/20 rounded-3xl transition-all duration-300 hover:border-primary/40 hover:scale-105 hover:rotate-1;
+    @apply bg-gradient-to-br from-card to-accent/10 border-4 border-primary/20 rounded-3xl transition-all duration-300 hover:border-primary/40 hover:scale-105 hover:rotate-1 shadow-lg hover:shadow-2xl;
   }
 }
 
@@ -126,21 +127,75 @@
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-15px);
   }
 }
 
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+  animation: float 4s ease-in-out infinite;
 }
 
 @keyframes wiggle {
-  0%, 100% { transform: rotate(-3deg); }
-  50% { transform: rotate(3deg); }
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
 }
 
 .animate-wiggle {
-  animation: wiggle 1s ease-in-out infinite;
+  animation: wiggle 2s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-50px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translateY(-10px);
+  }
+  70% {
+    transform: scale(0.9) translateY(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0px);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.8s ease-out forwards;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes rainbow {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+.animate-rainbow {
+  animation: rainbow 3s linear infinite;
 }
 
 /* Fix hover clipping issues */
@@ -154,6 +209,7 @@
     transform-style: preserve-3d;
     will-change: transform;
     backface-visibility: hidden;
+    contain: none !important;
   }
   
   /* Ensure containers don't clip hover effects */
@@ -164,6 +220,15 @@
   /* Prevent transform container issues */
   .transform-safe {
     transform: translateZ(0);
+  }
+
+  /* Cartoonish shadows */
+  .cartoon-shadow {
+    box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.1);
+  }
+
+  .cartoon-shadow-hover:hover {
+    box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -176,16 +241,41 @@
 [class*="Card"], 
 [class*="card"] {
   overflow: visible !important;
+  contain: none !important;
 }
 
 /* Grid and flex container fixes */
 .grid,
 .flex {
   overflow: visible !important;
+  contain: none !important;
 }
 
 /* Space and gap container fixes */
 [class*="space-"],
 [class*="gap-"] {
   overflow: visible !important;
+  contain: none !important;
+}
+
+/* Button enhancements */
+button {
+  transition: all 0.3s ease !important;
+}
+
+button:hover {
+  transform: scale(1.05) !important;
+}
+
+button:active {
+  transform: scale(0.95) !important;
+}
+
+/* Image hover effects */
+img {
+  transition: all 0.3s ease !important;
+}
+
+img:hover {
+  transform: scale(1.1) rotate(5deg) !important;
 }
