@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserProfile {
   id: string;
@@ -28,6 +29,20 @@ export const useAuth = () => {
   return context;
 };
 
+const logSecurityEvent = async (action: string, phoneNumber?: string, details: any = {}) => {
+  try {
+    await supabase.from('security_audit_logs').insert({
+      phone_number: phoneNumber || null,
+      action,
+      details,
+      ip_address: null,
+      user_agent: navigator.userAgent
+    });
+  } catch (error) {
+    console.warn('Failed to log security event:', error);
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +58,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const profile = JSON.parse(userProfile);
         setUser(profile);
         console.log('Restored user session:', profile.phone_number);
+        
+        // Log session restoration
+        logSecurityEvent('user_session_restored', profile.phone_number, {
+          user_id: profile.id,
+          full_name: profile.full_name,
+          language: profile.language
+        });
         
         // Track user session restored
         setTimeout(() => {
@@ -63,6 +85,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch (error) {
         console.error('Error parsing stored user profile:', error);
+        
+        // Log suspicious activity
+        logSecurityEvent('session_restoration_failed', undefined, {
+          error: 'Invalid stored user profile data',
+          error_details: error instanceof Error ? error.message : 'Unknown error'
+        });
+        
         // Clear invalid data
         localStorage.removeItem('phone_authenticated');
         localStorage.removeItem('current_user_profile');
@@ -77,6 +106,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Track sign out event
       if (user) {
+        await logSecurityEvent('user_signout_attempted', user.phone_number, {
+          user_id: user.id,
+          full_name: user.full_name
+        });
+        
         import('@/services/posthog').then(({ posthogService }) => {
           if (posthogService) {
             posthogService.capture('user_signed_out', user.id || user.phone_number, {
@@ -95,6 +129,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Clear state immediately
       setUser(null);
       
+      await logSecurityEvent('user_signout_success', user?.phone_number);
+      
       toast({
         title: "Signed out",
         description: "You have been signed out successfully.",
@@ -105,6 +141,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
     } catch (error: any) {
       console.error('Sign out failed:', error);
+      
+      await logSecurityEvent('user_signout_failed', user?.phone_number, {
+        error: error.message
+      });
       
       // Force cleanup even if there's an error
       localStorage.removeItem('phone_authenticated');

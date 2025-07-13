@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const useUserProfile = () => {
   const queryClient = useQueryClient();
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
       // Get the current user profile from localStorage
@@ -17,10 +17,11 @@ export const useUserProfile = () => {
       const profile = JSON.parse(userProfile);
       
       // Always fetch fresh data from database to get latest conversation summary
+      // Use secure query that works with new RLS policies
       const { data: freshProfile, error } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('id', profile.id)
+        .eq('phone_number', profile.phone_number)
         .single();
 
       if (error) {
@@ -46,35 +47,7 @@ export const useUserProfile = () => {
   };
 
   return {
-    ...useQuery({
-      queryKey: ['userProfile'],
-      queryFn: async () => {
-        const userProfile = localStorage.getItem('current_user_profile');
-        if (!userProfile) {
-          throw new Error('No authenticated user');
-        }
-
-        const profile = JSON.parse(userProfile);
-        
-        const { data: freshProfile, error } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', profile.id)
-          .single();
-
-        if (error) {
-          console.error('Error fetching fresh profile:', error);
-          return profile;
-        }
-
-        localStorage.setItem('current_user_profile', JSON.stringify(freshProfile));
-        
-        return freshProfile;
-      },
-      enabled: !!localStorage.getItem('phone_authenticated'),
-      staleTime: 30000,
-      refetchInterval: 60000,
-    }),
+    ...query,
     refreshProfile
   };
 };

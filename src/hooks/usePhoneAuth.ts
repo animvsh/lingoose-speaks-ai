@@ -1,6 +1,31 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+
+// Input validation functions
+const validatePhoneNumber = (phone: string): boolean => {
+  return /^\+[1-9]\d{9,14}$/.test(phone);
+};
+
+const validateUserName = (name: string): boolean => {
+  const trimmed = name.trim();
+  return trimmed.length >= 1 && trimmed.length <= 100 && /^[a-zA-Z\s\-']+$/.test(trimmed);
+};
+
+const logSecurityEvent = async (action: string, phoneNumber: string, details: any = {}) => {
+  try {
+    await supabase.from('security_audit_logs').insert({
+      phone_number: phoneNumber,
+      action,
+      details,
+      ip_address: null, // We can't easily get IP on client side
+      user_agent: navigator.userAgent
+    });
+  } catch (error) {
+    console.warn('Failed to log security event:', error);
+  }
+};
 
 export const usePhoneAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,9 +53,20 @@ export const usePhoneAuth = () => {
     
     try {
       const formattedPhone = formatPhoneNumber(phoneNumber);
+      
+      // Validate phone number format
+      if (!validatePhoneNumber(formattedPhone)) {
+        await logSecurityEvent('otp_send_invalid_phone', formattedPhone, {
+          error: 'Invalid phone number format'
+        });
+        throw new Error('Please enter a valid phone number with country code (e.g., +1234567890)');
+      }
+      
       console.log('Sending OTP to:', formattedPhone);
       
       // Track OTP send attempt
+      await logSecurityEvent('otp_send_attempted', formattedPhone);
+      
       setTimeout(() => {
         import('@/services/posthog').then(({ posthogService }) => {
           if (posthogService) {
@@ -51,7 +87,10 @@ export const usePhoneAuth = () => {
       if (error) {
         console.error('Send OTP error:', error);
         
-        // Track OTP send failure
+        await logSecurityEvent('otp_send_failed', formattedPhone, {
+          error: error.message
+        });
+        
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
             if (posthogService) {
@@ -67,7 +106,10 @@ export const usePhoneAuth = () => {
       }
 
       if (!data.success) {
-        // Track OTP send failure
+        await logSecurityEvent('otp_send_failed', formattedPhone, {
+          error: data.error
+        });
+        
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
             if (posthogService) {
@@ -84,7 +126,8 @@ export const usePhoneAuth = () => {
 
       console.log('OTP sent successfully');
       
-      // Track OTP send success
+      await logSecurityEvent('otp_send_success', formattedPhone);
+      
       setTimeout(() => {
         import('@/services/posthog').then(({ posthogService }) => {
           if (posthogService) {
@@ -113,9 +156,19 @@ export const usePhoneAuth = () => {
     
     try {
       const formattedPhone = formatPhoneNumber(phoneNumber);
+      
+      // Validate phone number format
+      if (!validatePhoneNumber(formattedPhone)) {
+        await logSecurityEvent('otp_verify_invalid_phone', formattedPhone, {
+          error: 'Invalid phone number format'
+        });
+        throw new Error('Please enter a valid phone number with country code');
+      }
+      
       console.log('Verifying OTP for:', formattedPhone);
       
-      // Track OTP verification attempt
+      await logSecurityEvent('otp_verify_attempted', formattedPhone);
+      
       setTimeout(() => {
         import('@/services/posthog').then(({ posthogService }) => {
           if (posthogService) {
@@ -138,7 +191,10 @@ export const usePhoneAuth = () => {
       if (error) {
         console.error('Verify OTP error:', error);
         
-        // Track OTP verification failure
+        await logSecurityEvent('otp_verify_failed', formattedPhone, {
+          error: error.message
+        });
+        
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
             if (posthogService) {
@@ -154,7 +210,10 @@ export const usePhoneAuth = () => {
       }
 
       if (!data.success || !data.verified) {
-        // Track OTP verification failure
+        await logSecurityEvent('otp_verify_failed', formattedPhone, {
+          error: data.error || 'Invalid code'
+        });
+        
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
             if (posthogService) {
@@ -171,7 +230,7 @@ export const usePhoneAuth = () => {
 
       console.log('OTP verified successfully, checking user profile...');
 
-      // Check if profile exists
+      // Check if profile exists with secure query
       const { data: existingProfile, error: findError } = await supabase
         .from('user_profiles')
         .select('*')
@@ -180,6 +239,9 @@ export const usePhoneAuth = () => {
 
       if (findError) {
         console.error('Error finding profile:', findError);
+        await logSecurityEvent('profile_lookup_failed', formattedPhone, {
+          error: findError.message
+        });
         throw findError;
       }
 
@@ -192,7 +254,11 @@ export const usePhoneAuth = () => {
         profile = existingProfile;
         accountDetected = true;
         
-        // Track returning user login
+        await logSecurityEvent('user_login_success', formattedPhone, {
+          user_id: profile.id,
+          is_returning_user: true
+        });
+        
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
             if (posthogService) {
@@ -207,18 +273,15 @@ export const usePhoneAuth = () => {
           });
         }, 500);
 
-        // Store the profile info and redirect to dashboard
         localStorage.setItem('current_user_profile', JSON.stringify(profile));
         localStorage.setItem('phone_authenticated', 'true');
         localStorage.setItem('phone_number', formattedPhone);
 
-        // Show account detected message
         toast({
           title: "Account detected!",
           description: `Welcome back, ${profile.full_name}! Logging you into your account.`,
         });
 
-        // Redirect to dashboard
         setTimeout(() => {
           window.location.href = '/app';
         }, 1500);
@@ -227,10 +290,16 @@ export const usePhoneAuth = () => {
         console.log('Creating new profile for new user...');
         isNewUser = true;
         
+        // Validate default name
+        const defaultName = 'New User';
+        if (!validateUserName(defaultName)) {
+          throw new Error('System error: Invalid default user name');
+        }
+        
         const { data: newProfile, error: createError } = await supabase
           .from('user_profiles')
           .insert({
-            full_name: 'New User',
+            full_name: defaultName,
             phone_number: formattedPhone,
             language: 'hindi'
           })
@@ -239,13 +308,20 @@ export const usePhoneAuth = () => {
 
         if (createError) {
           console.error('Error creating profile:', createError);
+          await logSecurityEvent('profile_creation_failed', formattedPhone, {
+            error: createError.message
+          });
           throw createError;
         }
         
         profile = newProfile;
         console.log('Created new profile:', profile.id);
         
-        // Track new user signup
+        await logSecurityEvent('user_signup_success', formattedPhone, {
+          user_id: profile.id,
+          is_new_user: true
+        });
+        
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
             if (posthogService) {
