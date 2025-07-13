@@ -12,7 +12,7 @@ const Auth = () => {
   const { toast } = useToast();
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen w-full bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <BolMascot className="mx-auto mb-4 hover:scale-110 transition-transform duration-300 animate-gentle-float" />
@@ -22,7 +22,7 @@ const Auth = () => {
           <p className="text-muted-foreground font-semibold">Your AI Hindi Learning Companion</p>
         </div>
         
-        <div className="warm-card p-6 soft-shadow">
+        <div className="warm-card p-6 soft-shadow w-full">
           <PhoneAuthForm onBack={() => {}} />
         </div>
       </div>

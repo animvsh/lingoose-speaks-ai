@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Phone, CheckCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Phone, CheckCircle, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
 import SimpleOnboardingFlow from "@/components/SimpleOnboardingFlow";
+import PhoneAuthForm from "@/components/PhoneAuthForm";
 
 const Landing = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
   
   const testimonials = [
     {
@@ -89,17 +91,49 @@ const Landing = () => {
     setShowOnboarding(true);
   };
 
+  const handleSignIn = () => {
+    setShowSignIn(true);
+  };
+
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
+  };
+
+  const handleSignInBack = () => {
+    setShowSignIn(false);
   };
 
   if (showOnboarding) {
     const phoneNumber = localStorage.getItem('phone_number') || '';
     return <SimpleOnboardingFlow onComplete={handleOnboardingComplete} phoneNumber={phoneNumber} />;
   }
+
+  if (showSignIn) {
+    return (
+      <div className="min-h-screen w-full bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <img 
+              src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png" 
+              alt="Bol Logo" 
+              className="h-16 w-auto object-contain mx-auto mb-4 hover:scale-110 transition-transform duration-300" 
+            />
+            <h1 className="text-4xl font-black text-primary mb-2 uppercase tracking-wider transform -rotate-1">
+              Sign In
+            </h1>
+            <p className="text-muted-foreground font-semibold">Welcome back to Bol</p>
+          </div>
+          
+          <div className="warm-card p-6 soft-shadow">
+            <PhoneAuthForm onBack={handleSignInBack} />
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen w-full bg-background">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
@@ -110,10 +144,20 @@ const Landing = () => {
               className="h-16 w-auto object-contain hover:scale-105 transition-transform duration-200" 
             />
           </div>
-          <div className="hidden sm:flex items-center space-x-8 text-sm font-semibold text-foreground">
-            <a href="#why" className="hover:text-primary transition-colors">Why Bol</a>
-            <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
-            <a href="#faqs" className="hover:text-primary transition-colors">FAQs</a>
+          <div className="flex items-center space-x-4">
+            <Button
+              onClick={handleSignIn}
+              variant="outline"
+              className="hidden sm:flex items-center bg-white hover:bg-gray-50 border-2 border-primary text-primary font-bold py-2 px-4 rounded-xl transition-all duration-200"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Sign In
+            </Button>
+            <div className="hidden sm:flex items-center space-x-8 text-sm font-semibold text-foreground">
+              <a href="#why" className="hover:text-primary transition-colors">Why Bol</a>
+              <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
+              <a href="#faqs" className="hover:text-primary transition-colors">FAQs</a>
+            </div>
           </div>
         </div>
       </header>
@@ -132,7 +176,7 @@ const Landing = () => {
             <p className="font-black text-2xl text-primary">$4/week. Cancel anytime.</p>
           </div>
 
-          <div className="mb-12">
+          <div className="mb-12 flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
               onClick={handleStartNow}
               className="warm-button font-black text-xl px-12 py-6 text-white soft-shadow"
@@ -140,12 +184,22 @@ const Landing = () => {
               <Phone className="w-6 h-6 mr-3" />
               START NOW! 🚀
             </Button>
-            <p className="text-sm mt-4 max-w-md mx-auto text-muted-foreground">
-              By clicking Start Now, you consent to the{' '}
-              <Link to="/terms-of-service" className="hover:underline font-semibold text-primary">Terms of Service</Link> and{' '}
-              <Link to="/privacy-policy" className="hover:underline font-semibold text-primary">Privacy Policy</Link>.
-            </p>
+            
+            <Button
+              onClick={handleSignIn}
+              variant="outline"
+              className="bg-white hover:bg-gray-50 border-2 border-primary text-primary font-black text-xl px-12 py-6 rounded-xl transition-all duration-200"
+            >
+              <LogIn className="w-6 h-6 mr-3" />
+              Sign In
+            </Button>
           </div>
+
+          <p className="text-sm mt-4 max-w-md mx-auto text-muted-foreground">
+            By clicking Start Now, you consent to the{' '}
+            <Link to="/terms-of-service" className="hover:underline font-semibold text-primary">Terms of Service</Link> and{' '}
+            <Link to="/privacy-policy" className="hover:underline font-semibold text-primary">Privacy Policy</Link>.
+          </p>
 
           {/* Hero Image */}
           <div className="relative max-w-lg mx-auto">

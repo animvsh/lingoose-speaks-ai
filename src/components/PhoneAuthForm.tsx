@@ -58,10 +58,16 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
 
     const result = await verifyOTP(phoneNumber, otpCode);
     if (result.success) {
-      if (result.isNewUser) {
+      if (result.accountDetected) {
         toast({
-          title: "🎉 Welcome to Lingoose!",
-          description: "Let's get you started with a quick setup!",
+          title: "🎉 Account Found!",
+          description: "We found your account. Signing you in...",
+          className: "border-2 border-blue-400 bg-blue-50 text-blue-800",
+        });
+      } else if (result.isNewUser) {
+        toast({
+          title: "🎉 Welcome to Bol!",
+          description: "Account created successfully!",
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
       } else {
@@ -74,7 +80,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
       
       // Redirect to main app
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = '/app';
       }, 1000);
     } else {
       toast({
@@ -92,7 +98,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
 
   if (step === 'otp') {
     return (
-      <Card className="border-4 border-slate-400 rounded-2xl bg-white shadow-lg">
+      <Card className="w-full border-4 border-slate-400 rounded-2xl bg-white shadow-lg">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Shield className="w-6 h-6 text-slate-600" />
@@ -112,7 +118,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
                 value={otpCode} 
                 onChange={setOtpCode} 
                 maxLength={6}
-                containerClassName="gap-2"
+                containerClassName="gap-2 justify-center"
               >
                 <InputOTPGroup>
                   <InputOTPSlot index={0} className="w-12 h-12 text-lg font-bold border-2 border-slate-300 rounded-xl" />
@@ -149,7 +155,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
   }
 
   return (
-    <Card className="border-4 border-slate-400 rounded-2xl bg-white shadow-lg">
+    <Card className="w-full border-4 border-slate-400 rounded-2xl bg-white shadow-lg">
       <CardHeader className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Shield className="w-6 h-6 text-slate-600" />
@@ -164,14 +170,14 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
       
       <CardContent>
         <form onSubmit={handleSendOTP} className="space-y-4">
-          <div className="relative">
+          <div className="relative w-full">
             <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
             <Input
               type="tel"
               placeholder="Enter your phone number (+1234567890)"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              className="pl-10 border-2 border-slate-300 rounded-xl font-bold"
+              className="w-full pl-10 border-2 border-slate-300 rounded-xl font-bold"
               required
             />
           </div>

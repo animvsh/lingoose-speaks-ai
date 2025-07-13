@@ -95,7 +95,7 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-amber-50 flex items-center justify-center">
+      <div className="min-h-screen w-full bg-amber-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
             <div className="w-8 h-8 bg-white rounded-full"></div>
@@ -108,7 +108,7 @@ const Index = () => {
 
   const renderCurrentView = () => {
     // Enhanced page transitions with scale and fade effects
-    const baseClasses = `transition-all duration-300 ease-in-out transform ${
+    const baseClasses = `w-full transition-all duration-300 ease-in-out transform ${
       isTransitioning 
         ? 'opacity-0 scale-95 translate-y-4' 
         : 'opacity-100 scale-100 translate-y-0'
@@ -125,7 +125,7 @@ const Index = () => {
     if (currentView === "home") {
       return (
         <div className={baseClasses}>
-          <div className="space-y-4">
+          <div className="w-full space-y-4">
             {/* Toggle button for testing panel */}
             {user && (
               <div className="flex justify-end p-4">
@@ -140,7 +140,7 @@ const Index = () => {
             
             {/* Testing Panel */}
             {showTestingPanel && user && (
-              <div className="px-4">
+              <div className="w-full px-4">
                 <StripeTestingPanel />
               </div>
             )}
@@ -201,8 +201,8 @@ const Index = () => {
   const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor";
 
   return (
-    <div className="min-h-screen bg-amber-50 overflow-hidden">
-      <div className={shouldShowBottomNav ? "pb-24" : ""}>
+    <div className="min-h-screen w-full bg-amber-50 overflow-hidden">
+      <div className={`w-full ${shouldShowBottomNav ? "pb-24" : ""}`}>
         {renderCurrentView()}
       </div>
       
