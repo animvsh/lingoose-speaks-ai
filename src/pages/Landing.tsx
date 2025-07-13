@@ -99,7 +99,7 @@ const Landing = () => {
   }
   
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F5F1E8' }}>
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
@@ -110,10 +110,10 @@ const Landing = () => {
               className="h-16 w-auto object-contain hover:scale-105 transition-transform duration-200" 
             />
           </div>
-          <div className="hidden sm:flex items-center space-x-8 text-sm font-bold" style={{ color: '#8B4513' }}>
-            <a href="#why" className="hover:opacity-70 transition-colors">Why Bol</a>
-            <a href="#pricing" className="hover:opacity-70 transition-colors">Pricing</a>
-            <a href="#faqs" className="hover:opacity-70 transition-colors">FAQs</a>
+          <div className="hidden sm:flex items-center space-x-8 text-sm font-semibold text-foreground">
+            <a href="#why" className="hover:text-primary transition-colors">Why Bol</a>
+            <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
+            <a href="#faqs" className="hover:text-primary transition-colors">FAQs</a>
           </div>
         </div>
       </header>
@@ -121,40 +121,39 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6" style={{ color: '#5D4037' }}>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6 text-foreground">
             Teach your kids Hindi.<br />
-            <span style={{ color: '#D2691E' }}>Without nagging.</span>
+            <span className="text-primary">Without nagging.</span>
           </h1>
           
-          <div className="space-y-4 text-lg sm:text-xl mb-8" style={{ color: '#8B4513' }}>
-            <p className="font-bold">Daily 1-on-1 calls. No apps. No worksheets.</p>
-            <p className="font-bold">Just one slightly pushy desi sheep.</p>
-            <p className="font-black text-2xl" style={{ color: '#A0612B' }}>$4/week. Cancel anytime.</p>
+          <div className="space-y-4 text-lg sm:text-xl mb-8 text-muted-foreground">
+            <p className="font-semibold">Daily 1-on-1 calls. No apps. No worksheets.</p>
+            <p className="font-semibold">Just one slightly pushy desi sheep.</p>
+            <p className="font-black text-2xl text-primary">$4/week. Cancel anytime.</p>
           </div>
 
           <div className="mb-12">
             <Button 
               onClick={handleStartNow}
-              className="font-black text-xl px-12 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 text-white"
-              style={{ backgroundColor: '#D2691E' }}
+              className="warm-button font-black text-xl px-12 py-6 text-white soft-shadow"
             >
               <Phone className="w-6 h-6 mr-3" />
               START NOW! 🚀
             </Button>
-            <p className="text-sm mt-4 max-w-md mx-auto" style={{ color: '#A0612B' }}>
+            <p className="text-sm mt-4 max-w-md mx-auto text-muted-foreground">
               By clicking Start Now, you consent to the{' '}
-              <Link to="/terms-of-service" className="hover:underline font-bold" style={{ color: '#D2691E' }}>Terms of Service</Link> and{' '}
-              <Link to="/privacy-policy" className="hover:underline font-bold" style={{ color: '#D2691E' }}>Privacy Policy</Link>.
+              <Link to="/terms-of-service" className="hover:underline font-semibold text-primary">Terms of Service</Link> and{' '}
+              <Link to="/privacy-policy" className="hover:underline font-semibold text-primary">Privacy Policy</Link>.
             </p>
           </div>
 
           {/* Hero Image */}
           <div className="relative max-w-lg mx-auto">
-            <div className="rounded-3xl p-8 shadow-xl" style={{ backgroundColor: '#EFEBE3', border: '4px solid #E0D7C7' }}>
+            <div className="warm-card p-8 soft-shadow">
               <img 
                 src="/lovable-uploads/b0e951c1-f59e-468b-afbb-83bef5734b90.png" 
                 alt="Learning character with headphones" 
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-contain animate-gentle-float"
               />
             </div>
           </div>
@@ -163,7 +162,7 @@ const Landing = () => {
 
       {/* Why Bol Works */}
       <section id="why" className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12" style={{ color: '#5D4037' }}>
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-foreground">
           Why Bol Works
         </h2>
         
@@ -190,7 +189,7 @@ const Landing = () => {
               image: "/lovable-uploads/a4122ad1-cbc2-4bd9-beae-8eda0bbf6aff.png"
             }
           ].map((item, index) => (
-            <Card key={index} className="p-6 text-center rounded-3xl hover:shadow-xl transition-all duration-200 hover:scale-105" style={{ backgroundColor: '#FFFFFF', border: '3px solid #E0D7C7' }}>
+            <Card key={index} className="warm-card p-6 text-center hover-lift">
               <div className="mb-4 flex justify-center">
                 <img 
                   src={item.image} 
@@ -198,8 +197,8 @@ const Landing = () => {
                   className="w-20 h-20 object-contain"
                 />
               </div>
-              <h3 className="text-lg font-black mb-3" style={{ color: '#5D4037' }}>{item.title}</h3>
-              <p className="text-sm font-bold" style={{ color: '#8B4513' }}>{item.desc}</p>
+              <h3 className="text-lg font-black mb-3 text-foreground">{item.title}</h3>
+              <p className="text-sm font-medium text-muted-foreground">{item.desc}</p>
             </Card>
           ))}
         </div>
@@ -207,14 +206,14 @@ const Landing = () => {
 
       {/* Pricing Section */}
       <section id="pricing" className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl lg:text-4xl font-black mb-8" style={{ color: '#5D4037' }}>💸 Simple Pricing</h2>
+        <h2 className="text-3xl lg:text-4xl font-black mb-8 text-foreground">💸 Simple Pricing</h2>
         
         <div className="inline-block">
-          <Card className="p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-200" style={{ backgroundColor: '#EFEBE3', border: '4px solid #E0D7C7' }}>
-            <div className="text-6xl font-black mb-4" style={{ color: '#5D4037' }}>
-              $4<span className="text-3xl" style={{ color: '#8B4513' }}>/week</span>
+          <Card className="warm-card p-10 soft-shadow">
+            <div className="text-6xl font-black mb-4 text-foreground">
+              $4<span className="text-3xl text-muted-foreground">/week</span>
             </div>
-            <ul className="text-lg space-y-3 font-bold" style={{ color: '#8B4513' }}>
+            <ul className="text-lg space-y-3 font-semibold text-muted-foreground">
               <li className="flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
                 Daily 1-on-1 calls 📞
@@ -234,13 +233,13 @@ const Landing = () => {
 
       {/* How It Works */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12" style={{ color: '#5D4037' }}>
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-foreground">
           How Bol Works
         </h2>
         
         {/* Process Flow */}
         <div className="max-w-4xl mx-auto mb-12 text-center">
-          <div className="rounded-3xl p-8 shadow-xl" style={{ backgroundColor: '#FFFFFF', border: '4px solid #E0D7C7' }}>
+          <div className="warm-card p-8 soft-shadow">
             <img 
               src="/lovable-uploads/ae3ff9ea-2f29-4a46-ac08-13a756e28a34.png" 
               alt="How Bol Works Process Flow Diagram" 
@@ -250,7 +249,7 @@ const Landing = () => {
         </div>
         
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="p-8 rounded-3xl hover:shadow-xl transition-shadow duration-200" style={{ backgroundColor: '#FFFFFF', border: '4px solid #E0D7C7' }}>
+          <Card className="warm-card p-8 hover-lift">
             <div className="w-16 h-16 mb-4 flex justify-center">
               <img 
                 src="/lovable-uploads/2759d760-66ad-49a1-b514-506532516fda.png" 
@@ -258,14 +257,14 @@ const Landing = () => {
                 className="w-16 h-16 object-contain"
               />
             </div>
-            <h3 className="text-xl font-black mb-3" style={{ color: '#5D4037' }}>Daily Progress Reports</h3>
-            <p className="font-bold" style={{ color: '#8B4513' }}>
+            <h3 className="text-xl font-black mb-3 text-foreground">Daily Progress Reports</h3>
+            <p className="font-medium text-muted-foreground">
               Get detailed reports after each call. Track your child's vocabulary growth, 
               pronunciation improvements, and conversation confidence.
             </p>
           </Card>
           
-          <Card className="p-8 rounded-3xl hover:shadow-xl transition-shadow duration-200" style={{ backgroundColor: '#FFFFFF', border: '4px solid #E0D7C7' }}>
+          <Card className="warm-card p-8 hover-lift">
             <div className="w-16 h-16 mb-4 flex justify-center">
               <img 
                 src="/lovable-uploads/3fba8058-0143-452a-823e-e925bb333097.png" 
@@ -273,8 +272,8 @@ const Landing = () => {
                 className="w-16 h-16 object-contain"
               />
             </div>
-            <h3 className="text-xl font-black mb-3" style={{ color: '#5D4037' }}>Scenario-Based Learning</h3>
-            <p className="font-bold" style={{ color: '#8B4513' }}>
+            <h3 className="text-xl font-black mb-3 text-foreground">Scenario-Based Learning</h3>
+            <p className="font-medium text-muted-foreground">
               Real-life situations like ordering food, asking for directions, or talking to relatives. 
               We don't teach grammar—we teach you to navigate conversations that actually matter.
             </p>
@@ -284,7 +283,7 @@ const Landing = () => {
 
       {/* Testimonials */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12" style={{ color: '#5D4037' }}>
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-foreground">
           What Devi Parents Say 🇮🇳
         </h2>
         
@@ -293,17 +292,15 @@ const Landing = () => {
           <div className="flex justify-center gap-4 mb-6">
             <button
               onClick={() => setCurrentTestimonial((prev) => (prev - 1 + totalSlides) % totalSlides)}
-              className="p-2 rounded-full transition-colors duration-200"
-              style={{ backgroundColor: '#E0D7C7' }}
+              className="p-2 rounded-full bg-secondary hover:bg-secondary/80 transition-colors duration-200"
             >
-              <ChevronLeft className="w-5 h-5" style={{ color: '#8B4513' }} />
+              <ChevronLeft className="w-5 h-5 text-foreground" />
             </button>
             <button
               onClick={() => setCurrentTestimonial((prev) => (prev + 1) % totalSlides)}
-              className="p-2 rounded-full transition-colors duration-200"
-              style={{ backgroundColor: '#E0D7C7' }}
+              className="p-2 rounded-full bg-secondary hover:bg-secondary/80 transition-colors duration-200"
             >
-              <ChevronRight className="w-5 h-5" style={{ color: '#8B4513' }} />
+              <ChevronRight className="w-5 h-5 text-foreground" />
             </button>
           </div>
 
@@ -327,16 +324,15 @@ const Landing = () => {
                     .map((testimonial, index) => (
                       <Card 
                         key={`${slideIndex}-${index}`}
-                        className="flex-1 max-w-sm p-6 rounded-2xl hover:shadow-lg transition-shadow duration-200"
-                        style={{ backgroundColor: '#FFFFFF', border: '4px solid #E0D7C7' }}
+                        className="warm-card flex-1 max-w-sm p-6 hover-lift"
                       >
                         <div className="text-2xl mb-3">💬</div>
-                        <blockquote className="text-sm mb-4 italic font-bold" style={{ color: '#5D4037' }}>
+                        <blockquote className="text-sm mb-4 italic font-medium text-foreground">
                           "{testimonial.quote}"
                         </blockquote>
                         <div>
-                          <cite className="text-sm font-black" style={{ color: '#8B4513' }}>— {testimonial.author}</cite>
-                          <p className="text-xs font-bold" style={{ color: '#A0612B' }}>{testimonial.role}</p>
+                          <cite className="text-sm font-black text-foreground">— {testimonial.author}</cite>
+                          <p className="text-xs font-medium text-muted-foreground">{testimonial.role}</p>
                         </div>
                       </Card>
                     ))}
@@ -349,7 +345,7 @@ const Landing = () => {
 
       {/* FAQs */}
       <section id="faqs" className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12" style={{ color: '#5D4037' }}>
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-foreground">
           FAQs
         </h2>
         <div className="max-w-3xl mx-auto space-y-6">
@@ -370,12 +366,12 @@ const Landing = () => {
               icon: "👨‍👩‍👧‍👦"
             }
           ].map((faq, index) => (
-            <Card key={index} className="p-6 rounded-2xl hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#FFFFFF', border: '4px solid #E0D7C7' }}>
+            <Card key={index} className="warm-card p-6 hover-lift">
               <div className="flex items-start gap-4">
                 <div className="text-2xl">{faq.icon}</div>
                 <div className="flex-1">
-                  <h3 className="font-black text-lg mb-2" style={{ color: '#5D4037' }}>{faq.question}</h3>
-                  <p className="font-bold" style={{ color: '#8B4513' }}>{faq.answer}</p>
+                  <h3 className="font-black text-lg mb-2 text-foreground">{faq.question}</h3>
+                  <p className="font-medium text-muted-foreground">{faq.answer}</p>
                 </div>
               </div>
             </Card>
@@ -384,7 +380,7 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="container mx-auto px-4 py-12 text-center" style={{ borderTop: '1px solid #E0D7C7' }}>
+      <footer className="container mx-auto px-4 py-12 text-center border-t border-border">
         <div className="space-y-4">
           <div className="flex items-center justify-center space-x-3">
             <img 
@@ -393,14 +389,14 @@ const Landing = () => {
               className="h-10 w-auto object-contain" 
             />
           </div>
-          <div className="space-y-2 font-bold" style={{ color: '#8B4513' }}>
+          <div className="space-y-2 font-semibold text-muted-foreground">
             <p>Fluent kids. Happy grandparents.</p>
             <p>No drama.</p>
           </div>
-          <div className="pt-4 text-sm font-bold" style={{ borderTop: '1px solid #E0D7C7', color: '#A0612B' }}>
-            <p>📩 <a href="mailto:support@bol.ad" className="hover:opacity-70 transition-colors">support@bol.ad</a></p>
+          <div className="pt-4 text-sm font-medium border-t border-border text-muted-foreground">
+            <p>📩 <a href="mailto:support@bol.ad" className="hover:text-primary transition-colors">support@bol.ad</a></p>
             <p className="mt-2">
-              <a href="/privacy-policy" className="hover:opacity-70 transition-colors">Privacy Policy</a> • © 2025 Bol. All rights reserved.
+              <a href="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</a> • © 2025 Bol. All rights reserved.
             </p>
           </div>
         </div>

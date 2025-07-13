@@ -18,7 +18,7 @@ const BolMascot = ({ className, size = "lg" }: BolMascotProps) => {
       <img 
         src="/lovable-uploads/711f26ed-7bb6-4411-8c08-9a443f487dfa.png"
         alt="Bol Mascot"
-        className="w-full h-full object-contain hover:scale-110 transition-transform duration-200 shadow-lg rounded-lg"
+        className="w-full h-full object-contain hover:scale-110 transition-transform duration-200 soft-shadow rounded-xl"
       />
     </div>
   );
