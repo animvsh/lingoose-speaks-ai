@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Heart, Star, Zap } from "lucide-react";
-import DuckMascot from "./DuckMascot";
+import BolMascot from "./BolMascot";
 import SimpleOnboardingFlow from "./SimpleOnboardingFlow";
 
 interface WelcomeScreenProps {
@@ -30,7 +30,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 flex items-center justify-center p-6">
       <div className={`w-full max-w-md transition-all duration-1000 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
         <div className="text-center space-y-8">
-          {/* Animated Duck with decorative elements */}
+          {/* Animated Mascot with decorative elements */}
           <div className="relative">
             <div className="absolute -top-4 -left-8 w-12 h-12 bg-orange-400 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.5s' }}>
               <Sparkles className="w-6 h-6 text-white" />
@@ -38,7 +38,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
             <div className="absolute -top-2 -right-6 w-10 h-10 bg-pink-400 rounded-full flex items-center justify-center animate-pulse">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <DuckMascot className="w-32 h-32 mx-auto animate-bounce" />
+            <BolMascot className="w-32 h-32 mx-auto animate-bounce" />
             <div className="absolute -bottom-4 -right-8 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center animate-spin">
               <Star className="w-4 h-4 text-orange-800" />
             </div>
@@ -60,7 +60,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
                   YOUR AI HINDI TEACHER
                 </h2>
                 <p className="text-blue-100 font-bold text-lg">
-                  Who happens to be a super smart goose! 🦆
+                  Who happens to be a super smart sheep! 🐏
                 </p>
               </div>
             </div>
@@ -68,7 +68,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
             {/* Fun tagline */}
             <div className="bg-white rounded-2xl p-4 border-4 border-orange-200 shadow-lg">
               <p className="text-orange-700 font-black text-xl italic">
-                "Let's quack the code of Hindi together!"
+                "Let's break the language barrier together!"
               </p>
             </div>
           </div>
@@ -88,7 +88,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
 
           {/* Fun footer message */}
           <div className="text-center p-4 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl border-3 border-yellow-200 shadow-lg">
-            <DuckMascot size="sm" className="w-6 h-6 inline-block mr-2" />
+            <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
             <span className="text-orange-700 font-bold">Ready to become fluent in Hindi? Let's go! 🚀</span>
           </div>
         </div>

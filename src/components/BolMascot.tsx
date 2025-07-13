@@ -1,12 +1,12 @@
 
 import { cn } from "@/lib/utils";
 
-interface DuckMascotProps {
+interface BolMascotProps {
   className?: string;
   size?: "sm" | "md" | "lg";
 }
 
-const DuckMascot = ({ className, size = "lg" }: DuckMascotProps) => {
+const BolMascot = ({ className, size = "lg" }: BolMascotProps) => {
   const sizeClasses = {
     sm: "w-16 h-16",
     md: "w-24 h-24", 
@@ -16,8 +16,8 @@ const DuckMascot = ({ className, size = "lg" }: DuckMascotProps) => {
   return (
     <div className={cn("relative", sizeClasses[size], className)}>
       <img 
-        src="/lovable-uploads/9b390537-0ebd-41d1-a22b-a1866619c6e8.png"
-        alt="Lingoose Mascot"
+        src="/lovable-uploads/bffc16a0-a627-446a-bf2b-ff86182ebeea.png"
+        alt="Bol Mascot"
         className="w-full h-full object-contain animate-bounce"
         style={{ animationDuration: "3s" }}
       />
@@ -25,4 +25,4 @@ const DuckMascot = ({ className, size = "lg" }: DuckMascotProps) => {
   );
 };
 
-export default DuckMascot;
+export default BolMascot;

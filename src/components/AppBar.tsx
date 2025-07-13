@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import DuckMascot from "./DuckMascot";
+import BolMascot from "./BolMascot";
 
 interface AppBarProps {
   title: string;
@@ -22,7 +22,7 @@ const AppBar = ({ title, onBack, showBackButton = true, showLogo = true }: AppBa
             <ArrowLeft className="w-6 h-6" />
           </Button>
         ) : showLogo ? (
-          <DuckMascot size="sm" className="w-14 h-14" />
+          <BolMascot size="sm" className="w-14 h-14" />
         ) : (
           <div className="w-14 h-14"></div>
         )}
@@ -32,7 +32,7 @@ const AppBar = ({ title, onBack, showBackButton = true, showLogo = true }: AppBa
             {title}
           </h1>
           {showLogo && (
-            <DuckMascot size="sm" className="w-8 h-8 ml-2 opacity-60" />
+            <BolMascot size="sm" className="w-8 h-8 ml-2 opacity-60" />
           )}
         </div>
         
