@@ -780,6 +780,16 @@ export type Database = {
         Args: { p_user_id: string; p_unit_id: string }
         Returns: number
       }
+      check_available_minutes: {
+        Args: { p_phone_number: string }
+        Returns: {
+          has_minutes: boolean
+          minutes_used: number
+          minutes_remaining: number
+          subscription_status: string
+          needs_upgrade: boolean
+        }[]
+      }
       create_user: {
         Args: { p_phone_number: string; p_language: string }
         Returns: undefined
