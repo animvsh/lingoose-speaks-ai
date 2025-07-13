@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -98,7 +99,7 @@ const Landing = () => {
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#F5F1E8' }}>
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
@@ -109,10 +110,10 @@ const Landing = () => {
               className="h-16 w-auto object-contain hover:scale-105 transition-transform duration-200" 
             />
           </div>
-          <div className="hidden sm:flex items-center space-x-8 text-sm font-bold text-amber-800">
-            <a href="#why" className="hover:text-orange-600 transition-colors">Why Bol</a>
-            <a href="#pricing" className="hover:text-orange-600 transition-colors">Pricing</a>
-            <a href="#faqs" className="hover:text-orange-600 transition-colors">FAQs</a>
+          <div className="hidden sm:flex items-center space-x-8 text-sm font-bold" style={{ color: '#8B4513' }}>
+            <a href="#why" className="hover:opacity-70 transition-colors">Why Bol</a>
+            <a href="#pricing" className="hover:opacity-70 transition-colors">Pricing</a>
+            <a href="#faqs" className="hover:opacity-70 transition-colors">FAQs</a>
           </div>
         </div>
       </header>
@@ -120,35 +121,36 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight text-amber-800 mb-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6" style={{ color: '#5D4037' }}>
             Teach your kids Hindi.<br />
-            <span className="text-orange-600">Without nagging.</span>
+            <span style={{ color: '#D2691E' }}>Without nagging.</span>
           </h1>
           
-          <div className="space-y-4 text-lg sm:text-xl text-amber-700 mb-8">
+          <div className="space-y-4 text-lg sm:text-xl mb-8" style={{ color: '#8B4513' }}>
             <p className="font-bold">Daily 1-on-1 calls. No apps. No worksheets.</p>
             <p className="font-bold">Just one slightly pushy desi sheep.</p>
-            <p className="font-black text-orange-700 text-2xl">$4/week. Cancel anytime.</p>
+            <p className="font-black text-2xl" style={{ color: '#A0612B' }}>$4/week. Cancel anytime.</p>
           </div>
 
           <div className="mb-12">
             <Button 
               onClick={handleStartNow}
-              className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 hover:from-orange-600 hover:via-pink-600 hover:to-purple-600 text-white font-black text-xl px-12 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+              className="font-black text-xl px-12 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 text-white"
+              style={{ backgroundColor: '#D2691E' }}
             >
               <Phone className="w-6 h-6 mr-3" />
               START NOW! 🚀
             </Button>
-            <p className="text-sm text-amber-600 mt-4 max-w-md mx-auto">
+            <p className="text-sm mt-4 max-w-md mx-auto" style={{ color: '#A0612B' }}>
               By clicking Start Now, you consent to the{' '}
-              <Link to="/terms-of-service" className="text-orange-600 hover:underline font-bold">Terms of Service</Link> and{' '}
-              <Link to="/privacy-policy" className="text-orange-600 hover:underline font-bold">Privacy Policy</Link>.
+              <Link to="/terms-of-service" className="hover:underline font-bold" style={{ color: '#D2691E' }}>Terms of Service</Link> and{' '}
+              <Link to="/privacy-policy" className="hover:underline font-bold" style={{ color: '#D2691E' }}>Privacy Policy</Link>.
             </p>
           </div>
 
           {/* Hero Image */}
           <div className="relative max-w-lg mx-auto">
-            <div className="bg-gradient-to-br from-orange-100 to-amber-100 rounded-3xl p-8 border-4 border-orange-200 shadow-xl">
+            <div className="rounded-3xl p-8 shadow-xl" style={{ backgroundColor: '#EFEBE3', border: '4px solid #E0D7C7' }}>
               <img 
                 src="/lovable-uploads/b0e951c1-f59e-468b-afbb-83bef5734b90.png" 
                 alt="Learning character with headphones" 
@@ -161,7 +163,7 @@ const Landing = () => {
 
       {/* Why Bol Works */}
       <section id="why" className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12" style={{ color: '#5D4037' }}>
           Why Bol Works
         </h2>
         
@@ -188,7 +190,7 @@ const Landing = () => {
               image: "/lovable-uploads/a4122ad1-cbc2-4bd9-beae-8eda0bbf6aff.png"
             }
           ].map((item, index) => (
-            <Card key={index} className="bg-white/80 backdrop-blur-sm p-6 text-center border-4 border-orange-200 rounded-3xl hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <Card key={index} className="p-6 text-center rounded-3xl hover:shadow-xl transition-all duration-200 hover:scale-105" style={{ backgroundColor: '#FFFFFF', border: '3px solid #E0D7C7' }}>
               <div className="mb-4 flex justify-center">
                 <img 
                   src={item.image} 
@@ -196,8 +198,8 @@ const Landing = () => {
                   className="w-20 h-20 object-contain"
                 />
               </div>
-              <h3 className="text-lg font-black text-amber-800 mb-3">{item.title}</h3>
-              <p className="text-amber-700 text-sm font-bold">{item.desc}</p>
+              <h3 className="text-lg font-black mb-3" style={{ color: '#5D4037' }}>{item.title}</h3>
+              <p className="text-sm font-bold" style={{ color: '#8B4513' }}>{item.desc}</p>
             </Card>
           ))}
         </div>
@@ -205,14 +207,14 @@ const Landing = () => {
 
       {/* Pricing Section */}
       <section id="pricing" className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-3xl lg:text-4xl font-black text-amber-800 mb-8">💸 Simple Pricing</h2>
+        <h2 className="text-3xl lg:text-4xl font-black mb-8" style={{ color: '#5D4037' }}>💸 Simple Pricing</h2>
         
         <div className="inline-block">
-          <Card className="bg-gradient-to-br from-amber-100 to-orange-100 p-10 border-4 border-orange-300 rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-200">
-            <div className="text-6xl font-black text-amber-800 mb-4">
-              $4<span className="text-3xl text-amber-700">/week</span>
+          <Card className="p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-200" style={{ backgroundColor: '#EFEBE3', border: '4px solid #E0D7C7' }}>
+            <div className="text-6xl font-black mb-4" style={{ color: '#5D4037' }}>
+              $4<span className="text-3xl" style={{ color: '#8B4513' }}>/week</span>
             </div>
-            <ul className="text-lg text-amber-700 space-y-3 font-bold">
+            <ul className="text-lg space-y-3 font-bold" style={{ color: '#8B4513' }}>
               <li className="flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
                 Daily 1-on-1 calls 📞
@@ -232,13 +234,13 @@ const Landing = () => {
 
       {/* How It Works */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12" style={{ color: '#5D4037' }}>
           How Bol Works
         </h2>
         
         {/* Process Flow */}
         <div className="max-w-4xl mx-auto mb-12 text-center">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-4 border-orange-200 shadow-xl">
+          <div className="rounded-3xl p-8 shadow-xl" style={{ backgroundColor: '#FFFFFF', border: '4px solid #E0D7C7' }}>
             <img 
               src="/lovable-uploads/ae3ff9ea-2f29-4a46-ac08-13a756e28a34.png" 
               alt="How Bol Works Process Flow Diagram" 
@@ -248,7 +250,7 @@ const Landing = () => {
         </div>
         
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="bg-white/80 backdrop-blur-sm p-8 border-4 border-orange-200 rounded-3xl hover:shadow-xl transition-shadow duration-200">
+          <Card className="p-8 rounded-3xl hover:shadow-xl transition-shadow duration-200" style={{ backgroundColor: '#FFFFFF', border: '4px solid #E0D7C7' }}>
             <div className="w-16 h-16 mb-4 flex justify-center">
               <img 
                 src="/lovable-uploads/2759d760-66ad-49a1-b514-506532516fda.png" 
@@ -256,14 +258,14 @@ const Landing = () => {
                 className="w-16 h-16 object-contain"
               />
             </div>
-            <h3 className="text-xl font-black text-amber-800 mb-3">Daily Progress Reports</h3>
-            <p className="text-amber-700 font-bold">
+            <h3 className="text-xl font-black mb-3" style={{ color: '#5D4037' }}>Daily Progress Reports</h3>
+            <p className="font-bold" style={{ color: '#8B4513' }}>
               Get detailed reports after each call. Track your child's vocabulary growth, 
               pronunciation improvements, and conversation confidence.
             </p>
           </Card>
           
-          <Card className="bg-white/80 backdrop-blur-sm p-8 border-4 border-orange-200 rounded-3xl hover:shadow-xl transition-shadow duration-200">
+          <Card className="p-8 rounded-3xl hover:shadow-xl transition-shadow duration-200" style={{ backgroundColor: '#FFFFFF', border: '4px solid #E0D7C7' }}>
             <div className="w-16 h-16 mb-4 flex justify-center">
               <img 
                 src="/lovable-uploads/3fba8058-0143-452a-823e-e925bb333097.png" 
@@ -271,8 +273,8 @@ const Landing = () => {
                 className="w-16 h-16 object-contain"
               />
             </div>
-            <h3 className="text-xl font-black text-amber-800 mb-3">Scenario-Based Learning</h3>
-            <p className="text-amber-700 font-bold">
+            <h3 className="text-xl font-black mb-3" style={{ color: '#5D4037' }}>Scenario-Based Learning</h3>
+            <p className="font-bold" style={{ color: '#8B4513' }}>
               Real-life situations like ordering food, asking for directions, or talking to relatives. 
               We don't teach grammar—we teach you to navigate conversations that actually matter.
             </p>
@@ -282,7 +284,7 @@ const Landing = () => {
 
       {/* Testimonials */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12" style={{ color: '#5D4037' }}>
           What Devi Parents Say 🇮🇳
         </h2>
         
@@ -291,15 +293,17 @@ const Landing = () => {
           <div className="flex justify-center gap-4 mb-6">
             <button
               onClick={() => setCurrentTestimonial((prev) => (prev - 1 + totalSlides) % totalSlides)}
-              className="p-2 rounded-full bg-orange-200 hover:bg-orange-300 transition-colors duration-200"
+              className="p-2 rounded-full transition-colors duration-200"
+              style={{ backgroundColor: '#E0D7C7' }}
             >
-              <ChevronLeft className="w-5 h-5 text-amber-700" />
+              <ChevronLeft className="w-5 h-5" style={{ color: '#8B4513' }} />
             </button>
             <button
               onClick={() => setCurrentTestimonial((prev) => (prev + 1) % totalSlides)}
-              className="p-2 rounded-full bg-orange-200 hover:bg-orange-300 transition-colors duration-200"
+              className="p-2 rounded-full transition-colors duration-200"
+              style={{ backgroundColor: '#E0D7C7' }}
             >
-              <ChevronRight className="w-5 h-5 text-amber-700" />
+              <ChevronRight className="w-5 h-5" style={{ color: '#8B4513' }} />
             </button>
           </div>
 
@@ -323,15 +327,16 @@ const Landing = () => {
                     .map((testimonial, index) => (
                       <Card 
                         key={`${slideIndex}-${index}`}
-                        className="flex-1 max-w-sm p-6 bg-white/80 backdrop-blur-sm border-4 border-orange-200 rounded-2xl hover:shadow-lg transition-shadow duration-200"
+                        className="flex-1 max-w-sm p-6 rounded-2xl hover:shadow-lg transition-shadow duration-200"
+                        style={{ backgroundColor: '#FFFFFF', border: '4px solid #E0D7C7' }}
                       >
                         <div className="text-2xl mb-3">💬</div>
-                        <blockquote className="text-sm text-amber-800 mb-4 italic font-bold">
+                        <blockquote className="text-sm mb-4 italic font-bold" style={{ color: '#5D4037' }}>
                           "{testimonial.quote}"
                         </blockquote>
                         <div>
-                          <cite className="text-sm text-amber-700 font-black">— {testimonial.author}</cite>
-                          <p className="text-xs text-amber-600 font-bold">{testimonial.role}</p>
+                          <cite className="text-sm font-black" style={{ color: '#8B4513' }}>— {testimonial.author}</cite>
+                          <p className="text-xs font-bold" style={{ color: '#A0612B' }}>{testimonial.role}</p>
                         </div>
                       </Card>
                     ))}
@@ -344,7 +349,7 @@ const Landing = () => {
 
       {/* FAQs */}
       <section id="faqs" className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-amber-800">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12" style={{ color: '#5D4037' }}>
           FAQs
         </h2>
         <div className="max-w-3xl mx-auto space-y-6">
@@ -365,12 +370,12 @@ const Landing = () => {
               icon: "👨‍👩‍👧‍👦"
             }
           ].map((faq, index) => (
-            <Card key={index} className="bg-white/80 backdrop-blur-sm p-6 border-4 border-orange-200 rounded-2xl hover:shadow-lg transition-shadow duration-200">
+            <Card key={index} className="p-6 rounded-2xl hover:shadow-lg transition-shadow duration-200" style={{ backgroundColor: '#FFFFFF', border: '4px solid #E0D7C7' }}>
               <div className="flex items-start gap-4">
                 <div className="text-2xl">{faq.icon}</div>
                 <div className="flex-1">
-                  <h3 className="font-black text-lg text-amber-800 mb-2">{faq.question}</h3>
-                  <p className="text-amber-700 font-bold">{faq.answer}</p>
+                  <h3 className="font-black text-lg mb-2" style={{ color: '#5D4037' }}>{faq.question}</h3>
+                  <p className="font-bold" style={{ color: '#8B4513' }}>{faq.answer}</p>
                 </div>
               </div>
             </Card>
@@ -379,7 +384,7 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="container mx-auto px-4 py-12 text-center border-t border-orange-200">
+      <footer className="container mx-auto px-4 py-12 text-center" style={{ borderTop: '1px solid #E0D7C7' }}>
         <div className="space-y-4">
           <div className="flex items-center justify-center space-x-3">
             <img 
@@ -388,14 +393,14 @@ const Landing = () => {
               className="h-10 w-auto object-contain" 
             />
           </div>
-          <div className="text-amber-700 space-y-2 font-bold">
+          <div className="space-y-2 font-bold" style={{ color: '#8B4513' }}>
             <p>Fluent kids. Happy grandparents.</p>
             <p>No drama.</p>
           </div>
-          <div className="pt-4 border-t border-orange-200 text-sm text-amber-600 font-bold">
-            <p>📩 <a href="mailto:support@bol.ad" className="hover:text-amber-800 transition-colors">support@bol.ad</a></p>
+          <div className="pt-4 text-sm font-bold" style={{ borderTop: '1px solid #E0D7C7', color: '#A0612B' }}>
+            <p>📩 <a href="mailto:support@bol.ad" className="hover:opacity-70 transition-colors">support@bol.ad</a></p>
             <p className="mt-2">
-              <a href="/privacy-policy" className="hover:text-amber-800 transition-colors">Privacy Policy</a> • © 2025 Bol. All rights reserved.
+              <a href="/privacy-policy" className="hover:opacity-70 transition-colors">Privacy Policy</a> • © 2025 Bol. All rights reserved.
             </p>
           </div>
         </div>
