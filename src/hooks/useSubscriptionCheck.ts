@@ -7,6 +7,7 @@ interface SubscriptionData {
   subscribed: boolean;
   subscription_tier: string;
   subscription_end: string | null;
+  trial_start_date: string | null;
 }
 
 export const useSubscriptionCheck = () => {
@@ -31,7 +32,8 @@ export const useSubscriptionCheck = () => {
       const result = data || {
         subscribed: false,
         subscription_tier: 'free_trial',
-        subscription_end: null
+        subscription_end: null,
+        trial_start_date: null
       };
 
       console.log('✅ Subscription status:', result);

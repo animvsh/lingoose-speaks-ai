@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
 import { posthogService } from "@/services/posthog";
 import AppBar from "./AppBar";
+import ProUpgradeCard from "./ProUpgradeCard";
 
 interface SettingsCardProps {
   onNavigate: (view: string) => void;
@@ -314,6 +315,13 @@ const SettingsCard = ({
               <span className="text-gray-700 font-medium">Accessibility</span>
             </div>
             <ChevronRight className="w-4 h-4 text-gray-500" />
+          </div>
+        </div>
+
+        {/* Pro Upgrade Section */}
+        <div className="w-full flex justify-center mt-6">
+          <div className="max-w-md w-full">
+            <ProUpgradeCard />
           </div>
         </div>
 
