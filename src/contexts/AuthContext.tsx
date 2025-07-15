@@ -137,8 +137,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "You have been signed out successfully.",
       });
       
-      // Navigate to auth page properly
-      window.location.href = '/auth';
+      // Navigate to landing page properly
+      window.location.href = '/';
       
     } catch (error: any) {
       console.error('Sign out failed:', error);
@@ -154,7 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       
       // Still redirect even on error
-      window.location.href = '/auth';
+      window.location.href = '/';
     }
   };
 
