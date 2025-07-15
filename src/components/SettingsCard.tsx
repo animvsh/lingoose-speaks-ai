@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
 import { posthogService } from "@/services/posthog";
+import AppBar from "./AppBar";
 
 interface SettingsCardProps {
   onNavigate: (view: string) => void;
@@ -163,21 +164,7 @@ const SettingsCard = ({
   };
 
   return <div className="min-h-screen bg-amber-50 pb-24">
-      <div className="px-6 pt-8 pb-6">
-        <div className="flex items-center justify-between">
-          <Button onClick={() => onNavigate("home")} className="w-14 h-14 bg-orange-500 hover:bg-orange-600 rounded-2xl text-white shadow-lg">
-            <ArrowLeft className="w-6 h-6" />
-          </Button>
-          
-          <div className="flex items-center justify-center flex-1">
-            <h1 className="text-3xl font-bold text-orange-500 uppercase tracking-wide text-center">
-              SETTINGS
-            </h1>
-          </div>
-          
-          <div className="w-14 h-14"></div>
-        </div>
-      </div>
+      <AppBar title="Settings" onBack={() => onNavigate("home")} />
 
       <div className="w-full space-y-6">
         {/* Account Settings */}

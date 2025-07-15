@@ -5,6 +5,7 @@ import { useCurriculumAnalytics } from "@/hooks/useCurriculumAnalytics";
 import { useCurrentActivity } from "@/hooks/useCurrentActivity";
 import ProUpgradeCard from "@/components/ProUpgradeCard";
 import SubscriptionStatusCard from "@/components/SubscriptionStatusCard";
+import AppBar from "./AppBar";
 
 interface DashboardStatsProps {
   onNavigate: (view: string) => void;
@@ -25,6 +26,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
   if (isLoading || isLoadingActivity) {
     return (
       <div className="min-h-screen bg-amber-50">
+        <AppBar title="Dashboard" showBackButton={false} />
         <div className="px-6 pt-6">
           <div className="text-center">
             <div className="w-16 h-16 bg-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
@@ -46,6 +48,7 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
 
   return (
     <div className="min-h-screen bg-amber-50 overflow-visible">
+      <AppBar title="Dashboard" showBackButton={false} />
       <div className="px-6 space-y-4 pb-6 pt-6 overflow-visible">
         {/* Welcome Header - Smaller */}
         <div className="text-center pt-2 animate-fade-in">

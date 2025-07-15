@@ -5,7 +5,7 @@ import { useSessionTracking } from "@/hooks/useSessionTracking";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useIsDesktop } from "@/hooks/use-mobile";
-import OnboardingFlow from "@/components/OnboardingFlow";
+import WelcomeScreen from "@/components/WelcomeScreen";
 import DashboardStats from "@/components/DashboardStats";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
@@ -156,7 +156,7 @@ const Index = () => {
     if (currentView === "onboarding" && !isOnboarded) {
       return (
         <div className={baseClasses}>
-          <OnboardingFlow onComplete={handleOnboardingComplete} />
+          <WelcomeScreen onComplete={handleOnboardingComplete} />
         </div>
       );
     }

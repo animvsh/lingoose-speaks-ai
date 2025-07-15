@@ -196,7 +196,7 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
               <Phone className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
               <Input
                 type="tel"
-                placeholder="Enter your phone number (+1234567890)"
+                placeholder="Enter your phone number (e.g., 1234567890)"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="w-full pl-10 border-2 border-slate-300 rounded-xl font-bold"
