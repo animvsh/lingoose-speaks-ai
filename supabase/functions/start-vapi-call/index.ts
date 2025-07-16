@@ -35,7 +35,7 @@ serve(async (req) => {
       userId, 
       topic = "Hindi conversation practice",
       lastConversationSummary = null,
-      maxDurationSeconds = 1500 // Default 25 minutes
+      maxDurationSeconds = 1500 // Default 25 minutes per day
     } = await req.json()
     
     if (!phoneNumber || !userId) {
@@ -67,8 +67,8 @@ serve(async (req) => {
     const availableMinutes = minutesCheck?.[0];
     if (!availableMinutes?.has_minutes) {
       const errorMsg = availableMinutes?.subscription_status === 'free_trial' 
-        ? 'Your free trial has expired or you\'ve reached your limit. Please upgrade to continue.'
-        : 'You\'ve reached your weekly limit. Your minutes will reset next week.';
+        ? 'Your 3-day free trial has expired or you\'ve used all your trial days. Please upgrade to continue.'
+        : 'You\'ve reached your weekly limit. Your days will reset next week.';
       
       return new Response(
         JSON.stringify({ error: errorMsg }),

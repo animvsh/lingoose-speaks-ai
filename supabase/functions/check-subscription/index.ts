@@ -58,7 +58,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({ 
         subscribed: false,
         subscription_tier: 'free_trial',
-        subscription_end: null
+        subscription_end: null,
+        trial_start_date: null
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -66,6 +67,17 @@ serve(async (req) => {
     }
 
     logStep("User profile found", { phoneNumber: profile.phone_number });
+
+    // Fetch trial_start_date from user_subscriptions
+    let trialStartDate = null;
+    const { data: userSub, error: userSubError } = await supabaseClient
+      .from('user_subscriptions')
+      .select('trial_start_date')
+      .eq('user_id', profile.id)
+      .maybeSingle();
+    if (userSub && userSub.trial_start_date) {
+      trialStartDate = userSub.trial_start_date;
+    }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
@@ -89,7 +101,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({ 
         subscribed: false,
         subscription_tier: 'free_trial',
-        subscription_end: null
+        subscription_end: null,
+        trial_start_date: trialStartDate
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -140,7 +153,8 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd
+      subscription_end: subscriptionEnd,
+      trial_start_date: trialStartDate
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

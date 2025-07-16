@@ -17,11 +17,11 @@ export const useCallInitiation = () => {
         throw new Error('User or activity not found');
       }
 
-      // Check if user has available minutes before starting call
+      // Check if user has available days before starting call
       if (!subscriptionStatus?.has_minutes) {
         const errorMsg = subscriptionStatus?.subscription_status === 'free_trial' 
-          ? 'Your free trial has expired or you\'ve reached your limit. Please upgrade to continue.'
-          : 'You\'ve reached your weekly limit. Your minutes will reset next week or upgrade for more.';
+          ? 'Your 3-day free trial has expired or you\'ve used all your trial days. Please upgrade to continue.'
+          : 'You\'ve reached your weekly limit. Your days will reset next week or upgrade for more.';
         throw new Error(errorMsg);
       }
 
@@ -60,10 +60,11 @@ export const useCallInitiation = () => {
 
       console.log('Starting call with phone number:', phoneNumber);
       console.log('Last conversation summary:', lastConversationSummary);
-      console.log('Minutes remaining:', subscriptionStatus?.minutes_remaining);
+      console.log('Days remaining:', subscriptionStatus?.minutes_remaining);
 
-      // Calculate max duration based on remaining minutes (convert to seconds)
-      const maxDurationSeconds = Math.floor((subscriptionStatus?.minutes_remaining || 25) * 60);
+      // Calculate max duration based on remaining days (convert to seconds)
+      // For free trial: 1 day = 1 call, so set a reasonable duration limit
+      const maxDurationSeconds = Math.floor((subscriptionStatus?.minutes_remaining || 3) * 60 * 25); // 25 minutes per day
 
       // Start the call using the edge function with duration limit
       const { data, error } = await supabase.functions.invoke('start-vapi-call', {

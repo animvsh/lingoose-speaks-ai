@@ -5,6 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
 import { posthogService } from "@/services/posthog";
 import AppBar from "./AppBar";
+import ProUpgradeCard from "./ProUpgradeCard";
+import { useSubscriptionCheck } from "@/hooks/useSubscriptionCheck";
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 
 interface SettingsCardProps {
   onNavigate: (view: string) => void;
@@ -30,6 +33,17 @@ const SettingsCard = ({
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [lastTestEvent, setLastTestEvent] = useState<string>('');
   const [webhookUrl, setWebhookUrl] = useState<string>('');
+  const { data: subscription } = useSubscriptionCheck();
+  const { data: subscriptionStatus } = useSubscriptionStatus();
+
+  // Calculate free trial day
+  let trialDay = null;
+  if (subscription?.trial_start_date) {
+    const start = new Date(subscription.trial_start_date);
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    trialDay = Math.min(diff + 1, 3); // Day 1, 2, or 3
+  }
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -165,6 +179,16 @@ const SettingsCard = ({
 
   return <div className="min-h-screen bg-amber-50 pb-24">
       <AppBar title="Settings" onBack={() => onNavigate("home")} />
+
+      {/* Pro Upgrade Card always visible */}
+      <div className="mb-6">
+        <ProUpgradeCard />
+        {subscription?.subscription_tier === 'free_trial' && trialDay && (
+          <div className="mt-2 text-center text-blue-700 font-bold text-lg">
+            Free Trial: Day {trialDay}/3 &mdash; {subscriptionStatus?.minutes_remaining?.toFixed(1) ?? 0} days left
+          </div>
+        )}
+      </div>
 
       <div className="w-full space-y-6">
         {/* Account Settings */}
@@ -329,19 +353,26 @@ const SettingsCard = ({
             </div>
             <ChevronRight className="w-4 h-4 text-gray-500" />
           </div>
-          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none cursor-pointer">
             <div className="flex items-center">
               <Shield className="w-5 h-5 mr-3 text-yellow-500" />
               <span className="text-gray-700 font-medium">Privacy Policy</span>
             </div>
             <ChevronRight className="w-4 h-4 text-gray-500" />
           </div>
-          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none cursor-pointer">
             <div className="flex items-center">
               <Star className="w-5 h-5 mr-3 text-orange-500" />
               <span className="text-gray-700 font-medium">Rate Us</span>
             </div>
             <ChevronRight className="w-4 h-4 text-gray-500" />
+          </div>
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+            <div className="flex items-center">
+              <Phone className="w-5 h-5 mr-3 text-green-500" />
+              <span className="text-gray-700 font-medium">Call the Founder</span>
+            </div>
+            <a href="tel:+1234567890" className="text-green-700 font-bold underline hover:text-green-900">Call</a>
           </div>
         </div>
 

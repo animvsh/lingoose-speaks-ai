@@ -200,7 +200,6 @@ const DashboardStats = ({ onNavigate }: DashboardStatsProps) => {
 
         {/* Subscription Management Section */}
         <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <ProUpgradeCard />
           <SubscriptionStatusCard />
         </div>
       </div>

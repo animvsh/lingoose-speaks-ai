@@ -36,7 +36,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <AppContent />
+        <div className="app-container min-h-screen">
+          <AppContent />
+        </div>
       </AuthProvider>
     </QueryClientProvider>
   );

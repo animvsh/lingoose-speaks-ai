@@ -48,10 +48,10 @@ const SubscriptionStatusCard = () => {
     return 'Expired';
   };
 
-  // Pro users have unlimited minutes, so show different calculation
+  // Pro users have unlimited days, so show different calculation
   const isProUser = stripeSubscription?.subscribed && stripeSubscription?.subscription_tier === 'pro';
-  const weeklyLimit = isProUser ? 999 : 25; // Unlimited for pro users
-  const minutesUsedPercentage = isProUser ? 0 : (subscriptionStatus.minutes_used / 25) * 100;
+  const weeklyLimit = isProUser ? 999 : 3; // 3 days for free trial
+  const daysUsedPercentage = isProUser ? 0 : (subscriptionStatus.minutes_used / 3) * 100;
 
   return (
     <Card className="border-2">
@@ -69,22 +69,22 @@ const SubscriptionStatusCard = () => {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span>Minutes Used</span>
+            <span>Days Used</span>
             <span className="font-medium">
-              {subscriptionStatus.minutes_used.toFixed(1)} / {isProUser ? '∞' : '25'} min
+              {subscriptionStatus.minutes_used.toFixed(1)} / {isProUser ? '∞' : '3'} days
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3">
             <div 
               className={`h-3 rounded-full transition-all duration-300 ${
-                minutesUsedPercentage >= 90 ? 'bg-red-500' : 
-                minutesUsedPercentage >= 70 ? 'bg-orange-500' : 'bg-green-500'
+                daysUsedPercentage >= 90 ? 'bg-red-500' : 
+                daysUsedPercentage >= 70 ? 'bg-orange-500' : 'bg-green-500'
               }`}
-              style={{ width: `${Math.min(minutesUsedPercentage, 100)}%` }}
+              style={{ width: `${Math.min(daysUsedPercentage, 100)}%` }}
             />
           </div>
           <div className="flex justify-between text-sm text-gray-600">
-            <span>Remaining: {isProUser ? '∞' : subscriptionStatus.minutes_remaining.toFixed(1)} min</span>
+            <span>Remaining: {isProUser ? '∞' : subscriptionStatus.minutes_remaining.toFixed(1)} days</span>
             {!isProUser && subscriptionStatus.needs_upgrade && (
               <span className="text-red-600 flex items-center gap-1">
                 <AlertTriangle className="w-3 h-3" />

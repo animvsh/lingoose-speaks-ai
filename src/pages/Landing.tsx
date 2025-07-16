@@ -110,7 +110,7 @@ const Landing = () => {
 
   if (showSignIn) {
     return (
-      <div className="min-h-screen w-full bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen w-full hindi-bg flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <img 
@@ -118,13 +118,12 @@ const Landing = () => {
               alt="Bol Logo" 
               className="h-16 w-auto object-contain mx-auto mb-4 hover:scale-110 transition-transform duration-300" 
             />
-            <h1 className="text-4xl font-black text-primary mb-2 uppercase tracking-wider transform -rotate-1">
+            <h1 className="text-4xl font-black text-brown-900 mb-2 uppercase tracking-wider transform -rotate-1 font-nunito">
               Sign In
             </h1>
-            <p className="text-muted-foreground font-semibold">Welcome back to Bol</p>
+            <p className="text-brown-700 font-semibold font-nunito">Welcome back to Bol</p>
           </div>
-          
-          <div className="warm-card p-6 soft-shadow">
+          <div className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 shadow-lg">
             <PhoneAuthForm onBack={handleSignInBack} />
           </div>
         </div>
@@ -133,7 +132,7 @@ const Landing = () => {
   }
   
   return (
-    <div className="min-h-screen w-full bg-background">
+    <div className="min-h-screen w-full hindi-bg font-nunito">
       {/* Header - optimized for desktop */}
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
@@ -148,12 +147,12 @@ const Landing = () => {
             <Button
               onClick={handleSignIn}
               variant="outline"
-              className="flex items-center bg-white hover:bg-gray-50 border-2 border-primary text-primary font-bold py-2 px-4 rounded-xl transition-all duration-200 text-sm md:text-base"
+              className="flex items-center bg-white hover:bg-orange-50 border-2 border-handdrawn text-primary font-bold py-2 px-4 rounded-2xl transition-all duration-200 text-sm md:text-base shadow-sm"
             >
               <LogIn className="w-4 h-4 mr-2" />
               Sign In
             </Button>
-            <div className="hidden lg:flex items-center space-x-8 text-sm font-semibold text-foreground">
+            <div className="hidden lg:flex items-center space-x-8 text-sm font-semibold text-brown-700 font-nunito">
               <a href="#why" className="hover:text-primary transition-colors">Why Bol</a>
               <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
               <a href="#faqs" className="hover:text-primary transition-colors">FAQs</a>
@@ -166,12 +165,12 @@ const Landing = () => {
       <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8 md:mb-12">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6 text-foreground">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6 text-brown-900 font-nunito">
               Teach your kids Hindi.<br />
               <span className="text-primary">Without nagging.</span>
             </h1>
             
-            <div className="space-y-4 text-base sm:text-lg md:text-xl mb-8 text-muted-foreground">
+            <div className="space-y-4 text-base sm:text-lg md:text-xl mb-8 text-brown-700 font-nunito">
               <p className="font-semibold">Daily 1-on-1 calls. No apps. No worksheets.</p>
               <p className="font-semibold">Just one slightly pushy desi sheep.</p>
               <p className="font-black text-xl md:text-2xl text-primary">$4/week. Cancel anytime.</p>
@@ -180,7 +179,7 @@ const Landing = () => {
             <div className="mb-8 md:mb-12 flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
                 onClick={handleStartNow}
-                className="warm-button font-black text-lg md:text-xl px-8 md:px-12 py-4 md:py-6 text-white soft-shadow"
+                className="warm-button font-black text-lg md:text-xl px-8 md:px-12 py-4 md:py-6 text-white shadow-lg rounded-3xl border-2 border-handdrawn"
               >
                 <Phone className="w-5 md:w-6 h-5 md:h-6 mr-3" />
                 START NOW! 🚀
@@ -189,14 +188,14 @@ const Landing = () => {
               <Button
                 onClick={handleSignIn}
                 variant="outline"
-                className="bg-white hover:bg-gray-50 border-2 border-primary text-primary font-black text-lg md:text-xl px-8 md:px-12 py-4 md:py-6 rounded-xl transition-all duration-200"
+                className="bg-white hover:bg-orange-50 border-2 border-handdrawn text-primary font-black text-lg md:text-xl px-8 md:px-12 py-4 md:py-6 rounded-3xl transition-all duration-200 shadow-sm"
               >
                 <LogIn className="w-5 md:w-6 h-5 md:h-6 mr-3" />
                 Sign In
               </Button>
             </div>
 
-            <p className="text-xs md:text-sm mt-4 max-w-md mx-auto text-muted-foreground">
+            <p className="text-xs md:text-sm mt-4 max-w-md mx-auto text-brown-700 font-nunito">
               By clicking Start Now, you consent to the{' '}
               <Link to="/terms-of-service" className="hover:underline font-semibold text-primary">Terms of Service</Link> and{' '}
               <Link to="/privacy-policy" className="hover:underline font-semibold text-primary">Privacy Policy</Link>.
@@ -205,7 +204,7 @@ const Landing = () => {
 
           {/* Hero Image - responsive */}
           <div className="relative max-w-sm md:max-w-lg mx-auto">
-            <div className="warm-card p-6 md:p-8 soft-shadow">
+            <div className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 md:p-8 shadow-lg">
               <img 
                 src="/lovable-uploads/b0e951c1-f59e-468b-afbb-83bef5734b90.png" 
                 alt="Learning character with headphones" 
@@ -218,7 +217,7 @@ const Landing = () => {
 
       {/* Why Bol Works */}
       <section id="why" className="container mx-auto px-4 py-12 md:py-16">
-        <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-8 md:mb-12 text-foreground">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-center mb-8 md:mb-12 text-brown-900 font-nunito">
           Why Bol Works
         </h2>
         
@@ -245,7 +244,7 @@ const Landing = () => {
               image: "/lovable-uploads/a4122ad1-cbc2-4bd9-beae-8eda0bbf6aff.png"
             }
           ].map((item, index) => (
-            <Card key={index} className="warm-card p-6 text-center hover-lift">
+            <Card key={index} className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 text-center shadow-lg hover-lift">
               <div className="mb-4 flex justify-center">
                 <img 
                   src={item.image} 
@@ -253,8 +252,8 @@ const Landing = () => {
                   className="w-16 md:w-20 h-16 md:h-20 object-contain"
                 />
               </div>
-              <h3 className="text-base md:text-lg font-black mb-3 text-foreground">{item.title}</h3>
-              <p className="text-sm font-medium text-muted-foreground">{item.desc}</p>
+              <h3 className="text-base md:text-lg font-black mb-3 text-brown-900 font-nunito">{item.title}</h3>
+              <p className="text-sm font-medium text-brown-700 font-nunito">{item.desc}</p>
             </Card>
           ))}
         </div>
@@ -262,21 +261,21 @@ const Landing = () => {
 
       {/* Pricing Section */}
       <section id="pricing" className="container mx-auto px-4 py-12 md:py-16 text-center">
-        <h2 className="text-2xl md:text-3xl lg:text-4xl font-black mb-8 text-foreground">💸 Simple Pricing</h2>
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-black mb-8 text-brown-900 font-nunito">💸 Simple Pricing</h2>
         
         <div className="inline-block">
-          <Card className="warm-card p-8 md:p-10 soft-shadow">
-            <div className="text-4xl md:text-6xl font-black mb-4 text-foreground">
+          <Card className="rounded-3xl border-2 border-handdrawn bg-white/90 p-8 md:p-10 shadow-lg">
+            <div className="text-4xl md:text-6xl font-black mb-4 text-brown-900 font-nunito">
               $4<span className="text-2xl md:text-3xl text-muted-foreground">/week</span>
             </div>
-            <ul className="text-base md:text-lg space-y-3 font-semibold text-muted-foreground">
+            <ul className="text-base md:text-lg space-y-3 font-semibold text-brown-700 font-nunito">
               <li className="flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
                 Daily 1-on-1 calls 📞
               </li>
               <li className="flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-                No tech headaches 🤯
+                No tech headaches ��
               </li>
               <li className="flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
@@ -289,13 +288,13 @@ const Landing = () => {
 
       {/* How It Works */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-foreground">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-brown-900 font-nunito">
           How Bol Works
         </h2>
         
         {/* Process Flow */}
         <div className="max-w-4xl mx-auto mb-12 text-center">
-          <div className="warm-card p-8 soft-shadow">
+          <div className="rounded-3xl border-2 border-handdrawn bg-white/90 p-8 shadow-lg">
             <img 
               src="/lovable-uploads/ae3ff9ea-2f29-4a46-ac08-13a756e28a34.png" 
               alt="How Bol Works Process Flow Diagram" 
@@ -305,7 +304,7 @@ const Landing = () => {
         </div>
         
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="warm-card p-8 hover-lift">
+          <Card className="rounded-3xl border-2 border-handdrawn bg-white/90 p-8 shadow-lg hover-lift">
             <div className="w-16 h-16 mb-4 flex justify-center">
               <img 
                 src="/lovable-uploads/2759d760-66ad-49a1-b514-506532516fda.png" 
@@ -313,14 +312,14 @@ const Landing = () => {
                 className="w-16 h-16 object-contain"
               />
             </div>
-            <h3 className="text-xl font-black mb-3 text-foreground">Daily Progress Reports</h3>
-            <p className="font-medium text-muted-foreground">
+            <h3 className="text-xl font-black mb-3 text-brown-900 font-nunito">Daily Progress Reports</h3>
+            <p className="font-medium text-brown-700 font-nunito">
               Get detailed reports after each call. Track your child's vocabulary growth, 
               pronunciation improvements, and conversation confidence.
             </p>
           </Card>
           
-          <Card className="warm-card p-8 hover-lift">
+          <Card className="rounded-3xl border-2 border-handdrawn bg-white/90 p-8 shadow-lg hover-lift">
             <div className="w-16 h-16 mb-4 flex justify-center">
               <img 
                 src="/lovable-uploads/3fba8058-0143-452a-823e-e925bb333097.png" 
@@ -328,8 +327,8 @@ const Landing = () => {
                 className="w-16 h-16 object-contain"
               />
             </div>
-            <h3 className="text-xl font-black mb-3 text-foreground">Scenario-Based Learning</h3>
-            <p className="font-medium text-muted-foreground">
+            <h3 className="text-xl font-black mb-3 text-brown-900 font-nunito">Scenario-Based Learning</h3>
+            <p className="font-medium text-brown-700 font-nunito">
               Real-life situations like ordering food, asking for directions, or talking to relatives. 
               We don't teach grammar—we teach you to navigate conversations that actually matter.
             </p>
@@ -339,7 +338,7 @@ const Landing = () => {
 
       {/* Testimonials */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-foreground">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-brown-900 font-nunito">
           What Devi Parents Say 🇮🇳
         </h2>
         
@@ -380,15 +379,15 @@ const Landing = () => {
                     .map((testimonial, index) => (
                       <Card 
                         key={`${slideIndex}-${index}`}
-                        className="warm-card flex-1 max-w-sm p-6 hover-lift"
+                        className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 hover-lift shadow-lg"
                       >
                         <div className="text-2xl mb-3">💬</div>
-                        <blockquote className="text-sm mb-4 italic font-medium text-foreground">
+                        <blockquote className="text-sm mb-4 italic font-medium text-brown-900 font-nunito">
                           "{testimonial.quote}"
                         </blockquote>
                         <div>
-                          <cite className="text-sm font-black text-foreground">— {testimonial.author}</cite>
-                          <p className="text-xs font-medium text-muted-foreground">{testimonial.role}</p>
+                          <cite className="text-sm font-black text-brown-900 font-nunito">— {testimonial.author}</cite>
+                          <p className="text-xs font-medium text-brown-700 font-nunito">{testimonial.role}</p>
                         </div>
                       </Card>
                     ))}
@@ -401,7 +400,7 @@ const Landing = () => {
 
       {/* FAQs */}
       <section id="faqs" className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-foreground">
+        <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-brown-900 font-nunito">
           FAQs
         </h2>
         <div className="max-w-3xl mx-auto space-y-6">
@@ -422,12 +421,12 @@ const Landing = () => {
               icon: "👨‍👩‍👧‍👦"
             }
           ].map((faq, index) => (
-            <Card key={index} className="warm-card p-6 hover-lift">
+            <Card key={index} className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 hover-lift shadow-lg">
               <div className="flex items-start gap-4">
                 <div className="text-2xl">{faq.icon}</div>
                 <div className="flex-1">
-                  <h3 className="font-black text-lg mb-2 text-foreground">{faq.question}</h3>
-                  <p className="font-medium text-muted-foreground">{faq.answer}</p>
+                  <h3 className="font-black text-lg mb-2 text-brown-900 font-nunito">{faq.question}</h3>
+                  <p className="font-medium text-brown-700 font-nunito">{faq.answer}</p>
                 </div>
               </div>
             </Card>
@@ -445,11 +444,11 @@ const Landing = () => {
               className="h-10 w-auto object-contain" 
             />
           </div>
-          <div className="space-y-2 font-semibold text-muted-foreground">
+          <div className="space-y-2 font-semibold text-brown-700 font-nunito">
             <p>Fluent kids. Happy grandparents.</p>
             <p>No drama.</p>
           </div>
-          <div className="pt-4 text-sm font-medium border-t border-border text-muted-foreground">
+          <div className="pt-4 text-sm font-medium border-t border-border text-brown-700 font-nunito">
             <p>📩 <a href="mailto:support@bol.ad" className="hover:text-primary transition-colors">support@bol.ad</a></p>
             <p className="mt-2">
               <a href="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</a> • © 2025 Bol. All rights reserved.
