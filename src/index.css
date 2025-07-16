@@ -1,28 +1,30 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 45 20% 96%;
-    --foreground: 25 35% 15%;
-    --card: 45 20% 98%;
-    --card-foreground: 25 35% 15%;
+    --background: 36 100% 97%; /* warm creamy */
+    --foreground: 30 60% 18%; /* dark brown */
+    --card: 36 100% 99%;
+    --card-foreground: 30 60% 18%;
     --popover: 45 20% 98%;
     --popover-foreground: 25 35% 15%;
-    --primary: 25 65% 50%;
-    --primary-foreground: 45 20% 96%;
-    --secondary: 35 25% 88%;
-    --secondary-foreground: 25 35% 15%;
-    --muted: 35 25% 88%;
-    --muted-foreground: 25 20% 45%;
+    --primary: 32 100% 60%; /* orange */
+    --primary-foreground: 36 100% 97%;
+    --secondary: 36 100% 92%;
+    --secondary-foreground: 30 60% 18%;
+    --muted: 36 100% 92%;
+    --muted-foreground: 30 30% 50%;
     --accent: 35 25% 88%;
     --accent-foreground: 25 35% 15%;
     --destructive: 0 65% 55%;
     --destructive-foreground: 45 20% 96%;
-    --border: 35 20% 85%;
-    --input: 35 20% 85%;
+    --border: 32 100% 80%;
+    --input: 32 100% 80%;
     --ring: 25 65% 50%;
     --chart-1: 25 65% 60%;
     --chart-2: 35 50% 55%;
@@ -58,17 +60,24 @@
     --chart-4: 15 55% 75%;
     --chart-5: 55 60% 80%;
   }
+
+  body {
+    font-family: 'Nunito', 'Inter', system-ui, sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    background-image: url('/placeholder.svg'), repeating-linear-gradient(135deg, rgba(255, 236, 200, 0.12) 0px, rgba(255, 236, 200, 0.12) 1px, transparent 1px, transparent 40px), url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><text x="0" y="40" font-size="32" fill="%23e2b97f" font-family="Baloo, Nunito, sans-serif" opacity="0.13">क ख ग घ च छ ज झ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह</text></svg>');
+    background-size: auto, 40px 40px, 400px 200px;
+    background-repeat: repeat;
+    background-position: top left, 0 0, 0 0;
+  }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-    overflow-x: hidden;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
+.hindi-bg {
+  background-color: hsl(var(--background));
+  background-image: url('/placeholder.svg'), repeating-linear-gradient(135deg, rgba(255, 236, 200, 0.12) 0px, rgba(255, 236, 200, 0.12) 1px, transparent 1px, transparent 40px), url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><text x="0" y="40" font-size="32" fill="%23e2b97f" font-family="Baloo, Nunito, sans-serif" opacity="0.13">क ख ग घ च छ ज झ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह</text></svg>');
+  background-size: auto, 40px 40px, 400px 200px;
+  background-repeat: repeat;
+  background-position: top left, 0 0, 0 0;
 }
 
 @layer components {

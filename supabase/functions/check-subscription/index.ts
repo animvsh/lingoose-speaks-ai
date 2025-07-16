@@ -68,13 +68,16 @@ serve(async (req) => {
 
     logStep("User profile found", { phoneNumber: profile.phone_number });
 
-    // Query user_subscriptions for trial_start_date
+    // Fetch trial_start_date from user_subscriptions
+    let trialStartDate = null;
     const { data: userSub, error: userSubError } = await supabaseClient
       .from('user_subscriptions')
       .select('trial_start_date')
-      .eq('phone_number', profile.phone_number)
-      .single();
-    const trialStartDate = userSub?.trial_start_date || null;
+      .eq('user_id', profile.id)
+      .maybeSingle();
+    if (userSub && userSub.trial_start_date) {
+      trialStartDate = userSub.trial_start_date;
+    }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     

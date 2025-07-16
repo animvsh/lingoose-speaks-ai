@@ -16,6 +16,7 @@ import AddSupervisorForm from "@/components/AddSupervisorForm";
 import ProUpgradeCard from "@/components/ProUpgradeCard";
 import StripeTestingPanel from "@/components/StripeTestingPanel";
 import DesktopExperienceMessage from "@/components/DesktopExperienceMessage";
+import ProfileManagementPage from "@/components/ProfileManagementPage";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
@@ -129,12 +130,12 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen w-full bg-amber-50 flex items-center justify-center">
+      <div className="min-h-screen w-full hindi-bg flex items-center justify-center font-nunito">
         <div className="text-center">
           <div className="w-16 h-16 bg-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
             <div className="w-8 h-8 bg-white rounded-full"></div>
           </div>
-          <p className="text-gray-600 font-medium">Loading...</p>
+          <p className="text-brown-700 font-medium font-nunito">Loading...</p>
         </div>
       </div>
     );
@@ -230,6 +231,14 @@ const Index = () => {
       );
     }
 
+    if (currentView === "profile-management") {
+      return (
+        <div className={baseClasses}>
+          <ProfileManagementPage onNavigate={handleNavigate} />
+        </div>
+      );
+    }
+
     return (
       <div className={baseClasses}>
         <DashboardStats onNavigate={handleNavigate} />
@@ -240,7 +249,7 @@ const Index = () => {
   const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor";
 
   return (
-    <div ref={containerRef} className="min-h-screen w-full bg-amber-50 overflow-hidden">
+    <div ref={containerRef} className="min-h-screen w-full hindi-bg overflow-hidden font-nunito">
       <div className={`w-full ${shouldShowBottomNav ? "pb-24" : ""}`}>
         {renderCurrentView()}
       </div>

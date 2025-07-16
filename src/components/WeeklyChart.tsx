@@ -38,7 +38,7 @@ const WeeklyChart = () => {
           </div>
         </div>
         <div className="text-center">
-          <p className="text-blue-900 font-black text-sm uppercase">This week: N/A calls • N/A minutes</p>
+          <p className="text-blue-900 font-black text-sm uppercase">This week: N/A calls • N/A days</p>
         </div>
       </CardContent>
     </Card>

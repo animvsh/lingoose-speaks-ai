@@ -95,7 +95,7 @@ const TodaysActivitySection = ({
             <div className="flex items-center justify-center gap-2 mb-2">
               <Clock className="w-5 h-5 text-white" />
               <span className="text-white font-bold">
-                {minutesRemaining.toFixed(1)} minutes remaining this week
+                {minutesRemaining.toFixed(1)} days remaining this week
               </span>
             </div>
             {!canStartCall && (
@@ -158,7 +158,7 @@ const TodaysActivitySection = ({
           } text-white font-black py-6 text-2xl rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-xl border-4 ${
             canStartCall ? 'border-orange-600' : 'border-gray-500'
           }`}
-          title={!canStartCall ? 'No minutes remaining - upgrade or wait for weekly reset' : ''}
+          title={!canStartCall ? 'No days remaining - upgrade or wait for weekly reset' : ''}
         >
           {isStartingCall ? (
             <>
@@ -181,7 +181,7 @@ const TodaysActivitySection = ({
         {!canStartCall && subscriptionStatus?.needs_upgrade && (
           <div className="text-center">
             <p className="text-white/80 text-sm mb-2">
-              Need more practice time? Upgrade for unlimited weekly minutes!
+              Need more practice time? Upgrade for unlimited weekly days!
             </p>
             <Button 
               variant="outline" 

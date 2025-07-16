@@ -7,7 +7,7 @@ interface SubscriptionData {
   subscribed: boolean;
   subscription_tier: string;
   subscription_end: string | null;
-  trial_start_date: string | null;
+  trial_start_date?: string | null;
 }
 
 export const useSubscriptionCheck = () => {
