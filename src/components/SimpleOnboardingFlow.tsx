@@ -242,7 +242,10 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
                 </div>
 
                 <div className="space-y-6">
-                  <div className="flex items-start space-x-4 p-4 bg-purple-50 rounded-2xl border-2 border-purple-200">
+                  <div 
+                    className="flex items-start space-x-4 p-4 bg-purple-50 rounded-2xl border-2 border-purple-200 cursor-pointer"
+                    onClick={() => setHasConsented(!hasConsented)}
+                  >
                     <Checkbox
                       id="consent"
                       checked={hasConsented}
