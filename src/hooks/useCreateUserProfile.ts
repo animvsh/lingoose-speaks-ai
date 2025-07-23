@@ -10,6 +10,24 @@ interface CreateUserProfileData {
   language?: string;
 }
 
+// Phone number formatting helper
+const formatPhoneNumber = (phone: string): string => {
+  // Remove all non-digit characters
+  const cleaned = phone.replace(/\D/g, '');
+  
+  // Add + prefix if not present and number doesn't start with country code
+  if (!phone.startsWith('+')) {
+    // If it's a US number (10 digits), add +1
+    if (cleaned.length === 10) {
+      return `+1${cleaned}`;
+    }
+    // Otherwise add + to whatever they provided
+    return `+${cleaned}`;
+  }
+  
+  return phone;
+};
+
 // Input validation functions
 const validatePhoneNumber = (phone: string): boolean => {
   return /^\+[1-9]\d{9,14}$/.test(phone);
@@ -42,10 +60,14 @@ export const useCreateUserProfile = () => {
     mutationFn: async (profileData: CreateUserProfileData) => {
       console.log('Attempting to create profile with:', profileData);
       
+      // Auto-format phone number to handle missing country codes
+      const formattedPhone = formatPhoneNumber(profileData.phone_number);
+      
       // Input validation
-      if (!validatePhoneNumber(profileData.phone_number)) {
-        await logSecurityEvent('profile_creation_invalid_phone', profileData.phone_number, {
-          error: 'Invalid phone number format'
+      if (!validatePhoneNumber(formattedPhone)) {
+        await logSecurityEvent('profile_creation_invalid_phone', formattedPhone, {
+          error: 'Invalid phone number format',
+          original_phone: profileData.phone_number
         });
         throw new Error('Please enter a valid phone number with country code (e.g., +1234567890)');
       }
@@ -58,21 +80,22 @@ export const useCreateUserProfile = () => {
         throw new Error('Name must be 1-100 characters and contain only letters, spaces, hyphens, and apostrophes');
       }
       
-      await logSecurityEvent('profile_creation_attempted', profileData.phone_number, {
+      await logSecurityEvent('profile_creation_attempted', formattedPhone, {
         full_name: profileData.full_name,
-        language: profileData.language || 'hindi'
+        language: profileData.language || 'hindi',
+        original_phone: profileData.phone_number
       });
       
       // Check if a profile with this phone number already exists
       const { data: existingProfile, error: fetchError } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('phone_number', profileData.phone_number)
+        .eq('phone_number', formattedPhone)
         .maybeSingle();
 
       if (fetchError) {
         console.error('Error checking for existing profile:', fetchError);
-        await logSecurityEvent('profile_lookup_failed', profileData.phone_number, {
+        await logSecurityEvent('profile_lookup_failed', formattedPhone, {
           error: fetchError.message
         });
         throw fetchError;
@@ -83,7 +106,7 @@ export const useCreateUserProfile = () => {
       if (existingProfile) {
         console.log('Profile already exists, updating:', existingProfile.id);
         
-        await logSecurityEvent('profile_update_attempted', profileData.phone_number, {
+        await logSecurityEvent('profile_update_attempted', formattedPhone, {
           user_id: existingProfile.id,
           update_fields: ['full_name', 'proficiency_level', 'language']
         });
@@ -102,7 +125,7 @@ export const useCreateUserProfile = () => {
 
         if (updateError) {
           console.error('Error updating profile:', updateError);
-          await logSecurityEvent('profile_update_failed', profileData.phone_number, {
+          await logSecurityEvent('profile_update_failed', formattedPhone, {
             user_id: existingProfile.id,
             error: updateError.message
           });
@@ -111,7 +134,7 @@ export const useCreateUserProfile = () => {
 
         profile = updatedProfile;
         
-        await logSecurityEvent('profile_update_success', profileData.phone_number, {
+        await logSecurityEvent('profile_update_success', formattedPhone, {
           user_id: profile.id
         });
       } else {
@@ -121,7 +144,7 @@ export const useCreateUserProfile = () => {
         const { data: newProfile, error: insertError } = await supabase
           .from('user_profiles')
           .insert({
-            phone_number: profileData.phone_number,
+            phone_number: formattedPhone,
             full_name: profileData.full_name,
             proficiency_level: profileData.proficiency_level,
             language: profileData.language || 'hindi'
@@ -131,7 +154,7 @@ export const useCreateUserProfile = () => {
 
         if (insertError) {
           console.error('Error creating profile:', insertError);
-          await logSecurityEvent('profile_creation_failed', profileData.phone_number, {
+          await logSecurityEvent('profile_creation_failed', formattedPhone, {
             error: insertError.message
           });
           throw insertError;
@@ -139,7 +162,7 @@ export const useCreateUserProfile = () => {
 
         profile = newProfile;
         
-        await logSecurityEvent('profile_creation_success', profileData.phone_number, {
+        await logSecurityEvent('profile_creation_success', formattedPhone, {
           user_id: profile.id
         });
       }
@@ -147,7 +170,7 @@ export const useCreateUserProfile = () => {
       // Store user profile in localStorage for authentication
       localStorage.setItem('current_user_profile', JSON.stringify(profile));
       localStorage.setItem('phone_authenticated', 'true');
-      localStorage.setItem('phone_number', profileData.phone_number);
+      localStorage.setItem('phone_number', formattedPhone);
 
       console.log('Profile operation successful:', profile);
       return profile;

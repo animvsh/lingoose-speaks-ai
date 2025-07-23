@@ -447,6 +447,14 @@ const Landing = () => {
           <div className="space-y-2 font-semibold text-brown-700 font-nunito">
             <p>Fluent kids. Happy grandparents.</p>
             <p>No drama.</p>
+            <div className="flex items-center justify-center gap-2 text-sm mt-3">
+              <img 
+                src="/yc-logo.png" 
+                alt="Y Combinator Logo" 
+                className="h-4 w-auto object-contain opacity-70" 
+              />
+              <span className="text-brown-600">not backed by y combinator (yet)</span>
+            </div>
           </div>
           <div className="pt-4 text-sm font-medium border-t border-border text-brown-700 font-nunito">
             <p>📩 <a href="mailto:support@bol.ad" className="hover:text-primary transition-colors">support@bol.ad</a></p>
