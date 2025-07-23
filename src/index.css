@@ -65,19 +65,10 @@
     font-family: 'Nunito', 'Inter', system-ui, sans-serif;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    background-image: url('/placeholder.svg'), repeating-linear-gradient(135deg, rgba(255, 236, 200, 0.12) 0px, rgba(255, 236, 200, 0.12) 1px, transparent 1px, transparent 40px), url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><text x="0" y="40" font-size="32" fill="%23e2b97f" font-family="Baloo, Nunito, sans-serif" opacity="0.13">क ख ग घ च छ ज झ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह</text></svg>');
-    background-size: auto, 40px 40px, 400px 200px;
+    background-image: url('data:image/svg+xml;utf8,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="hsl(32 100% 85%)" stroke-width="1" opacity="0.08"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+    background-size: 60px 60px;
     background-repeat: repeat;
-    background-position: top left, 0 0, 0 0;
   }
-}
-
-.hindi-bg {
-  background-color: hsl(var(--background));
-  background-image: url('/placeholder.svg'), repeating-linear-gradient(135deg, rgba(255, 236, 200, 0.12) 0px, rgba(255, 236, 200, 0.12) 1px, transparent 1px, transparent 40px), url('data:image/svg+xml;utf8,<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><text x="0" y="40" font-size="32" fill="%23e2b97f" font-family="Baloo, Nunito, sans-serif" opacity="0.13">क ख ग घ च छ ज झ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह</text></svg>');
-  background-size: auto, 40px 40px, 400px 200px;
-  background-repeat: repeat;
-  background-position: top left, 0 0, 0 0;
 }
 
 @layer components {
@@ -98,19 +89,31 @@
   }
 
   .warm-card {
-    @apply bg-card/80 backdrop-blur-sm border-2 border-border/40 rounded-3xl transition-all duration-300 hover:shadow-lg hover:bg-card/90;
+    @apply bg-card border-2 border-border rounded-3xl transition-all duration-300 hover:shadow-lg hover:border-primary/30 hover:-translate-y-1;
   }
 
   .warm-button {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 border-2 border-primary/20 shadow-sm;
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 border-2 border-primary/20 shadow-sm hover:shadow-md;
   }
 
   .soft-shadow {
+    box-shadow: 0 4px 20px rgba(139, 69, 19, 0.08);
+  }
+
+  .elevated-shadow {
     box-shadow: 0 8px 32px rgba(139, 69, 19, 0.12);
   }
 
-  .warm-gradient {
-    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--secondary)) 100%);
+  .clean-input {
+    @apply bg-background border-2 border-border rounded-2xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-all duration-200;
+  }
+
+  .clean-surface {
+    @apply bg-card/95 backdrop-blur-sm border border-border/50 rounded-2xl;
+  }
+
+  .interactive-element {
+    @apply transition-all duration-200 hover:scale-105 active:scale-95;
   }
 }
 
@@ -143,7 +146,7 @@
     opacity: 1;
   }
   50% {
-    opacity: 0.8;
+    opacity: 0.85;
   }
 }
 
@@ -151,7 +154,7 @@
   animation: soft-pulse 3s ease-in-out infinite;
 }
 
-/* Enhanced hover effects with warm theme */
+/* Enhanced hover effects with clean theme */
 @layer utilities {
   .hover-lift {
     @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
@@ -160,17 +163,53 @@
   .warm-focus {
     @apply focus:ring-2 focus:ring-primary/30 focus:border-primary;
   }
+
+  .glass-effect {
+    @apply bg-card/80 backdrop-blur-md border border-border/40;
+  }
+
+  .clean-grid {
+    background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="smallgrid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="hsl(32 100% 88%)" stroke-width="1" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23smallgrid)"/></svg>');
+    background-size: 40px 40px;
+  }
 }
 
-/* Global hover effect improvements */
+/* Global improvements */
 button {
-  transition: all 0.3s ease !important;
+  transition: all 0.2s ease !important;
 }
 
 button:hover {
-  transform: translateY(-2px) !important;
+  transform: translateY(-1px) !important;
 }
 
 button:active {
   transform: translateY(0px) !important;
+}
+
+/* Remove any lingering gradient references */
+.warm-gradient,
+.hindi-bg {
+  background: hsl(var(--background)) !important;
+  background-image: url('data:image/svg+xml;utf8,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="hsl(32 100% 85%)" stroke-width="1" opacity="0.08"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>') !important;
+  background-size: 60px 60px !important;
+  background-repeat: repeat !important;
+}
+
+/* Improved typography */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold text-foreground;
+}
+
+p {
+  @apply text-foreground/90 leading-relaxed;
+}
+
+/* Better spacing */
+.space-y-clean > * + * {
+  margin-top: 1.5rem;
+}
+
+.space-x-clean > * + * {
+  margin-left: 1rem;
 }
