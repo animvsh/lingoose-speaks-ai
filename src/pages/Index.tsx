@@ -163,8 +163,8 @@ const Index = () => {
   };
 
   const handleNavigate = (view: string, data?: any) => {
-    console.log('🚀 Index handleNavigate called with view:', view, 'currentView before:', currentView);
-    console.log('🚀 Index handleNavigate called with view:', view, 'currentView before:', currentView);
+    console.log('🚀🚀🚀 Index handleNavigate called with view:', view, 'currentView before:', currentView);
+    console.log('🚀🚀🚀 Call stack:', new Error().stack);
     const previousView = currentView;
     setIsTransitioning(true);
     
@@ -177,9 +177,9 @@ const Index = () => {
       if (view === 'activity-details' && data) {
         setActivityDetailsData(data);
       }
-      console.log('🎯 About to set currentView to:', view);
+      console.log('🎯🎯🎯 About to set currentView to:', view);
       setCurrentView(view);
-      console.log('🎯 currentView should now be:', view);
+      console.log('🎯🎯🎯 currentView should now be:', view);
       
       // Stagger the transition completion for smoother effect
       setTimeout(() => {
