@@ -174,6 +174,72 @@ export type Database = {
           },
         ]
       }
+      ai_behavior_metrics: {
+        Row: {
+          analysis_details: Json | null
+          call_date: string
+          callback_usage: number | null
+          continuity_score: number | null
+          created_at: string
+          followup_quality: number | null
+          id: string
+          improvement_suggestions: string[] | null
+          instruction_adherence: number | null
+          phone_number: string
+          question_density: number | null
+          recovery_score: number | null
+          repetition_avoidance: number | null
+          target_vocab_prompt_rate: number | null
+          tone_consistency: number | null
+          updated_at: string
+          user_fluency_delta: number | null
+          user_id: string
+          vapi_call_analysis_id: string
+        }
+        Insert: {
+          analysis_details?: Json | null
+          call_date?: string
+          callback_usage?: number | null
+          continuity_score?: number | null
+          created_at?: string
+          followup_quality?: number | null
+          id?: string
+          improvement_suggestions?: string[] | null
+          instruction_adherence?: number | null
+          phone_number: string
+          question_density?: number | null
+          recovery_score?: number | null
+          repetition_avoidance?: number | null
+          target_vocab_prompt_rate?: number | null
+          tone_consistency?: number | null
+          updated_at?: string
+          user_fluency_delta?: number | null
+          user_id: string
+          vapi_call_analysis_id: string
+        }
+        Update: {
+          analysis_details?: Json | null
+          call_date?: string
+          callback_usage?: number | null
+          continuity_score?: number | null
+          created_at?: string
+          followup_quality?: number | null
+          id?: string
+          improvement_suggestions?: string[] | null
+          instruction_adherence?: number | null
+          phone_number?: string
+          question_density?: number | null
+          recovery_score?: number | null
+          repetition_avoidance?: number | null
+          target_vocab_prompt_rate?: number | null
+          tone_consistency?: number | null
+          updated_at?: string
+          user_fluency_delta?: number | null
+          user_id?: string
+          vapi_call_analysis_id?: string
+        }
+        Relationships: []
+      }
       call_logs: {
         Row: {
           call_sid: string | null
@@ -1052,6 +1118,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_prompt_evolution: {
+        Row: {
+          created_at: string
+          current_prompt: string
+          effectiveness_score: number | null
+          id: string
+          improvement_rationale: string | null
+          is_active: boolean | null
+          phone_number: string
+          previous_prompt: string | null
+          trigger_metrics: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_prompt: string
+          effectiveness_score?: number | null
+          id?: string
+          improvement_rationale?: string | null
+          is_active?: boolean | null
+          phone_number: string
+          previous_prompt?: string | null
+          trigger_metrics?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_prompt?: string
+          effectiveness_score?: number | null
+          id?: string
+          improvement_rationale?: string | null
+          is_active?: boolean | null
+          phone_number?: string
+          previous_prompt?: string | null
+          trigger_metrics?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_activity_ratings: {
         Row: {

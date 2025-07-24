@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
+import { useAIBehaviorAnalysis } from '@/hooks/useAIBehaviorMetrics';
 
 interface CallCompletionConditions {
   exerciseCompleted: boolean;
@@ -13,6 +14,7 @@ export const useCallCompletionTracker = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { analyzeAIBehavior } = useAIBehaviorAnalysis();
   
   const [conditions, setConditions] = useState<CallCompletionConditions>({
     exerciseCompleted: false,
@@ -106,6 +108,15 @@ export const useCallCompletionTracker = () => {
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['activity-details'] });
       queryClient.invalidateQueries({ queryKey: ['call-analysis'] });
+
+      // Trigger AI behavior analysis
+      if (callData.transcript) {
+        console.log('Triggering AI behavior analysis for call:', callData.id);
+        analyzeAIBehavior({
+          callAnalysisId: callData.id,
+          transcript: callData.transcript
+        });
+      }
 
     } catch (error) {
       console.error('Error processing transcript:', error);

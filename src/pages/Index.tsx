@@ -19,6 +19,7 @@ import { FluencyRoadmapView } from "@/components/FluencyRoadmapView";
 import StripeTestingPanel from "@/components/StripeTestingPanel";
 import DesktopExperienceMessage from "@/components/DesktopExperienceMessage";
 import ProfileManagementPage from "@/components/ProfileManagementPage";
+import AIBehaviorMetricsPanel from "@/components/AIBehaviorMetricsPanel";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import PageTransition from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
@@ -245,6 +246,8 @@ const Index = () => {
       content = <AddSupervisorForm onClose={() => handleNavigate("settings")} />;
     } else if (currentView === "profile-management") {
       content = <ProfileManagementPage onNavigate={handleNavigate} />;
+    } else if (currentView === "ai-behavior-metrics") {
+      content = <AIBehaviorMetricsPanel />;
     } else {
       content = <DashboardStats onNavigate={handleNavigate} />;
     }

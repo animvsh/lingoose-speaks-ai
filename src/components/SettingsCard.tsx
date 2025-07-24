@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus, UserPlus, Bug, Activity } from "lucide-react";
+import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus, UserPlus, Bug, Activity, Brain } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
@@ -220,6 +220,23 @@ const SettingsCard = ({
                   <span className="text-brown-700 font-bold">Add Supervisor</span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-purple-500" />
+              </div>
+            </div>
+          </div>
+
+          {/* AI Behavior Analytics */}
+          <div className="w-full rounded-3xl border-2 border-handdrawn bg-white/90 p-6 shadow-lg">
+            <h3 className="text-xl font-black text-brown-900 mb-6 uppercase tracking-wide flex items-center">
+              <Brain className="w-6 h-6 mr-3 text-blue-500" />
+              AI Behavior Analytics
+            </h3>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between py-4 px-4 bg-blue-50 rounded-2xl border-2 border-blue-200 cursor-pointer hover:bg-blue-100 transition-all duration-200 hover:scale-[1.02]" onClick={() => handleNavigationClick("ai-behavior-metrics", "ai_behavior_metrics")}>
+                <div className="flex items-center">
+                  <Brain className="w-5 h-5 mr-3 text-blue-500" />
+                  <span className="text-brown-700 font-bold">Performance Metrics</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-blue-500" />
               </div>
             </div>
           </div>

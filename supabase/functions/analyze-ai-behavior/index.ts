@@ -1,0 +1,372 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { callAnalysisId, transcript, userId, phoneNumber } = await req.json();
+
+    console.log('Analyzing AI behavior for call:', callAnalysisId);
+
+    if (!transcript || !callAnalysisId) {
+      throw new Error('Missing required data: transcript and callAnalysisId');
+    }
+
+    // Parse transcript to separate AI and user messages
+    const { aiMessages, userMessages } = parseTranscript(transcript);
+    
+    if (aiMessages.length === 0) {
+      console.log('No AI messages found in transcript');
+      return new Response(JSON.stringify({ error: 'No AI messages found' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Calculate all AI behavior metrics
+    const metrics = await calculateAIBehaviorMetrics(aiMessages, userMessages, transcript);
+    
+    // Generate improvement suggestions
+    const improvements = generateImprovementSuggestions(metrics);
+
+    // Store metrics in database
+    const { data: metricsData, error: metricsError } = await supabaseClient
+      .from('ai_behavior_metrics')
+      .insert({
+        user_id: userId,
+        vapi_call_analysis_id: callAnalysisId,
+        phone_number: phoneNumber,
+        instruction_adherence: metrics.instructionAdherence,
+        target_vocab_prompt_rate: metrics.targetVocabPromptRate,
+        question_density: metrics.questionDensity,
+        continuity_score: metrics.continuityscore,
+        followup_quality: metrics.followupQuality,
+        repetition_avoidance: metrics.repetitionAvoidance,
+        tone_consistency: metrics.toneConsistency,
+        recovery_score: metrics.recoveryScore,
+        callback_usage: metrics.callbackUsage,
+        user_fluency_delta: metrics.userFluencyDelta,
+        analysis_details: metrics.details,
+        improvement_suggestions: improvements
+      })
+      .select()
+      .single();
+
+    if (metricsError) {
+      console.error('Error storing metrics:', metricsError);
+      throw metricsError;
+    }
+
+    // Update or create system prompt evolution
+    await updateSystemPrompt(supabaseClient, userId, phoneNumber, metrics, improvements);
+
+    console.log('AI behavior analysis completed successfully');
+
+    return new Response(JSON.stringify({
+      success: true,
+      metrics: metricsData,
+      improvements
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error('Error in analyze-ai-behavior function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+});
+
+function parseTranscript(transcript: string) {
+  const lines = transcript.split('\n').filter(line => line.trim());
+  const aiMessages: string[] = [];
+  const userMessages: string[] = [];
+
+  for (const line of lines) {
+    const cleaned = line.trim();
+    if (cleaned.toLowerCase().includes('assistant:') || cleaned.toLowerCase().includes('ai:') || cleaned.toLowerCase().includes('bot:')) {
+      const message = cleaned.replace(/^(assistant:|ai:|bot:)/i, '').trim();
+      if (message) aiMessages.push(message);
+    } else if (cleaned.toLowerCase().includes('user:') || cleaned.toLowerCase().includes('human:')) {
+      const message = cleaned.replace(/^(user:|human:)/i, '').trim();
+      if (message) userMessages.push(message);
+    } else if (cleaned && !cleaned.includes(':')) {
+      // Fallback: if no clear speaker indication, assume alternating pattern
+      if (aiMessages.length === userMessages.length) {
+        aiMessages.push(cleaned);
+      } else {
+        userMessages.push(cleaned);
+      }
+    }
+  }
+
+  return { aiMessages, userMessages };
+}
+
+async function calculateAIBehaviorMetrics(aiMessages: string[], userMessages: string[], fullTranscript: string) {
+  const totalAITurns = aiMessages.length;
+  
+  // 1. Instruction Adherence Score (placeholder - would need specific instructions)
+  const instructionAdherence = 0.85; // Default high score
+
+  // 2. Target Vocabulary Prompt Rate
+  const targetVocab = ['ticket', 'delay', 'luggage', 'flight', 'booking']; // Default vocab
+  const vocabMatches = targetVocab.filter(word => 
+    aiMessages.some(msg => msg.toLowerCase().includes(word.toLowerCase()))
+  );
+  const targetVocabPromptRate = vocabMatches.length / targetVocab.length;
+
+  // 3. Question Density
+  const questionTurns = aiMessages.filter(msg => msg.includes('?')).length;
+  const questionDensity = questionTurns / totalAITurns;
+
+  // 4. Continuity Score (simplified - checking topic consistency)
+  const continuityscore = calculateContinuityScore(aiMessages);
+
+  // 5. Follow-up Quality Score (simplified)
+  const followupQuality = calculateFollowupQuality(aiMessages, userMessages);
+
+  // 6. Repetition Avoidance Score
+  const repetitionAvoidance = calculateRepetitionAvoidance(aiMessages);
+
+  // 7. Tone Consistency Score (simplified)
+  const toneConsistency = 0.90; // Placeholder
+
+  // 8. Callback Usage
+  const callbackUsage = calculateCallbackUsage(aiMessages, userMessages);
+
+  // 9. Recovery Score
+  const recoveryScore = calculateRecoveryScore(aiMessages, userMessages);
+
+  // 10. User Fluency Delta (simplified)
+  const userFluencyDelta = calculateUserFluencyDelta(userMessages);
+
+  return {
+    instructionAdherence,
+    targetVocabPromptRate,
+    questionDensity,
+    continuityscore,
+    followupQuality,
+    repetitionAvoidance,
+    toneConsistency,
+    recoveryScore,
+    callbackUsage,
+    userFluencyDelta,
+    details: {
+      totalAITurns,
+      questionTurns,
+      vocabMatches,
+      userMessageCount: userMessages.length
+    }
+  };
+}
+
+function calculateContinuityScore(aiMessages: string[]): number {
+  if (aiMessages.length < 2) return 1.0;
+  
+  // Simple word overlap between consecutive messages
+  let totalSimilarity = 0;
+  for (let i = 0; i < aiMessages.length - 1; i++) {
+    const words1 = new Set(aiMessages[i].toLowerCase().split(/\s+/));
+    const words2 = new Set(aiMessages[i + 1].toLowerCase().split(/\s+/));
+    const intersection = new Set([...words1].filter(x => words2.has(x)));
+    const union = new Set([...words1, ...words2]);
+    totalSimilarity += intersection.size / union.size;
+  }
+  
+  return Math.min(1.0, totalSimilarity / (aiMessages.length - 1));
+}
+
+function calculateFollowupQuality(aiMessages: string[], userMessages: string[]): number {
+  let qualityScore = 0;
+  let pairs = 0;
+
+  for (let i = 0; i < Math.min(aiMessages.length, userMessages.length); i++) {
+    if (userMessages[i] && aiMessages[i]) {
+      // Check if AI response contains words from user message
+      const userWords = new Set(userMessages[i].toLowerCase().split(/\s+/));
+      const aiWords = aiMessages[i].toLowerCase().split(/\s+/);
+      const hasContext = aiWords.some(word => userWords.has(word));
+      
+      if (hasContext) qualityScore++;
+      pairs++;
+    }
+  }
+
+  return pairs > 0 ? qualityScore / pairs : 0;
+}
+
+function calculateRepetitionAvoidance(aiMessages: string[]): number {
+  const phrases = aiMessages.join(' ').toLowerCase().split(/[.!?]+/);
+  const uniquePhrases = new Set(phrases.map(p => p.trim()));
+  
+  return phrases.length > 0 ? uniquePhrases.size / phrases.length : 1.0;
+}
+
+function calculateCallbackUsage(aiMessages: string[], userMessages: string[]): number {
+  let callbacks = 0;
+  
+  // Look for references to earlier user inputs
+  const earlierUserWords = new Set();
+  
+  for (let i = 0; i < userMessages.length; i++) {
+    userMessages[i].toLowerCase().split(/\s+/).forEach(word => earlierUserWords.add(word));
+    
+    if (i < aiMessages.length) {
+      const aiMessage = aiMessages[i].toLowerCase();
+      // Check if AI references words from earlier user messages
+      if (aiMessage.includes('you said') || aiMessage.includes('you mentioned') || 
+          [...earlierUserWords].some(word => word.length > 3 && aiMessage.includes(word))) {
+        callbacks++;
+      }
+    }
+  }
+  
+  return callbacks;
+}
+
+function calculateRecoveryScore(aiMessages: string[], userMessages: string[]): number {
+  let recoveries = 0;
+  let opportunities = 0;
+
+  for (let i = 0; i < userMessages.length; i++) {
+    const userMsg = userMessages[i].toLowerCase();
+    // Detect weak/short responses
+    if (userMsg.length < 10 || ['yes', 'no', 'ok', 'haan', 'nahi'].includes(userMsg.trim())) {
+      opportunities++;
+      
+      // Check if next AI message is engaging
+      if (i < aiMessages.length && aiMessages[i].includes('?')) {
+        recoveries++;
+      }
+    }
+  }
+
+  return opportunities > 0 ? recoveries / opportunities : 1.0;
+}
+
+function calculateUserFluencyDelta(userMessages: string[]): number {
+  if (userMessages.length === 0) return 0;
+  
+  const totalWords = userMessages.join(' ').split(/\s+/).length;
+  const uniqueWords = new Set(userMessages.join(' ').toLowerCase().split(/\s+/)).size;
+  const avgSentenceLength = totalWords / userMessages.length;
+  
+  // Simple scoring based on word variety and sentence length
+  const varietyScore = uniqueWords / totalWords;
+  const lengthScore = Math.min(1.0, avgSentenceLength / 8); // Normalize to 8 words average
+  
+  return (varietyScore + lengthScore) / 2;
+}
+
+function generateImprovementSuggestions(metrics: any): string[] {
+  const suggestions: string[] = [];
+
+  if (metrics.questionDensity < 0.4) {
+    suggestions.push("Ask more questions to engage the user - aim for 1 question every 2-3 turns");
+  }
+
+  if (metrics.targetVocabPromptRate < 0.7) {
+    suggestions.push("Include more target vocabulary words in your responses");
+  }
+
+  if (metrics.continuityscore < 0.8) {
+    suggestions.push("Maintain better topic continuity between your responses");
+  }
+
+  if (metrics.followupQuality < 0.7) {
+    suggestions.push("Ask more context-aware follow-up questions based on user responses");
+  }
+
+  if (metrics.repetitionAvoidance < 0.8) {
+    suggestions.push("Vary your sentence structure and avoid repeating phrases");
+  }
+
+  if (metrics.recoveryScore < 0.8) {
+    suggestions.push("Improve recovery when users give short or unclear responses");
+  }
+
+  if (metrics.callbackUsage < 1) {
+    suggestions.push("Reference earlier parts of the conversation to show continuity");
+  }
+
+  return suggestions;
+}
+
+async function updateSystemPrompt(supabaseClient: any, userId: string, phoneNumber: string, metrics: any, improvements: string[]) {
+  if (improvements.length === 0) return;
+
+  // Get current prompt if exists
+  const { data: currentPrompt } = await supabaseClient
+    .from('system_prompt_evolution')
+    .select('*')
+    .eq('phone_number', phoneNumber)
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const basePrompt = currentPrompt?.current_prompt || `You are a helpful AI language learning assistant. Your goal is to help users practice conversational skills in a natural, engaging way.
+
+Core Instructions:
+- Be friendly and encouraging
+- Ask engaging questions to keep the conversation flowing
+- Use appropriate vocabulary for the user's level
+- Provide gentle corrections when needed
+- Maintain conversation continuity`;
+
+  // Generate improved prompt based on metrics
+  let improvedPrompt = basePrompt;
+  
+  if (metrics.questionDensity < 0.4) {
+    improvedPrompt += "\n\nIMPORTANT: Ask at least one question every 2-3 turns to maintain engagement.";
+  }
+
+  if (metrics.continuityscore < 0.8) {
+    improvedPrompt += "\n\nIMPORTANT: Build upon your previous messages and maintain topic continuity unless the user explicitly changes the subject.";
+  }
+
+  if (metrics.repetitionAvoidance < 0.8) {
+    improvedPrompt += "\n\nIMPORTANT: Vary your sentence structure and avoid repeating phrases or expressions.";
+  }
+
+  if (improvements.length > 0) {
+    improvedPrompt += "\n\nSpecific improvements needed:\n" + improvements.map(imp => `- ${imp}`).join('\n');
+  }
+
+  // Store new prompt
+  await supabaseClient
+    .from('system_prompt_evolution')
+    .insert({
+      user_id: userId,
+      phone_number: phoneNumber,
+      current_prompt: improvedPrompt,
+      previous_prompt: currentPrompt?.current_prompt || null,
+      trigger_metrics: metrics,
+      improvement_rationale: improvements.join('; ')
+    });
+
+  // Deactivate old prompt
+  if (currentPrompt) {
+    await supabaseClient
+      .from('system_prompt_evolution')
+      .update({ is_active: false })
+      .eq('id', currentPrompt.id);
+  }
+}
