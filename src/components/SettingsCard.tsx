@@ -170,8 +170,7 @@ const SettingsCard = ({
   const handleLogout = async () => {
     trackAuthEvent('logout');
     await signOut();
-    // Navigate to landing page smoothly after logout
-    navigate('/', { replace: true });
+    // Don't navigate - the Landing page will detect the user is null and show landing content
   };
 
   const handleNavigationClick = (destination: string, feature?: string) => {

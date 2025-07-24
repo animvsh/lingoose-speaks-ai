@@ -6,6 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import SimpleOnboardingFlow from "@/components/SimpleOnboardingFlow";
 import PhoneAuthForm from "@/components/PhoneAuthForm";
 import { useAuth } from "@/contexts/AuthContext";
+import DashboardStats from "@/components/DashboardStats";
+import AnimatedBottomNav from "@/components/AnimatedBottomNav";
 
 const Landing = () => {
   const { user, loading, refreshUser } = useAuth();
@@ -13,6 +15,7 @@ const Landing = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [currentView, setCurrentView] = useState("home");
   
   const testimonials = [
     {
@@ -83,12 +86,8 @@ const Landing = () => {
   const reviewsPerSlide = 3;
   const totalSlides = Math.ceil(testimonials.length / reviewsPerSlide);
 
-  // Smoothly redirect authenticated users to the app using React Router
-  useEffect(() => {
-    if (user && !loading) {
-      navigate('/app', { replace: true });
-    }
-  }, [user, loading, navigate]);
+  // Don't redirect - instead show the app content directly on this page
+  // This prevents any blank screens or page transitions
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -96,6 +95,18 @@ const Landing = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, [totalSlides]);
+
+  // Show smooth loading state - no blank screens ever
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full hindi-bg flex items-center justify-center animate-fade-in">
+        <div className="text-center space-y-4">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-muted-foreground font-nunito">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleStartNow = () => {
     setShowOnboarding(true);
@@ -105,14 +116,18 @@ const Landing = () => {
     setShowSignIn(true);
   };
 
-  // Show smooth loading during authentication transitions
-  if (loading) {
+  // If user is authenticated, show the app content directly without any navigation
+  if (user && !loading) {
+    // Show the main app interface directly on this page - no navigation, no blank screens
     return (
-      <div className="min-h-screen w-full hindi-bg flex items-center justify-center">
-        <div className="text-center space-y-4 animate-fade-in">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-muted-foreground font-nunito">Loading...</p>
+      <div className="min-h-screen w-full hindi-bg font-nunito animate-fade-in">
+        <div className="w-full pb-24">
+          <DashboardStats onNavigate={(view) => setCurrentView(view)} />
         </div>
+        <AnimatedBottomNav 
+          currentView={currentView} 
+          onNavigate={(view) => setCurrentView(view)}
+        />
       </div>
     );
   }
