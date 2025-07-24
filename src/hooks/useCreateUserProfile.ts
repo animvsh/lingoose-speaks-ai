@@ -168,7 +168,17 @@ export const useCreateUserProfile = () => {
       }
 
       // Store user profile in localStorage for authentication
-      localStorage.setItem('currentUser', JSON.stringify(profile));
+      // Ensure we only store the fields that AuthContext expects
+      const userForAuth = {
+        id: profile.id,
+        full_name: profile.full_name,
+        phone_number: profile.phone_number,
+        language: profile.language,
+        created_at: profile.created_at,
+        updated_at: profile.updated_at
+      };
+      
+      localStorage.setItem('currentUser', JSON.stringify(userForAuth));
       localStorage.setItem('phone_authenticated', 'true');
       localStorage.setItem('phone_number', formattedPhone);
 

@@ -89,12 +89,16 @@ const Index = () => {
         }
       } else {
         // Only redirect to auth if loading is complete and user is definitively null
-        // Add a small delay to prevent blank screens during auth state changes
+        // Add a longer delay to ensure auth state has time to load from localStorage
         setTimeout(() => {
           if (!user && !loading) {
-            navigate('/');
+            // Double check localStorage before redirecting
+            const storedUser = localStorage.getItem('currentUser');
+            if (!storedUser) {
+              navigate('/');
+            }
           }
-        }, 100);
+        }, 500);
       }
     }
   }, [user, loading, identify, trackScreenView, trackPageView, navigate]);
