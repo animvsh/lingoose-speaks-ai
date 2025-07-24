@@ -14,6 +14,7 @@ import SettingsCard from "@/components/SettingsCard";
 import ActivityDetailsView from "@/components/ActivityDetailsView";
 import AddSupervisorForm from "@/components/AddSupervisorForm";
 import ProfileManagementPage from "@/components/ProfileManagementPage";
+import AIBehaviorMetricsPanel from "@/components/AIBehaviorMetricsPanel";
 import PageTransition from "@/components/PageTransition";
 import { EnhancedProgressView } from "@/components/EnhancedProgressView";
 import { FluencyRoadmapView } from "@/components/FluencyRoadmapView";
@@ -196,6 +197,8 @@ const Landing = () => {
       content = <AddSupervisorForm onClose={() => handleNavigate("settings")} />;
     } else if (currentView === "profile-management") {
       content = <ProfileManagementPage onNavigate={handleNavigate} />;
+    } else if (currentView === "ai-behavior-metrics") {
+      content = <AIBehaviorMetricsPanel onNavigate={handleNavigate} />;
     } else {
       content = <DashboardStats onNavigate={handleNavigate} />;
     }
@@ -214,7 +217,7 @@ const Landing = () => {
 
   // If user is authenticated, show the complete app interface
   if (user && !loading) {
-    const shouldShowBottomNav = isOnboarded && currentView !== "onboarding" && currentView !== "add-supervisor";
+    const shouldShowBottomNav = isOnboarded && currentView !== "onboarding" && currentView !== "add-supervisor" && currentView !== "ai-behavior-metrics";
     
     return (
       <div className="min-h-screen w-full hindi-bg font-nunito animate-fade-in">
