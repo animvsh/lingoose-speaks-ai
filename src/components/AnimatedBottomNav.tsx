@@ -20,6 +20,7 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
 
   const handleNavClick = (view: string, label: string) => {
     console.log('📱📱📱 AnimatedBottomNav handleNavClick called with view:', view, 'label:', label);
+    alert(`Clicked ${label} - view: ${view}`); // Debugging alert
     
     // Add haptic feedback for mobile devices
     if ('vibrate' in navigator) {
