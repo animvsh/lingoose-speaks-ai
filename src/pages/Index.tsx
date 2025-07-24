@@ -200,7 +200,7 @@ const Index = () => {
   }
 
   const renderCurrentView = () => {
-    console.log('🎨 renderCurrentView called with currentView:', currentView, 'type:', typeof currentView, 'isOnboarded:', isOnboarded);
+    console.log('🎨🎨🎨 renderCurrentView called with currentView:', currentView, 'type:', typeof currentView, 'isOnboarded:', isOnboarded);
     let content;
 
     if (currentView === "onboarding" && !isOnboarded) {
@@ -241,6 +241,7 @@ const Index = () => {
     } else if (currentView === "roadmap") {
       content = <FluencyRoadmapView />;
     } else if (currentView === "settings") {
+      console.log('🔧🔧🔧 Rendering SettingsCard for currentView:', currentView);
       content = <SettingsCard onNavigate={handleNavigate} />;
     } else if (currentView === "add-supervisor") {
       content = <AddSupervisorForm onClose={() => handleNavigate("settings")} />;
@@ -253,7 +254,7 @@ const Index = () => {
       console.log('🎯 Rendering SystemPromptSettingsPage for currentView:', currentView);
       content = <SystemPromptSettingsPage onNavigate={handleNavigate} />;
     } else {
-      console.log('🏠 Rendering default DashboardStats for currentView:', currentView, 'Expected: system-prompt-settings');
+      console.log('🏠🏠🏠 Rendering default DashboardStats for currentView:', currentView, 'Expected: one of [home, activity, progress, settings, etc]');
       content = <DashboardStats onNavigate={handleNavigate} />;
     }
 
