@@ -69,13 +69,6 @@ const Index = () => {
   useSwipeNavigation(containerRef, handleSwipe);
 
   useEffect(() => {
-    // If user arrives at /app but we're now handling everything on landing page,
-    // redirect them back to landing page to prevent route conflicts
-    if (user || localStorage.getItem('phone_authenticated') === 'true') {
-      navigate('/', { replace: true });
-      return;
-    }
-
     if (!loading) {
       const isAuthenticated = localStorage.getItem('phone_authenticated');
       const needsOnboarding = localStorage.getItem('needs_onboarding');
