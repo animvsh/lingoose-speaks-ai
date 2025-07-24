@@ -49,7 +49,12 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
                 key={view}
                 variant="ghost"
                 size="sm"
-                onClick={() => handleNavClick(view, label)}
+                onClick={(e) => {
+                  console.log('🔥🔥🔥 BUTTON CLICKED:', view, label);
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleNavClick(view, label);
+                }}
                 className={`
                   w-16 h-16 rounded-3xl border-2 border-handdrawn transition-all duration-150 ease-out
                   transform active:scale-95 hover:scale-105 hover-lift
