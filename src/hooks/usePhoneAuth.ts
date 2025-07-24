@@ -59,8 +59,10 @@ export const usePhoneAuth = () => {
         });
         throw new Error('Please enter a valid phone number with country code (e.g., +1234567890)');
       }
-      console.log('Sending OTP to:', formattedPhone);
+      
+      console.log('Sending OTP via Twilio to:', formattedPhone);
       await logSecurityEvent('otp_send_attempted', formattedPhone);
+      
       setTimeout(() => {
         import('@/services/posthog').then(({ posthogService }) => {
           if (posthogService) {
@@ -70,10 +72,17 @@ export const usePhoneAuth = () => {
           }
         });
       }, 100);
-      // Use Supabase Auth OTP
-      const { error } = await supabase.auth.signInWithOtp({ phone: formattedPhone });
+
+      // Use Twilio Verify service instead of Supabase Auth
+      const { data, error } = await supabase.functions.invoke('twilio-verify', {
+        body: {
+          action: 'send',
+          phoneNumber: formattedPhone
+        }
+      });
+
       if (error) {
-        console.error('Send OTP error:', error);
+        console.error('Twilio Verify error:', error);
         await logSecurityEvent('otp_send_failed', formattedPhone, { error: error.message });
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
@@ -87,7 +96,15 @@ export const usePhoneAuth = () => {
         }, 100);
         throw new Error(error.message || 'Failed to send verification code');
       }
-      console.log('OTP sent successfully');
+
+      if (!data?.success) {
+        const errorMessage = data?.error || 'Failed to send verification code';
+        console.error('Twilio Verify failed:', errorMessage);
+        await logSecurityEvent('otp_send_failed', formattedPhone, { error: errorMessage });
+        throw new Error(errorMessage);
+      }
+
+      console.log('OTP sent successfully via Twilio');
       await logSecurityEvent('otp_send_success', formattedPhone);
       setTimeout(() => {
         import('@/services/posthog').then(({ posthogService }) => {
@@ -98,6 +115,7 @@ export const usePhoneAuth = () => {
           }
         });
       }, 100);
+      
       return { success: true };
     } catch (error: any) {
       console.error('Send OTP error:', error);
@@ -117,8 +135,10 @@ export const usePhoneAuth = () => {
         });
         throw new Error('Please enter a valid phone number with country code');
       }
-      console.log('Verifying OTP for:', formattedPhone);
+      
+      console.log('Verifying OTP via Twilio for:', formattedPhone);
       await logSecurityEvent('otp_verify_attempted', formattedPhone);
+      
       setTimeout(() => {
         import('@/services/posthog').then(({ posthogService }) => {
           if (posthogService) {
@@ -128,10 +148,18 @@ export const usePhoneAuth = () => {
           }
         });
       }, 100);
-      // Use Supabase Auth OTP
-      const { data, error } = await supabase.auth.verifyOtp({ phone: formattedPhone, token: code, type: 'sms' });
+
+      // Verify OTP using Twilio Verify service
+      const { data, error } = await supabase.functions.invoke('twilio-verify', {
+        body: {
+          action: 'verify',
+          phoneNumber: formattedPhone,
+          code: code
+        }
+      });
+
       if (error) {
-        console.error('Verify OTP error:', error);
+        console.error('Twilio Verify error:', error);
         await logSecurityEvent('otp_verify_failed', formattedPhone, { error: error.message });
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
@@ -145,31 +173,35 @@ export const usePhoneAuth = () => {
         }, 100);
         throw new Error(error.message || 'Failed to verify code');
       }
-      // Get the Supabase Auth user
-      const user = data?.user;
-      if (!user) {
-        throw new Error('No user returned from Supabase Auth after OTP verification');
+
+      if (!data?.success || !data?.verified) {
+        const errorMessage = data?.error || 'Invalid verification code';
+        console.error('Twilio Verify failed:', errorMessage);
+        await logSecurityEvent('otp_verify_failed', formattedPhone, { error: errorMessage });
+        throw new Error(errorMessage);
       }
-      // Check if profile exists
+
+      console.log('OTP verified successfully via Twilio');
+
+      // After successful verification, create or find user profile
       const { data: existingProfile, error: findError } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('phone_number', formattedPhone)
         .maybeSingle();
+
       if (findError) {
         console.error('Error finding profile:', findError);
         await logSecurityEvent('profile_lookup_failed', formattedPhone, { error: findError.message });
         throw findError;
       }
+
       let profile;
       let isNewUser = false;
       let accountDetected = false;
+
       if (existingProfile) {
-        // Link profile to auth user if not already linked
-        if (!existingProfile.auth_user_id) {
-          await supabase.from('user_profiles').update({ auth_user_id: user.id }).eq('id', existingProfile.id);
-        }
-        profile = { ...existingProfile, auth_user_id: user.id };
+        profile = existingProfile;
         accountDetected = true;
         await logSecurityEvent('user_login_success', formattedPhone, { user_id: profile.id, is_returning_user: true });
         setTimeout(() => {
@@ -191,21 +223,23 @@ export const usePhoneAuth = () => {
         toast({ title: "Account detected!", description: `Welcome back, ${profile.full_name}! Logging you into your account.` });
         setTimeout(() => { window.location.href = '/app'; }, 1500);
       } else {
-        // Create new profile for new user, link to auth user
+        // Create new profile for new user
         const defaultName = 'New User';
         if (!validateUserName(defaultName)) {
           throw new Error('System error: Invalid default user name');
         }
         const { data: newProfile, error: createError } = await supabase
           .from('user_profiles')
-          .insert({ full_name: defaultName, phone_number: formattedPhone, language: 'hindi', auth_user_id: user.id })
+          .insert({ full_name: defaultName, phone_number: formattedPhone, language: 'hindi' })
           .select('*')
           .single();
+
         if (createError) {
           console.error('Error creating profile:', createError);
           await logSecurityEvent('profile_creation_failed', formattedPhone, { error: createError.message });
           throw createError;
         }
+
         profile = newProfile;
         isNewUser = true;
         await logSecurityEvent('user_signup_success', formattedPhone, { user_id: profile.id, is_new_user: true });
@@ -228,6 +262,7 @@ export const usePhoneAuth = () => {
           });
         }, 500);
       }
+
       console.log('Phone authentication successful, isNewUser:', isNewUser, 'accountDetected:', accountDetected);
       return { success: true, isNewUser, accountDetected };
     } catch (error: any) {
