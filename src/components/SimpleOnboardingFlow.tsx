@@ -88,10 +88,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
       }, {
         onSuccess: () => {
           // Redirect to dashboard after successful profile creation
-          setTimeout(() => {
-            window.location.href = '/app';
-          }, 1000);
-          onComplete();
+          window.location.href = '/app';
         }
       });
     }

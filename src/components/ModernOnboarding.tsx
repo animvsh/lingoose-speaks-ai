@@ -85,10 +85,8 @@ const ModernOnboarding = ({ phoneNumber, onComplete }: ModernOnboardingProps) =>
         className: "border-2 border-primary/20 bg-primary/5",
       });
 
-      // Small delay for better UX, then complete
-      setTimeout(() => {
-        onComplete();
-      }, 1000);
+      // Redirect to dashboard after successful profile creation
+      window.location.href = '/app';
 
     } catch (error) {
       console.error('Profile creation failed:', error);
