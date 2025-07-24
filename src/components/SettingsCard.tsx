@@ -174,9 +174,11 @@ const SettingsCard = ({
   };
 
   const handleNavigationClick = (destination: string, feature?: string) => {
+    console.log('🎯 SettingsCard navigation clicked:', destination, feature);
     if (feature) {
       trackFeatureUsage('settings_navigation', feature);
     }
+    console.log('🎯 Calling onNavigate with:', destination);
     onNavigate(destination);
   };
 

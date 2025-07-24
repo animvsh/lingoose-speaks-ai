@@ -162,6 +162,7 @@ const Index = () => {
   };
 
   const handleNavigate = (view: string, data?: any) => {
+    console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView);
     const previousView = currentView;
     setIsTransitioning(true);
     
@@ -174,6 +175,7 @@ const Index = () => {
       if (view === 'activity-details' && data) {
         setActivityDetailsData(data);
       }
+      console.log('🎯 Setting currentView to:', view);
       setCurrentView(view);
       
       // Stagger the transition completion for smoother effect
@@ -194,6 +196,7 @@ const Index = () => {
   }
 
   const renderCurrentView = () => {
+    console.log('🎨 renderCurrentView called with currentView:', currentView, 'isOnboarded:', isOnboarded);
     let content;
 
     if (currentView === "onboarding" && !isOnboarded) {
@@ -240,8 +243,10 @@ const Index = () => {
     } else if (currentView === "profile-management") {
       content = <ProfileManagementPage onNavigate={handleNavigate} />;
     } else if (currentView === "ai-behavior-metrics") {
+      console.log('🧠 Rendering AIBehaviorMetricsPanel');
       content = <AIBehaviorMetricsPanel onNavigate={handleNavigate} />;
     } else {
+      console.log('🏠 Rendering default DashboardStats for currentView:', currentView);
       content = <DashboardStats onNavigate={handleNavigate} />;
     }
 
@@ -257,7 +262,7 @@ const Index = () => {
     );
   };
 
-  const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor";
+  const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor" && currentView !== "ai-behavior-metrics";
 
   // Don't render anything if we're in a loading state
   if (loading) {
