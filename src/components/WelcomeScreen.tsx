@@ -9,9 +9,10 @@ import SimpleOnboardingFlow from "./SimpleOnboardingFlow";
 
 interface WelcomeScreenProps {
   onComplete: () => void;
+  onProfileCreated?: () => void;
 }
 
-const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
+const WelcomeScreen = ({ onComplete, onProfileCreated }: WelcomeScreenProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [phoneNumber] = useState(() => localStorage.getItem('phone_number') || '');
@@ -39,7 +40,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
   };
 
   if (showOnboarding) {
-    return <SimpleOnboardingFlow onComplete={onComplete} phoneNumber={phoneNumber} />;
+    return <SimpleOnboardingFlow onComplete={onComplete} phoneNumber={phoneNumber} onProfileCreated={onProfileCreated} />;
   }
 
   return (

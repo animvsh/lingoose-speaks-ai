@@ -22,7 +22,7 @@ import PageTransition from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, refreshUser } = useAuth();
   const navigate = useNavigate();
   const isDesktop = useIsDesktop();
   const { trackNavigation, trackScreenView, trackOnboardingComplete, identify } = usePostHog();
@@ -137,14 +137,10 @@ const Index = () => {
         trackScreenView("dashboard");
         trackPageView("dashboard");
         
-        // Force a page reload to refresh the auth context
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
+        // Refresh the auth context to pick up the new user profile
+        refreshUser();
       } catch (error) {
         console.error('Error parsing user profile after onboarding:', error);
-        // Force a page reload anyway to refresh the auth context
-        window.location.reload();
       }
     } else if (user) {
       localStorage.setItem(`onboarding_complete_${user.id}`, "true");
@@ -192,7 +188,7 @@ const Index = () => {
     let content;
 
     if (currentView === "onboarding" && !isOnboarded) {
-      content = <WelcomeScreen onComplete={handleOnboardingComplete} />;
+      content = <WelcomeScreen onComplete={handleOnboardingComplete} onProfileCreated={refreshUser} />;
     } else if (currentView === "home") {
       content = (
         <div className="w-full space-y-4">

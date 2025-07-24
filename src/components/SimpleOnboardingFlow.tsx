@@ -12,9 +12,10 @@ import { useCreateUserProfile } from "@/hooks/useCreateUserProfile";
 interface SimpleOnboardingFlowProps {
   onComplete: () => void;
   phoneNumber: string;
+  onProfileCreated?: () => void;
 }
 
-const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowProps) => {
+const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: SimpleOnboardingFlowProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [fullName, setFullName] = useState("");
   const [userPhoneNumber, setUserPhoneNumber] = useState(phoneNumber || "");
@@ -87,6 +88,10 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
         language: 'hindi'
       }, {
         onSuccess: () => {
+          // Notify parent that profile was created so it can refresh the auth context
+          if (onProfileCreated) {
+            onProfileCreated();
+          }
           // Complete onboarding - let the parent component handle navigation
           onComplete();
         }

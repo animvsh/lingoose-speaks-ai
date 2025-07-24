@@ -17,6 +17,7 @@ interface AuthContextType {
   session: any; // Keep for compatibility
   loading: boolean;
   signOut: () => Promise<void>;
+  refreshUser: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -48,6 +49,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  // Function to refresh user from localStorage
+  const refreshUserFromStorage = () => {
+    const userProfile = localStorage.getItem('current_user_profile');
+    if (userProfile) {
+      try {
+        const profile = JSON.parse(userProfile);
+        setUser(profile);
+        console.log('User profile refreshed from storage:', profile.phone_number);
+      } catch (error) {
+        console.error('Error parsing stored user profile:', error);
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
+  };
 
   useEffect(() => {
     // Check if user is authenticated via phone
@@ -114,6 +132,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     setLoading(false);
+
+    // Note: storage events only fire across tabs, not within the same tab
+    // So we rely on manual calls to refreshUser() for same-tab updates
   }, []);
 
   const signOut = async () => {
@@ -176,6 +197,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session: user ? { user } : null, // Create a fake session for compatibility
     loading,
     signOut,
+    refreshUser: refreshUserFromStorage,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
