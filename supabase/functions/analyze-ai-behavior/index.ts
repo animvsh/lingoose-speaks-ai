@@ -372,7 +372,8 @@ async function generateAIInsights(metrics: any, aiMessages: string[], userMessag
   }
 
   try {
-    const prompt = `You are an expert AI conversation coach analyzing a language learning session. Based on the following metrics and conversation transcript, provide 3-5 specific, actionable insights for improving the AI's teaching effectiveness in the next call.
+    // Enhanced prompt for more actionable, prompt-evolution focused insights
+    const prompt = `You are an expert AI conversation coach analyzing a Hindi language learning session. Based on the metrics and conversation patterns, provide specific, actionable prompt modifications that will make the AI more engaging and effective.
 
 CONVERSATION METRICS:
 - Instruction Adherence: ${(metrics.instructionAdherence * 100).toFixed(1)}%
@@ -383,16 +384,33 @@ CONVERSATION METRICS:
 - Recovery Score: ${(metrics.recoveryScore * 100).toFixed(1)}%
 - User Fluency Delta: ${(metrics.userFluencyDelta * 100).toFixed(1)}%
 
-CONVERSATION SAMPLE:
-${transcript.slice(0, 2000)}...
+CONVERSATION ANALYSIS:
+AI Messages: ${aiMessages.length} total
+User Messages: ${userMessages.length} total
+Sample Conversation:
+${transcript.slice(0, 1500)}...
 
-Provide insights that are:
-1. Specific and actionable
-2. Based on actual conversation patterns you observe
-3. Focused on improving language learning outcomes
-4. Practical for implementation in the next call
+USER ENGAGEMENT PATTERNS:
+${userMessages.map((msg, i) => `Turn ${i+1}: "${msg.slice(0, 80)}${msg.length > 80 ? '...' : ''}"`).slice(0, 5).join('\n')}
 
-Format as a simple array of strings, each being one actionable insight. Return only the JSON array, no other text.`;
+Analyze the conversation patterns and provide 4-6 specific system prompt improvements that will:
+1. Make conversations more engaging and fun
+2. Improve specific weak metrics
+3. Adapt to this user's communication style
+4. Add personality and cultural relevance
+5. Include specific phrases/techniques that work
+
+Format as JSON array of objects with "improvement" and "rationale" fields. Each improvement should be a direct addition or modification to the system prompt.
+
+Example format:
+[
+  {
+    "improvement": "Add to prompt: 'Use travel-related emojis (✈️🎒🌍) and ask scenario-based questions like: Imagine you're checking in at Delhi airport - what would you say?'",
+    "rationale": "User responds well to practical scenarios. Question density was low at 45%, so specific question prompts will help."
+  }
+]
+
+Return only valid JSON - no other text.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -403,11 +421,14 @@ Format as a simple array of strings, each being one actionable insight. Return o
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are an expert AI conversation coach. Return only valid JSON arrays of insights.' },
+          { 
+            role: 'system', 
+            content: 'You are an expert AI conversation coach. Return only valid JSON arrays of prompt improvements with "improvement" and "rationale" fields.' 
+          },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
-        max_tokens: 800
+        temperature: 0.8,
+        max_tokens: 1200
       }),
     });
 
@@ -421,7 +442,12 @@ Format as a simple array of strings, each being one actionable insight. Return o
     try {
       const parsedInsights = JSON.parse(insights);
       if (Array.isArray(parsedInsights)) {
-        return parsedInsights.slice(0, 5); // Limit to 5 insights
+        // Extract just the improvements for the suggestions array
+        return parsedInsights.map(item => 
+          typeof item === 'object' && item.improvement 
+            ? `${item.improvement}${item.rationale ? ` (Reason: ${item.rationale})` : ''}`
+            : item.toString()
+        ).slice(0, 6);
       }
     } catch (parseError) {
       console.error('Failed to parse OpenAI insights, using fallback');
@@ -495,26 +521,72 @@ Core Instructions:
 - Provide gentle corrections when needed
 - Maintain conversation continuity`;
 
-  // Generate improved prompt based on metrics
+async function updateSystemPrompt(supabaseClient: any, userId: string, phoneNumber: string, metrics: any, improvements: string[]) {
+  if (improvements.length === 0) return;
+
+  // Get current prompt if exists
+  const { data: currentPrompt } = await supabaseClient
+    .from('system_prompt_evolution')
+    .select('*')
+    .eq('phone_number', phoneNumber)
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const basePrompt = currentPrompt?.current_prompt || `You are an enthusiastic Hindi conversation teacher! 🎉
+
+PERSONALITY:
+- Be warm, encouraging, and slightly playful
+- Use emojis occasionally (✈️🎒🗣️)
+- Celebrate small wins: "Great job!" "Perfect!"
+- Reference scenarios relevant to travel and daily life
+
+ENGAGEMENT RULES:
+- Ask a follow-up question every 2-3 responses
+- If user gives short reply, ask "Tell me more about..." 
+- Use scenarios: "Imagine you're at the airport..."
+- Mix Hindi and English naturally like real conversations
+
+VOCABULARY FOCUS:
+- Naturally include: ticket, flight, booking, luggage, passenger
+- Don't force it - make it conversational
+- Praise when they use target words
+
+RECOVERY TACTICS:
+- Short reply? → Ask opinion or expand scenario
+- Silence? → "What would you say if..." 
+- Mistake? → Gentle correction + encouragement`;
+
+  // Generate dynamically improved prompt based on insights
   let improvedPrompt = basePrompt;
   
+  // Add specific improvements based on AI analysis
+  if (improvements.length > 0) {
+    improvedPrompt += "\n\n" + "=== RECENT AI-POWERED IMPROVEMENTS ===\n";
+    improvements.forEach((improvement, index) => {
+      improvedPrompt += `${index + 1}. ${improvement}\n`;
+    });
+  }
+
+  // Add metric-specific improvements
   if (metrics.questionDensity < 0.4) {
-    improvedPrompt += "\n\nIMPORTANT: Ask at least one question every 2-3 turns to maintain engagement.";
+    improvedPrompt += "\n\nIMPORTANT: QUESTION DENSITY IS LOW - Ask at least one engaging question every 2 turns. Use phrases like 'What do you think about...?' or 'Can you tell me more about...?'";
   }
 
   if (metrics.continuityscore < 0.8) {
-    improvedPrompt += "\n\nIMPORTANT: Build upon your previous messages and maintain topic continuity unless the user explicitly changes the subject.";
+    improvedPrompt += "\n\nIMPORTANT: CONTINUITY NEEDS WORK - Always reference something from the previous exchange. Use phrases like 'Building on what you just said...' or 'That reminds me of...'";
   }
 
-  if (metrics.repetitionAvoidance < 0.8) {
-    improvedPrompt += "\n\nIMPORTANT: Vary your sentence structure and avoid repeating phrases or expressions.";
+  if (metrics.recoveryScore < 0.8) {
+    improvedPrompt += "\n\nIMPORTANT: RECOVERY STRATEGY - When user gives short answers, immediately expand with 'That's interesting! What made you choose that?' or create a mini-scenario to re-engage.";
   }
 
-  if (improvements.length > 0) {
-    improvedPrompt += "\n\nSpecific improvements needed:\n" + improvements.map(imp => `- ${imp}`).join('\n');
+  if (metrics.targetVocabPromptRate < 0.6) {
+    improvedPrompt += "\n\nIMPORTANT: VOCABULARY INTEGRATION - Weave target words naturally into questions and scenarios. Example: 'When booking a flight, what's the first thing you check?'";
   }
 
-  // Store new prompt
+  // Store new prompt with evolution tracking
   await supabaseClient
     .from('system_prompt_evolution')
     .insert({
@@ -523,7 +595,8 @@ Core Instructions:
       current_prompt: improvedPrompt,
       previous_prompt: currentPrompt?.current_prompt || null,
       trigger_metrics: metrics,
-      improvement_rationale: improvements.join('; ')
+      improvement_rationale: improvements.join('; '),
+      evolution_reason: `AI-powered analysis identified ${improvements.length} specific improvements based on conversation patterns and metric performance.`
     });
 
   // Deactivate old prompt
@@ -533,4 +606,5 @@ Core Instructions:
       .update({ is_active: false })
       .eq('id', currentPrompt.id);
   }
+}
 }
