@@ -17,6 +17,8 @@ import ProUpgradeCard from "@/components/ProUpgradeCard";
 import StripeTestingPanel from "@/components/StripeTestingPanel";
 import DesktopExperienceMessage from "@/components/DesktopExperienceMessage";
 import ProfileManagementPage from "@/components/ProfileManagementPage";
+import LoadingOverlay from "@/components/LoadingOverlay";
+import PageTransition from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
@@ -140,102 +142,60 @@ const Index = () => {
   }
 
   const renderCurrentView = () => {
-    // Enhanced page transitions with scale and fade effects
-    const baseClasses = `w-full transition-all duration-300 ease-in-out transform ${
-      isTransitioning 
-        ? 'opacity-0 scale-95 translate-y-4' 
-        : 'opacity-100 scale-100 translate-y-0'
-    }`;
+    let content;
 
     if (currentView === "onboarding" && !isOnboarded) {
-      return (
-        <div className={baseClasses}>
-          <WelcomeScreen onComplete={handleOnboardingComplete} />
+      content = <WelcomeScreen onComplete={handleOnboardingComplete} />;
+    } else if (currentView === "home") {
+      content = (
+        <div className="w-full space-y-4">
+          {/* Toggle button for testing panel */}
+          {user && (
+            <div className="flex justify-end p-4">
+              <button
+                onClick={() => setShowTestingPanel(!showTestingPanel)}
+                className="text-sm bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-1 rounded-full transition-colors"
+              >
+                {showTestingPanel ? 'Hide' : 'Show'} Stripe Testing
+              </button>
+            </div>
+          )}
+          
+          {/* Testing Panel */}
+          {showTestingPanel && user && (
+            <div className="w-full px-4">
+              <StripeTestingPanel />
+            </div>
+          )}
+          
+          <DashboardStats onNavigate={handleNavigate} />
         </div>
       );
-    }
-
-    if (currentView === "home") {
-      return (
-        <div className={baseClasses}>
-          <div className="w-full space-y-4">
-            {/* Toggle button for testing panel */}
-            {user && (
-              <div className="flex justify-end p-4">
-                <button
-                  onClick={() => setShowTestingPanel(!showTestingPanel)}
-                  className="text-sm bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-1 rounded-full transition-colors"
-                >
-                  {showTestingPanel ? 'Hide' : 'Show'} Stripe Testing
-                </button>
-              </div>
-            )}
-            
-            {/* Testing Panel */}
-            {showTestingPanel && user && (
-              <div className="w-full px-4">
-                <StripeTestingPanel />
-              </div>
-            )}
-            
-            <DashboardStats onNavigate={handleNavigate} />
-          </div>
-        </div>
-      );
-    }
-
-    if (currentView === "activity") {
-      return (
-        <div className={baseClasses}>
-          <ActivityCard onNavigate={handleNavigate} />
-        </div>
-      );
-    }
-
-    if (currentView === "activity-details") {
-      return (
-        <div className={baseClasses}>
-          <ActivityDetailsView activity={activityDetailsData} onNavigate={handleNavigate} />
-        </div>
-      );
-    }
-
-    if (currentView === "curriculum") {
-      return (
-        <div className={baseClasses}>
-          <CurriculumCard onNavigate={handleNavigate} />
-        </div>
-      );
-    }
-
-    if (currentView === "settings") {
-      return (
-        <div className={baseClasses}>
-          <SettingsCard onNavigate={handleNavigate} />
-        </div>
-      );
-    }
-
-    if (currentView === "add-supervisor") {
-      return (
-        <div className={baseClasses}>
-          <AddSupervisorForm onClose={() => handleNavigate("settings")} />
-        </div>
-      );
-    }
-
-    if (currentView === "profile-management") {
-      return (
-        <div className={baseClasses}>
-          <ProfileManagementPage onNavigate={handleNavigate} />
-        </div>
-      );
+    } else if (currentView === "activity") {
+      content = <ActivityCard onNavigate={handleNavigate} />;
+    } else if (currentView === "activity-details") {
+      content = <ActivityDetailsView activity={activityDetailsData} onNavigate={handleNavigate} />;
+    } else if (currentView === "curriculum") {
+      content = <CurriculumCard onNavigate={handleNavigate} />;
+    } else if (currentView === "settings") {
+      content = <SettingsCard onNavigate={handleNavigate} />;
+    } else if (currentView === "add-supervisor") {
+      content = <AddSupervisorForm onClose={() => handleNavigate("settings")} />;
+    } else if (currentView === "profile-management") {
+      content = <ProfileManagementPage onNavigate={handleNavigate} />;
+    } else {
+      content = <DashboardStats onNavigate={handleNavigate} />;
     }
 
     return (
-      <div className={baseClasses}>
-        <DashboardStats onNavigate={handleNavigate} />
-      </div>
+      <PageTransition 
+        isTransitioning={isTransitioning} 
+        transitionKey={currentView}
+      >
+        <div className="w-full">
+          {content}
+        </div>
+      </PageTransition>
     );
   };
 
@@ -243,16 +203,7 @@ const Index = () => {
 
   // Don't render anything if we're in a loading state without a user
   if (loading || (!user && !isDesktop)) {
-    return (
-      <div className="min-h-screen w-full hindi-bg flex items-center justify-center font-nunito">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-3xl border-2 border-handdrawn bg-white flex items-center justify-center mx-auto mb-4 animate-gentle-float shadow-lg">
-            <div className="w-8 h-8 bg-primary rounded-full animate-pulse"></div>
-          </div>
-          <p className="text-brown-700 font-bold font-nunito">Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingOverlay isLoading={true} variant="gentle">{null}</LoadingOverlay>;
   }
 
   return (
