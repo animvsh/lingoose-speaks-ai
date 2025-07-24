@@ -40,8 +40,8 @@ serve(async (req) => {
     // Calculate all AI behavior metrics
     const metrics = await calculateAIBehaviorMetrics(aiMessages, userMessages, transcript);
     
-    // Generate improvement suggestions
-    const improvements = generateImprovementSuggestions(metrics);
+    // Generate improvement suggestions using OpenAI
+    const improvements = await generateAIInsights(metrics, aiMessages, userMessages, transcript);
 
     // Store metrics in database
     const { data: metricsData, error: metricsError } = await supabaseClient
@@ -363,7 +363,79 @@ function calculateUserFluencyDelta(userMessages: string[]): number {
   return Math.max(-1, Math.min(1, (uniqueWordImprovement + lengthImprovement) / 2));
 }
 
-function generateImprovementSuggestions(metrics: any): string[] {
+async function generateAIInsights(metrics: any, aiMessages: string[], userMessages: string[], transcript: string): Promise<string[]> {
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  
+  if (!openAIApiKey) {
+    console.log('OpenAI API key not found, using fallback insights');
+    return generateFallbackSuggestions(metrics);
+  }
+
+  try {
+    const prompt = `You are an expert AI conversation coach analyzing a language learning session. Based on the following metrics and conversation transcript, provide 3-5 specific, actionable insights for improving the AI's teaching effectiveness in the next call.
+
+CONVERSATION METRICS:
+- Instruction Adherence: ${(metrics.instructionAdherence * 100).toFixed(1)}%
+- Question Density: ${(metrics.questionDensity * 100).toFixed(1)}%
+- Continuity Score: ${(metrics.continuityscore * 100).toFixed(1)}%
+- Follow-up Quality: ${(metrics.followupQuality * 100).toFixed(1)}%
+- Repetition Avoidance: ${(metrics.repetitionAvoidance * 100).toFixed(1)}%
+- Recovery Score: ${(metrics.recoveryScore * 100).toFixed(1)}%
+- User Fluency Delta: ${(metrics.userFluencyDelta * 100).toFixed(1)}%
+
+CONVERSATION SAMPLE:
+${transcript.slice(0, 2000)}...
+
+Provide insights that are:
+1. Specific and actionable
+2. Based on actual conversation patterns you observe
+3. Focused on improving language learning outcomes
+4. Practical for implementation in the next call
+
+Format as a simple array of strings, each being one actionable insight. Return only the JSON array, no other text.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'You are an expert AI conversation coach. Return only valid JSON arrays of insights.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 800
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const insights = data.choices[0].message.content;
+    
+    try {
+      const parsedInsights = JSON.parse(insights);
+      if (Array.isArray(parsedInsights)) {
+        return parsedInsights.slice(0, 5); // Limit to 5 insights
+      }
+    } catch (parseError) {
+      console.error('Failed to parse OpenAI insights, using fallback');
+    }
+    
+    return generateFallbackSuggestions(metrics);
+    
+  } catch (error) {
+    console.error('Error generating AI insights:', error);
+    return generateFallbackSuggestions(metrics);
+  }
+}
+
+function generateFallbackSuggestions(metrics: any): string[] {
   const suggestions: string[] = [];
 
   if (metrics.questionDensity < 0.4) {
@@ -392,6 +464,10 @@ function generateImprovementSuggestions(metrics: any): string[] {
 
   if (metrics.callbackUsage < 1) {
     suggestions.push("Reference earlier parts of the conversation to show continuity");
+  }
+
+  if (suggestions.length === 0) {
+    suggestions.push("Continue maintaining your current high performance across all metrics");
   }
 
   return suggestions;
