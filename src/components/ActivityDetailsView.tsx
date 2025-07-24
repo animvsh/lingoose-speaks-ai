@@ -74,27 +74,29 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
         .limit(1)
         .maybeSingle();
 
-      // Fetch real skill analysis data if call analysis exists
-      let skillsAnalysis = null;
+      // Fetch real core metrics data if call analysis exists
+      let coreMetrics = null;
       if (callData) {
-        const { data: skillsData, error: skillsError } = await supabase
-          .from('vapi_skill_analysis')
+        const { data: metricsData, error: metricsError } = await supabase
+          .from('core_language_metrics')
           .select('*')
           .eq('vapi_call_analysis_id', callData.id)
-          .order('created_at', { ascending: false });
+          .order('call_date', { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
-        if (!skillsError && skillsData && skillsData.length > 0) {
-          skillsAnalysis = skillsData;
+        if (!metricsError && metricsData) {
+          coreMetrics = metricsData;
         }
       }
 
-      console.log('Activity details query:', { callData, ratingData, skillsAnalysis, callError, ratingError });
+      console.log('Activity details query:', { callData, ratingData, coreMetrics, callError, ratingError });
 
       return {
         callAnalysis: callData,
         rating: ratingData,
         activity: activity,
-        skillsAnalysis: skillsAnalysis
+        coreMetrics: coreMetrics
       };
     },
     enabled: !!user && !!activity
@@ -107,16 +109,36 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
     return `${mins}m ${secs}s`;
   };
 
-  const getSkillsTestedData = () => {
-    // Use real skills analysis data if available
-    if (activityDetails?.skillsAnalysis && activityDetails.skillsAnalysis.length > 0) {
-      return activityDetails.skillsAnalysis.map(skill => ({
-        name: skill.skill_name,
-        before: skill.before_score,
-        after: skill.after_score,
-        improvement: skill.improvement,
-        isReal: true
-      }));
+  const getCoreMetricsData = () => {
+    // Use real core metrics data if available
+    if (activityDetails?.coreMetrics) {
+      const metrics = activityDetails.coreMetrics;
+      return [
+        {
+          name: 'Speaking Speed',
+          value: `${Math.round(metrics.words_per_minute)} WPM`,
+          target: '90+ WPM',
+          status: metrics.words_per_minute >= 90 ? 'good' : 'needs-work'
+        },
+        {
+          name: 'Vocabulary Usage',
+          value: `${Math.round(metrics.target_vocabulary_usage_percent)}%`,
+          target: '70%+',
+          status: metrics.target_vocabulary_usage_percent >= 70 ? 'good' : 'needs-work'
+        },
+        {
+          name: 'Speech Clarity',
+          value: `${Math.round(metrics.speech_clarity_percent)}%`,
+          target: '90%+',
+          status: metrics.speech_clarity_percent >= 90 ? 'good' : 'needs-work'
+        },
+        {
+          name: 'Conversation Flow',
+          value: `${metrics.turn_count} exchanges`,
+          target: '8+ exchanges',
+          status: metrics.turn_count >= 8 ? 'good' : 'needs-work'
+        }
+      ];
     }
 
     // Return empty array if no real data is available
@@ -141,9 +163,9 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
     );
   }
 
-  const skillsData = getSkillsTestedData();
+  const metricsData = getCoreMetricsData();
   const hasRealTranscript = activityDetails?.callAnalysis?.transcript;
-  const hasRealSkillsAnalysis = skillsData.length > 0;
+  const hasRealMetrics = metricsData.length > 0;
 
   return (
     <div className="min-h-screen bg-amber-50 pb-6">
@@ -204,39 +226,47 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
                 SKILLS TESTED & IMPROVED
               </h3>
               <p className="text-gray-600 font-medium text-sm">
-                {hasRealSkillsAnalysis ? 'Real analysis from your practice session' : 'No skill analysis data available'}
+                {hasRealMetrics ? 'Core metrics from your practice session' : 'No core metrics data available'}
               </p>
             </div>
           </div>
 
-          {hasRealSkillsAnalysis ? (
+          {hasRealMetrics ? (
             <>
               <div className="mb-4 p-3 bg-green-50 rounded-2xl">
                 <p className="text-green-700 text-sm font-medium">
-                  ✓ Analysis based on real conversation data from VAPI call
+                  ✓ Analysis based on 10 core metrics from your conversation
                 </p>
               </div>
 
+              {activityDetails?.coreMetrics && (
+                <div className="mb-4 p-3 bg-blue-50 rounded-2xl">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-700">
+                      {Math.round(activityDetails.coreMetrics.composite_score)}/100
+                    </div>
+                    <div className="text-xs text-blue-600 font-bold uppercase">Composite Fluency Score</div>
+                    {activityDetails.coreMetrics.advancement_eligible && (
+                      <div className="mt-2 text-green-600 font-bold text-sm">🎉 Ready for Level Advancement!</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
-                {skillsData.map((skill, index) => (
+                {metricsData.map((metric, index) => (
                   <div key={index} className="bg-gray-50 rounded-2xl p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-gray-800">{skill.name}</span>
-                      <span className="text-green-600 font-bold">+{skill.improvement}%</span>
+                      <span className="font-bold text-gray-800">{metric.name}</span>
+                      <span className={`font-bold ${metric.status === 'good' ? 'text-green-600' : 'text-orange-600'}`}>
+                        {metric.value}
+                      </span>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="flex-1">
-                        <div className="text-xs text-gray-600 mb-1">Before: {skill.before}%</div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-red-400 h-2 rounded-full" style={{ width: `${skill.before}%` }}></div>
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-xs text-gray-600 mb-1">After: {skill.after}%</div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-green-400 h-2 rounded-full" style={{ width: `${skill.after}%` }}></div>
-                        </div>
-                      </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-600">Target: {metric.target}</span>
+                      <span className={`text-xs font-bold ${metric.status === 'good' ? 'text-green-600' : 'text-orange-600'}`}>
+                        {metric.status === 'good' ? '✓ Met' : '⚠ Needs Work'}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -247,12 +277,12 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
               <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <AlertCircle className="w-8 h-8 text-orange-500" />
               </div>
-              <h4 className="text-lg font-bold text-gray-800 mb-2">No Skills Analysis Available</h4>
+              <h4 className="text-lg font-bold text-gray-800 mb-2">No Core Metrics Available</h4>
               <p className="text-gray-600 mb-4">
-                Complete a practice call session to see detailed skill analysis here.
+                Complete a practice call session to see detailed core metrics here.
               </p>
               <p className="text-sm text-gray-500">
-                Your conversation will be analyzed to provide insights on greeting, conversation flow, vocabulary usage, and pronunciation.
+                Your conversation will be analyzed for speed, clarity, vocabulary usage, and fluency metrics.
               </p>
             </div>
           )}

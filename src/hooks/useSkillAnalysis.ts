@@ -3,20 +3,39 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-export const useSkillAnalysis = (callAnalysisId?: string) => {
+export interface CoreMetrics {
+  id: string;
+  words_per_minute: number;
+  filler_words_per_minute: number;
+  pauses_per_minute: number;
+  speech_clarity_percent: number;
+  turn_count: number;
+  unique_vocabulary_count: number;
+  target_vocabulary_usage_percent: number;
+  self_correction_rate: number;
+  average_response_delay_seconds: number;
+  fluency_progress_delta: number;
+  composite_score: number;
+  advancement_eligible: boolean;
+  areas_for_improvement: string[];
+  call_date: string;
+  created_at: string;
+}
+
+export const useCoreMetrics = (callAnalysisId?: string) => {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['skill-analysis', user?.id, callAnalysisId],
+    queryKey: ['core-metrics', user?.id, callAnalysisId],
     queryFn: async () => {
       if (!user || !callAnalysisId) throw new Error('No user or call analysis ID found');
 
       const { data, error } = await supabase
-        .from('vapi_skill_analysis')
+        .from('core_language_metrics')
         .select('*')
         .eq('vapi_call_analysis_id', callAnalysisId)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('call_date', { ascending: false });
 
       if (error) throw error;
       return data || [];
@@ -25,36 +44,24 @@ export const useSkillAnalysis = (callAnalysisId?: string) => {
   });
 };
 
-export const useLatestSkillAnalysis = () => {
+export const useLatestCoreMetrics = () => {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['latest-skill-analysis', user?.id],
+    queryKey: ['latest-core-metrics', user?.id],
     queryFn: async () => {
       if (!user) throw new Error('No user found');
 
-      // First get the latest call analysis
-      const { data: latestCall, error: callError } = await supabase
-        .from('vapi_call_analysis')
-        .select('id')
+      const { data, error } = await supabase
+        .from('core_language_metrics')
+        .select('*')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .order('call_date', { ascending: false })
         .limit(1)
         .maybeSingle();
 
-      if (callError || !latestCall) {
-        return [];
-      }
-
-      // Then get the skill analysis for that call
-      const { data, error } = await supabase
-        .from('vapi_skill_analysis')
-        .select('*')
-        .eq('vapi_call_analysis_id', latestCall.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
     },
     enabled: !!user,
   });
