@@ -94,10 +94,8 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
         });
       }
       
-      // Redirect to main app
-      setTimeout(() => {
-        window.location.href = '/app';
-      }, 1000);
+      // Redirect to main app immediately after successful verification
+      window.location.href = '/app';
     } else {
       toast({
         title: "❌ Verification Failed",
