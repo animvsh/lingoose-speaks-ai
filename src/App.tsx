@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { usePostHog } from "@/hooks/usePostHog";
+
 import Index from "@/pages/Index";
 import Landing from "@/pages/Landing";
 import Auth from "@/pages/Auth";
@@ -15,8 +15,6 @@ import "./App.css";
 const queryClient = new QueryClient();
 
 function AppContent() {
-  const { trackPageView } = usePostHog();
-
   return (
     <Router>
       <Routes>
