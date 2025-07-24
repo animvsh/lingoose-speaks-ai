@@ -271,6 +271,7 @@ const Index = () => {
   };
 
   const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor" && currentView !== "ai-behavior-metrics" && currentView !== "system-prompt-settings";
+  console.log('🔍🔍🔍 shouldShowBottomNav:', shouldShowBottomNav, { isOnboarded, user: !!user, currentView });
 
   // Don't render anything if we're in a loading state
   if (loading) {
@@ -289,8 +290,13 @@ const Index = () => {
         {renderCurrentView()}
       </div>
       
-      {shouldShowBottomNav && (
-        <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
+      {shouldShowBottomNav ? (
+        <>
+          <div>🔍 Rendering AnimatedBottomNav</div>
+          <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
+        </>
+      ) : (
+        <div>🔍 NOT rendering AnimatedBottomNav - shouldShow: {shouldShowBottomNav}</div>
       )}
     </div>
   );
