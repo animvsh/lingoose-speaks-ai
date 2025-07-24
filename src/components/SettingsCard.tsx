@@ -183,7 +183,7 @@ const SettingsCard = ({
   };
 
   return <div className="min-h-screen hindi-bg pb-24 font-nunito">
-      <AppBar title="Settings" onBack={() => onNavigate("home")} />
+      <AppBar title="Settings" showBackButton={false} />
 
       <div className="px-4 pt-4">
         {/* Pro Upgrade Card always visible */}
