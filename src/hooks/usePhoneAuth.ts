@@ -220,47 +220,31 @@ export const usePhoneAuth = () => {
         localStorage.setItem('current_user_profile', JSON.stringify(profile));
         localStorage.setItem('phone_authenticated', 'true');
         localStorage.setItem('phone_number', formattedPhone);
-        toast({ title: "Account detected!", description: `Welcome back, ${profile.full_name}! Logging you into your account.` });
-        setTimeout(() => { window.location.href = '/app'; }, 1500);
+        // Don't redirect for existing users - let the component handle this
       } else {
-        // Create new profile for new user
-        const defaultName = 'New User';
-        if (!validateUserName(defaultName)) {
-          throw new Error('System error: Invalid default user name');
-        }
-        const { data: newProfile, error: createError } = await supabase
-          .from('user_profiles')
-          .insert({ full_name: defaultName, phone_number: formattedPhone, language: 'hindi' })
-          .select('*')
-          .single();
-
-        if (createError) {
-          console.error('Error creating profile:', createError);
-          await logSecurityEvent('profile_creation_failed', formattedPhone, { error: createError.message });
-          throw createError;
-        }
-
-        profile = newProfile;
+        // For new users, just set a flag that they need onboarding
+        // Don't create a profile yet - let the onboarding flow handle this
         isNewUser = true;
-        await logSecurityEvent('user_signup_success', formattedPhone, { user_id: profile.id, is_new_user: true });
+        await logSecurityEvent('otp_verify_success_new_user', formattedPhone);
         
-        // Store authentication state immediately for new users
-        localStorage.setItem('current_user_profile', JSON.stringify(profile));
+        // Store minimal auth state for new users
         localStorage.setItem('phone_authenticated', 'true');
         localStorage.setItem('phone_number', formattedPhone);
+        localStorage.setItem('needs_onboarding', 'true');
         
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
             if (posthogService) {
-              posthogService.capture('user_signed_up', profile.id, {
-                phone_number: profile.phone_number,
-                full_name: profile.full_name,
-                language: profile.language,
+              posthogService.capture('phone_verified_new_user', formattedPhone, {
+                phone_number: formattedPhone,
                 is_new_user: true
               });
             }
           });
         }, 500);
+        
+        // Return success without profile for new users
+        profile = null;
       }
 
       console.log('Phone authentication successful, isNewUser:', isNewUser, 'accountDetected:', accountDetected);

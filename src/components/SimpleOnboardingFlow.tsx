@@ -87,10 +87,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
         language: 'hindi'
       }, {
         onSuccess: () => {
-          // Redirect to dashboard after successful profile creation
-          setTimeout(() => {
-            window.location.href = '/app';
-          }, 1000);
+          // Complete onboarding - let the parent component handle navigation
           onComplete();
         }
       });

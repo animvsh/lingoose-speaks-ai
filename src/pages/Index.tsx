@@ -67,8 +67,11 @@ const Index = () => {
 
   useEffect(() => {
     if (!loading) {
+      const isAuthenticated = localStorage.getItem('phone_authenticated');
+      const needsOnboarding = localStorage.getItem('needs_onboarding');
+      
       if (user) {
-        // Identify user in PostHog
+        // Existing user with complete profile
         identify({
           user_type: 'authenticated',
           onboarding_completed: localStorage.getItem(`onboarding_complete_${user.id}`) ? true : false
@@ -86,11 +89,21 @@ const Index = () => {
           trackScreenView("onboarding");
           trackPageView("onboarding");
         }
+      } else if (isAuthenticated === 'true' && needsOnboarding === 'true') {
+        // New user who is authenticated but needs onboarding
+        identify({
+          user_type: 'new_authenticated',
+          onboarding_completed: false
+        });
+        
+        setCurrentView("onboarding");
+        trackScreenView("onboarding");
+        trackPageView("onboarding");
       } else {
         // Only redirect to auth if loading is complete and user is definitively null
         // Add a small delay to prevent blank screens during auth state changes
         setTimeout(() => {
-          if (!user && !loading) {
+          if (!user && !loading && isAuthenticated !== 'true') {
             navigate('/');
           }
         }, 100);
@@ -99,7 +112,31 @@ const Index = () => {
   }, [user, loading, identify, trackScreenView, trackPageView, navigate]);
 
   const handleOnboardingComplete = () => {
-    if (user) {
+    // Clean up onboarding flags
+    localStorage.removeItem('needs_onboarding');
+    
+    // Check if we now have a user (profile was created during onboarding)
+    const userProfile = localStorage.getItem('current_user_profile');
+    if (userProfile) {
+      try {
+        const profile = JSON.parse(userProfile);
+        localStorage.setItem(`onboarding_complete_${profile.id}`, "true");
+        setIsOnboarded(true);
+        setCurrentView("home");
+        trackOnboardingComplete();
+        trackScreenView("dashboard");
+        trackPageView("dashboard");
+        
+        // Force a page reload to refresh the auth context
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
+      } catch (error) {
+        console.error('Error parsing user profile after onboarding:', error);
+        // Force a page reload anyway to refresh the auth context
+        window.location.reload();
+      }
+    } else if (user) {
       localStorage.setItem(`onboarding_complete_${user.id}`, "true");
       setIsOnboarded(true);
       setCurrentView("home");
@@ -201,8 +238,14 @@ const Index = () => {
 
   const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor";
 
-  // Don't render anything if we're in a loading state without a user
-  if (loading || (!user && !isDesktop)) {
+  // Don't render anything if we're in a loading state
+  if (loading) {
+    return <LoadingOverlay isLoading={true} variant="gentle">{null}</LoadingOverlay>;
+  }
+  
+  // If not authenticated and not on desktop, don't render the app
+  const isAuthenticated = localStorage.getItem('phone_authenticated');
+  if (!user && !isAuthenticated && !isDesktop) {
     return <LoadingOverlay isLoading={true} variant="gentle">{null}</LoadingOverlay>;
   }
 

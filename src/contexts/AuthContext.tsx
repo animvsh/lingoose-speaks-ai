@@ -53,50 +53,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check if user is authenticated via phone
     const isAuthenticated = localStorage.getItem('phone_authenticated');
     const userProfile = localStorage.getItem('current_user_profile');
+    const needsOnboarding = localStorage.getItem('needs_onboarding');
     
-    if (isAuthenticated === 'true' && userProfile) {
-      try {
-        const profile = JSON.parse(userProfile);
-        setUser(profile);
-        console.log('Restored user session:', profile.phone_number);
-        
-        // Log session restoration
-        logSecurityEvent('user_session_restored', profile.phone_number, {
-          user_id: profile.id,
-          full_name: profile.full_name,
-          language: profile.language
-        });
-        
-        // Track user session restored
-        setTimeout(() => {
-          import('@/services/posthog').then(({ posthogService }) => {
-            if (posthogService) {
-              posthogService.capture('user_session_restored', profile.id || profile.phone_number, {
-                phone_number: profile.phone_number,
-                full_name: profile.full_name,
-                language: profile.language
-              });
-            }
+    if (isAuthenticated === 'true') {
+      if (userProfile && !needsOnboarding) {
+        // Existing user with complete profile
+        try {
+          const profile = JSON.parse(userProfile);
+          setUser(profile);
+          console.log('Restored user session:', profile.phone_number);
+          
+          // Log session restoration
+          logSecurityEvent('user_session_restored', profile.phone_number, {
+            user_id: profile.id,
+            full_name: profile.full_name,
+            language: profile.language
           });
-        }, 1000);
+          
+          // Track user session restored
+          setTimeout(() => {
+            import('@/services/posthog').then(({ posthogService }) => {
+              if (posthogService) {
+                posthogService.capture('user_session_restored', profile.id || profile.phone_number, {
+                  phone_number: profile.phone_number,
+                  full_name: profile.full_name,
+                  language: profile.language
+                });
+              }
+            });
+          }, 1000);
 
-        // If user is authenticated and on landing page, redirect to app
+          // If user is authenticated and on landing page, redirect to app
+          if (window.location.pathname === '/') {
+            window.location.href = '/app';
+          }
+        } catch (error) {
+          console.error('Error parsing stored user profile:', error);
+          
+          // Log suspicious activity
+          logSecurityEvent('session_restoration_failed', undefined, {
+            error: 'Invalid stored user profile data',
+            error_details: error instanceof Error ? error.message : 'Unknown error'
+          });
+          
+          // Clear invalid data
+          localStorage.removeItem('phone_authenticated');
+          localStorage.removeItem('current_user_profile');
+          localStorage.removeItem('phone_number');
+          localStorage.removeItem('needs_onboarding');
+        }
+      } else if (needsOnboarding === 'true') {
+        // New user who needs onboarding - keep user as null but authenticated
+        console.log('User authenticated but needs onboarding');
+        
+        // If user is on landing page and needs onboarding, redirect to app for onboarding
         if (window.location.pathname === '/') {
           window.location.href = '/app';
         }
-      } catch (error) {
-        console.error('Error parsing stored user profile:', error);
-        
-        // Log suspicious activity
-        logSecurityEvent('session_restoration_failed', undefined, {
-          error: 'Invalid stored user profile data',
-          error_details: error instanceof Error ? error.message : 'Unknown error'
-        });
-        
-        // Clear invalid data
-        localStorage.removeItem('phone_authenticated');
-        localStorage.removeItem('current_user_profile');
-        localStorage.removeItem('phone_number');
       }
     }
     

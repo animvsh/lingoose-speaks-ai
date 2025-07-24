@@ -80,22 +80,31 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
           description: "We found your account. Signing you in...",
           className: "border-2 border-blue-400 bg-blue-50 text-blue-800",
         });
+        // For existing users, redirect to app after a brief delay
+        setTimeout(() => {
+          window.location.href = '/app';
+        }, 1500);
       } else if (result.isNewUser) {
         toast({
           title: "🎉 Welcome to Bol!",
-          description: "Account created successfully!",
+          description: "Let's set up your profile!",
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
+        // For new users, redirect to app for onboarding
+        setTimeout(() => {
+          window.location.href = '/app';
+        }, 1000);
       } else {
         toast({
           title: "🎉 Welcome Back!",
           description: "Successfully signed in!",
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
+        // For returning users, redirect to app after a brief delay
+        setTimeout(() => {
+          window.location.href = '/app';
+        }, 1500);
       }
-      
-      // Redirect to main app immediately after successful verification
-      window.location.href = '/app';
     } else {
       toast({
         title: "❌ Verification Failed",
