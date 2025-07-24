@@ -247,7 +247,7 @@ const Index = () => {
     } else if (currentView === "profile-management") {
       content = <ProfileManagementPage onNavigate={handleNavigate} />;
     } else if (currentView === "ai-behavior-metrics") {
-      content = <AIBehaviorMetricsPanel />;
+      content = <AIBehaviorMetricsPanel onNavigate={handleNavigate} />;
     } else {
       content = <DashboardStats onNavigate={handleNavigate} />;
     }

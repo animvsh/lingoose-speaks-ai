@@ -122,39 +122,42 @@ function parseTranscript(transcript: string) {
 async function calculateAIBehaviorMetrics(aiMessages: string[], userMessages: string[], fullTranscript: string) {
   const totalAITurns = aiMessages.length;
   
-  // 1. Instruction Adherence Score (placeholder - would need specific instructions)
-  const instructionAdherence = 0.85; // Default high score
+  // 1. Instruction Adherence Score - evaluate common instruction adherence
+  const instructionAdherence = calculateInstructionAdherence(aiMessages, fullTranscript);
 
-  // 2. Target Vocabulary Prompt Rate
-  const targetVocab = ['ticket', 'delay', 'luggage', 'flight', 'booking']; // Default vocab
+  // 2. Target Vocabulary Prompt Rate - check for domain-specific vocabulary
+  const targetVocab = ['ticket', 'delay', 'luggage', 'flight', 'booking', 'reservation', 'passenger', 'departure', 'arrival', 'gate'];
   const vocabMatches = targetVocab.filter(word => 
     aiMessages.some(msg => msg.toLowerCase().includes(word.toLowerCase()))
   );
   const targetVocabPromptRate = vocabMatches.length / targetVocab.length;
 
-  // 3. Question Density
-  const questionTurns = aiMessages.filter(msg => msg.includes('?')).length;
+  // 3. Question Density - enhanced to detect Hindi questions too
+  const questionTurns = aiMessages.filter(msg => 
+    msg.includes('?') || 
+    /\b(kya|kab|kaise|kaun|kyun|kahan|kitna)\b/i.test(msg)
+  ).length;
   const questionDensity = questionTurns / totalAITurns;
 
-  // 4. Continuity Score (simplified - checking topic consistency)
+  // 4. Continuity Score - improved word overlap calculation
   const continuityscore = calculateContinuityScore(aiMessages);
 
-  // 5. Follow-up Quality Score (simplified)
+  // 5. Follow-up Quality Score - context-aware follow-ups
   const followupQuality = calculateFollowupQuality(aiMessages, userMessages);
 
-  // 6. Repetition Avoidance Score
+  // 6. Repetition Avoidance Score - n-gram based analysis
   const repetitionAvoidance = calculateRepetitionAvoidance(aiMessages);
 
-  // 7. Tone Consistency Score (simplified)
-  const toneConsistency = 0.90; // Placeholder
+  // 7. Tone Consistency Score - basic tone analysis
+  const toneConsistency = calculateToneConsistency(aiMessages);
 
-  // 8. Callback Usage
+  // 8. Callback Usage - references to earlier conversation
   const callbackUsage = calculateCallbackUsage(aiMessages, userMessages);
 
-  // 9. Recovery Score
+  // 9. Recovery Score - handling weak user responses
   const recoveryScore = calculateRecoveryScore(aiMessages, userMessages);
 
-  // 10. User Fluency Delta (simplified)
+  // 10. User Fluency Delta - improvement measurement
   const userFluencyDelta = calculateUserFluencyDelta(userMessages);
 
   return {
@@ -172,19 +175,54 @@ async function calculateAIBehaviorMetrics(aiMessages: string[], userMessages: st
       totalAITurns,
       questionTurns,
       vocabMatches,
-      userMessageCount: userMessages.length
+      userMessageCount: userMessages.length,
+      targetVocab,
+      enhancedAnalysis: true
     }
   };
+}
+
+function calculateInstructionAdherence(aiMessages: string[], fullTranscript: string): number {
+  // Define common instruction categories to check
+  const instructions = [
+    { name: 'friendly_tone', check: (msg: string) => /\b(thank you|thanks|please|sorry|welcome)\b/i.test(msg) },
+    { name: 'questions_asked', check: (msg: string) => msg.includes('?') || /\b(kya|kab|kaise)\b/i.test(msg) },
+    { name: 'topic_maintained', check: (msg: string, idx: number) => idx === 0 || msg.length > 10 },
+    { name: 'no_repetition', check: (msg: string, idx: number, msgs: string[]) => 
+      idx === 0 || !msgs.slice(0, idx).some(prev => prev.toLowerCase() === msg.toLowerCase()) }
+  ];
+  
+  let totalScore = 0;
+  let totalChecks = 0;
+  
+  aiMessages.forEach((msg, idx) => {
+    instructions.forEach(instruction => {
+      if (instruction.check(msg, idx, aiMessages)) {
+        totalScore++;
+      }
+      totalChecks++;
+    });
+  });
+  
+  return totalChecks > 0 ? totalScore / totalChecks : 0.85;
 }
 
 function calculateContinuityScore(aiMessages: string[]): number {
   if (aiMessages.length < 2) return 1.0;
   
-  // Simple word overlap between consecutive messages
+  // Enhanced word overlap with semantic keywords
   let totalSimilarity = 0;
+  const contentWords = (text: string) => 
+    text.toLowerCase().split(/\s+/).filter(word => 
+      word.length > 3 && !['this', 'that', 'with', 'have', 'been', 'will'].includes(word)
+    );
+  
   for (let i = 0; i < aiMessages.length - 1; i++) {
-    const words1 = new Set(aiMessages[i].toLowerCase().split(/\s+/));
-    const words2 = new Set(aiMessages[i + 1].toLowerCase().split(/\s+/));
+    const words1 = new Set(contentWords(aiMessages[i]));
+    const words2 = new Set(contentWords(aiMessages[i + 1]));
+    
+    if (words1.size === 0 || words2.size === 0) continue;
+    
     const intersection = new Set([...words1].filter(x => words2.has(x)));
     const union = new Set([...words1, ...words2]);
     totalSimilarity += intersection.size / union.size;
@@ -213,10 +251,47 @@ function calculateFollowupQuality(aiMessages: string[], userMessages: string[]):
 }
 
 function calculateRepetitionAvoidance(aiMessages: string[]): number {
-  const phrases = aiMessages.join(' ').toLowerCase().split(/[.!?]+/);
-  const uniquePhrases = new Set(phrases.map(p => p.trim()));
+  if (aiMessages.length === 0) return 1.0;
   
-  return phrases.length > 0 ? uniquePhrases.size / phrases.length : 1.0;
+  // Create 5-grams from all AI messages
+  const allText = aiMessages.join(' ').toLowerCase();
+  const words = allText.split(/\s+/);
+  
+  if (words.length < 5) return 1.0;
+  
+  const ngrams = [];
+  for (let i = 0; i <= words.length - 5; i++) {
+    ngrams.push(words.slice(i, i + 5).join(' '));
+  }
+  
+  const uniqueNgrams = new Set(ngrams);
+  const repetitionRate = (ngrams.length - uniqueNgrams.size) / ngrams.length;
+  
+  return Math.max(0, 1 - repetitionRate);
+}
+
+function calculateToneConsistency(aiMessages: string[]): number {
+  if (aiMessages.length === 0) return 1.0;
+  
+  // Simple tone indicators
+  const casualIndicators = ['hi', 'hey', 'sure', 'cool', 'awesome', 'great', 'nice'];
+  const formalIndicators = ['please', 'kindly', 'certainly', 'however', 'furthermore'];
+  
+  let casualCount = 0;
+  let formalCount = 0;
+  
+  aiMessages.forEach(msg => {
+    const lowerMsg = msg.toLowerCase();
+    if (casualIndicators.some(word => lowerMsg.includes(word))) casualCount++;
+    if (formalIndicators.some(word => lowerMsg.includes(word))) formalCount++;
+  });
+  
+  if (casualCount === 0 && formalCount === 0) return 0.90; // Default neutral
+  
+  const total = casualCount + formalCount;
+  const dominantTone = Math.max(casualCount, formalCount);
+  
+  return dominantTone / total;
 }
 
 function calculateCallbackUsage(aiMessages: string[], userMessages: string[]): number {
@@ -264,15 +339,28 @@ function calculateRecoveryScore(aiMessages: string[], userMessages: string[]): n
 function calculateUserFluencyDelta(userMessages: string[]): number {
   if (userMessages.length === 0) return 0;
   
-  const totalWords = userMessages.join(' ').split(/\s+/).length;
-  const uniqueWords = new Set(userMessages.join(' ').toLowerCase().split(/\s+/)).size;
-  const avgSentenceLength = totalWords / userMessages.length;
+  const firstHalf = userMessages.slice(0, Math.floor(userMessages.length / 2));
+  const secondHalf = userMessages.slice(Math.floor(userMessages.length / 2));
   
-  // Simple scoring based on word variety and sentence length
-  const varietyScore = uniqueWords / totalWords;
-  const lengthScore = Math.min(1.0, avgSentenceLength / 8); // Normalize to 8 words average
+  if (firstHalf.length === 0 || secondHalf.length === 0) return 0;
   
-  return (varietyScore + lengthScore) / 2;
+  // Calculate metrics for both halves
+  const getMetrics = (messages: string[]) => {
+    const totalWords = messages.join(' ').split(/\s+/).length;
+    const uniqueWords = new Set(messages.join(' ').toLowerCase().split(/\s+/)).size;
+    const avgLength = totalWords / messages.length;
+    return { totalWords, uniqueWords, avgLength };
+  };
+  
+  const firstMetrics = getMetrics(firstHalf);
+  const secondMetrics = getMetrics(secondHalf);
+  
+  // Calculate improvement indicators
+  const uniqueWordImprovement = (secondMetrics.uniqueWords - firstMetrics.uniqueWords) / Math.max(firstMetrics.uniqueWords, 1);
+  const lengthImprovement = (secondMetrics.avgLength - firstMetrics.avgLength) / Math.max(firstMetrics.avgLength, 1);
+  
+  // Return delta as improvement score (-1 to 1)
+  return Math.max(-1, Math.min(1, (uniqueWordImprovement + lengthImprovement) / 2));
 }
 
 function generateImprovementSuggestions(metrics: any): string[] {
