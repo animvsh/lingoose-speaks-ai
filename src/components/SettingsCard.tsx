@@ -181,7 +181,7 @@ const SettingsCard = ({
       <AppBar title="Settings" onBack={() => onNavigate("home")} />
 
       {/* Pro Upgrade Card always visible */}
-      <div className="mb-6">
+      <div className="mb-6 px-6">
         <ProUpgradeCard />
         {subscription?.subscription_tier === 'free_trial' && trialDay && (
           <div className="mt-2 text-center text-blue-700 font-bold text-lg">
@@ -190,7 +190,7 @@ const SettingsCard = ({
         )}
       </div>
 
-      <div className="w-full space-y-6">
+      <div className="w-full space-y-6 px-6">
         {/* Account Settings */}
         <div className="w-full bg-white p-6 border-4 border-gray-200">
           <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
