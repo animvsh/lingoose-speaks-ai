@@ -248,10 +248,10 @@ const Index = () => {
       console.log('🧠 Rendering AIBehaviorMetricsPanel');
       content = <AIBehaviorMetricsPanel onNavigate={handleNavigate} />;
     } else if (currentView === "system-prompt-settings") {
-      console.log('🎯 Rendering SystemPromptSettingsPage');
+      console.log('🎯 Rendering SystemPromptSettingsPage for currentView:', currentView);
       content = <SystemPromptSettingsPage onNavigate={handleNavigate} />;
     } else {
-      console.log('🏠 Rendering default DashboardStats for currentView:', currentView);
+      console.log('🏠 Rendering default DashboardStats for currentView:', currentView, 'Expected: system-prompt-settings');
       content = <DashboardStats onNavigate={handleNavigate} />;
     }
 
