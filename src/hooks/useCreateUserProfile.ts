@@ -168,7 +168,7 @@ export const useCreateUserProfile = () => {
       }
 
       // Store user profile in localStorage for authentication
-      localStorage.setItem('current_user_profile', JSON.stringify(profile));
+      localStorage.setItem('currentUser', JSON.stringify(profile));
       localStorage.setItem('phone_authenticated', 'true');
       localStorage.setItem('phone_number', formattedPhone);
 
