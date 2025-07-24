@@ -269,7 +269,15 @@ const Landing = () => {
   }
   
   return (
-    <div className="min-h-screen w-full hindi-bg font-nunito animate-fade-in">
+    <div 
+      className="min-h-screen w-full font-nunito animate-fade-in"
+      style={{
+        backgroundImage: `url('/lovable-uploads/f7e8c6ae-d967-4e31-a5b0-8ea6962b374c.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       {/* Header - optimized for desktop */}
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
