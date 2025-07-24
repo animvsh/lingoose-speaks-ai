@@ -35,9 +35,9 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-amber-50 border-t border-gray-100 z-50 safe-area-bottom">
-      <div className="max-w-md mx-auto px-6 py-3">
-        <div className="flex justify-center space-x-4">
+    <div className="fixed bottom-0 left-0 right-0 hindi-bg border-t-2 border-handdrawn z-50 safe-area-bottom font-nunito">
+      <div className="max-w-md mx-auto px-4 py-3">
+        <div className="flex justify-center space-x-3">
           {navItems.map(({ view, icon: Icon, label }) => {
             const isActive = currentView === view;
             
@@ -54,17 +54,17 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
                 }}
                 onClick={() => handleNavClick(view, label)}
                 className={`
-                  w-14 h-14 rounded-2xl transition-all duration-150 ease-out
-                  transform active:scale-95 hover:scale-110 
-                  mobile-touch-target select-none
+                  w-16 h-16 rounded-3xl border-2 border-handdrawn transition-all duration-150 ease-out
+                  transform active:scale-95 hover:scale-105 hover-lift
+                  mobile-touch-target select-none shadow-lg font-nunito
                   ${isActive 
-                    ? 'bg-blue-400 text-white scale-105' 
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300 active:bg-gray-400'
+                    ? 'bg-primary text-white scale-105 border-primary shadow-xl' 
+                    : 'bg-white/90 text-brown-700 hover:bg-secondary active:bg-primary/20'
                   }
                 `}
                 aria-label={label}
               >
-                <Icon className={`w-6 h-6 transition-transform duration-150 ${isActive ? 'scale-110' : ''}`} />
+                <Icon className={`w-7 h-7 transition-transform duration-150 ${isActive ? 'scale-110' : ''}`} />
               </Button>
             );
           })}

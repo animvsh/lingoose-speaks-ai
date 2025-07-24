@@ -230,17 +230,17 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
 
   if (isLoadingActivity || !currentActivity) {
     return (
-      <div className="min-h-screen bg-amber-50">
+      <div className="min-h-screen hindi-bg font-nunito">
         <AppBar title="Practice" showBackButton={false} />
-        <div className="px-6 pt-6">
-          <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
-            <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-              <RefreshCw className="w-8 h-8 text-gray-400 animate-spin" />
+        <div className="px-4 pt-6">
+          <div className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 text-center shadow-lg">
+            <div className="w-16 h-16 rounded-3xl border-2 border-handdrawn bg-secondary flex items-center justify-center mx-auto mb-4 animate-gentle-float">
+              <RefreshCw className="w-8 h-8 text-primary animate-spin" />
             </div>
-            <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide mb-2">
+            <h3 className="text-lg font-black text-brown-900 uppercase tracking-wide mb-2 font-nunito">
               LOADING ACTIVITY
             </h3>
-            <p className="text-gray-600 font-medium text-sm">
+            <p className="text-brown-700 font-bold text-sm font-nunito">
               Preparing your practice session...
             </p>
           </div>
@@ -250,16 +250,16 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-amber-50 pb-28">
+    <div className="min-h-screen hindi-bg pb-28 font-nunito">
       <AppBar title="Practice" showBackButton={false} />
-      <div className="px-6 space-y-6 pt-6">
+      <div className="px-4 space-y-6 pt-6">
         {/* Previous Activity Section */}
         <PreviousActivitySection 
           previousActivity={previousActivityData} 
           onNavigate={onNavigate} 
         />
 
-        {/* Main Learning Section - with relative positioning for button */}
+        {/* Main Learning Section */}
         <div className="relative">
           <TodaysActivitySection 
             currentActivity={currentActivity} 
@@ -271,16 +271,16 @@ const ActivityCard = ({ onNavigate }: ActivityCardProps) => {
         </div>
 
         {/* Learning Progress Tree */}
-        <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200">
+        <div className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 shadow-lg">
           <div className="flex items-center mb-4">
-            <div className="w-14 h-14 bg-purple-400 rounded-2xl flex items-center justify-center mr-4">
+            <div className="w-14 h-14 bg-primary rounded-3xl border-2 border-handdrawn flex items-center justify-center mr-4 shadow-lg">
               <Trophy className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide">
+              <h3 className="text-lg font-black text-brown-900 uppercase tracking-wide font-nunito">
                 LEARNING PROGRESS
               </h3>
-              <p className="text-gray-600 font-medium text-sm">
+              <p className="text-brown-700 font-bold text-sm font-nunito">
                 Your skill development path
               </p>
             </div>

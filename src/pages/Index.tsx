@@ -85,8 +85,13 @@ const Index = () => {
           trackPageView("onboarding");
         }
       } else {
-        // Redirect to auth if no user
-        navigate('/auth');
+        // Only redirect to auth if loading is complete and user is definitively null
+        // Add a small delay to prevent blank screens during auth state changes
+        setTimeout(() => {
+          if (!user && !loading) {
+            navigate('/');
+          }
+        }, 100);
       }
     }
   }, [user, loading, identify, trackScreenView, trackPageView, navigate]);
@@ -128,18 +133,6 @@ const Index = () => {
     }, 150);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen w-full hindi-bg flex items-center justify-center font-nunito">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <div className="w-8 h-8 bg-white rounded-full"></div>
-          </div>
-          <p className="text-brown-700 font-medium font-nunito">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   // Show desktop message if user is authenticated, onboarded, and on desktop
   if (user && isOnboarded && isDesktop) {
@@ -247,6 +240,20 @@ const Index = () => {
   };
 
   const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor";
+
+  // Don't render anything if we're in a loading state without a user
+  if (loading || (!user && !isDesktop)) {
+    return (
+      <div className="min-h-screen w-full hindi-bg flex items-center justify-center font-nunito">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-3xl border-2 border-handdrawn bg-white flex items-center justify-center mx-auto mb-4 animate-gentle-float shadow-lg">
+            <div className="w-8 h-8 bg-primary rounded-full animate-pulse"></div>
+          </div>
+          <p className="text-brown-700 font-bold font-nunito">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className="min-h-screen w-full hindi-bg overflow-hidden font-nunito">
