@@ -46,12 +46,6 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
                 key={view}
                 variant="ghost"
                 size="sm"
-                onTouchStart={() => {
-                  // Immediate visual feedback on touch
-                  if ('vibrate' in navigator) {
-                    navigator.vibrate(25);
-                  }
-                }}
                 onClick={() => handleNavClick(view, label)}
                 className={`
                   w-16 h-16 rounded-3xl border-2 border-handdrawn transition-all duration-150 ease-out
