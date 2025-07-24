@@ -5,8 +5,10 @@ import { ChevronLeft, ChevronRight, Phone, CheckCircle, LogIn } from "lucide-rea
 import { Link } from "react-router-dom";
 import SimpleOnboardingFlow from "@/components/SimpleOnboardingFlow";
 import PhoneAuthForm from "@/components/PhoneAuthForm";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Landing = () => {
+  const { user, loading, refreshUser } = useAuth();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
@@ -80,6 +82,13 @@ const Landing = () => {
   const reviewsPerSlide = 3;
   const totalSlides = Math.ceil(testimonials.length / reviewsPerSlide);
 
+  // Redirect authenticated users to the app
+  useEffect(() => {
+    if (user && !loading) {
+      window.location.href = '/app';
+    }
+  }, [user, loading]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % totalSlides);
@@ -105,7 +114,7 @@ const Landing = () => {
 
   if (showOnboarding) {
     const phoneNumber = localStorage.getItem('phone_number') || '';
-    return <SimpleOnboardingFlow onComplete={handleOnboardingComplete} phoneNumber={phoneNumber} />;
+    return <SimpleOnboardingFlow onComplete={handleOnboardingComplete} phoneNumber={phoneNumber} onProfileCreated={refreshUser} />;
   }
 
   if (showSignIn) {
