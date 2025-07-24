@@ -109,14 +109,12 @@ const Landing = () => {
     return () => clearInterval(interval);
   }, [totalSlides]);
 
-  // Check if user has completed onboarding and redirect to app
+  // Check if user has completed onboarding
   useEffect(() => {
     if (user) {
       const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.id}`);
       if (onboardingComplete) {
-        console.log('🚀 User is authenticated and onboarded, redirecting to /app');
-        navigate('/app');
-        return;
+        setIsOnboarded(true);
       } else {
         setCurrentView("onboarding");
       }
