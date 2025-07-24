@@ -300,14 +300,12 @@ const SettingsCard = ({
               </Button>
             </div>}
           
-          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none cursor-pointer" onClick={() => handleNavigationClick("notifications", "notifications")}>
             <div className="flex items-center">
               <Bell className="w-5 h-5 mr-3 text-blue-500" />
               <span className="text-gray-700 font-medium">Notifications</span>
             </div>
-            <Button variant="outline" size="icon" onClick={toggleNotifications}>
-              {notificationsEnabled ? "ON" : "OFF"}
-            </Button>
+            <ChevronRight className="w-4 h-4 text-gray-500" />
           </div>
           <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
             <div className="flex items-center">

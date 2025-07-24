@@ -17,6 +17,7 @@ import ProUpgradeCard from "@/components/ProUpgradeCard";
 import StripeTestingPanel from "@/components/StripeTestingPanel";
 import DesktopExperienceMessage from "@/components/DesktopExperienceMessage";
 import ProfileManagementPage from "@/components/ProfileManagementPage";
+import NotificationSettingsPage from "@/components/NotificationSettingsPage";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import PageTransition from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
@@ -183,6 +184,8 @@ const Index = () => {
       content = <AddSupervisorForm onClose={() => handleNavigate("settings")} />;
     } else if (currentView === "profile-management") {
       content = <ProfileManagementPage onNavigate={handleNavigate} />;
+    } else if (currentView === "notifications") {
+      content = <NotificationSettingsPage onNavigate={handleNavigate} />;
     } else {
       content = <DashboardStats onNavigate={handleNavigate} />;
     }
