@@ -97,15 +97,26 @@ const Landing = () => {
   const reviewsPerSlide = 3;
   const totalSlides = Math.ceil(testimonials.length / reviewsPerSlide);
 
-  // Don't redirect - instead show the app content directly on this page
-  // This prevents any blank screens or page transitions
-
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+  // This ensures hook order consistency across all renders
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % totalSlides);
     }, 5000);
     return () => clearInterval(interval);
   }, [totalSlides]);
+
+  // Check if user has completed onboarding
+  useEffect(() => {
+    if (user) {
+      const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.id}`);
+      if (onboardingComplete) {
+        setIsOnboarded(true);
+      } else {
+        setCurrentView("onboarding");
+      }
+    }
+  }, [user]);
 
   // Show smooth loading state - no blank screens ever
   if (loading) {
@@ -126,18 +137,6 @@ const Landing = () => {
   const handleSignIn = () => {
     setShowSignIn(true);
   };
-
-  // Check if user has completed onboarding
-  useEffect(() => {
-    if (user) {
-      const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.id}`);
-      if (onboardingComplete) {
-        setIsOnboarded(true);
-      } else {
-        setCurrentView("onboarding");
-      }
-    }
-  }, [user]);
 
   const handleNavigate = (view: string, data?: any) => {
     setIsTransitioning(true);
