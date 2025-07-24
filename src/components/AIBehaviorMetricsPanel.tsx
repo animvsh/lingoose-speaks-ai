@@ -69,52 +69,237 @@ AI: Excellent! You used "Main kya le sakta hun" perfectly. For carry-on, you can
   }
 
   if (!latestMetrics) {
+    // Show empty state with all metrics displayed as N/A
+    const emptyMetrics = [
+      {
+        name: 'Instruction Adherence',
+        value: null,
+        icon: Target,
+        description: 'How well AI follows system prompt rules',
+        status: 'No data available'
+      },
+      {
+        name: 'Question Density',
+        value: null,
+        icon: MessageSquare,
+        description: 'Frequency of engaging questions',
+        status: 'No data available'
+      },
+      {
+        name: 'Continuity Score',
+        value: null,
+        icon: TrendingUp,
+        description: 'Topic consistency across responses',
+        status: 'No data available'
+      },
+      {
+        name: 'Follow-up Quality',
+        value: null,
+        icon: RotateCcw,
+        description: 'Context-aware response quality',
+        status: 'No data available'
+      },
+      {
+        name: 'Tone Consistency',
+        value: null,
+        icon: Volume2,
+        description: 'Emotional tone stability',
+        status: 'No data available'
+      },
+      {
+        name: 'Recovery Score',
+        value: null,
+        icon: Clock,
+        description: 'Handling of user silence/short replies',
+        status: 'No data available'
+      }
+    ];
+
     return (
       <div className="min-h-screen hindi-bg pb-24 font-nunito">
         <AppBar title="AI Behavior Analytics" onBack={() => onNavigate?.("settings")} />
         
         <div className="px-4 pt-4 space-y-6">
-          <Card className="w-full border-dashed border-2">
-            <CardHeader className="text-center">
-              <Brain className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <CardTitle>No AI Behavior Data Available</CardTitle>
+          {/* All Metrics Display - Even When Empty */}
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="h-5 w-5" />
+                AI Behavior Metrics (All Tracked Fields)
+              </CardTitle>
               <CardDescription>
-                Complete a practice call to see detailed AI performance metrics and OpenAI-powered insights
+                Complete overview of all metrics being monitored - generate data to see actual values
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Core Metrics Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {emptyMetrics.map((metric) => {
+                  const Icon = metric.icon;
+                  return (
+                    <div key={metric.name} className="p-4 border rounded-lg space-y-3 bg-muted/30">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium text-sm">{metric.name}</span>
+                        </div>
+                        <Badge variant="outline" className="text-muted-foreground">
+                          N/A
+                        </Badge>
+                      </div>
+                      <Progress value={0} className="h-2 opacity-50" />
+                      <p className="text-xs text-muted-foreground">{metric.description}</p>
+                      <p className="text-xs text-amber-600 font-medium">{metric.status}</p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Special Metrics */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 border rounded-lg bg-muted/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-sm">Vocabulary Usage Rate</span>
+                    <Badge variant="outline" className="text-muted-foreground">N/A</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Target words included in responses</p>
+                </div>
+                
+                <div className="p-4 border rounded-lg bg-muted/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-sm">Callback Usage</span>
+                    <Badge variant="outline" className="text-muted-foreground">N/A</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">References to earlier conversation</p>
+                </div>
+
+                <div className="p-4 border rounded-lg bg-muted/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-sm">User Fluency Delta</span>
+                    <Badge variant="outline" className="text-muted-foreground">N/A</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">User improvement during conversation</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* System Prompt Improvement Guide */}
+          <Card className="w-full border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-900">
+                <Lightbulb className="h-5 w-5 text-blue-600" />
+                How to Improve Your AI System Prompt
+              </CardTitle>
+              <CardDescription className="text-blue-700">
+                Guidelines for making your AI more engaging and effective
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-center space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Alert className="border-blue-200 bg-white/70">
+                  <MessageSquare className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-blue-800">
+                    <strong>Increase Question Density:</strong> Add "Ask follow-up questions every 2-3 responses" to your prompt
+                  </AlertDescription>
+                </Alert>
+                
+                <Alert className="border-green-200 bg-green-50/70">
+                  <Sparkles className="h-4 w-4 text-green-600" />
+                  <AlertDescription className="text-green-800">
+                    <strong>Make It Fun:</strong> Include "Use humor, emojis, and cultural references to keep conversations engaging"
+                  </AlertDescription>
+                </Alert>
+                
+                <Alert className="border-purple-200 bg-purple-50/70">
+                  <Target className="h-4 w-4 text-purple-600" />
+                  <AlertDescription className="text-purple-800">
+                    <strong>Target Vocabulary:</strong> "Naturally incorporate these words: [travel, booking, luggage, flight, etc.]"
+                  </AlertDescription>
+                </Alert>
+                
+                <Alert className="border-orange-200 bg-orange-50/70">
+                  <RotateCcw className="h-4 w-4 text-orange-600" />
+                  <AlertDescription className="text-orange-800">
+                    <strong>Recovery Strategies:</strong> "When users give short replies, ask 'Can you tell me more about...' or 'What do you think about..?'"
+                  </AlertDescription>
+                </Alert>
+              </div>
+              
+              <div className="mt-6 p-4 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg border border-purple-200">
+                <h4 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Sample Fun System Prompt Enhancement:
+                </h4>
+                <pre className="text-sm text-purple-800 whitespace-pre-wrap bg-white/50 p-3 rounded border">
+{`"You are an enthusiastic Hindi conversation teacher! 🎉
+
+PERSONALITY:
+- Be warm, encouraging, and slightly playful
+- Use emojis occasionally (✈️🎒🗣️)
+- Celebrate small wins: "Great job!" "Perfect!"
+- Reference popular culture when relevant
+
+ENGAGEMENT RULES:
+- Ask a follow-up question every 2-3 responses
+- If user gives short reply, ask "Tell me more about..." 
+- Use scenarios: "Imagine you're at the airport..."
+- Mix Hindi and English naturally like real conversations
+
+VOCABULARY FOCUS:
+- Naturally include: ticket, flight, booking, luggage, passenger
+- Don't force it - make it conversational
+- Praise when they use target words
+
+RECOVERY TACTICS:
+- Short reply? → Ask opinion or expand scenario
+- Silence? → "What would you say if..." 
+- Mistake? → Gentle correction + encouragement"`}
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5" />
+                Quick Actions
+              </CardTitle>
+              <CardDescription>
+                Generate sample data or manually analyze a call
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Button 
                   onClick={generateSampleData} 
                   disabled={isAnalyzing}
-                  className="w-full"
+                  className="w-full h-16 text-left flex-col items-start justify-center"
                   size="lg"
                 >
                   {isAnalyzing ? (
                     <>
-                      <Zap className="h-5 w-5 mr-2 animate-spin" />
-                      Generating AI Analysis...
+                      <Zap className="h-5 w-5 animate-spin mb-1" />
+                      <span className="text-sm">Generating Analysis...</span>
                     </>
                   ) : (
                     <>
-                      <Sparkles className="h-5 w-5 mr-2" />
-                      Generate Sample Analysis
+                      <Sparkles className="h-5 w-5 mb-1" />
+                      <span className="font-semibold">Generate Sample Data</span>
+                      <span className="text-xs opacity-80">See how metrics work with sample conversation</span>
                     </>
                   )}
                 </Button>
-                <p className="text-sm text-muted-foreground">
-                  See how our AI behavior analysis works with sample conversation data
-                </p>
-              </div>
-              
-              <Separator className="my-6" />
-              
-              <div className="space-y-4">
-                <h4 className="font-semibold flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Manual Call Analysis
-                </h4>
-                <ManualCallDataFetch />
+                
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-semibold mb-2 flex items-center gap-2">
+                    <Target className="h-4 w-4" />
+                    Manual Analysis
+                  </h4>
+                  <ManualCallDataFetch />
+                </div>
               </div>
             </CardContent>
           </Card>
