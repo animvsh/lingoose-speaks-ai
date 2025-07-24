@@ -88,12 +88,22 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
         language: 'hindi'
       }, {
         onSuccess: () => {
-          // Notify parent that profile was created so it can refresh the auth context
-          if (onProfileCreated) {
-            onProfileCreated();
-          }
-          // Complete onboarding - let the parent component handle navigation
-          onComplete();
+          console.log('🎉 Profile creation successful - calling callbacks');
+          
+          // Small delay to ensure localStorage is fully written
+          setTimeout(() => {
+            // Notify parent that profile was created so it can refresh the auth context
+            if (onProfileCreated) {
+              console.log('📞 Calling onProfileCreated callback');
+              onProfileCreated();
+            } else {
+              console.log('⚠️ No onProfileCreated callback provided');
+            }
+            
+            // Complete onboarding - let the parent component handle navigation
+            console.log('✅ Calling onComplete callback');
+            onComplete();
+          }, 100);
         }
       });
     }

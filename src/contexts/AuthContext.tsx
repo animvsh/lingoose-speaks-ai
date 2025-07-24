@@ -52,24 +52,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Function to refresh user from localStorage
   const refreshUserFromStorage = () => {
+    console.log('🔄 refreshUserFromStorage called');
     const userProfile = localStorage.getItem('current_user_profile');
     const needsOnboarding = localStorage.getItem('needs_onboarding');
+    
+    console.log('📝 localStorage values:', {
+      userProfile: userProfile ? 'EXISTS' : 'NULL',
+      needsOnboarding,
+      pathname: window.location.pathname
+    });
     
     if (userProfile && needsOnboarding !== 'true') {
       try {
         const profile = JSON.parse(userProfile);
         setUser(profile);
-        console.log('User profile refreshed from storage:', profile.phone_number);
+        console.log('✅ User profile refreshed from storage:', profile.phone_number);
         
         // If user is authenticated and on landing page, redirect to app
         if (window.location.pathname === '/') {
+          console.log('🚀 Redirecting to /app');
           window.location.href = '/app';
         }
       } catch (error) {
-        console.error('Error parsing stored user profile:', error);
+        console.error('❌ Error parsing stored user profile:', error);
         setUser(null);
       }
     } else {
+      console.log('⚠️ Profile not complete - staying on current page');
       setUser(null);
     }
   };

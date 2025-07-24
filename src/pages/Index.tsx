@@ -122,11 +122,16 @@ const Index = () => {
   }, [user, loading, identify, trackScreenView, trackPageView, navigate]);
 
   const handleOnboardingComplete = () => {
+    console.log('🎯 handleOnboardingComplete called');
+    
     // Clean up onboarding flags
     localStorage.removeItem('needs_onboarding');
+    console.log('🗑️ Removed needs_onboarding flag');
     
     // Check if we now have a user (profile was created during onboarding)
     const userProfile = localStorage.getItem('current_user_profile');
+    console.log('📝 userProfile in localStorage:', userProfile ? 'EXISTS' : 'NULL');
+    
     if (userProfile) {
       try {
         const profile = JSON.parse(userProfile);
@@ -136,11 +141,9 @@ const Index = () => {
         trackOnboardingComplete();
         trackScreenView("dashboard");
         trackPageView("dashboard");
-        
-        // Refresh the auth context to pick up the new user profile
-        refreshUser();
+        console.log('✅ Onboarding marked complete for user:', profile.phone_number);
       } catch (error) {
-        console.error('Error parsing user profile after onboarding:', error);
+        console.error('❌ Error parsing user profile after onboarding:', error);
       }
     } else if (user) {
       localStorage.setItem(`onboarding_complete_${user.id}`, "true");
@@ -149,6 +152,9 @@ const Index = () => {
       trackOnboardingComplete();
       trackScreenView("dashboard");
       trackPageView("dashboard");
+      console.log('✅ Onboarding marked complete for existing user:', user.phone_number);
+    } else {
+      console.log('⚠️ No user found in onboarding complete - this should not happen');
     }
   };
 
