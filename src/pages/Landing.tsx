@@ -169,9 +169,11 @@ const Landing = () => {
             <div className="flex justify-center mb-6">
               <div className="inline-flex items-center bg-card border-2 border-handdrawn rounded-full px-4 py-2 shadow-sm hover-lift">
                 <span className="text-sm font-black text-foreground mr-2 font-nunito">not backed by</span>
-                <div className="bg-primary rounded-md px-2 py-1 mr-2">
-                  <span className="text-xs font-black text-white font-nunito">Y</span>
-                </div>
+                <img 
+                  src="/lovable-uploads/42e02fd5-e4c2-4e62-af21-e13f2948849d.png" 
+                  alt="Y Combinator logo" 
+                  className="w-6 h-6 mr-2"
+                />
                 <span className="text-sm font-black text-foreground font-nunito">combinator (yet)</span>
               </div>
             </div>
