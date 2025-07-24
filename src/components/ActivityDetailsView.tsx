@@ -8,6 +8,8 @@ import { useEffect } from "react";
 import AppBar from "./AppBar";
 import { TranscriptDisplay } from "./TranscriptDisplay";
 import { useCallCompletionTracker } from "@/hooks/useCallCompletionTracker";
+import { useLanguageMetrics } from "@/hooks/useLanguageMetrics";
+import { LanguageMetricsDisplay } from "./LanguageMetricsDisplay";
 
 interface ActivityDetailsViewProps {
   activity: any;
@@ -22,6 +24,9 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
     stopActivityDetailsTracking,
     hasProcessedTranscript 
   } = useCallCompletionTracker();
+
+  // Get language metrics for the latest call
+  const { data: languageMetrics, isLoading: metricsLoading } = useLanguageMetrics();
 
   // Track time spent in activity details for call completion detection
   useEffect(() => {
@@ -252,6 +257,12 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
             </div>
           )}
         </div>
+
+        {/* Language Metrics */}
+        <LanguageMetricsDisplay 
+          metrics={languageMetrics as any} 
+          isLoading={metricsLoading}
+        />
 
         {/* Conversation Transcript with Speaker Identification */}
         <TranscriptDisplay 
