@@ -240,6 +240,13 @@ const SettingsCard = ({
                 </div>
                 <ChevronRight className="w-5 h-5 text-blue-500" />
               </div>
+              <div className="flex items-center justify-between py-4 px-4 bg-indigo-50 rounded-2xl border-2 border-indigo-200 cursor-pointer hover:bg-indigo-100 transition-all duration-200 hover:scale-[1.02]" onClick={() => handleNavigationClick("system-prompt-settings", "system_prompt_settings")}>
+                <div className="flex items-center">
+                  <Settings className="w-5 h-5 mr-3 text-indigo-500" />
+                  <span className="text-brown-700 font-bold">System Prompt Template</span>
+                </div>
+                <ChevronRight className="w-5 h-5 text-indigo-500" />
+              </div>
             </div>
           </div>
 

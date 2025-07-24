@@ -1124,6 +1124,7 @@ export type Database = {
           created_at: string
           current_prompt: string
           effectiveness_score: number | null
+          evolution_reason: string | null
           id: string
           improvement_rationale: string | null
           is_active: boolean | null
@@ -1137,6 +1138,7 @@ export type Database = {
           created_at?: string
           current_prompt: string
           effectiveness_score?: number | null
+          evolution_reason?: string | null
           id?: string
           improvement_rationale?: string | null
           is_active?: boolean | null
@@ -1150,12 +1152,46 @@ export type Database = {
           created_at?: string
           current_prompt?: string
           effectiveness_score?: number | null
+          evolution_reason?: string | null
           id?: string
           improvement_rationale?: string | null
           is_active?: boolean | null
           phone_number?: string
           previous_prompt?: string | null
           trigger_metrics?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      system_prompt_templates: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          phone_number: string
+          template_content: string
+          template_version: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          phone_number: string
+          template_content: string
+          template_version?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          phone_number?: string
+          template_content?: string
+          template_version?: number | null
           updated_at?: string
           user_id?: string
         }

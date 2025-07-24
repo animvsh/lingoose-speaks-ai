@@ -20,6 +20,7 @@ import StripeTestingPanel from "@/components/StripeTestingPanel";
 import DesktopExperienceMessage from "@/components/DesktopExperienceMessage";
 import ProfileManagementPage from "@/components/ProfileManagementPage";
 import AIBehaviorMetricsPanel from "@/components/AIBehaviorMetricsPanel";
+import { SystemPromptSettingsPage } from "@/components/SystemPromptSettingsPage";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import PageTransition from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
@@ -246,6 +247,9 @@ const Index = () => {
     } else if (currentView === "ai-behavior-metrics") {
       console.log('🧠 Rendering AIBehaviorMetricsPanel');
       content = <AIBehaviorMetricsPanel onNavigate={handleNavigate} />;
+    } else if (currentView === "system-prompt-settings") {
+      console.log('🎯 Rendering SystemPromptSettingsPage');
+      content = <SystemPromptSettingsPage onNavigate={handleNavigate} />;
     } else {
       console.log('🏠 Rendering default DashboardStats for currentView:', currentView);
       content = <DashboardStats onNavigate={handleNavigate} />;
@@ -263,7 +267,7 @@ const Index = () => {
     );
   };
 
-  const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor" && currentView !== "ai-behavior-metrics";
+  const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor" && currentView !== "ai-behavior-metrics" && currentView !== "system-prompt-settings";
 
   // Don't render anything if we're in a loading state
   if (loading) {

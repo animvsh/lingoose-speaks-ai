@@ -512,7 +512,7 @@ RECOVERY TACTICS:
                 Current Evolved VAPI System Prompt
               </CardTitle>
               <CardDescription className="text-blue-700">
-                🧬 This prompt has evolved {currentPrompt.evolution_reason ? 'through AI analysis' : 'based on your conversations'} • Last updated: {new Date(currentPrompt.created_at).toLocaleDateString()}
+                🧬 This prompt has evolved through AI analysis • Last updated: {new Date(currentPrompt.created_at).toLocaleDateString()}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -533,9 +533,9 @@ RECOVERY TACTICS:
                       <p className="text-sm text-blue-800">
                         <strong>Changes:</strong> {currentPrompt.improvement_rationale}
                       </p>
-                      {currentPrompt.evolution_reason && (
+                      {currentPrompt.improvement_rationale && (
                         <p className="text-xs text-blue-600 mt-2">
-                          <strong>How it evolved:</strong> {currentPrompt.evolution_reason}
+                          <strong>How it evolved:</strong> Based on conversation analysis and performance metrics
                         </p>
                       )}
                     </div>
