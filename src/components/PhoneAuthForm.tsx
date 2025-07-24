@@ -9,11 +9,15 @@ import { usePhoneAuth } from "@/hooks/usePhoneAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
+import ExistingAccountModal from "./ExistingAccountModal";
 
 const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otpCode, setOtpCode] = useState("");
+  const [showExistingAccountModal, setShowExistingAccountModal] = useState(false);
+  const [existingProfile, setExistingProfile] = useState<any>(null);
+  const [isSignInMode, setIsSignInMode] = useState(false);
   const { sendOTP, verifyOTP, isLoading } = usePhoneAuth();
   const { toast } = useToast();
   const { trackSwipe } = useEngagementTracking();
@@ -74,36 +78,38 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
 
     const result = await verifyOTP(phoneNumber, otpCode);
     if (result.success) {
-      if (result.accountDetected) {
+      if (result.accountDetected && result.profile && !isSignInMode) {
+        // Show modal for existing account (only in signup flow)
+        setExistingProfile(result.profile);
+        setShowExistingAccountModal(true);
+      } else if (result.accountDetected && result.profile && isSignInMode) {
+        // Auto-login for sign-in mode
+        localStorage.setItem('current_user_profile', JSON.stringify(result.profile));
+        localStorage.setItem('phone_authenticated', 'true');
+        localStorage.setItem('phone_number', phoneNumber);
+        
         toast({
-          title: "🎉 Account Found!",
-          description: "We found your account. Signing you in...",
-          className: "border-2 border-blue-400 bg-blue-50 text-blue-800",
+          title: "🎉 Welcome back!",
+          description: "You've been signed in successfully.",
+          className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
-        // For existing users, redirect to app after a brief delay
-        setTimeout(() => {
-          window.location.href = '/app';
-        }, 1500);
+        
+        // Smooth state update without any page reload
+        // The Landing page will detect the authenticated user and show the app
       } else if (result.isNewUser) {
         toast({
           title: "🎉 Welcome to Bol!",
           description: "Let's set up your profile!",
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
-        // For new users, redirect to app for onboarding
-        setTimeout(() => {
-          window.location.href = '/app';
-        }, 1000);
+        // No redirect needed - the Landing page will detect new user state and show onboarding
       } else {
         toast({
           title: "🎉 Welcome Back!",
           description: "Successfully signed in!",
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
-        // For returning users, redirect to app after a brief delay
-        setTimeout(() => {
-          window.location.href = '/app';
-        }, 1500);
+        // No redirect needed - smooth state transition
       }
     } else {
       toast({
@@ -117,6 +123,40 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
   const handleBackToPhone = () => {
     setStep('phone');
     setOtpCode("");
+  };
+
+  const handleLoginFromModal = async () => {
+    setShowExistingAccountModal(false);
+    setIsSignInMode(true);
+    
+    // Auto-login the existing user
+    if (existingProfile) {
+      localStorage.setItem('current_user_profile', JSON.stringify(existingProfile));
+      localStorage.setItem('phone_authenticated', 'true');
+      localStorage.setItem('phone_number', phoneNumber);
+      
+      toast({
+        title: "🎉 Welcome back!",
+        description: "You've been signed in successfully.",
+        className: "border-2 border-green-400 bg-green-50 text-green-800",
+      });
+      
+      // No reload needed - Landing page will detect the authenticated state automatically
+    }
+  };
+
+  const handleCreateNewFromModal = () => {
+    setShowExistingAccountModal(false);
+    
+    toast({
+      title: "⚠️ Account Creation",
+      description: "Creating a new account with this number will override the existing one. Please contact support if this is not intended.",
+      variant: "destructive",
+    });
+    
+    // Force new account creation by clearing existing profile detection
+    // The system will proceed with onboarding flow
+    localStorage.setItem('force_new_account', 'true');
   };
 
   if (step === 'otp') {
@@ -221,6 +261,15 @@ const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
           </form>
         </CardContent>
       </Card>
+      
+      <ExistingAccountModal
+        isOpen={showExistingAccountModal}
+        onClose={() => setShowExistingAccountModal(false)}
+        onLogin={handleLoginFromModal}
+        onCreateNew={handleCreateNewFromModal}
+        phoneNumber={phoneNumber}
+        userName={existingProfile?.full_name}
+      />
     </div>
   );
 };

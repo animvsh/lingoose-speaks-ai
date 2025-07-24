@@ -125,7 +125,7 @@ export const usePhoneAuth = () => {
     }
   };
 
-  const verifyOTP = async (phoneNumber: string, code: string): Promise<{ success: boolean; error?: string; isNewUser?: boolean; accountDetected?: boolean }> => {
+  const verifyOTP = async (phoneNumber: string, code: string): Promise<{ success: boolean; error?: string; isNewUser?: boolean; accountDetected?: boolean; profile?: any }> => {
     setIsLoading(true);
     try {
       const formattedPhone = formatPhoneNumber(phoneNumber);
@@ -201,26 +201,24 @@ export const usePhoneAuth = () => {
       let accountDetected = false;
 
       if (existingProfile) {
-        profile = existingProfile;
+        // Account exists - don't auto-login, let UI handle this
         accountDetected = true;
-        await logSecurityEvent('user_login_success', formattedPhone, { user_id: profile.id, is_returning_user: true });
+        await logSecurityEvent('existing_account_detected', formattedPhone, { user_id: existingProfile.id });
+        
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
             if (posthogService) {
-              posthogService.capture('user_signed_in', profile.id, {
-                phone_number: profile.phone_number,
-                full_name: profile.full_name,
-                language: profile.language,
-                is_new_user: false,
-                account_detected: true
+              posthogService.capture('existing_account_detected', existingProfile.id, {
+                phone_number: existingProfile.phone_number,
+                full_name: existingProfile.full_name,
+                context: 'signup_attempt'
               });
             }
           });
         }, 500);
-        localStorage.setItem('current_user_profile', JSON.stringify(profile));
-        localStorage.setItem('phone_authenticated', 'true');
-        localStorage.setItem('phone_number', formattedPhone);
-        // Don't redirect for existing users - let the component handle this
+        
+        // Don't set auth state yet - wait for user confirmation
+        profile = existingProfile;
       } else {
         // For new users, just set a flag that they need onboarding
         // Don't create a profile yet - let the onboarding flow handle this
@@ -248,7 +246,7 @@ export const usePhoneAuth = () => {
       }
 
       console.log('Phone authentication successful, isNewUser:', isNewUser, 'accountDetected:', accountDetected);
-      return { success: true, isNewUser, accountDetected };
+      return { success: true, isNewUser, accountDetected, profile };
     } catch (error: any) {
       console.error('Verify OTP error:', error);
       return { success: false, error: error.message || 'Failed to verify code' };

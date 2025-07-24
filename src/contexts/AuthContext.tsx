@@ -142,8 +142,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     setLoading(false);
 
-    // Note: storage events only fire across tabs, not within the same tab
-    // So we rely on manual calls to refreshUser() for same-tab updates
+    // Listen for localStorage changes within the same tab for instant state updates
+    const checkForAuthChanges = () => {
+      const isAuthenticated = localStorage.getItem('phone_authenticated');
+      const userProfile = localStorage.getItem('current_user_profile');
+      const needsOnboarding = localStorage.getItem('needs_onboarding');
+      
+      if (isAuthenticated === 'true' && userProfile && needsOnboarding !== 'true') {
+        try {
+          const profile = JSON.parse(userProfile);
+          if (!user || user.id !== profile.id) {
+            setUser(profile);
+            console.log('✅ Auth state updated from localStorage change:', profile.phone_number);
+          }
+        } catch (error) {
+          console.error('❌ Error parsing updated user profile:', error);
+        }
+      } else if (isAuthenticated !== 'true' && user) {
+        setUser(null);
+        console.log('🚪 User logged out - clearing state');
+      }
+    };
+
+    // Check for changes every 500ms to catch localStorage updates instantly
+    const authCheckInterval = setInterval(checkForAuthChanges, 500);
+    
+    return () => clearInterval(authCheckInterval);
   }, []);
 
   const signOut = async () => {
