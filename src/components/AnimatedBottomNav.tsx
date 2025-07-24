@@ -9,6 +9,7 @@ interface AnimatedBottomNavProps {
 }
 
 const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) => {
+  console.log('🚀🚀🚀 AnimatedBottomNav RENDERED with currentView:', currentView);
   const { trackTap } = useEngagementTracking();
   
   const navItems = [
