@@ -124,38 +124,6 @@ const PreviousActivitySection = ({ previousActivity, onNavigate }: PreviousActiv
     isLoadingActivity
   });
 
-  if (isLoadingActivity) {
-    return (
-      <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
-        <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-          <Clock className="w-8 h-8 text-gray-400" />
-        </div>
-        <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide mb-2">
-          LOADING ACTIVITY
-        </h3>
-        <p className="text-gray-600 font-medium text-sm">
-          Fetching your latest activity...
-        </p>
-      </div>
-    );
-  }
-
-  if (!displayActivity) {
-    return (
-      <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200 text-center">
-        <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <Clock className="w-8 h-8 text-gray-400" />
-        </div>
-        <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide mb-2">
-          NO PREVIOUS ACTIVITY
-        </h3>
-        <p className="text-gray-600 font-medium text-sm">
-          Start your first conversation practice session
-        </p>
-      </div>
-    );
-  }
-
   const formatDuration = (durationSeconds: number) => {
     if (!durationSeconds) return 'N/A';
     const minutes = Math.round(durationSeconds / 60);
@@ -218,18 +186,50 @@ const PreviousActivitySection = ({ previousActivity, onNavigate }: PreviousActiv
     onNavigate('activity-details', displayActivity);
   };
 
+  if (isLoadingActivity) {
+    return (
+      <div className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 text-center shadow-lg font-nunito">
+        <div className="w-16 h-16 bg-orange-100 border-2 border-orange-300 rounded-3xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <Clock className="w-8 h-8 text-orange-500" />
+        </div>
+        <h3 className="text-lg font-black text-brown-900 uppercase tracking-wide mb-2">
+          LOADING ACTIVITY
+        </h3>
+        <p className="text-brown-700 font-bold text-sm">
+          Fetching your latest activity...
+        </p>
+      </div>
+    );
+  }
+
+  if (!displayActivity) {
+    return (
+      <div className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 text-center shadow-lg font-nunito">
+        <div className="w-16 h-16 bg-blue-100 border-2 border-blue-300 rounded-3xl flex items-center justify-center mx-auto mb-4">
+          <Clock className="w-8 h-8 text-blue-500" />
+        </div>
+        <h3 className="text-lg font-black text-brown-900 uppercase tracking-wide mb-2">
+          NO PREVIOUS ACTIVITY
+        </h3>
+        <p className="text-brown-700 font-bold text-sm">
+          Start your first conversation practice session
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-amber-50 rounded-3xl p-6 border-4 border-gray-200">
-      <div className="flex items-center justify-between mb-4">
+    <div className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 shadow-lg font-nunito">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <div className="w-14 h-14 bg-green-400 rounded-2xl flex items-center justify-center mr-4">
+          <div className="w-14 h-14 bg-green-400 border-2 border-handdrawn rounded-3xl flex items-center justify-center mr-4 shadow-lg">
             <CheckCircle className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide">
+            <h3 className="text-lg font-black text-brown-900 uppercase tracking-wide">
               PREVIOUS ACTIVITY
             </h3>
-            <p className="text-gray-600 font-medium text-sm">
+            <p className="text-brown-700 font-bold text-sm">
               From activities table
             </p>
           </div>
@@ -238,26 +238,26 @@ const PreviousActivitySection = ({ previousActivity, onNavigate }: PreviousActiv
           variant="ghost"
           size="sm"
           onClick={handleViewDetails}
-          className="text-green-600 hover:text-green-700 hover:bg-green-100"
+          className="text-green-600 hover:text-green-700 hover:bg-green-100 p-2 rounded-xl border border-green-300 font-bold"
         >
           <ArrowRight className="w-5 h-5" />
         </Button>
       </div>
 
       <div className="space-y-4">
-        <div className={`rounded-2xl p-4 border-2 ${getStatusBgColor(displayActivity.type)} cursor-pointer hover:opacity-80 transition-opacity`}
+        <div className={`rounded-3xl border-2 border-handdrawn p-4 ${getStatusBgColor(displayActivity.type)} cursor-pointer hover:scale-[1.02] transition-all duration-200 shadow-sm`}
              onClick={handleViewDetails}>
-          <div className="flex items-center justify-between mb-2">
-            <span className={`font-bold text-sm ${getStatusColor(displayActivity.type)}`}>
+          <div className="flex items-center justify-between mb-3">
+            <span className={`font-black text-sm ${getStatusColor(displayActivity.type)} uppercase tracking-wide`}>
               {displayActivity.name || 'Practice Activity'}
             </span>
-            <span className={`font-bold text-sm ${getStatusColor(displayActivity.type)}`}>
+            <span className={`font-black text-sm ${getStatusColor(displayActivity.type)} bg-white/50 px-2 py-1 rounded-xl border border-white/70`}>
               {getStatusText(displayActivity)}
             </span>
           </div>
           <div className="flex items-center justify-between mb-2">
-            <span className={`font-bold text-sm ${getStatusColor(displayActivity.type)}`}>Duration</span>
-            <span className={`font-bold ${getStatusColor(displayActivity.type)}`}>
+            <span className={`font-black text-sm ${getStatusColor(displayActivity.type)}`}>Duration</span>
+            <span className={`font-black ${getStatusColor(displayActivity.type)}`}>
               {displayActivity.duration_seconds 
                 ? formatDuration(displayActivity.duration_seconds)
                 : `~${displayActivity.estimated_duration_minutes || 10}min`
@@ -265,17 +265,17 @@ const PreviousActivitySection = ({ previousActivity, onNavigate }: PreviousActiv
             </span>
           </div>
           {displayActivity.completed_at && (
-            <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-70`}>
+            <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-70 font-medium`}>
               Completed on {new Date(displayActivity.completed_at).toLocaleDateString()}
             </div>
           )}
           {displayActivity.description && (
-            <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-60 mt-1`}>
+            <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-60 mt-1 font-medium`}>
               {displayActivity.description}
             </div>
           )}
           {displayActivity.difficulty_level && (
-            <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-50 mt-1`}>
+            <div className={`text-xs ${getStatusColor(displayActivity.type)} opacity-50 mt-1 font-medium`}>
               Difficulty: {displayActivity.difficulty_level}
             </div>
           )}
@@ -283,39 +283,39 @@ const PreviousActivitySection = ({ previousActivity, onNavigate }: PreviousActiv
 
         {/* Conversation Summary Section */}
         {userProfile?.last_conversation_summary && (
-          <div className="bg-blue-50 rounded-2xl p-4 border-2 border-blue-100">
+          <div className="bg-blue-50 rounded-3xl border-2 border-blue-200 p-4 shadow-sm">
             <div className="flex items-center mb-3">
-              <div className="w-8 h-8 bg-blue-400 rounded-xl flex items-center justify-center mr-3">
+              <div className="w-8 h-8 bg-blue-400 border border-blue-500 rounded-2xl flex items-center justify-center mr-3">
                 <MessageSquare className="w-4 h-4 text-white" />
               </div>
-              <h4 className="text-sm font-bold text-blue-800 uppercase tracking-wide">
+              <h4 className="text-sm font-black text-blue-800 uppercase tracking-wide">
                 Conversation Summary
               </h4>
             </div>
-            <p className="text-blue-700 text-sm font-medium leading-relaxed">
+            <p className="text-blue-700 text-sm font-bold leading-relaxed">
               {userProfile.last_conversation_summary}
             </p>
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-blue-50 rounded-2xl p-3 text-center border-2 border-blue-100">
-            <div className="w-8 h-8 bg-blue-400 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <TrendingUp className="w-4 h-4 text-white" />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-blue-50 rounded-3xl border-2 border-blue-200 p-4 text-center shadow-sm hover:scale-105 transition-all duration-200">
+            <div className="w-10 h-10 bg-blue-400 border border-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <TrendingUp className="w-5 h-5 text-white" />
             </div>
-            <div className="text-lg font-bold text-blue-700">
+            <div className="text-xl font-black text-blue-700">
               {getPerformanceScore()}
             </div>
-            <div className="text-xs text-blue-600 font-bold uppercase">Performance</div>
+            <div className="text-xs text-blue-600 font-black uppercase tracking-wide">Performance</div>
           </div>
-          <div className="bg-orange-50 rounded-2xl p-3 text-center border-2 border-orange-100">
-            <div className="w-8 h-8 bg-orange-400 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <Target className="w-4 h-4 text-white" />
+          <div className="bg-orange-50 rounded-3xl border-2 border-orange-200 p-4 text-center shadow-sm hover:scale-105 transition-all duration-200">
+            <div className="w-10 h-10 bg-orange-400 border border-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <Target className="w-5 h-5 text-white" />
             </div>
-            <div className="text-lg font-bold text-orange-700">
+            <div className="text-xl font-black text-orange-700">
               {getEngagementScore()}
             </div>
-            <div className="text-xs text-orange-600 font-bold uppercase">Engagement</div>
+            <div className="text-xs text-orange-600 font-black uppercase tracking-wide">Engagement</div>
           </div>
         </div>
       </div>

@@ -71,37 +71,37 @@ const TodaysActivitySection = ({
   const minutesRemaining = subscriptionStatus?.minutes_remaining || 0;
 
   return (
-    <div className="bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl p-8 border-4 border-blue-600 shadow-2xl">
+    <div className="rounded-3xl border-2 border-handdrawn bg-gradient-to-br from-primary to-orange-500 p-8 shadow-lg font-nunito relative">
       {/* Header with main learning message */}
       <div className="text-center mb-8">
-        <div className="w-20 h-20 bg-white/20 border-4 border-white/30 rounded-3xl flex items-center justify-center mx-auto mb-6">
+        <div className="w-20 h-20 bg-white/20 border-2 border-handdrawn rounded-3xl flex items-center justify-center mx-auto mb-6 animate-gentle-float">
           <Zap className="w-10 h-10 text-white" />
         </div>
-        <h2 className="text-3xl font-black text-white mb-3 uppercase tracking-wide">
+        <h2 className="text-3xl font-black text-white mb-4 uppercase tracking-wide">
           WHAT YOU'RE LEARNING TODAY
         </h2>
-        <div className="bg-white/10 rounded-2xl p-4 mb-4">
-          <h3 className="text-xl font-bold text-white mb-2">
+        <div className="bg-white/20 rounded-3xl border-2 border-white/30 p-6 mb-4">
+          <h3 className="text-xl font-black text-white mb-2">
             {currentActivity.name}
           </h3>
-          <p className="text-blue-100 font-medium text-lg">
+          <p className="text-white/90 font-bold text-lg">
             {currentActivity.description}
           </p>
         </div>
 
         {/* Usage Status Display */}
         {subscriptionStatus && (
-          <div className="bg-white/10 rounded-2xl p-4 mb-4">
+          <div className="bg-white/20 rounded-3xl border-2 border-white/30 p-4 mb-4">
             <div className="flex items-center justify-center gap-2 mb-2">
               <Clock className="w-5 h-5 text-white" />
-              <span className="text-white font-bold">
-                {minutesRemaining.toFixed(1)} days remaining this week
+              <span className="text-white font-black">
+                {minutesRemaining.toFixed(1)} minutes remaining this week
               </span>
             </div>
             {!canStartCall && (
               <div className="flex items-center justify-center gap-2 text-red-200">
                 <AlertTriangle className="w-4 h-4" />
-                <span className="text-sm">
+                <span className="text-sm font-bold">
                   {subscriptionStatus.subscription_status === 'free_trial' 
                     ? 'Free trial expired or limit reached' 
                     : 'Weekly limit reached'}
@@ -119,7 +119,7 @@ const TodaysActivitySection = ({
           disabled={isRegenerating}
           variant="ghost"
           size="sm"
-          className="text-white hover:bg-white/20 p-2 rounded-xl"
+          className="text-white hover:bg-white/20 p-3 rounded-2xl border border-white/30 font-bold"
           title="Generate new activity"
         >
           <RefreshCw className={`w-5 h-5 ${isRegenerating ? 'animate-spin' : ''}`} />
@@ -128,18 +128,20 @@ const TodaysActivitySection = ({
 
       <div className="space-y-6">
         {/* Skills section */}
-        <div className="bg-white/90 rounded-2xl p-6 border-2 border-white">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-blue-700 font-bold text-lg uppercase tracking-wide">Skills You'll Practice</span>
-            <span className="text-blue-600 font-bold text-lg">{currentActivity.estimated_duration_minutes || 15} min</span>
+        <div className="bg-white/90 rounded-3xl border-2 border-handdrawn p-6 shadow-lg">
+          <div className="flex items-center justify-between mb-6">
+            <span className="text-brown-900 font-black text-lg uppercase tracking-wide">Skills You'll Practice</span>
+            <span className="text-primary font-black text-lg bg-orange-100 px-3 py-1 rounded-xl border border-orange-300">
+              {currentActivity.estimated_duration_minutes || 15} min
+            </span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             {currentActivity.skills?.map((skill: any, index: number) => (
-              <div key={index} className={`rounded-xl p-3 border-2 ${getRatingBgColor(skill.rating)}`}>
-                <div className="text-sm font-bold text-blue-700 uppercase tracking-wide mb-1">
+              <div key={index} className={`rounded-2xl border-2 border-handdrawn p-4 ${getRatingBgColor(skill.rating)} hover:scale-105 transition-all duration-200`}>
+                <div className="text-sm font-black text-brown-900 uppercase tracking-wide mb-2">
                   {skill.name}
                 </div>
-                <div className={`text-lg font-bold ${getRatingColor(skill.rating)}`}>
+                <div className={`text-xl font-black ${getRatingColor(skill.rating)}`}>
                   {skill.rating}/100
                 </div>
               </div>
@@ -153,12 +155,10 @@ const TodaysActivitySection = ({
           disabled={isStartingCall || !canStartCall}
           className={`w-full ${
             canStartCall 
-              ? 'bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600' 
-              : 'bg-gray-400 hover:bg-gray-500 cursor-not-allowed'
-          } text-white font-black py-6 text-2xl rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-xl border-4 ${
-            canStartCall ? 'border-orange-600' : 'border-gray-500'
-          }`}
-          title={!canStartCall ? 'No days remaining - upgrade or wait for weekly reset' : ''}
+              ? 'warm-button font-black text-white shadow-lg border-2 border-handdrawn' 
+              : 'bg-gray-400 hover:bg-gray-500 cursor-not-allowed text-white font-black border-2 border-gray-500'
+          } py-8 text-2xl rounded-3xl transition-all duration-300 transform hover:scale-105`}
+          title={!canStartCall ? 'No minutes remaining - upgrade or wait for weekly reset' : ''}
         >
           {isStartingCall ? (
             <>
@@ -173,21 +173,21 @@ const TodaysActivitySection = ({
           ) : (
             <>
               <Zap className="w-6 h-6 mr-3" />
-              START LEARNING NOW!
+              START LEARNING NOW! 🚀
             </>
           )}
         </Button>
 
         {!canStartCall && subscriptionStatus?.needs_upgrade && (
-          <div className="text-center">
-            <p className="text-white/80 text-sm mb-2">
-              Need more practice time? Upgrade for unlimited weekly days!
+          <div className="text-center bg-white/20 rounded-3xl border-2 border-white/30 p-4">
+            <p className="text-white/90 text-sm mb-3 font-bold">
+              Need more practice time? Upgrade for unlimited weekly minutes!
             </p>
             <Button 
               variant="outline" 
-              className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+              className="bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 font-bold px-6 py-2 rounded-xl"
             >
-              Upgrade to Pro
+              Upgrade to Pro ⭐
             </Button>
           </div>
         )}
