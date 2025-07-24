@@ -142,6 +142,7 @@ const Landing = () => {
   };
 
   const handleNavigate = (view: string, data?: any) => {
+    console.log('🏠 LANDING.tsx handleNavigate called with:', view);
     setIsTransitioning(true);
     
     if (data) {
