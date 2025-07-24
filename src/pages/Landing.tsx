@@ -165,6 +165,17 @@ const Landing = () => {
       <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8 md:mb-12">
+            {/* YC-style badge */}
+            <div className="flex justify-center mb-6">
+              <div className="inline-flex items-center bg-card border-2 border-handdrawn rounded-full px-4 py-2 shadow-sm hover-lift">
+                <span className="text-sm font-black text-foreground mr-2 font-nunito">not backed by</span>
+                <div className="bg-primary rounded-md px-2 py-1 mr-2">
+                  <span className="text-xs font-black text-white font-nunito">Y</span>
+                </div>
+                <span className="text-sm font-black text-foreground font-nunito">combinator (yet)</span>
+              </div>
+            </div>
+            
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6 text-brown-900 font-nunito">
               Teach your kids Hindi.<br />
               <span className="text-primary">Without nagging.</span>
