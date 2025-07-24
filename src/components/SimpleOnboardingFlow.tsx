@@ -105,8 +105,32 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
 
   const handleProficiencySelect = (level: number) => {
     setProficiencyLevel(level);
-    // Immediately proceed to create profile without timeout
-    handleNext();
+    
+    // Ensure we have a valid phone number
+    const validPhoneNumber = userPhoneNumber.trim() || `+1${Date.now()}`;
+    
+    console.log('Creating profile with:', {
+      phone_number: validPhoneNumber,
+      full_name: fullName.trim(),
+      proficiency_level: level,
+      language: 'hindi'
+    });
+
+    // Create user profile directly
+    createUserProfile.mutate({
+      phone_number: validPhoneNumber,
+      full_name: fullName.trim(),
+      proficiency_level: level,
+      language: 'hindi'
+    }, {
+      onSuccess: () => {
+        // Redirect to dashboard after successful profile creation
+        setTimeout(() => {
+          window.location.href = '/app';
+        }, 1000);
+        onComplete();
+      }
+    });
   };
 
   const renderStep = () => {
