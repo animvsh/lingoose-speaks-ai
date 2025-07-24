@@ -143,10 +143,10 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
               View your complete learning analytics and detailed progress
             </p>
             <Button 
-              onClick={() => handleNavigate("curriculum")}
+              onClick={() => handleNavigate("progress")}
               className="w-full bg-purple-500 hover:bg-purple-600 text-white font-black py-3 text-lg rounded-xl border-2 border-purple-400 transition-all duration-200 hover:scale-[1.02]"
             >
-              VIEW ANALYTICS →
+              VIEW ENHANCED ANALYTICS →
             </Button>
           </div>
         </div>

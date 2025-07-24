@@ -14,7 +14,7 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
   const navItems = [
     { view: "home", icon: Home, label: "Home" },
     { view: "activity", icon: Phone, label: "Activity" },
-    { view: "curriculum", icon: BookOpen, label: "Curriculum" },
+    { view: "progress", icon: BookOpen, label: "Progress" },
     { view: "settings", icon: Settings, label: "Settings" }
   ];
 

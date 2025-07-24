@@ -15,6 +15,8 @@ import ActivityDetailsView from "@/components/ActivityDetailsView";
 import AddSupervisorForm from "@/components/AddSupervisorForm";
 import ProfileManagementPage from "@/components/ProfileManagementPage";
 import PageTransition from "@/components/PageTransition";
+import { EnhancedProgressView } from "@/components/EnhancedProgressView";
+import { FluencyRoadmapView } from "@/components/FluencyRoadmapView";
 import WelcomeScreen from "@/components/WelcomeScreen";
 
 const Landing = () => {
@@ -184,6 +186,10 @@ const Landing = () => {
       content = <ActivityDetailsView activity={activityDetailsData} onNavigate={handleNavigate} />;
     } else if (currentView === "curriculum") {
       content = <CurriculumCard onNavigate={handleNavigate} />;
+    } else if (currentView === "progress") {
+      content = <EnhancedProgressView onNavigate={handleNavigate} />;
+    } else if (currentView === "roadmap") {
+      content = <FluencyRoadmapView />;
     } else if (currentView === "settings") {
       content = <SettingsCard onNavigate={handleNavigate} />;
     } else if (currentView === "add-supervisor") {

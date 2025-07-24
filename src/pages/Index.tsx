@@ -14,6 +14,8 @@ import ActivityDetailsView from "@/components/ActivityDetailsView";
 import AnimatedBottomNav from "@/components/AnimatedBottomNav";
 import AddSupervisorForm from "@/components/AddSupervisorForm";
 import ProUpgradeCard from "@/components/ProUpgradeCard";
+import { EnhancedProgressView } from "@/components/EnhancedProgressView";
+import { FluencyRoadmapView } from "@/components/FluencyRoadmapView";
 import StripeTestingPanel from "@/components/StripeTestingPanel";
 import DesktopExperienceMessage from "@/components/DesktopExperienceMessage";
 import ProfileManagementPage from "@/components/ProfileManagementPage";
@@ -37,7 +39,7 @@ const Index = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Define navigation order for swipe gestures
-  const navigationOrder = ["home", "activity", "curriculum", "settings"];
+  const navigationOrder = ["home", "activity", "progress", "settings"];
   
   const handleSwipe = (direction: 'left' | 'right') => {
     if (currentView === "onboarding" || currentView === "add-supervisor" || currentView === "activity-details") {
@@ -233,6 +235,10 @@ const Index = () => {
       content = <ActivityDetailsView activity={activityDetailsData} onNavigate={handleNavigate} />;
     } else if (currentView === "curriculum") {
       content = <CurriculumCard onNavigate={handleNavigate} />;
+    } else if (currentView === "progress") {
+      content = <EnhancedProgressView onNavigate={handleNavigate} />;
+    } else if (currentView === "roadmap") {
+      content = <FluencyRoadmapView />;
     } else if (currentView === "settings") {
       content = <SettingsCard onNavigate={handleNavigate} />;
     } else if (currentView === "add-supervisor") {
