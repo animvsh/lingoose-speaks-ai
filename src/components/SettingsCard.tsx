@@ -377,7 +377,7 @@ const SettingsCard = ({
         </div>
 
         {/* Logout */}
-        <div className="w-full px-6">
+        <div className="w-full">
           <Button onClick={handleLogout} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-3xl transition-all duration-200">
             <LogOut className="w-5 h-5 mr-2" />
             Log Out
