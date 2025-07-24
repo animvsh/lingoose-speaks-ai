@@ -5,7 +5,7 @@ import { useSessionTracking } from "@/hooks/useSessionTracking";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useIsDesktop } from "@/hooks/use-mobile";
-import WelcomeScreen from "@/components/WelcomeScreen";
+import NewWelcomeScreen from "@/components/NewWelcomeScreen";
 import DashboardStats from "@/components/DashboardStats";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
@@ -145,7 +145,7 @@ const Index = () => {
     let content;
 
     if (currentView === "onboarding" && !isOnboarded) {
-      content = <WelcomeScreen onComplete={handleOnboardingComplete} />;
+      content = <NewWelcomeScreen onComplete={handleOnboardingComplete} />;
     } else if (currentView === "home") {
       content = (
         <div className="w-full space-y-4">
