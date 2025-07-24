@@ -184,8 +184,7 @@ const Landing = () => {
             </h1>
             
             <div className="space-y-4 text-base sm:text-lg md:text-xl mb-8 text-brown-700 font-nunito">
-              <p className="font-semibold">Daily 1-on-1 calls. No apps. No worksheets.</p>
-              <p className="font-semibold">Just one slightly pushy desi sheep.</p>
+              <p className="font-semibold">Daily 1-on-1 calls. No apps.</p>
               <p className="font-black text-xl md:text-2xl text-primary">$4/week. Cancel anytime.</p>
             </div>
 
