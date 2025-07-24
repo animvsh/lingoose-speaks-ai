@@ -64,6 +64,81 @@ export type Database = {
           },
         ]
       }
+      adaptive_activities: {
+        Row: {
+          activity_type: string
+          adaptation_reason: string | null
+          completed_at: string | null
+          conversation_prompts: string[] | null
+          created_at: string
+          description: string
+          difficulty_level: number
+          estimated_duration_minutes: number | null
+          focus_areas: Json
+          id: string
+          is_completed: boolean | null
+          performance_after: Json | null
+          phone_number: string
+          practice_scenarios: Json | null
+          scheduled_date: string
+          strength_areas: string[] | null
+          target_metrics: string[]
+          target_vocabulary: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+          weakness_areas: string[] | null
+        }
+        Insert: {
+          activity_type: string
+          adaptation_reason?: string | null
+          completed_at?: string | null
+          conversation_prompts?: string[] | null
+          created_at?: string
+          description: string
+          difficulty_level?: number
+          estimated_duration_minutes?: number | null
+          focus_areas?: Json
+          id?: string
+          is_completed?: boolean | null
+          performance_after?: Json | null
+          phone_number: string
+          practice_scenarios?: Json | null
+          scheduled_date: string
+          strength_areas?: string[] | null
+          target_metrics: string[]
+          target_vocabulary?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+          weakness_areas?: string[] | null
+        }
+        Update: {
+          activity_type?: string
+          adaptation_reason?: string | null
+          completed_at?: string | null
+          conversation_prompts?: string[] | null
+          created_at?: string
+          description?: string
+          difficulty_level?: number
+          estimated_duration_minutes?: number | null
+          focus_areas?: Json
+          id?: string
+          is_completed?: boolean | null
+          performance_after?: Json | null
+          phone_number?: string
+          practice_scenarios?: Json | null
+          scheduled_date?: string
+          strength_areas?: string[] | null
+          target_metrics?: string[]
+          target_vocabulary?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          weakness_areas?: string[] | null
+        }
+        Relationships: []
+      }
       agent_audit_logs: {
         Row: {
           action: Database["public"]["Enums"]["agent_action"]
@@ -98,117 +173,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      call_language_metrics: {
-        Row: {
-          analysis_confidence: number | null
-          analysis_version: string | null
-          average_response_time_seconds: number | null
-          confidence_indicators: Json | null
-          conversation_depth_score: number | null
-          created_at: string
-          engagement_level: number | null
-          filler_words_detected: string[] | null
-          filler_words_per_minute: number | null
-          grammar_patterns: Json | null
-          id: string
-          interruption_count: number | null
-          longest_continuous_speech_seconds: number | null
-          pause_timestamps: Json | null
-          pauses_per_minute: number | null
-          processing_notes: string | null
-          pronunciation_issues: Json | null
-          response_times: number[] | null
-          self_correction_rate: number | null
-          silence_time_percent: number | null
-          speech_clarity_percent: number | null
-          speech_time_ratio: number | null
-          target_vocabulary: string[] | null
-          target_vocabulary_usage_percent: number | null
-          total_call_duration_seconds: number | null
-          total_user_speaking_time_seconds: number | null
-          turn_count: number | null
-          unique_word_count: number | null
-          updated_at: string
-          user_id: string
-          user_word_list: string[] | null
-          vapi_call_analysis_id: string
-          vocabulary_diversity_score: number | null
-          words_per_minute: number | null
-        }
-        Insert: {
-          analysis_confidence?: number | null
-          analysis_version?: string | null
-          average_response_time_seconds?: number | null
-          confidence_indicators?: Json | null
-          conversation_depth_score?: number | null
-          created_at?: string
-          engagement_level?: number | null
-          filler_words_detected?: string[] | null
-          filler_words_per_minute?: number | null
-          grammar_patterns?: Json | null
-          id?: string
-          interruption_count?: number | null
-          longest_continuous_speech_seconds?: number | null
-          pause_timestamps?: Json | null
-          pauses_per_minute?: number | null
-          processing_notes?: string | null
-          pronunciation_issues?: Json | null
-          response_times?: number[] | null
-          self_correction_rate?: number | null
-          silence_time_percent?: number | null
-          speech_clarity_percent?: number | null
-          speech_time_ratio?: number | null
-          target_vocabulary?: string[] | null
-          target_vocabulary_usage_percent?: number | null
-          total_call_duration_seconds?: number | null
-          total_user_speaking_time_seconds?: number | null
-          turn_count?: number | null
-          unique_word_count?: number | null
-          updated_at?: string
-          user_id: string
-          user_word_list?: string[] | null
-          vapi_call_analysis_id: string
-          vocabulary_diversity_score?: number | null
-          words_per_minute?: number | null
-        }
-        Update: {
-          analysis_confidence?: number | null
-          analysis_version?: string | null
-          average_response_time_seconds?: number | null
-          confidence_indicators?: Json | null
-          conversation_depth_score?: number | null
-          created_at?: string
-          engagement_level?: number | null
-          filler_words_detected?: string[] | null
-          filler_words_per_minute?: number | null
-          grammar_patterns?: Json | null
-          id?: string
-          interruption_count?: number | null
-          longest_continuous_speech_seconds?: number | null
-          pause_timestamps?: Json | null
-          pauses_per_minute?: number | null
-          processing_notes?: string | null
-          pronunciation_issues?: Json | null
-          response_times?: number[] | null
-          self_correction_rate?: number | null
-          silence_time_percent?: number | null
-          speech_clarity_percent?: number | null
-          speech_time_ratio?: number | null
-          target_vocabulary?: string[] | null
-          target_vocabulary_usage_percent?: number | null
-          total_call_duration_seconds?: number | null
-          total_user_speaking_time_seconds?: number | null
-          turn_count?: number | null
-          unique_word_count?: number | null
-          updated_at?: string
-          user_id?: string
-          user_word_list?: string[] | null
-          vapi_call_analysis_id?: string
-          vocabulary_diversity_score?: number | null
-          words_per_minute?: number | null
-        }
-        Relationships: []
       }
       call_logs: {
         Row: {
@@ -336,6 +300,117 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      core_language_metrics: {
+        Row: {
+          advancement_eligible: boolean | null
+          analysis_confidence: number | null
+          areas_for_improvement: string[] | null
+          average_response_delay_seconds: number | null
+          call_date: string
+          composite_score: number | null
+          correction_count: number | null
+          created_at: string
+          filler_words_detected: string[] | null
+          filler_words_per_minute: number | null
+          fluency_progress_delta: number | null
+          id: string
+          long_pause_count: number | null
+          matched_target_words: string[] | null
+          pauses_per_minute: number | null
+          phone_number: string
+          previous_session_scores: Json | null
+          response_delays: number[] | null
+          self_correction_rate: number | null
+          speech_clarity_percent: number | null
+          target_vocabulary: string[] | null
+          target_vocabulary_usage_percent: number | null
+          total_exchanges: number | null
+          total_sentences: number | null
+          total_words_spoken: number | null
+          turn_count: number | null
+          unique_vocabulary_count: number | null
+          updated_at: string
+          user_id: string
+          user_speaking_time_seconds: number | null
+          vapi_call_analysis_id: string
+          words_correctly_transcribed: number | null
+          words_per_minute: number | null
+          words_used: string[] | null
+        }
+        Insert: {
+          advancement_eligible?: boolean | null
+          analysis_confidence?: number | null
+          areas_for_improvement?: string[] | null
+          average_response_delay_seconds?: number | null
+          call_date?: string
+          composite_score?: number | null
+          correction_count?: number | null
+          created_at?: string
+          filler_words_detected?: string[] | null
+          filler_words_per_minute?: number | null
+          fluency_progress_delta?: number | null
+          id?: string
+          long_pause_count?: number | null
+          matched_target_words?: string[] | null
+          pauses_per_minute?: number | null
+          phone_number: string
+          previous_session_scores?: Json | null
+          response_delays?: number[] | null
+          self_correction_rate?: number | null
+          speech_clarity_percent?: number | null
+          target_vocabulary?: string[] | null
+          target_vocabulary_usage_percent?: number | null
+          total_exchanges?: number | null
+          total_sentences?: number | null
+          total_words_spoken?: number | null
+          turn_count?: number | null
+          unique_vocabulary_count?: number | null
+          updated_at?: string
+          user_id: string
+          user_speaking_time_seconds?: number | null
+          vapi_call_analysis_id: string
+          words_correctly_transcribed?: number | null
+          words_per_minute?: number | null
+          words_used?: string[] | null
+        }
+        Update: {
+          advancement_eligible?: boolean | null
+          analysis_confidence?: number | null
+          areas_for_improvement?: string[] | null
+          average_response_delay_seconds?: number | null
+          call_date?: string
+          composite_score?: number | null
+          correction_count?: number | null
+          created_at?: string
+          filler_words_detected?: string[] | null
+          filler_words_per_minute?: number | null
+          fluency_progress_delta?: number | null
+          id?: string
+          long_pause_count?: number | null
+          matched_target_words?: string[] | null
+          pauses_per_minute?: number | null
+          phone_number?: string
+          previous_session_scores?: Json | null
+          response_delays?: number[] | null
+          self_correction_rate?: number | null
+          speech_clarity_percent?: number | null
+          target_vocabulary?: string[] | null
+          target_vocabulary_usage_percent?: number | null
+          total_exchanges?: number | null
+          total_sentences?: number | null
+          total_words_spoken?: number | null
+          turn_count?: number | null
+          unique_vocabulary_count?: number | null
+          updated_at?: string
+          user_id?: string
+          user_speaking_time_seconds?: number | null
+          vapi_call_analysis_id?: string
+          words_correctly_transcribed?: number | null
+          words_per_minute?: number | null
+          words_used?: string[] | null
+        }
+        Relationships: []
       }
       course_nodes: {
         Row: {
@@ -816,96 +891,6 @@ export type Database = {
           },
         ]
       }
-      session_performance: {
-        Row: {
-          ai_correction_gentleness: number | null
-          ai_question_appropriateness: number | null
-          ai_speech_dominance_ratio: number | null
-          ai_used_target_vocabulary: boolean | null
-          ai_wait_time_appropriate: boolean | null
-          areas_for_improvement: Json | null
-          avg_response_time_seconds: number | null
-          clarity_percentage: number | null
-          created_at: string
-          filler_words_per_minute: number | null
-          fluency_level_id: string
-          id: string
-          level_skill_id: string | null
-          pauses_per_minute: number | null
-          self_correction_rate: number | null
-          session_success: boolean | null
-          session_type: string
-          silence_percentage: number | null
-          skill_improvement_score: number | null
-          speech_time_ratio: number | null
-          target_vocabulary_hit_rate: number | null
-          turn_count: number | null
-          unique_vocabulary_count: number | null
-          user_id: string
-          vapi_call_analysis_id: string | null
-          vocabulary_learned: Json | null
-          wpm: number | null
-        }
-        Insert: {
-          ai_correction_gentleness?: number | null
-          ai_question_appropriateness?: number | null
-          ai_speech_dominance_ratio?: number | null
-          ai_used_target_vocabulary?: boolean | null
-          ai_wait_time_appropriate?: boolean | null
-          areas_for_improvement?: Json | null
-          avg_response_time_seconds?: number | null
-          clarity_percentage?: number | null
-          created_at?: string
-          filler_words_per_minute?: number | null
-          fluency_level_id: string
-          id?: string
-          level_skill_id?: string | null
-          pauses_per_minute?: number | null
-          self_correction_rate?: number | null
-          session_success?: boolean | null
-          session_type: string
-          silence_percentage?: number | null
-          skill_improvement_score?: number | null
-          speech_time_ratio?: number | null
-          target_vocabulary_hit_rate?: number | null
-          turn_count?: number | null
-          unique_vocabulary_count?: number | null
-          user_id: string
-          vapi_call_analysis_id?: string | null
-          vocabulary_learned?: Json | null
-          wpm?: number | null
-        }
-        Update: {
-          ai_correction_gentleness?: number | null
-          ai_question_appropriateness?: number | null
-          ai_speech_dominance_ratio?: number | null
-          ai_used_target_vocabulary?: boolean | null
-          ai_wait_time_appropriate?: boolean | null
-          areas_for_improvement?: Json | null
-          avg_response_time_seconds?: number | null
-          clarity_percentage?: number | null
-          created_at?: string
-          filler_words_per_minute?: number | null
-          fluency_level_id?: string
-          id?: string
-          level_skill_id?: string | null
-          pauses_per_minute?: number | null
-          self_correction_rate?: number | null
-          session_success?: boolean | null
-          session_type?: string
-          silence_percentage?: number | null
-          skill_improvement_score?: number | null
-          speech_time_ratio?: number | null
-          target_vocabulary_hit_rate?: number | null
-          turn_count?: number | null
-          unique_vocabulary_count?: number | null
-          user_id?: string
-          vapi_call_analysis_id?: string | null
-          vocabulary_learned?: Json | null
-          wpm?: number | null
-        }
-        Relationships: []
-      }
       skill_explanations: {
         Row: {
           created_at: string
@@ -1219,6 +1204,69 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vocabulary_learned_count?: number | null
+        }
+        Relationships: []
+      }
+      user_level_progression: {
+        Row: {
+          advancement_blocked_reason: string | null
+          created_at: string
+          current_level: string
+          id: string
+          level_start_date: string
+          phone_number: string
+          sessions_meeting_criteria: number | null
+          target_clarity_percent: number | null
+          target_filler_rate: number | null
+          target_pause_rate: number | null
+          target_response_delay: number | null
+          target_turn_count: number | null
+          target_unique_words: number | null
+          target_vocab_usage_percent: number | null
+          target_wpm: number | null
+          total_sessions_in_level: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          advancement_blocked_reason?: string | null
+          created_at?: string
+          current_level?: string
+          id?: string
+          level_start_date?: string
+          phone_number: string
+          sessions_meeting_criteria?: number | null
+          target_clarity_percent?: number | null
+          target_filler_rate?: number | null
+          target_pause_rate?: number | null
+          target_response_delay?: number | null
+          target_turn_count?: number | null
+          target_unique_words?: number | null
+          target_vocab_usage_percent?: number | null
+          target_wpm?: number | null
+          total_sessions_in_level?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          advancement_blocked_reason?: string | null
+          created_at?: string
+          current_level?: string
+          id?: string
+          level_start_date?: string
+          phone_number?: string
+          sessions_meeting_criteria?: number | null
+          target_clarity_percent?: number | null
+          target_filler_rate?: number | null
+          target_pause_rate?: number | null
+          target_response_delay?: number | null
+          target_turn_count?: number | null
+          target_unique_words?: number | null
+          target_vocab_usage_percent?: number | null
+          target_wpm?: number | null
+          total_sessions_in_level?: number | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1538,61 +1586,26 @@ export type Database = {
           },
         ]
       }
-      vapi_skill_analysis: {
-        Row: {
-          after_score: number
-          analysis_details: Json | null
-          before_score: number
-          confidence_score: number | null
-          created_at: string
-          id: string
-          improvement: number
-          skill_name: string
-          updated_at: string
-          user_id: string
-          vapi_call_analysis_id: string
-        }
-        Insert: {
-          after_score?: number
-          analysis_details?: Json | null
-          before_score?: number
-          confidence_score?: number | null
-          created_at?: string
-          id?: string
-          improvement?: number
-          skill_name: string
-          updated_at?: string
-          user_id: string
-          vapi_call_analysis_id: string
-        }
-        Update: {
-          after_score?: number
-          analysis_details?: Json | null
-          before_score?: number
-          confidence_score?: number | null
-          created_at?: string
-          id?: string
-          improvement?: number
-          skill_name?: string
-          updated_at?: string
-          user_id?: string
-          vapi_call_analysis_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "vapi_skill_analysis_vapi_call_analysis_id_fkey"
-            columns: ["vapi_call_analysis_id"]
-            isOneToOne: false
-            referencedRelation: "vapi_call_analysis"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      calculate_composite_score: {
+        Args: {
+          p_wpm: number
+          p_unique_words: number
+          p_target_vocab_percent: number
+          p_filler_rate: number
+          p_pause_rate: number
+          p_turn_count: number
+          p_clarity_percent: number
+          p_response_delay: number
+          p_self_correction_rate: number
+          p_progress_delta: number
+        }
+        Returns: number
+      }
       calculate_skill_progress: {
         Args: { p_user_id: string; p_skill_id: string }
         Returns: number
@@ -1609,6 +1622,15 @@ export type Database = {
           minutes_remaining: number
           subscription_status: string
           needs_upgrade: boolean
+        }[]
+      }
+      check_level_advancement: {
+        Args: { p_user_id: string; p_phone_number: string }
+        Returns: {
+          eligible: boolean
+          current_level: string
+          sessions_qualified: number
+          reason: string
         }[]
       }
       create_user: {
