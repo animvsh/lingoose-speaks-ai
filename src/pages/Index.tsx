@@ -163,8 +163,8 @@ const Index = () => {
   };
 
   const handleNavigate = (view: string, data?: any) => {
-    console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView);
-    console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView);
+    console.log('🚀 Index handleNavigate called with view:', view, 'currentView before:', currentView);
+    console.log('🚀 Index handleNavigate called with view:', view, 'currentView before:', currentView);
     const previousView = currentView;
     setIsTransitioning(true);
     
@@ -177,12 +177,14 @@ const Index = () => {
       if (view === 'activity-details' && data) {
         setActivityDetailsData(data);
       }
-      console.log('🎯 Setting currentView to:', view);
+      console.log('🎯 About to set currentView to:', view);
       setCurrentView(view);
+      console.log('🎯 currentView should now be:', view);
       
       // Stagger the transition completion for smoother effect
       setTimeout(() => {
         setIsTransitioning(false);
+        console.log('🎯 Transition completed, currentView should be:', view);
       }, 50);
       
       // Track screen view and page view
@@ -198,7 +200,7 @@ const Index = () => {
   }
 
   const renderCurrentView = () => {
-    console.log('🎨 renderCurrentView called with currentView:', currentView, 'isOnboarded:', isOnboarded);
+    console.log('🎨 renderCurrentView called with currentView:', currentView, 'type:', typeof currentView, 'isOnboarded:', isOnboarded);
     let content;
 
     if (currentView === "onboarding" && !isOnboarded) {
