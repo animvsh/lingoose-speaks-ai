@@ -68,7 +68,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
       setCurrentStep(2);
     } else if (currentStep === 2 && hasConsented) {
       setCurrentStep(3);
-    } else if (currentStep === 3 && proficiencyLevel) {
+    } else if (currentStep === 3 && proficiencyLevel !== null) {
       // Ensure we have a valid phone number
       const validPhoneNumber = userPhoneNumber.trim() || `+1${Date.now()}`;
       
@@ -105,9 +105,8 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
 
   const handleProficiencySelect = (level: number) => {
     setProficiencyLevel(level);
-    setTimeout(() => {
-      handleNext();
-    }, 300);
+    // Immediately proceed to create profile without timeout
+    handleNext();
   };
 
   const renderStep = () => {
