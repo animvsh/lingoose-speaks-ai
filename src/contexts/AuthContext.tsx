@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,11 +13,12 @@ interface UserProfile {
 
 interface AuthContextType {
   user: UserProfile | null;
-  session: any; // Keep for compatibility
+  session: any;
   loading: boolean;
   signOut: () => Promise<void>;
 }
 
+// Create context with proper error handling
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
@@ -31,7 +31,6 @@ export const useAuth = () => {
 
 const logSecurityEvent = async (action: string, phoneNumber?: string, details: any = {}) => {
   try {
-    // Use untyped insert to bypass TypeScript checks for security_audit_logs table
     await (supabase as any).from('security_audit_logs').insert({
       phone_number: phoneNumber || null,
       action,
@@ -50,120 +49,94 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is authenticated via phone
-    const isAuthenticated = localStorage.getItem('phone_authenticated');
-    const userProfile = localStorage.getItem('current_user_profile');
-    
-    if (isAuthenticated === 'true' && userProfile) {
-      try {
-        const profile = JSON.parse(userProfile);
-        setUser(profile);
-        console.log('Restored user session:', profile.phone_number);
-        
-        // Log session restoration
-        logSecurityEvent('user_session_restored', profile.phone_number, {
-          user_id: profile.id,
-          full_name: profile.full_name,
-          language: profile.language
-        });
-        
-        // Track user session restored
-        setTimeout(() => {
-          import('@/services/posthog').then(({ posthogService }) => {
-            if (posthogService) {
-              posthogService.capture('user_session_restored', profile.id || profile.phone_number, {
-                phone_number: profile.phone_number,
-                full_name: profile.full_name,
-                language: profile.language
-              });
-            }
-          });
-        }, 1000);
+    let mounted = true;
 
-        // If user is authenticated and on landing page, redirect to app
-        if (window.location.pathname === '/') {
-          window.location.href = '/app';
+    const restoreSession = async () => {
+      try {
+        console.log('AuthProvider: Restoring session from localStorage...');
+        const storedUser = localStorage.getItem('currentUser');
+        
+        if (storedUser && mounted) {
+          const parsedUser = JSON.parse(storedUser);
+          console.log('AuthProvider: Found stored user:', parsedUser);
+          setUser(parsedUser);
+          
+          await logSecurityEvent('session_restored', parsedUser.phone_number, {
+            user_id: parsedUser.id,
+            restored_at: new Date().toISOString()
+          });
         }
       } catch (error) {
-        console.error('Error parsing stored user profile:', error);
-        
-        // Log suspicious activity
-        logSecurityEvent('session_restoration_failed', undefined, {
-          error: 'Invalid stored user profile data',
-          error_details: error instanceof Error ? error.message : 'Unknown error'
-        });
-        
-        // Clear invalid data
-        localStorage.removeItem('phone_authenticated');
-        localStorage.removeItem('current_user_profile');
-        localStorage.removeItem('phone_number');
+        console.error('AuthProvider: Error restoring session:', error);
+        localStorage.removeItem('currentUser');
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
-    }
-    
-    setLoading(false);
+    };
+
+    restoreSession();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const signOut = async () => {
     try {
-      // Track sign out event
+      console.log('AuthProvider: Starting signOut process...');
+      
       if (user) {
-        await logSecurityEvent('user_signout_attempted', user.phone_number, {
+        await logSecurityEvent('logout', user.phone_number, {
           user_id: user.id,
-          full_name: user.full_name
-        });
-        
-        import('@/services/posthog').then(({ posthogService }) => {
-          if (posthogService) {
-            posthogService.capture('user_signed_out', user.id || user.phone_number, {
-              phone_number: user.phone_number,
-              full_name: user.full_name
-            });
-          }
+          logout_time: new Date().toISOString()
         });
       }
 
-      // Clear localStorage immediately
-      localStorage.removeItem('phone_authenticated');
-      localStorage.removeItem('current_user_profile');
-      localStorage.removeItem('phone_number');
+      // Clear local storage
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('authToken');
       
-      // Clear state immediately
+      // Clear any onboarding state
+      if (user) {
+        localStorage.removeItem(`onboarding_complete_${user.id}`);
+      }
+      
+      // Update state
       setUser(null);
       
-      await logSecurityEvent('user_signout_success', user?.phone_number);
+      console.log('AuthProvider: SignOut completed successfully');
+      
+      // Navigate to landing page
+      window.location.href = '/';
+      
+    } catch (error) {
+      console.error('AuthProvider: Error during signOut:', error);
+      
+      // Force clear everything on error
+      localStorage.clear();
+      setUser(null);
+      window.location.href = '/';
       
       toast({
-        title: "Signed out",
-        description: "You have been signed out successfully.",
+        title: "Error signing out",
+        description: "There was an issue signing out. You have been logged out anyway.",
+        variant: "destructive",
       });
-      
-      // Navigate to landing page properly
-      window.location.href = '/';
-      
-    } catch (error: any) {
-      console.error('Sign out failed:', error);
-      
-      await logSecurityEvent('user_signout_failed', user?.phone_number, {
-        error: error.message
-      });
-      
-      // Force cleanup even if there's an error
-      localStorage.removeItem('phone_authenticated');
-      localStorage.removeItem('current_user_profile');
-      localStorage.removeItem('phone_number');
-      setUser(null);
-      
-      // Still redirect even on error
-      window.location.href = '/';
     }
   };
 
-  const value = {
+  const contextValue: AuthContextType = {
     user,
-    session: user ? { user } : null, // Create a fake session for compatibility
+    session: user, // Keep for compatibility
     loading,
     signOut,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return React.createElement(
+    AuthContext.Provider,
+    { value: contextValue },
+    children
+  );
 };
