@@ -64,88 +64,6 @@ export type Database = {
           },
         ]
       }
-      agent_audit_logs: {
-        Row: {
-          action: Database["public"]["Enums"]["agent_action"]
-          agent_id: string | null
-          created_at: string | null
-          details: Json | null
-          id: string
-          user_id: string
-        }
-        Insert: {
-          action: Database["public"]["Enums"]["agent_action"]
-          agent_id?: string | null
-          created_at?: string | null
-          details?: Json | null
-          id?: string
-          user_id: string
-        }
-        Update: {
-          action?: Database["public"]["Enums"]["agent_action"]
-          agent_id?: string | null
-          created_at?: string | null
-          details?: Json | null
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "agent_audit_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      call_logs: {
-        Row: {
-          call_sid: string | null
-          created_at: string | null
-          duration: number | null
-          id: string
-          metadata: Json | null
-          phone_number: string
-          recording_url: string | null
-          status: Database["public"]["Enums"]["call_status"] | null
-          transcript: string | null
-          user_id: string
-        }
-        Insert: {
-          call_sid?: string | null
-          created_at?: string | null
-          duration?: number | null
-          id?: string
-          metadata?: Json | null
-          phone_number: string
-          recording_url?: string | null
-          status?: Database["public"]["Enums"]["call_status"] | null
-          transcript?: string | null
-          user_id: string
-        }
-        Update: {
-          call_sid?: string | null
-          created_at?: string | null
-          duration?: number | null
-          id?: string
-          metadata?: Json | null
-          phone_number?: string
-          recording_url?: string | null
-          status?: Database["public"]["Enums"]["call_status"] | null
-          transcript?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "call_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       call_transcripts: {
         Row: {
           call_id: string
@@ -226,89 +144,6 @@ export type Database = {
           },
         ]
       }
-      course_nodes: {
-        Row: {
-          course_id: string
-          created_at: string | null
-          description: string | null
-          difficulty: Database["public"]["Enums"]["node_difficulty"] | null
-          estimated_duration: number | null
-          id: string
-          name: string
-          node_type: Database["public"]["Enums"]["node_type"]
-          position_x: number
-          position_y: number
-          prerequisites: string[] | null
-          updated_at: string | null
-        }
-        Insert: {
-          course_id: string
-          created_at?: string | null
-          description?: string | null
-          difficulty?: Database["public"]["Enums"]["node_difficulty"] | null
-          estimated_duration?: number | null
-          id?: string
-          name: string
-          node_type: Database["public"]["Enums"]["node_type"]
-          position_x?: number
-          position_y?: number
-          prerequisites?: string[] | null
-          updated_at?: string | null
-        }
-        Update: {
-          course_id?: string
-          created_at?: string | null
-          description?: string | null
-          difficulty?: Database["public"]["Enums"]["node_difficulty"] | null
-          estimated_duration?: number | null
-          id?: string
-          name?: string
-          node_type?: Database["public"]["Enums"]["node_type"]
-          position_x?: number
-          position_y?: number
-          prerequisites?: string[] | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "course_nodes_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      courses: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          language: string
-          name: string
-          total_nodes: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          language?: string
-          name: string
-          total_nodes?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          language?: string
-          name?: string
-          total_nodes?: number | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       curriculum_insights: {
         Row: {
           comparison_analysis: Json
@@ -344,48 +179,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      daily_recommendations: {
-        Row: {
-          completed: boolean | null
-          created_at: string | null
-          id: string
-          node_id: string
-          recommended_date: string
-          user_id: string
-        }
-        Insert: {
-          completed?: boolean | null
-          created_at?: string | null
-          id?: string
-          node_id: string
-          recommended_date?: string
-          user_id: string
-        }
-        Update: {
-          completed?: boolean | null
-          created_at?: string | null
-          id?: string
-          node_id?: string
-          recommended_date?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "daily_recommendations_node_id_fkey"
-            columns: ["node_id"]
-            isOneToOne: false
-            referencedRelation: "course_nodes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "daily_recommendations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       learning_outlines: {
         Row: {
@@ -496,39 +289,6 @@ export type Database = {
           },
         ]
       }
-      notifications: {
-        Row: {
-          body: string
-          created_at: string | null
-          id: string
-          read_at: string | null
-          sent_at: string | null
-          title: string
-          type: string | null
-          user_id: string
-        }
-        Insert: {
-          body: string
-          created_at?: string | null
-          id?: string
-          read_at?: string | null
-          sent_at?: string | null
-          title: string
-          type?: string | null
-          user_id: string
-        }
-        Update: {
-          body?: string
-          created_at?: string | null
-          id?: string
-          read_at?: string | null
-          sent_at?: string | null
-          title?: string
-          type?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       pronunciation_results: {
         Row: {
           audio_url: string | null
@@ -567,62 +327,6 @@ export type Database = {
           word_scores?: Json | null
         }
         Relationships: []
-      }
-      security_audit_logs: {
-        Row: {
-          action: string | null
-          created_at: string | null
-          details: Json | null
-          id: number
-          ip_address: string | null
-          phone_number: string | null
-          user_agent: string | null
-        }
-        Insert: {
-          action?: string | null
-          created_at?: string | null
-          details?: Json | null
-          id?: number
-          ip_address?: string | null
-          phone_number?: string | null
-          user_agent?: string | null
-        }
-        Update: {
-          action?: string | null
-          created_at?: string | null
-          details?: Json | null
-          id?: number
-          ip_address?: string | null
-          phone_number?: string | null
-          user_agent?: string | null
-        }
-        Relationships: []
-      }
-      session_context: {
-        Row: {
-          context: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          context?: string | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          context?: string | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "session_context_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       skill_explanations: {
         Row: {
@@ -814,51 +518,6 @@ export type Database = {
           },
         ]
       }
-      user_course_progress: {
-        Row: {
-          completed_nodes: number | null
-          course_id: string
-          id: string
-          last_activity: string | null
-          overall_progress: number | null
-          started_at: string | null
-          user_id: string
-        }
-        Insert: {
-          completed_nodes?: number | null
-          course_id: string
-          id?: string
-          last_activity?: string | null
-          overall_progress?: number | null
-          started_at?: string | null
-          user_id: string
-        }
-        Update: {
-          completed_nodes?: number | null
-          course_id?: string
-          id?: string
-          last_activity?: string | null
-          overall_progress?: number | null
-          started_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_course_progress_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_course_progress_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_mini_skill_scores: {
         Row: {
           attempts: number | null
@@ -900,60 +559,6 @@ export type Database = {
           },
           {
             foreignKeyName: "user_mini_skill_scores_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_node_progress: {
-        Row: {
-          created_at: string | null
-          fluency_percentage: number | null
-          id: string
-          last_practiced: string | null
-          mastered_at: string | null
-          node_id: string
-          practice_sessions: number | null
-          status: Database["public"]["Enums"]["node_status"] | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          fluency_percentage?: number | null
-          id?: string
-          last_practiced?: string | null
-          mastered_at?: string | null
-          node_id: string
-          practice_sessions?: number | null
-          status?: Database["public"]["Enums"]["node_status"] | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          fluency_percentage?: number | null
-          id?: string
-          last_practiced?: string | null
-          mastered_at?: string | null
-          node_id?: string
-          practice_sessions?: number | null
-          status?: Database["public"]["Enums"]["node_status"] | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_node_progress_node_id_fkey"
-            columns: ["node_id"]
-            isOneToOne: false
-            referencedRelation: "course_nodes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_node_progress_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
@@ -1027,7 +632,6 @@ export type Database = {
         Row: {
           auth_user_id: string | null
           created_at: string | null
-          fcm_token: string | null
           full_name: string
           id: string
           language: string | null
@@ -1040,7 +644,6 @@ export type Database = {
         Insert: {
           auth_user_id?: string | null
           created_at?: string | null
-          fcm_token?: string | null
           full_name: string
           id?: string
           language?: string | null
@@ -1053,7 +656,6 @@ export type Database = {
         Update: {
           auth_user_id?: string | null
           created_at?: string | null
-          fcm_token?: string | null
           full_name?: string
           id?: string
           language?: string | null
@@ -1229,28 +831,7 @@ export type Database = {
       }
     }
     Enums: {
-      agent_action: "created" | "called" | "updated"
-      call_status: "completed" | "failed" | "missed" | "in_progress"
-      message_role: "user" | "assistant" | "system"
-      node_difficulty: "beginner" | "intermediate" | "advanced"
-      node_status:
-        | "locked"
-        | "available"
-        | "in_progress"
-        | "completed"
-        | "mastered"
-      node_type:
-        | "core_grammar"
-        | "survival_language"
-        | "social_conversation"
-        | "formal_business"
-        | "fun_personality"
-      persona_type:
-        | "goose_strict"
-        | "goose_flirty"
-        | "goose_chaotic"
-        | "goose_supportive"
-      proficiency_level: "beginner" | "intermediate" | "advanced"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1377,32 +958,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      agent_action: ["created", "called", "updated"],
-      call_status: ["completed", "failed", "missed", "in_progress"],
-      message_role: ["user", "assistant", "system"],
-      node_difficulty: ["beginner", "intermediate", "advanced"],
-      node_status: [
-        "locked",
-        "available",
-        "in_progress",
-        "completed",
-        "mastered",
-      ],
-      node_type: [
-        "core_grammar",
-        "survival_language",
-        "social_conversation",
-        "formal_business",
-        "fun_personality",
-      ],
-      persona_type: [
-        "goose_strict",
-        "goose_flirty",
-        "goose_chaotic",
-        "goose_supportive",
-      ],
-      proficiency_level: ["beginner", "intermediate", "advanced"],
-    },
+    Enums: {},
   },
 } as const

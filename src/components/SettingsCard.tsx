@@ -181,7 +181,7 @@ const SettingsCard = ({
       <AppBar title="Settings" onBack={() => onNavigate("home")} />
 
       {/* Pro Upgrade Card always visible */}
-      <div className="mb-6 px-6">
+      <div className="mb-6">
         <ProUpgradeCard />
         {subscription?.subscription_tier === 'free_trial' && trialDay && (
           <div className="mt-2 text-center text-blue-700 font-bold text-lg">
@@ -190,7 +190,7 @@ const SettingsCard = ({
         )}
       </div>
 
-      <div className="w-full space-y-6 px-6">
+      <div className="w-full space-y-6">
         {/* Account Settings */}
         <div className="w-full bg-white p-6 border-4 border-gray-200">
           <h3 className="text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide">
@@ -300,12 +300,14 @@ const SettingsCard = ({
               </Button>
             </div>}
           
-          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none cursor-pointer" onClick={() => handleNavigationClick("notifications", "notifications")}>
+          <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
             <div className="flex items-center">
               <Bell className="w-5 h-5 mr-3 text-blue-500" />
               <span className="text-gray-700 font-medium">Notifications</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-gray-500" />
+            <Button variant="outline" size="icon" onClick={toggleNotifications}>
+              {notificationsEnabled ? "ON" : "OFF"}
+            </Button>
           </div>
           <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-none">
             <div className="flex items-center">
@@ -375,7 +377,7 @@ const SettingsCard = ({
         </div>
 
         {/* Logout */}
-        <div className="w-full">
+        <div className="w-full px-6">
           <Button onClick={handleLogout} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-3xl transition-all duration-200">
             <LogOut className="w-5 h-5 mr-2" />
             Log Out

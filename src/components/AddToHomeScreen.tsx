@@ -129,7 +129,7 @@ const AddToHomeScreen = ({ onDismiss }: AddToHomeScreenProps) => {
       <Card className="w-full bg-white p-6 rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom duration-300">
         <div className="flex justify-between items-start mb-6">
           <div className="flex items-center space-x-3">
-            
+            <BolMascot size="sm" className="w-8 h-8" />
             <h3 className="text-xl font-bold text-slate-800">
               Add to Home Screen
             </h3>

@@ -98,7 +98,7 @@ const AddSupervisorForm = ({ onClose }: AddSupervisorFormProps) => {
       <div className="max-w-md mx-auto space-y-8">
         {/* Mascot and Header */}
         <div className="flex flex-col items-center justify-center space-y-2 mb-2">
-          
+          <BolMascot size="md" className="w-16 h-16 animate-bounce-slow" />
           <h1 className="text-2xl font-black text-orange-600 uppercase tracking-wide animate-fade-in">Add Supervisor</h1>
         </div>
         <div className="flex items-center justify-end mb-2">

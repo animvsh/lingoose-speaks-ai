@@ -5,7 +5,7 @@ import { useSessionTracking } from "@/hooks/useSessionTracking";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useIsDesktop } from "@/hooks/use-mobile";
-import NewWelcomeScreen from "@/components/NewWelcomeScreen";
+import WelcomeScreen from "@/components/WelcomeScreen";
 import DashboardStats from "@/components/DashboardStats";
 import ActivityCard from "@/components/ActivityCard";
 import CurriculumCard from "@/components/CurriculumCard";
@@ -17,7 +17,6 @@ import ProUpgradeCard from "@/components/ProUpgradeCard";
 import StripeTestingPanel from "@/components/StripeTestingPanel";
 import DesktopExperienceMessage from "@/components/DesktopExperienceMessage";
 import ProfileManagementPage from "@/components/ProfileManagementPage";
-import NotificationSettingsPage from "@/components/NotificationSettingsPage";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import PageTransition from "@/components/PageTransition";
 import { useNavigate } from "react-router-dom";
@@ -89,25 +88,12 @@ const Index = () => {
         }
       } else {
         // Only redirect to auth if loading is complete and user is definitively null
-        // Give more time for auth state to load and double-check localStorage
+        // Add a small delay to prevent blank screens during auth state changes
         setTimeout(() => {
           if (!user && !loading) {
-            // Triple check localStorage before redirecting
-            const storedUser = localStorage.getItem('currentUser');
-            const phoneAuth = localStorage.getItem('phone_authenticated');
-            
-            console.log('Index: Final auth check - user:', user, 'loading:', loading, 'storedUser:', !!storedUser, 'phoneAuth:', phoneAuth);
-            
-            if (!storedUser && phoneAuth !== 'true') {
-              console.log('Index: No authentication found, redirecting to landing');
-              navigate('/');
-            } else if (storedUser && !user) {
-              // Force reload if we have stored user but auth context hasn't picked it up
-              console.log('Index: Auth state mismatch, forcing reload');
-              window.location.reload();
-            }
+            navigate('/');
           }
-        }, 1000); // Increased timeout for better reliability
+        }, 100);
       }
     }
   }, [user, loading, identify, trackScreenView, trackPageView, navigate]);
@@ -159,7 +145,7 @@ const Index = () => {
     let content;
 
     if (currentView === "onboarding" && !isOnboarded) {
-      content = <NewWelcomeScreen onComplete={handleOnboardingComplete} />;
+      content = <WelcomeScreen onComplete={handleOnboardingComplete} />;
     } else if (currentView === "home") {
       content = (
         <div className="w-full space-y-4">
@@ -197,8 +183,6 @@ const Index = () => {
       content = <AddSupervisorForm onClose={() => handleNavigate("settings")} />;
     } else if (currentView === "profile-management") {
       content = <ProfileManagementPage onNavigate={handleNavigate} />;
-    } else if (currentView === "notifications") {
-      content = <NotificationSettingsPage onNavigate={handleNavigate} />;
     } else {
       content = <DashboardStats onNavigate={handleNavigate} />;
     }

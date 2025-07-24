@@ -62,9 +62,9 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     switch (currentStep) {
       case 0:
         return (
-          <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 px-6 pb-8">
+          <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 pb-8">
             {/* Header with animated sheep */}
-            <div className="pt-8 pb-6">
+            <div className="px-6 pt-8 pb-6">
               <div className="flex items-center justify-center">
                 <div className="text-center">
                   <div className="relative">
@@ -81,7 +81,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="px-6 space-y-4">
               {/* Progress indicator with fun design */}
               <div className="flex items-center justify-center mb-8">
                 <div className="flex space-x-3">
@@ -129,6 +129,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
               {/* Fun footer message */}
               <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-orange-200 shadow-lg">
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-orange-700 font-bold">Choose what excites you most! 🌟</span>
               </div>
             </div>
@@ -137,9 +138,9 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
       case 1:
         return (
-          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 px-6 pb-8">
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-8">
             {/* Header with back button */}
-            <div className="pt-8 pb-6">
+            <div className="px-6 pt-8 pb-6">
               <div className="flex items-center justify-between">
                 <Button
                   onClick={prevStep}
@@ -160,7 +161,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="px-6 space-y-4">
               {/* Progress indicator */}
               <div className="flex items-center justify-center mb-8">
                 <div className="flex space-x-3">
@@ -212,7 +213,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
               {/* Fun footer message */}
               <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-purple-200 shadow-lg">
-                
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-purple-700 font-bold">Pick your perfect teaching vibe! ✨</span>
               </div>
             </div>
@@ -224,9 +225,9 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         const selectedToneData = tones.find(t => t.id === selectedTone);
         
         return (
-          <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 px-6 pb-8">
+          <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 pb-8">
             {/* Header with back button */}
-            <div className="pt-8 pb-6">
+            <div className="px-6 pt-8 pb-6">
               <div className="flex items-center justify-between">
                 <Button
                   onClick={prevStep}
@@ -248,7 +249,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="px-6 space-y-6">
               {/* Progress indicator - all complete */}
               <div className="flex items-center justify-center mb-8">
                 <div className="flex space-x-3">
@@ -287,7 +288,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               {/* Profile Summary Card with enhanced design */}
               <div className="bg-white rounded-3xl p-8 border-4 border-blue-200 shadow-2xl relative">
                 <div className="absolute top-4 right-4">
-                  
+                  <BolMascot size="sm" className="w-8 h-8 opacity-20" />
                 </div>
                 <div className="flex items-center justify-center space-x-4 mb-6">
                   <div className={`w-20 h-20 bg-gradient-to-br ${selectedGoalData?.color} rounded-3xl flex items-center justify-center text-4xl shadow-xl border-3 border-white`}>

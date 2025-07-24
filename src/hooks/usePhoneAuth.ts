@@ -217,20 +217,11 @@ export const usePhoneAuth = () => {
             }
           });
         }, 500);
-        // Store user data in the format AuthContext expects
-        const userForAuth = {
-          id: profile.id,
-          full_name: profile.full_name,
-          phone_number: profile.phone_number,
-          language: profile.language,
-          created_at: profile.created_at,
-          updated_at: profile.updated_at
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(userForAuth));
+        localStorage.setItem('current_user_profile', JSON.stringify(profile));
         localStorage.setItem('phone_authenticated', 'true');
         localStorage.setItem('phone_number', formattedPhone);
         toast({ title: "Account detected!", description: `Welcome back, ${profile.full_name}! Logging you into your account.` });
+        setTimeout(() => { window.location.href = '/app'; }, 1500);
       } else {
         // Create new profile for new user
         const defaultName = 'New User';
@@ -253,17 +244,8 @@ export const usePhoneAuth = () => {
         isNewUser = true;
         await logSecurityEvent('user_signup_success', formattedPhone, { user_id: profile.id, is_new_user: true });
         
-        // Store user data in the format AuthContext expects
-        const userForAuth = {
-          id: profile.id,
-          full_name: profile.full_name,
-          phone_number: profile.phone_number,
-          language: profile.language,
-          created_at: profile.created_at,
-          updated_at: profile.updated_at
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(userForAuth));
+        // Store authentication state immediately for new users
+        localStorage.setItem('current_user_profile', JSON.stringify(profile));
         localStorage.setItem('phone_authenticated', 'true');
         localStorage.setItem('phone_number', formattedPhone);
         

@@ -31,6 +31,9 @@ const AppBar = ({ title, onBack, showBackButton = true, showLogo = true }: AppBa
           <h1 className="text-3xl font-bold text-primary uppercase tracking-wide text-center">
             {title}
           </h1>
+          {showLogo && (
+            <BolMascot size="sm" className="w-8 h-8 ml-2 opacity-60" />
+          )}
         </div>
         
         <div className="w-14 h-14"></div>

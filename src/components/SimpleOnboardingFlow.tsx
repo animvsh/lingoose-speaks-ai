@@ -88,7 +88,10 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
       }, {
         onSuccess: () => {
           // Redirect to dashboard after successful profile creation
-          window.location.href = '/app';
+          setTimeout(() => {
+            window.location.href = '/app';
+          }, 1000);
+          onComplete();
         }
       });
     }
@@ -102,29 +105,8 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
 
   const handleProficiencySelect = (level: number) => {
     setProficiencyLevel(level);
-    
-    // Ensure we have a valid phone number
-    const validPhoneNumber = userPhoneNumber.trim() || `+1${Date.now()}`;
-    
-    console.log('Creating profile with:', {
-      phone_number: validPhoneNumber,
-      full_name: fullName.trim(),
-      proficiency_level: level,
-      language: 'hindi'
-    });
-
-    // Create user profile directly
-    createUserProfile.mutate({
-      phone_number: validPhoneNumber,
-      full_name: fullName.trim(),
-      proficiency_level: level,
-      language: 'hindi'
-    }, {
-      onSuccess: () => {
-        // Redirect to dashboard after successful profile creation
-        window.location.href = '/app';
-      }
-    });
+    // Immediately proceed to create profile without timeout
+    handleNext();
   };
 
   const renderStep = () => {
@@ -133,7 +115,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
         return (
           <div className="w-full min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50">
             <AppBar title="Welcome" showBackButton={false} />
-            <div className="px-6 pt-4 w-full flex items-center justify-center">
+            <div className="w-full flex items-center justify-center">
               <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                   <div className="relative mb-6">
@@ -178,6 +160,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
 
                 <div className="text-center mt-6 p-4 bg-white rounded-2xl border-3 border-orange-200 shadow-lg w-full">
+                  <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                   <span className="text-orange-700 font-bold">Nice to meet you! 🌟</span>
                 </div>
               </div>
@@ -232,6 +215,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
 
               <div className="text-center p-4 bg-white rounded-2xl border-3 border-blue-200 shadow-lg w-full max-w-md mx-auto">
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-blue-700 font-bold text-sm sm:text-base">We'll call you for fun Hindi lessons! 📞</span>
               </div>
             </div>
@@ -296,6 +280,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
 
               <div className="text-center p-4 bg-white rounded-2xl border-3 border-purple-200 shadow-lg w-full max-w-md mx-auto">
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-purple-700 font-bold text-sm sm:text-base">Your privacy matters to us! 🔒</span>
               </div>
             </div>
@@ -351,7 +336,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
 
               <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-green-200 shadow-lg w-full max-w-md mx-auto">
-                
+                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-green-700 font-bold text-sm sm:text-base">
                   {createUserProfile.isPending ? "Creating your profile..." : "Choose your current level! 🎯"}
                 </span>

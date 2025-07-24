@@ -11,17 +11,6 @@ const Landing = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   
-  // Check if user is already authenticated and redirect to app
-  useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    const phoneAuth = localStorage.getItem('phone_authenticated');
-    
-    if (storedUser && phoneAuth === 'true') {
-      console.log('Landing: User already authenticated, redirecting to app');
-      window.location.href = '/app';
-    }
-  }, []);
-  
   const testimonials = [
     {
       quote: "Finally, my son can talk to his nani properly. She's so happy she cries every time he calls her.",
@@ -108,13 +97,6 @@ const Landing = () => {
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
-    // Check if user is authenticated and redirect to app
-    const storedUser = localStorage.getItem('currentUser');
-    const phoneAuth = localStorage.getItem('phone_authenticated');
-    
-    if (storedUser && phoneAuth === 'true') {
-      window.location.href = '/app';
-    }
   };
 
   const handleSignInBack = () => {
@@ -202,7 +184,8 @@ const Landing = () => {
             </h1>
             
             <div className="space-y-4 text-base sm:text-lg md:text-xl mb-8 text-brown-700 font-nunito">
-              <p className="font-semibold">Daily 1-on-1 calls. No apps.</p>
+              <p className="font-semibold">Daily 1-on-1 calls. No apps. No worksheets.</p>
+              <p className="font-semibold">Just one slightly pushy desi sheep.</p>
               <p className="font-black text-xl md:text-2xl text-primary">$4/week. Cancel anytime.</p>
             </div>
 
@@ -369,26 +352,61 @@ const Landing = () => {
       {/* Testimonials */}
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl lg:text-4xl font-black text-center mb-12 text-brown-900 font-nunito">
-          What Parents Say 🇮🇳
+          What Devi Parents Say 🇮🇳
         </h2>
         
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.slice(0, 6).map((testimonial, index) => (
-              <Card 
-                key={index}
-                className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 hover-lift shadow-lg"
-              >
-                <div className="text-2xl mb-3">💬</div>
-                <blockquote className="text-sm mb-4 italic font-medium text-brown-900 font-nunito">
-                  "{testimonial.quote}"
-                </blockquote>
-                <div>
-                  <cite className="text-sm font-black text-brown-900 font-nunito">— {testimonial.author}</cite>
-                  <p className="text-xs font-medium text-brown-700 font-nunito">{testimonial.role}</p>
+        <div className="relative max-w-6xl mx-auto">
+          {/* Navigation buttons */}
+          <div className="flex justify-center gap-4 mb-6">
+            <button
+              onClick={() => setCurrentTestimonial((prev) => (prev - 1 + totalSlides) % totalSlides)}
+              className="p-2 rounded-full bg-secondary hover:bg-secondary/80 transition-colors duration-200"
+            >
+              <ChevronLeft className="w-5 h-5 text-foreground" />
+            </button>
+            <button
+              onClick={() => setCurrentTestimonial((prev) => (prev + 1) % totalSlides)}
+              className="p-2 rounded-full bg-secondary hover:bg-secondary/80 transition-colors duration-200"
+            >
+              <ChevronRight className="w-5 h-5 text-foreground" />
+            </button>
+          </div>
+
+          {/* Testimonials carousel */}
+          <div className="overflow-hidden">
+            <div 
+              className="flex transition-transform duration-500 ease-out"
+              style={{ 
+                transform: `translateX(-${currentTestimonial * 100}%)`,
+                width: `${totalSlides * 100}%`
+              }}
+            >
+              {Array.from({ length: totalSlides }).map((_, slideIndex) => (
+                <div 
+                  key={slideIndex}
+                  className="w-full flex gap-6 justify-center"
+                  style={{ width: `${100 / totalSlides}%` }}
+                >
+                  {testimonials
+                    .slice(slideIndex * reviewsPerSlide, (slideIndex + 1) * reviewsPerSlide)
+                    .map((testimonial, index) => (
+                      <Card 
+                        key={`${slideIndex}-${index}`}
+                        className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 hover-lift shadow-lg"
+                      >
+                        <div className="text-2xl mb-3">💬</div>
+                        <blockquote className="text-sm mb-4 italic font-medium text-brown-900 font-nunito">
+                          "{testimonial.quote}"
+                        </blockquote>
+                        <div>
+                          <cite className="text-sm font-black text-brown-900 font-nunito">— {testimonial.author}</cite>
+                          <p className="text-xs font-medium text-brown-700 font-nunito">{testimonial.role}</p>
+                        </div>
+                      </Card>
+                    ))}
                 </div>
-              </Card>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
