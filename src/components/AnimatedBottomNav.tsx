@@ -38,7 +38,13 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 hindi-bg border-t-2 border-handdrawn z-50 safe-area-bottom font-nunito">
+    <div className="fixed bottom-0 left-0 right-0 hindi-bg border-t-2 border-handdrawn z-[9999] safe-area-bottom font-nunito pointer-events-auto"
+         style={{ pointerEvents: 'auto' }}
+         onClick={(e) => {
+           console.log('🚨🚨🚨 CONTAINER CLICKED');
+           e.stopPropagation();
+         }}
+    >
       <div className="max-w-md mx-auto px-4 py-3">
         <div className="flex justify-center space-x-3">
           {navItems.map(({ view, icon: Icon, label }) => {
