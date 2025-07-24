@@ -171,6 +171,9 @@ export const useCreateUserProfile = () => {
       localStorage.setItem('current_user_profile', JSON.stringify(profile));
       localStorage.setItem('phone_authenticated', 'true');
       localStorage.setItem('phone_number', formattedPhone);
+      
+      // CRITICAL: Remove the needs_onboarding flag since profile is now complete
+      localStorage.removeItem('needs_onboarding');
 
       console.log('Profile operation successful:', profile);
       return profile;
