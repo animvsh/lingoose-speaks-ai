@@ -111,7 +111,7 @@ const WelcomeScreen = ({ onComplete }: WelcomeScreenProps) => {
           {/* Fun footer message */}
           <div className="text-center warm-card p-6 soft-shadow">
             <div className="flex items-center justify-center">
-              <BolMascot size="sm" className="w-8 h-8 mr-3" />
+              
               <span className="text-foreground font-black text-lg">Ready to become fluent in Hindi? Let's go! 🚀</span>
             </div>
           </div>

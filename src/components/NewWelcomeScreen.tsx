@@ -112,7 +112,7 @@ const NewWelcomeScreen = ({ onComplete }: NewWelcomeScreenProps) => {
           {/* Fun footer */}
           <div className="warm-card p-4 border border-handdrawn shadow-md">
             <div className="flex items-center justify-center gap-3">
-              <BolMascot size="sm" className="w-6 h-6" />
+              
               <span className="text-foreground font-bold text-sm">
                 Ready to become fluent in Hindi? 🚀
               </span>

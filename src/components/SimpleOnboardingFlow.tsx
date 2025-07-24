@@ -160,7 +160,6 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
 
                 <div className="text-center mt-6 p-4 bg-white rounded-2xl border-3 border-orange-200 shadow-lg w-full">
-                  <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                   <span className="text-orange-700 font-bold">Nice to meet you! 🌟</span>
                 </div>
               </div>
@@ -215,7 +214,6 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
 
               <div className="text-center p-4 bg-white rounded-2xl border-3 border-blue-200 shadow-lg w-full max-w-md mx-auto">
-                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-blue-700 font-bold text-sm sm:text-base">We'll call you for fun Hindi lessons! 📞</span>
               </div>
             </div>
@@ -280,7 +278,6 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
 
               <div className="text-center p-4 bg-white rounded-2xl border-3 border-purple-200 shadow-lg w-full max-w-md mx-auto">
-                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-purple-700 font-bold text-sm sm:text-base">Your privacy matters to us! 🔒</span>
               </div>
             </div>
@@ -336,7 +333,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
               </div>
 
               <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-green-200 shadow-lg w-full max-w-md mx-auto">
-                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
+                
                 <span className="text-green-700 font-bold text-sm sm:text-base">
                   {createUserProfile.isPending ? "Creating your profile..." : "Choose your current level! 🎯"}
                 </span>

@@ -177,7 +177,7 @@ const ModernOnboarding = ({ phoneNumber, onComplete }: ModernOnboardingProps) =>
           {/* Footer */}
           <div className="text-center warm-card p-4 border border-handdrawn rounded-xl">
             <p className="text-sm text-muted-foreground">
-              <BolMascot size="sm" className="w-5 h-5 inline mr-2" />
+              
               Don't worry, we'll adjust as we learn together! 🎯
             </p>
           </div>

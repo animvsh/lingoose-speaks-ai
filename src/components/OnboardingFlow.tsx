@@ -129,7 +129,6 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
               {/* Fun footer message */}
               <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-orange-200 shadow-lg">
-                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-orange-700 font-bold">Choose what excites you most! 🌟</span>
               </div>
             </div>
@@ -213,7 +212,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
               {/* Fun footer message */}
               <div className="text-center mt-8 p-4 bg-white rounded-2xl border-3 border-purple-200 shadow-lg">
-                <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
+                
                 <span className="text-purple-700 font-bold">Pick your perfect teaching vibe! ✨</span>
               </div>
             </div>
@@ -288,7 +287,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               {/* Profile Summary Card with enhanced design */}
               <div className="bg-white rounded-3xl p-8 border-4 border-blue-200 shadow-2xl relative">
                 <div className="absolute top-4 right-4">
-                  <BolMascot size="sm" className="w-8 h-8 opacity-20" />
+                  
                 </div>
                 <div className="flex items-center justify-center space-x-4 mb-6">
                   <div className={`w-20 h-20 bg-gradient-to-br ${selectedGoalData?.color} rounded-3xl flex items-center justify-center text-4xl shadow-xl border-3 border-white`}>
