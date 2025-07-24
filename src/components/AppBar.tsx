@@ -11,18 +11,12 @@ interface AppBarProps {
 }
 
 const AppBar = ({ title, onBack, showBackButton = true, showLogo = true }: AppBarProps) => {
-  console.log('🎯🎯🎯 AppBar rendered with:', { title, onBack: !!onBack, showBackButton, showLogo });
   return (
     <div className="px-6 pt-8 pb-6 bg-background/80 backdrop-blur-sm border-b border-border">
       <div className="flex items-center justify-between">
         {showBackButton && onBack ? (
           <Button
-            onClick={(e) => {
-              console.log('🔥🔥🔥 AppBar back button clicked');
-              e.preventDefault();
-              e.stopPropagation();
-              onBack();
-            }}
+            onClick={onBack}
             className="w-14 h-14 warm-button rounded-2xl text-white soft-shadow"
           >
             <ArrowLeft className="w-6 h-6" />

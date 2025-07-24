@@ -9,7 +9,6 @@ interface AnimatedBottomNavProps {
 }
 
 const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) => {
-  console.log('🚀🚀🚀 AnimatedBottomNav RENDERED with currentView:', currentView);
   const { trackTap } = useEngagementTracking();
   
   const navItems = [
@@ -20,8 +19,6 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
   ];
 
   const handleNavClick = (view: string, label: string) => {
-    console.log('📱📱📱 AnimatedBottomNav handleNavClick called with view:', view, 'label:', label);
-    
     // Add haptic feedback for mobile devices
     if ('vibrate' in navigator) {
       navigator.vibrate(50);
@@ -34,18 +31,11 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
       nav_label: label
     });
     
-    console.log('📱📱📱 About to call onNavigate with:', view);
     onNavigate(view);
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 hindi-bg border-t-2 border-handdrawn z-[9999] safe-area-bottom font-nunito pointer-events-auto"
-         style={{ pointerEvents: 'auto' }}
-         onClick={(e) => {
-           console.log('🚨🚨🚨 CONTAINER CLICKED');
-           e.stopPropagation();
-         }}
-    >
+    <div className="fixed bottom-0 left-0 right-0 hindi-bg border-t-2 border-handdrawn z-50 safe-area-bottom font-nunito">
       <div className="max-w-md mx-auto px-4 py-3">
         <div className="flex justify-center space-x-3">
           {navItems.map(({ view, icon: Icon, label }) => {
@@ -56,16 +46,17 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
                 key={view}
                 variant="ghost"
                 size="sm"
-                onClick={(e) => {
-                  console.log('🔥🔥🔥 BUTTON CLICKED:', view, label);
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleNavClick(view, label);
+                onTouchStart={() => {
+                  // Immediate visual feedback on touch
+                  if ('vibrate' in navigator) {
+                    navigator.vibrate(25);
+                  }
                 }}
+                onClick={() => handleNavClick(view, label)}
                 className={`
                   w-16 h-16 rounded-3xl border-2 border-handdrawn transition-all duration-150 ease-out
                   transform active:scale-95 hover:scale-105 hover-lift
-                  mobile-touch-target select-none shadow-lg font-nunito cursor-pointer
+                  mobile-touch-target select-none shadow-lg font-nunito
                   ${isActive 
                     ? 'bg-primary text-white scale-105 border-primary shadow-xl' 
                     : 'bg-white/90 text-brown-700 hover:bg-secondary active:bg-primary/20'

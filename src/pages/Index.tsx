@@ -163,8 +163,8 @@ const Index = () => {
   };
 
   const handleNavigate = (view: string, data?: any) => {
-    console.log('🚀🚀🚀 Index handleNavigate called with view:', view, 'currentView before:', currentView);
-    console.log('🚀🚀🚀 Call stack:', new Error().stack);
+    console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView);
+    console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView);
     const previousView = currentView;
     setIsTransitioning(true);
     
@@ -177,14 +177,12 @@ const Index = () => {
       if (view === 'activity-details' && data) {
         setActivityDetailsData(data);
       }
-      console.log('🎯🎯🎯 About to set currentView to:', view);
+      console.log('🎯 Setting currentView to:', view);
       setCurrentView(view);
-      console.log('🎯🎯🎯 currentView should now be:', view);
       
       // Stagger the transition completion for smoother effect
       setTimeout(() => {
         setIsTransitioning(false);
-        console.log('🎯 Transition completed, currentView should be:', view);
       }, 50);
       
       // Track screen view and page view
@@ -200,7 +198,7 @@ const Index = () => {
   }
 
   const renderCurrentView = () => {
-    console.log('🎨🎨🎨 renderCurrentView called with currentView:', currentView, 'type:', typeof currentView, 'isOnboarded:', isOnboarded);
+    console.log('🎨 renderCurrentView called with currentView:', currentView, 'isOnboarded:', isOnboarded);
     let content;
 
     if (currentView === "onboarding" && !isOnboarded) {
@@ -241,7 +239,6 @@ const Index = () => {
     } else if (currentView === "roadmap") {
       content = <FluencyRoadmapView />;
     } else if (currentView === "settings") {
-      console.log('🔧🔧🔧 Rendering SettingsCard for currentView:', currentView);
       content = <SettingsCard onNavigate={handleNavigate} />;
     } else if (currentView === "add-supervisor") {
       content = <AddSupervisorForm onClose={() => handleNavigate("settings")} />;
@@ -251,10 +248,10 @@ const Index = () => {
       console.log('🧠 Rendering AIBehaviorMetricsPanel');
       content = <AIBehaviorMetricsPanel onNavigate={handleNavigate} />;
     } else if (currentView === "system-prompt-settings") {
-      console.log('🎯 Rendering SystemPromptSettingsPage for currentView:', currentView);
+      console.log('🎯 Rendering SystemPromptSettingsPage');
       content = <SystemPromptSettingsPage onNavigate={handleNavigate} />;
     } else {
-      console.log('🏠🏠🏠 Rendering default DashboardStats for currentView:', currentView, 'Expected: one of [home, activity, progress, settings, etc]');
+      console.log('🏠 Rendering default DashboardStats for currentView:', currentView);
       content = <DashboardStats onNavigate={handleNavigate} />;
     }
 
@@ -271,7 +268,6 @@ const Index = () => {
   };
 
   const shouldShowBottomNav = isOnboarded && user && currentView !== "onboarding" && currentView !== "add-supervisor" && currentView !== "ai-behavior-metrics" && currentView !== "system-prompt-settings";
-  console.log('🔍🔍🔍 shouldShowBottomNav:', shouldShowBottomNav, { isOnboarded, user: !!user, currentView });
 
   // Don't render anything if we're in a loading state
   if (loading) {
@@ -290,13 +286,8 @@ const Index = () => {
         {renderCurrentView()}
       </div>
       
-      {shouldShowBottomNav ? (
-        <>
-          <div>🔍 Rendering AnimatedBottomNav</div>
-          <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
-        </>
-      ) : (
-        <div>🔍 NOT rendering AnimatedBottomNav - shouldShow: {shouldShowBottomNav}</div>
+      {shouldShowBottomNav && (
+        <AnimatedBottomNav currentView={currentView} onNavigate={handleNavigate} />
       )}
     </div>
   );
