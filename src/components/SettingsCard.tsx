@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
 import { posthogService } from "@/services/posthog";
+import { useNavigate } from "react-router-dom";
 import AppBar from "./AppBar";
 import ProUpgradeCard from "./ProUpgradeCard";
 import { useSubscriptionCheck } from "@/hooks/useSubscriptionCheck";
@@ -16,6 +17,7 @@ interface SettingsCardProps {
 const SettingsCard = ({
   onNavigate
 }: SettingsCardProps) => {
+  const navigate = useNavigate();
   const {
     signOut
   } = useAuth();
@@ -165,9 +167,11 @@ const SettingsCard = ({
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     trackAuthEvent('logout');
-    signOut();
+    await signOut();
+    // Navigate to landing page smoothly after logout
+    navigate('/', { replace: true });
   };
 
   const handleNavigationClick = (destination: string, feature?: string) => {

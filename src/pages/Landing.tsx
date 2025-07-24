@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, Phone, CheckCircle, LogIn } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SimpleOnboardingFlow from "@/components/SimpleOnboardingFlow";
 import PhoneAuthForm from "@/components/PhoneAuthForm";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Landing = () => {
   const { user, loading, refreshUser } = useAuth();
+  const navigate = useNavigate();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
@@ -82,12 +83,12 @@ const Landing = () => {
   const reviewsPerSlide = 3;
   const totalSlides = Math.ceil(testimonials.length / reviewsPerSlide);
 
-  // Redirect authenticated users to the app
+  // Smoothly redirect authenticated users to the app using React Router
   useEffect(() => {
     if (user && !loading) {
-      window.location.href = '/app';
+      navigate('/app', { replace: true });
     }
-  }, [user, loading]);
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -104,6 +105,18 @@ const Landing = () => {
     setShowSignIn(true);
   };
 
+  // Show smooth loading during authentication transitions
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full hindi-bg flex items-center justify-center">
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-muted-foreground font-nunito">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
   };
@@ -119,7 +132,7 @@ const Landing = () => {
 
   if (showSignIn) {
     return (
-      <div className="min-h-screen w-full hindi-bg flex items-center justify-center p-4">
+      <div className="min-h-screen w-full hindi-bg flex items-center justify-center p-4 animate-fade-in">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <img 
@@ -141,7 +154,7 @@ const Landing = () => {
   }
   
   return (
-    <div className="min-h-screen w-full hindi-bg font-nunito">
+    <div className="min-h-screen w-full hindi-bg font-nunito animate-fade-in">
       {/* Header - optimized for desktop */}
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">

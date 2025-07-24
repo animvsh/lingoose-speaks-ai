@@ -68,11 +68,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(profile);
         console.log('✅ User profile refreshed from storage:', profile.phone_number);
         
-        // If user is authenticated and on landing page, redirect to app
-        if (window.location.pathname === '/') {
-          console.log('🚀 Redirecting to /app');
-          window.location.href = '/app';
-        }
+        // Don't redirect here - let individual pages handle their own redirects
+        // This prevents jarring page reloads
       } catch (error) {
         console.error('❌ Error parsing stored user profile:', error);
         setUser(null);
@@ -117,10 +114,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
           }, 1000);
 
-          // If user is authenticated and on landing page, redirect to app
-          if (window.location.pathname === '/') {
-            window.location.href = '/app';
-          }
+          // Don't redirect here - let components handle their own navigation
+          // This prevents jarring page reloads during authentication
         } catch (error) {
           console.error('Error parsing stored user profile:', error);
           
@@ -140,10 +135,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // New user who needs onboarding - keep user as null but authenticated
         console.log('User authenticated but needs onboarding');
         
-        // If user is on landing page and needs onboarding, redirect to app for onboarding
-        if (window.location.pathname === '/') {
-          window.location.href = '/app';
-        }
+        // Don't redirect here - let components handle their own navigation
+        // This prevents jarring page reloads during authentication
       }
     }
     
@@ -187,8 +180,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "You have been signed out successfully.",
       });
       
-      // Navigate to landing page properly
-      window.location.href = '/';
+      // Don't force a hard redirect - let the app handle navigation smoothly
+      // The user state has been cleared, so components will react accordingly
       
     } catch (error: any) {
       console.error('Sign out failed:', error);
@@ -203,8 +196,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('phone_number');
       setUser(null);
       
-      // Still redirect even on error
-      window.location.href = '/';
+      // Don't force a hard redirect even on error - let components handle navigation
     }
   };
 
