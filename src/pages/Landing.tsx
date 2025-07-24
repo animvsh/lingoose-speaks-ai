@@ -8,6 +8,14 @@ import PhoneAuthForm from "@/components/PhoneAuthForm";
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardStats from "@/components/DashboardStats";
 import AnimatedBottomNav from "@/components/AnimatedBottomNav";
+import ActivityCard from "@/components/ActivityCard";
+import CurriculumCard from "@/components/CurriculumCard";
+import SettingsCard from "@/components/SettingsCard";
+import ActivityDetailsView from "@/components/ActivityDetailsView";
+import AddSupervisorForm from "@/components/AddSupervisorForm";
+import ProfileManagementPage from "@/components/ProfileManagementPage";
+import PageTransition from "@/components/PageTransition";
+import WelcomeScreen from "@/components/WelcomeScreen";
 
 const Landing = () => {
   const { user, loading, refreshUser } = useAuth();
@@ -16,6 +24,9 @@ const Landing = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   const [currentView, setCurrentView] = useState("home");
+  const [isOnboarded, setIsOnboarded] = useState(false);
+  const [activityDetailsData, setActivityDetailsData] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
   const testimonials = [
     {
@@ -116,23 +127,107 @@ const Landing = () => {
     setShowSignIn(true);
   };
 
-  // If user is authenticated, show the app content directly without any navigation
+  // Check if user has completed onboarding
+  useEffect(() => {
+    if (user) {
+      const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.id}`);
+      if (onboardingComplete) {
+        setIsOnboarded(true);
+      } else {
+        setCurrentView("onboarding");
+      }
+    }
+  }, [user]);
+
+  const handleNavigate = (view: string, data?: any) => {
+    setIsTransitioning(true);
+    
+    if (data) {
+      setActivityDetailsData(data);
+    }
+    
+    setTimeout(() => {
+      setCurrentView(view);
+      setIsTransitioning(false);
+    }, 150);
+  };
+
+  const handleOnboardingComplete = () => {
+    localStorage.removeItem('needs_onboarding');
+    
+    const userProfile = localStorage.getItem('current_user_profile');
+    if (userProfile) {
+      try {
+        const profile = JSON.parse(userProfile);
+        localStorage.setItem(`onboarding_complete_${profile.id}`, "true");
+        setIsOnboarded(true);
+        setCurrentView("home");
+      } catch (error) {
+        console.error('Error parsing user profile after onboarding:', error);
+      }
+    } else if (user) {
+      localStorage.setItem(`onboarding_complete_${user.id}`, "true");
+      setIsOnboarded(true);
+      setCurrentView("home");
+    }
+  };
+
+  const renderCurrentView = () => {
+    let content;
+
+    if (currentView === "onboarding" && !isOnboarded) {
+      content = <WelcomeScreen onComplete={handleOnboardingComplete} onProfileCreated={refreshUser} />;
+    } else if (currentView === "home") {
+      content = <DashboardStats onNavigate={handleNavigate} />;
+    } else if (currentView === "activity") {
+      content = <ActivityCard onNavigate={handleNavigate} />;
+    } else if (currentView === "activity-details") {
+      content = <ActivityDetailsView activity={activityDetailsData} onNavigate={handleNavigate} />;
+    } else if (currentView === "curriculum") {
+      content = <CurriculumCard onNavigate={handleNavigate} />;
+    } else if (currentView === "settings") {
+      content = <SettingsCard onNavigate={handleNavigate} />;
+    } else if (currentView === "add-supervisor") {
+      content = <AddSupervisorForm onClose={() => handleNavigate("settings")} />;
+    } else if (currentView === "profile-management") {
+      content = <ProfileManagementPage onNavigate={handleNavigate} />;
+    } else {
+      content = <DashboardStats onNavigate={handleNavigate} />;
+    }
+
+    return (
+      <PageTransition 
+        isTransitioning={isTransitioning} 
+        transitionKey={currentView}
+      >
+        <div className="w-full">
+          {content}
+        </div>
+      </PageTransition>
+    );
+  };
+
+  // If user is authenticated, show the complete app interface
   if (user && !loading) {
-    // Show the main app interface directly on this page - no navigation, no blank screens
+    const shouldShowBottomNav = isOnboarded && currentView !== "onboarding" && currentView !== "add-supervisor";
+    
     return (
       <div className="min-h-screen w-full hindi-bg font-nunito animate-fade-in">
-        <div className="w-full pb-24">
-          <DashboardStats onNavigate={(view) => setCurrentView(view)} />
+        <div className={`w-full ${shouldShowBottomNav ? "pb-24" : ""}`}>
+          {renderCurrentView()}
         </div>
-        <AnimatedBottomNav 
-          currentView={currentView} 
-          onNavigate={(view) => setCurrentView(view)}
-        />
+        
+        {shouldShowBottomNav && (
+          <AnimatedBottomNav 
+            currentView={currentView} 
+            onNavigate={handleNavigate}
+          />
+        )}
       </div>
     );
   }
 
-  const handleOnboardingComplete = () => {
+  const handleLandingOnboardingComplete = () => {
     setShowOnboarding(false);
   };
 
@@ -142,7 +237,7 @@ const Landing = () => {
 
   if (showOnboarding) {
     const phoneNumber = localStorage.getItem('phone_number') || '';
-    return <SimpleOnboardingFlow onComplete={handleOnboardingComplete} phoneNumber={phoneNumber} onProfileCreated={refreshUser} />;
+    return <SimpleOnboardingFlow onComplete={handleLandingOnboardingComplete} phoneNumber={phoneNumber} onProfileCreated={refreshUser} />;
   }
 
   if (showSignIn) {
