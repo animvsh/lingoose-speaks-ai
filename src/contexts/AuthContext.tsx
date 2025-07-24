@@ -59,12 +59,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (storedUser && mounted) {
           const parsedUser = JSON.parse(storedUser);
           console.log('AuthProvider: Found stored user:', parsedUser);
-          setUser(parsedUser);
           
-          await logSecurityEvent('session_restored', parsedUser.phone_number, {
-            user_id: parsedUser.id,
-            restored_at: new Date().toISOString()
-          });
+          // Validate the user object has required fields
+          if (parsedUser.id && parsedUser.phone_number && parsedUser.full_name) {
+            setUser(parsedUser);
+            
+            await logSecurityEvent('session_restored', parsedUser.phone_number, {
+              user_id: parsedUser.id,
+              restored_at: new Date().toISOString()
+            });
+          } else {
+            console.warn('AuthProvider: Invalid user object in localStorage, clearing...');
+            localStorage.removeItem('currentUser');
+          }
         }
       } catch (error) {
         console.error('AuthProvider: Error restoring session:', error);

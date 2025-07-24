@@ -11,6 +11,17 @@ const Landing = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   
+  // Check if user is already authenticated and redirect to app
+  useEffect(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    const phoneAuth = localStorage.getItem('phone_authenticated');
+    
+    if (storedUser && phoneAuth === 'true') {
+      console.log('Landing: User already authenticated, redirecting to app');
+      window.location.href = '/app';
+    }
+  }, []);
+  
   const testimonials = [
     {
       quote: "Finally, my son can talk to his nani properly. She's so happy she cries every time he calls her.",
@@ -97,6 +108,13 @@ const Landing = () => {
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
+    // Check if user is authenticated and redirect to app
+    const storedUser = localStorage.getItem('currentUser');
+    const phoneAuth = localStorage.getItem('phone_authenticated');
+    
+    if (storedUser && phoneAuth === 'true') {
+      window.location.href = '/app';
+    }
   };
 
   const handleSignInBack = () => {

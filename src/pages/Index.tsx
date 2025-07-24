@@ -89,16 +89,25 @@ const Index = () => {
         }
       } else {
         // Only redirect to auth if loading is complete and user is definitively null
-        // Add a longer delay to ensure auth state has time to load from localStorage
+        // Give more time for auth state to load and double-check localStorage
         setTimeout(() => {
           if (!user && !loading) {
-            // Double check localStorage before redirecting
+            // Triple check localStorage before redirecting
             const storedUser = localStorage.getItem('currentUser');
-            if (!storedUser) {
+            const phoneAuth = localStorage.getItem('phone_authenticated');
+            
+            console.log('Index: Final auth check - user:', user, 'loading:', loading, 'storedUser:', !!storedUser, 'phoneAuth:', phoneAuth);
+            
+            if (!storedUser && phoneAuth !== 'true') {
+              console.log('Index: No authentication found, redirecting to landing');
               navigate('/');
+            } else if (storedUser && !user) {
+              // Force reload if we have stored user but auth context hasn't picked it up
+              console.log('Index: Auth state mismatch, forcing reload');
+              window.location.reload();
             }
           }
-        }, 500);
+        }, 1000); // Increased timeout for better reliability
       }
     }
   }, [user, loading, identify, trackScreenView, trackPageView, navigate]);
