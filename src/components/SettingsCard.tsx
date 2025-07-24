@@ -175,14 +175,11 @@ const SettingsCard = ({
 
   const handleNavigationClick = (destination: string, feature?: string) => {
     console.log('🎯 SettingsCard navigation clicked:', destination, feature);
-    console.log('🎯 onNavigate function type:', typeof onNavigate);
-    console.log('🎯 onNavigate function:', onNavigate.toString().slice(0, 100));
     if (feature) {
       trackFeatureUsage('settings_navigation', feature);
     }
     console.log('🎯 Calling onNavigate with:', destination);
     onNavigate(destination);
-    console.log('🎯 onNavigate call completed');
   };
 
   return <div className="min-h-screen hindi-bg pb-24 font-nunito">

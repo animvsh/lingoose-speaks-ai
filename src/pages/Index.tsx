@@ -241,7 +241,6 @@ const Index = () => {
     } else if (currentView === "roadmap") {
       content = <FluencyRoadmapView />;
     } else if (currentView === "settings") {
-      console.log('🏗️ INDEX.tsx rendering SettingsCard with Index handleNavigate');
       content = <SettingsCard onNavigate={handleNavigate} />;
     } else if (currentView === "add-supervisor") {
       content = <AddSupervisorForm onClose={() => handleNavigate("settings")} />;
