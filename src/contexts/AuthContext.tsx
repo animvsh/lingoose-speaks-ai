@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const needsOnboarding = localStorage.getItem('needs_onboarding');
     
     if (isAuthenticated === 'true') {
-      if (userProfile && !needsOnboarding) {
+      if (userProfile && needsOnboarding !== 'true') {
         // Existing user with complete profile
         try {
           const profile = JSON.parse(userProfile);

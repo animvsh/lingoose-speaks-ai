@@ -99,6 +99,16 @@ const Index = () => {
         setCurrentView("onboarding");
         trackScreenView("onboarding");
         trackPageView("onboarding");
+      } else if (isAuthenticated === 'true') {
+        // Authenticated user but no profile yet - stay in the app and show onboarding
+        identify({
+          user_type: 'authenticated_no_profile',
+          onboarding_completed: false
+        });
+        
+        setCurrentView("onboarding");
+        trackScreenView("onboarding");
+        trackPageView("onboarding");
       } else {
         // Only redirect to auth if loading is complete and user is definitively null
         // Add a small delay to prevent blank screens during auth state changes
