@@ -49,17 +49,11 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
                 key={view}
                 variant="ghost"
                 size="sm"
-                onTouchStart={() => {
-                  // Immediate visual feedback on touch
-                  if ('vibrate' in navigator) {
-                    navigator.vibrate(25);
-                  }
-                }}
                 onClick={() => handleNavClick(view, label)}
                 className={`
                   w-16 h-16 rounded-3xl border-2 border-handdrawn transition-all duration-150 ease-out
                   transform active:scale-95 hover:scale-105 hover-lift
-                  mobile-touch-target select-none shadow-lg font-nunito
+                  mobile-touch-target select-none shadow-lg font-nunito cursor-pointer
                   ${isActive 
                     ? 'bg-primary text-white scale-105 border-primary shadow-xl' 
                     : 'bg-white/90 text-brown-700 hover:bg-secondary active:bg-primary/20'
