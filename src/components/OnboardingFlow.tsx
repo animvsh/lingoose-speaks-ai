@@ -62,9 +62,9 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
     switch (currentStep) {
       case 0:
         return (
-          <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 pb-8">
+          <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50 px-6 pb-8">
             {/* Header with animated sheep */}
-            <div className="px-6 pt-8 pb-6">
+            <div className="pt-8 pb-6">
               <div className="flex items-center justify-center">
                 <div className="text-center">
                   <div className="relative">
@@ -81,7 +81,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               </div>
             </div>
 
-            <div className="px-6 space-y-4">
+            <div className="space-y-4">
               {/* Progress indicator with fun design */}
               <div className="flex items-center justify-center mb-8">
                 <div className="flex space-x-3">
@@ -137,9 +137,9 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
 
       case 1:
         return (
-          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-8">
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 px-6 pb-8">
             {/* Header with back button */}
-            <div className="px-6 pt-8 pb-6">
+            <div className="pt-8 pb-6">
               <div className="flex items-center justify-between">
                 <Button
                   onClick={prevStep}
@@ -160,7 +160,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               </div>
             </div>
 
-            <div className="px-6 space-y-4">
+            <div className="space-y-4">
               {/* Progress indicator */}
               <div className="flex items-center justify-center mb-8">
                 <div className="flex space-x-3">
@@ -224,9 +224,9 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
         const selectedToneData = tones.find(t => t.id === selectedTone);
         
         return (
-          <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 pb-8">
+          <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 px-6 pb-8">
             {/* Header with back button */}
-            <div className="px-6 pt-8 pb-6">
+            <div className="pt-8 pb-6">
               <div className="flex items-center justify-between">
                 <Button
                   onClick={prevStep}
@@ -248,7 +248,7 @@ const OnboardingFlow = ({ onComplete }: OnboardingFlowProps) => {
               </div>
             </div>
 
-            <div className="px-6 space-y-6">
+            <div className="space-y-6">
               {/* Progress indicator - all complete */}
               <div className="flex items-center justify-center mb-8">
                 <div className="flex space-x-3">

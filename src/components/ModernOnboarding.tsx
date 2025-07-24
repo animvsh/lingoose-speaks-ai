@@ -120,7 +120,7 @@ const ModernOnboarding = ({ phoneNumber, onComplete }: ModernOnboardingProps) =>
 
   if (step === 'level') {
     return (
-      <div className="min-h-screen hindi-bg p-6">
+      <div className="min-h-screen hindi-bg px-6 pt-4">
         <div className="w-full max-w-md mx-auto space-y-6">
           {/* Header */}
           <div className="text-center space-y-4">
@@ -187,7 +187,7 @@ const ModernOnboarding = ({ phoneNumber, onComplete }: ModernOnboardingProps) =>
   }
 
   return (
-    <div className="min-h-screen hindi-bg flex items-center justify-center p-6">
+    <div className="min-h-screen hindi-bg flex items-center justify-center px-6 pt-4">
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="text-center space-y-4">

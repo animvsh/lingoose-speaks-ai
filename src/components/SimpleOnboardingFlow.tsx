@@ -115,7 +115,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber }: SimpleOnboardingFlowP
         return (
           <div className="w-full min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50">
             <AppBar title="Welcome" showBackButton={false} />
-            <div className="w-full flex items-center justify-center">
+            <div className="px-6 pt-4 w-full flex items-center justify-center">
               <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                   <div className="relative mb-6">
