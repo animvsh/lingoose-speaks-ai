@@ -373,37 +373,37 @@ const Landing = () => {
           </div>
 
           {/* Testimonials carousel */}
-          <div className="overflow-hidden">
+          <div className="overflow-hidden rounded-3xl">
             <div 
               className="flex transition-transform duration-500 ease-out"
               style={{ 
-                transform: `translateX(-${currentTestimonial * 100}%)`,
-                width: `${totalSlides * 100}%`
+                transform: `translateX(-${currentTestimonial * 100}%)`
               }}
             >
               {Array.from({ length: totalSlides }).map((_, slideIndex) => (
                 <div 
                   key={slideIndex}
-                  className="w-full flex gap-6 justify-center"
-                  style={{ width: `${100 / totalSlides}%` }}
+                  className="w-full flex-shrink-0 px-4"
                 >
-                  {testimonials
-                    .slice(slideIndex * reviewsPerSlide, (slideIndex + 1) * reviewsPerSlide)
-                    .map((testimonial, index) => (
-                      <Card 
-                        key={`${slideIndex}-${index}`}
-                        className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 hover-lift shadow-lg"
-                      >
-                        <div className="text-2xl mb-3">💬</div>
-                        <blockquote className="text-sm mb-4 italic font-medium text-brown-900 font-nunito">
-                          "{testimonial.quote}"
-                        </blockquote>
-                        <div>
-                          <cite className="text-sm font-black text-brown-900 font-nunito">— {testimonial.author}</cite>
-                          <p className="text-xs font-medium text-brown-700 font-nunito">{testimonial.role}</p>
-                        </div>
-                      </Card>
-                    ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    {testimonials
+                      .slice(slideIndex * reviewsPerSlide, (slideIndex + 1) * reviewsPerSlide)
+                      .map((testimonial, index) => (
+                        <Card 
+                          key={`${slideIndex}-${index}`}
+                          className="rounded-3xl border-2 border-handdrawn bg-white/90 p-6 hover-lift shadow-lg"
+                        >
+                          <div className="text-2xl mb-3">💬</div>
+                          <blockquote className="text-sm mb-4 italic font-medium text-brown-900 font-nunito">
+                            "{testimonial.quote}"
+                          </blockquote>
+                          <div>
+                            <cite className="text-sm font-black text-brown-900 font-nunito">— {testimonial.author}</cite>
+                            <p className="text-xs font-medium text-brown-700 font-nunito">{testimonial.role}</p>
+                          </div>
+                        </Card>
+                      ))}
+                  </div>
                 </div>
               ))}
             </div>
