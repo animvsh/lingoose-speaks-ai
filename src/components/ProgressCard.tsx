@@ -50,155 +50,125 @@ const ProgressCard = ({ onNavigate }: ProgressCardProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-amber-50 pb-24">
+    <div className="min-h-screen hindi-bg pb-24 font-nunito">
       <AppBar 
-        title="PROGRESS" 
+        title="Progress" 
         onBack={() => handleNavigate("home")} 
         showBackButton={true} 
       />
 
-      <div className="px-6 space-y-6">
+      <div className="px-4 pt-4 space-y-6">
         {/* Header Section */}
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold text-orange-600 mb-2 uppercase tracking-wide">
-            OVERVIEW
+        <div className="w-full rounded-3xl border-2 border-handdrawn bg-white/90 p-6 shadow-lg text-center">
+          <div className="w-16 h-16 bg-blue-100 border-2 border-blue-300 rounded-3xl flex items-center justify-center mx-auto mb-4">
+            <Trophy className="w-8 h-8 text-blue-500" />
+          </div>
+          <h2 className="text-2xl font-black text-brown-900 mb-2 uppercase tracking-wide">
+            Learning Overview
           </h2>
-          <p className="text-xl font-semibold text-gray-700">
-            Your learning journey
+          <p className="text-brown-700 font-bold">
+            Your learning journey progress
           </p>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 gap-4 mb-8">
-          <div className="bg-blue-400 rounded-3xl p-6 border-4 border-blue-500">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center mr-4">
-                <BookOpen className="w-6 h-6 text-white" />
+        <div className="w-full rounded-3xl border-2 border-handdrawn bg-white/90 p-6 shadow-lg">
+          <h3 className="text-xl font-black text-brown-900 mb-6 uppercase tracking-wide flex items-center">
+            <BookOpen className="w-6 h-6 mr-3 text-blue-500" />
+            Learning Sessions
+          </h3>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between py-4 px-4 bg-blue-50 rounded-2xl border-2 border-blue-200">
+              <div className="flex items-center">
+                <BookOpen className="w-5 h-5 mr-3 text-blue-500" />
+                <span className="text-brown-700 font-bold">Total Sessions</span>
               </div>
-              <div>
-                <h3 className="text-lg font-bold text-white uppercase tracking-wide">
-                  LEARNING SESSIONS
-                </h3>
-                <p className="text-blue-100 font-medium text-sm">
-                  Total completed sessions
-                </p>
-              </div>
+              <span className="text-blue-500 font-black text-xl bg-blue-100 px-3 py-1 rounded-xl border-2 border-blue-300">
+                {overviewStats.totalSessions}
+              </span>
             </div>
-            <div className="text-4xl font-bold text-white mb-2">{overviewStats.totalSessions}</div>
-            <div className="text-blue-100 text-sm font-medium">
-              {overviewStats.completedThisWeek} completed this week
-            </div>
-          </div>
-
-          <div className="bg-green-400 rounded-3xl p-6 border-4 border-green-500">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center mr-4">
-                <Star className="w-6 h-6 text-white" />
+            
+            <div className="flex items-center justify-between py-4 px-4 bg-green-50 rounded-2xl border-2 border-green-200">
+              <div className="flex items-center">
+                <Clock className="w-5 h-5 mr-3 text-green-500" />
+                <span className="text-brown-700 font-bold">This Week</span>
               </div>
-              <div>
-                <h3 className="text-lg font-bold text-white uppercase tracking-wide">
-                  AVERAGE RATING
-                </h3>
-                <p className="text-green-100 font-medium text-sm">
-                  Your performance score
-                </p>
-              </div>
-            </div>
-            <div className="text-4xl font-bold text-white mb-2">{overviewStats.averageRating}/5</div>
-            <div className="flex items-center text-green-100 text-sm font-medium">
-              {Array.from({ length: 5 }, (_, i) => (
-                <Star
-                  key={i}
-                  className={`w-4 h-4 mr-1 ${
-                    i < Math.round(overviewStats.averageRating) ? "fill-white text-white" : "text-green-200"
-                  }`}
-                />
-              ))}
+              <span className="text-green-500 font-black text-xl bg-green-100 px-3 py-1 rounded-xl border-2 border-green-300">
+                {overviewStats.completedThisWeek}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Redirect to Analytics */}
-        <div className="bg-orange-400 rounded-3xl p-6 border-4 border-orange-500">
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center mr-4">
-              <Trophy className="w-6 h-6 text-white" />
+        {/* Performance Section */}
+        <div className="w-full rounded-3xl border-2 border-handdrawn bg-white/90 p-6 shadow-lg">
+          <h3 className="text-xl font-black text-brown-900 mb-6 uppercase tracking-wide flex items-center">
+            <Star className="w-6 h-6 mr-3 text-orange-500" />
+            Performance
+          </h3>
+          
+          <div className="flex items-center justify-between py-4 px-4 bg-orange-50 rounded-2xl border-2 border-orange-200">
+            <div className="flex items-center">
+              <Star className="w-5 h-5 mr-3 text-orange-500" />
+              <div>
+                <span className="text-brown-700 font-bold block">Average Rating</span>
+                <div className="flex items-center mt-1">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 mr-1 ${
+                        i < Math.round(overviewStats.averageRating) ? "fill-orange-500 text-orange-500" : "text-orange-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-bold text-white uppercase tracking-wide">
-                DETAILED ANALYTICS
-              </h3>
-              <p className="text-orange-100 font-medium text-sm">
-                View your complete learning analytics
-              </p>
-            </div>
+            <span className="text-orange-500 font-black text-xl bg-orange-100 px-3 py-1 rounded-xl border-2 border-orange-300">
+              {overviewStats.averageRating}/5
+            </span>
           </div>
-          <Button 
-            onClick={() => handleNavigate("curriculum")}
-            className="w-full bg-white hover:bg-orange-50 text-orange-600 font-bold py-3 text-lg rounded-2xl"
-          >
-            VIEW ANALYTICS →
-          </Button>
+        </div>
+
+        {/* Analytics Section */}
+        <div className="w-full rounded-3xl border-2 border-handdrawn bg-white/90 p-6 shadow-lg">
+          <h3 className="text-xl font-black text-brown-900 mb-6 uppercase tracking-wide flex items-center">
+            <Trophy className="w-6 h-6 mr-3 text-purple-500" />
+            Detailed Analytics
+          </h3>
+          
+          <div className="bg-purple-50 rounded-2xl border-2 border-purple-200 p-4 mb-4">
+            <p className="text-brown-700 font-bold text-center mb-3">
+              View your complete learning analytics and detailed progress
+            </p>
+            <Button 
+              onClick={() => handleNavigate("curriculum")}
+              className="w-full bg-purple-500 hover:bg-purple-600 text-white font-black py-3 text-lg rounded-xl border-2 border-purple-400 transition-all duration-200 hover:scale-[1.02]"
+            >
+              VIEW ANALYTICS →
+            </Button>
+          </div>
         </div>
 
         {/* No Data Message */}
         {(!ratings || ratings.length === 0) && (
-          <div className="bg-gray-200 rounded-3xl p-8 border-4 border-gray-300 text-center">
-            <div className="w-16 h-16 bg-gray-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-white" />
+          <div className="w-full rounded-3xl border-2 border-handdrawn bg-white/90 p-6 shadow-lg text-center">
+            <div className="w-16 h-16 bg-gray-100 border-2 border-gray-300 rounded-3xl flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-gray-500" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-2">Start Learning</h3>
-            <p className="text-gray-600 font-medium mb-4">
+            <h3 className="text-xl font-black text-brown-900 mb-2 uppercase tracking-wide">Start Learning</h3>
+            <p className="text-brown-700 font-bold mb-4">
               Begin your language learning journey to see your progress here!
             </p>
             <Button 
               onClick={() => handleNavigate("activity")}
-              className="bg-orange-400 hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-2xl"
+              className="bg-green-500 hover:bg-green-600 text-white font-black py-3 px-6 rounded-xl border-2 border-green-400 transition-all duration-200 hover:scale-[1.02]"
             >
               START FIRST SESSION
             </Button>
           </div>
         )}
-      </div>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white px-6 py-4 border-t border-gray-100">
-        <div className="max-w-md mx-auto">
-          <div className="flex justify-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => handleNavigate("home")}
-              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
-            >
-              <Home className="w-6 h-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => handleNavigate("activity")}
-              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
-            >
-              <Phone className="w-6 h-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => handleNavigate("curriculum")}
-              className="w-14 h-14 bg-gray-200 rounded-2xl text-gray-600"
-            >
-              <CheckCircle className="w-6 h-6" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => handleNavigate("settings")}
-              className="w-14 h-14 bg-blue-400 rounded-2xl text-white"
-            >
-              <Settings className="w-6 h-6" />
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   );
