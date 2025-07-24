@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 import AppBar from "./AppBar";
+import { TranscriptDisplay } from "./TranscriptDisplay";
+import { useCallCompletionTracker } from "@/hooks/useCallCompletionTracker";
 
 interface ActivityDetailsViewProps {
   activity: any;
@@ -13,6 +16,30 @@ interface ActivityDetailsViewProps {
 
 const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps) => {
   const { user } = useAuth();
+  const { 
+    latestCall, 
+    startActivityDetailsTracking, 
+    stopActivityDetailsTracking,
+    hasProcessedTranscript 
+  } = useCallCompletionTracker();
+
+  // Track time spent in activity details for call completion detection
+  useEffect(() => {
+    console.log('ActivityDetailsView mounted - starting tracking');
+    startActivityDetailsTracking();
+    
+    return () => {
+      console.log('ActivityDetailsView unmounted - stopping tracking');
+      stopActivityDetailsTracking();
+    };
+  }, []);
+
+  // Log when we detect processed transcript
+  useEffect(() => {
+    if (hasProcessedTranscript) {
+      console.log('Processed transcript detected in ActivityDetailsView');
+    }
+  }, [hasProcessedTranscript]);
 
   // Fetch detailed activity data including transcripts and analysis
   const { data: activityDetails, isLoading } = useQuery({
@@ -226,43 +253,11 @@ const ActivityDetailsView = ({ activity, onNavigate }: ActivityDetailsViewProps)
           )}
         </div>
 
-        {/* Conversation Transcript */}
-        <div className="bg-white rounded-3xl p-6 border-4 border-gray-200">
-          <div className="flex items-center mb-4">
-            <div className="w-14 h-14 bg-blue-400 rounded-2xl flex items-center justify-center mr-4">
-              <MessageSquare className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-800 uppercase tracking-wide">
-                CONVERSATION TRANSCRIPT
-              </h3>
-              <p className="text-gray-600 font-medium text-sm">
-                {hasRealTranscript ? 'Real conversation from your practice session' : 'No conversation data available'}
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-gray-50 rounded-2xl p-4 max-h-64 overflow-y-auto">
-            {hasRealTranscript ? (
-              <>
-                <div className="mb-3 p-3 bg-green-50 rounded-2xl">
-                  <p className="text-green-700 text-sm font-medium">
-                    ✓ Real conversation transcript from VAPI call
-                  </p>
-                </div>
-                <pre className="text-sm text-gray-700 whitespace-pre-wrap font-medium leading-relaxed">
-                  {activityDetails.callAnalysis.transcript}
-                </pre>
-              </>
-            ) : (
-              <div className="text-center text-gray-500 py-8">
-                <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="font-medium">No conversation transcript available</p>
-                <p className="text-sm">Complete a practice call to see your conversation here</p>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Conversation Transcript with Speaker Identification */}
+        <TranscriptDisplay 
+          callAnalysis={activityDetails?.callAnalysis || latestCall} 
+          className="bg-white rounded-3xl"
+        />
 
         {/* Feedback & Recommendations */}
         {activityDetails?.rating?.feedback_notes && (

@@ -5,6 +5,7 @@ import { usePostHog } from "@/hooks/usePostHog";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import { useLearningAnalytics } from "@/hooks/useLearningAnalytics";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
+import { useCallCompletionTracker } from "@/hooks/useCallCompletionTracker";
 
 interface TodaysActivitySectionProps {
   currentActivity: any;
@@ -25,6 +26,7 @@ const TodaysActivitySection = ({
   const { trackTap } = useEngagementTracking();
   const { trackLearningSessionStart } = useLearningAnalytics();
   const { data: subscriptionStatus } = useSubscriptionStatus();
+  const { markExerciseCompleted } = useCallCompletionTracker();
 
   const getRatingColor = (rating: number) => {
     if (rating < 40) return "text-red-600";
@@ -64,6 +66,11 @@ const TodaysActivitySection = ({
     });
 
     trackPracticeStart(currentActivity);
+    
+    // Mark exercise as completed for call tracking
+    // We'll mark it as completed when the call starts since the user initiated the full exercise
+    markExerciseCompleted();
+    
     onStartPractice();
   };
 
