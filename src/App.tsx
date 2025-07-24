@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { useState } from "react";
 
 import Index from "@/pages/Index";
 import Landing from "@/pages/Landing";
@@ -11,8 +12,6 @@ import NotFound from "@/pages/NotFound";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 import "./App.css";
-
-const queryClient = new QueryClient();
 
 function AppContent() {
   return (
@@ -31,6 +30,16 @@ function AppContent() {
 }
 
 function App() {
+  // Create QueryClient inside component to avoid hot reload issues
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        retry: 1,
+      },
+    },
+  }));
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
