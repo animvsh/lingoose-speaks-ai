@@ -163,6 +163,7 @@ const Index = () => {
 
   const handleNavigate = (view: string, data?: any) => {
     console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView);
+    console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView);
     const previousView = currentView;
     setIsTransitioning(true);
     
