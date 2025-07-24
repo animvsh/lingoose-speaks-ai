@@ -201,6 +201,7 @@ const Index = () => {
 
   const renderCurrentView = () => {
     console.log('🎨 renderCurrentView called with currentView:', currentView, 'type:', typeof currentView, 'isOnboarded:', isOnboarded);
+    console.log('🎨 currentView === "settings"?', currentView === "settings");
     let content;
 
     if (currentView === "onboarding" && !isOnboarded) {
