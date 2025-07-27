@@ -276,7 +276,7 @@ const Landing = () => {
       className="min-h-screen w-full font-nunito animate-fade-in"
       style={{
         backgroundImage: `url('/lovable-uploads/f7e8c6ae-d967-4e31-a5b0-8ea6962b374c.png')`,
-        backgroundSize: 'contain',
+        backgroundSize: 'auto',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
