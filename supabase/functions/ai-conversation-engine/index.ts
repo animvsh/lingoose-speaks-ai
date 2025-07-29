@@ -75,8 +75,10 @@ serve(async (req) => {
       content: msg.message_text
     }));
 
-    // Enhanced system prompt with comprehensive scheduling intelligence and topic focus
+    // Enhanced system prompt with JSON formatting requirement
     const systemPrompt = `You are an intelligent AI assistant for Lingoose, a language learning app that provides phone call practice sessions. Your PRIMARY job is scheduling language practice calls and keeping conversations focused on language learning.
+
+CRITICAL: You MUST respond with valid JSON only. No additional text before or after the JSON.
 
 🎯 CORE MISSION: STAY ON TOPIC - LANGUAGE LEARNING ONLY
 - If users talk about anything other than scheduling language practice calls, gently redirect them back to scheduling
@@ -172,7 +174,12 @@ You must respond with a JSON object containing:
 
 Keep messages under 160 characters when possible. Be conversational and helpful.`;
 
-    // Call OpenAI
+    // Call OpenAI with enhanced error handling
+    console.log('Making OpenAI API call with model:', 'gpt-4.1-2025-04-14');
+    console.log('System prompt length:', systemPrompt.length);
+    console.log('Conversation history length:', conversationHistory.length);
+    console.log('Incoming message:', incomingMessage);
+
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -180,38 +187,69 @@ Keep messages under 160 characters when possible. Be conversational and helpful.
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'gpt-4o-mini', // Using a more reliable model
         messages: [
           { role: 'system', content: systemPrompt },
           ...conversationHistory,
           { role: 'user', content: incomingMessage }
         ],
-        temperature: 0.7,
-        max_tokens: 600,
+        temperature: 0.3, // Lower temperature for more consistent JSON output
+        max_tokens: 300,
+        response_format: { type: "json_object" } // Force JSON response
       }),
     });
 
+    console.log('OpenAI response status:', openaiResponse.status);
+    
     if (!openaiResponse.ok) {
-      console.error('OpenAI API error:', await openaiResponse.text());
-      throw new Error('OpenAI API failed');
+      const errorText = await openaiResponse.text();
+      console.error('OpenAI API error:', errorText);
+      throw new Error(`OpenAI API failed: ${errorText}`);
     }
 
     const openaiResult = await openaiResponse.json();
-    const aiResponseText = openaiResult.choices[0].message.content;
+    console.log('OpenAI result structure:', Object.keys(openaiResult));
     
+    if (!openaiResult.choices || !openaiResult.choices[0] || !openaiResult.choices[0].message) {
+      console.error('Invalid OpenAI response structure:', openaiResult);
+      throw new Error('Invalid OpenAI response structure');
+    }
+    
+    const aiResponseText = openaiResult.choices[0].message.content;
     console.log('Raw AI response:', aiResponseText);
 
-    // Parse AI response
+    // Parse AI response with better error handling
     let aiResponse;
     try {
+      if (!aiResponseText || aiResponseText.trim() === '') {
+        throw new Error('Empty AI response');
+      }
       aiResponse = JSON.parse(aiResponseText);
+      
+      // Validate required fields
+      if (!aiResponse.message || !aiResponse.action) {
+        throw new Error('Missing required fields in AI response');
+      }
+      
     } catch (parseError) {
-      console.error('Failed to parse AI response, using fallback:', parseError);
-      // Fallback response
+      console.error('Failed to parse AI response:', parseError);
+      console.error('Raw response that failed to parse:', aiResponseText);
+      
+      // Try to extract just a message if JSON parsing fails
+      let fallbackMessage = "When would you like to schedule your language practice call?";
+      if (aiResponseText && typeof aiResponseText === 'string') {
+        // Try to extract a reasonable message from the response
+        const messageMatch = aiResponseText.match(/"message":\s*"([^"]+)"/);
+        if (messageMatch) {
+          fallbackMessage = messageMatch[1];
+        }
+      }
+      
+      // Enhanced fallback response
       aiResponse = {
-        message: "I'd be happy to help schedule your language practice call. When would be a good time for you?",
+        message: fallbackMessage,
         action: "update_conversation_state",
-        conversation_state: { stage: "initial" }
+        conversation_state: { stage: "initial", error: "parsing_failed" }
       };
     }
 
