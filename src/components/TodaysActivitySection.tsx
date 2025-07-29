@@ -66,7 +66,8 @@ const TodaysActivitySection = ({
           await supabase.functions.invoke('send-sms', {
             body: {
               phoneNumber: userProfile.phone_number,
-              otp: "Hey, we're calling! Get ready to answer your phone shortly... 📞"
+              message: "Hey, we're calling! Get ready to answer your phone shortly... 📞",
+              messageType: 'notification'
             }
           });
           console.log('SMS sent successfully');

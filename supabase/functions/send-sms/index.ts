@@ -13,9 +13,14 @@ serve(async (req) => {
   }
 
   try {
-    const { phoneNumber, otp } = await req.json()
+    const { phoneNumber, otp, message, messageType = 'otp' } = await req.json()
     
-    console.log('SMS request received:', { phoneNumber: phoneNumber?.slice(-4), otp: otp ? '***' : 'missing' })
+    console.log('SMS request received:', { 
+      phoneNumber: phoneNumber?.slice(-4), 
+      messageType,
+      hasOtp: !!otp,
+      hasMessage: !!message 
+    })
 
     // Get Twilio credentials from Supabase secrets
     const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID')
@@ -39,13 +44,28 @@ serve(async (req) => {
       throw new Error('Phone number must include country code (e.g., +1234567890)')
     }
 
+    // Determine message content based on type
+    let messageBody: string
+    if (messageType === 'notification' && message) {
+      messageBody = message
+    } else if (messageType === 'otp' && otp) {
+      messageBody = `Your Lingoose verification code is: ${otp}. This code will expire in 10 minutes. Don't share this code with anyone!`
+    } else {
+      // Backwards compatibility - if only 'otp' field is provided, treat as notification if it's not a number
+      if (otp && isNaN(Number(otp))) {
+        messageBody = otp
+      } else {
+        messageBody = `Your Lingoose verification code is: ${otp}. This code will expire in 10 minutes. Don't share this code with anyone!`
+      }
+    }
+
     // Create Twilio client
     const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`
     
     const body = new URLSearchParams({
       To: phoneNumber,
       From: fromNumber,
-      Body: `Your Lingoose verification code is: ${otp}. This code will expire in 10 minutes. Don't share this code with anyone!`
+      Body: messageBody
     })
 
     console.log('Sending SMS via Twilio API...')
