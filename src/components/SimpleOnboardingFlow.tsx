@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import BolMascot from "./BolMascot";
 import AppBar from "./AppBar";
 import { useCreateUserProfile } from "@/hooks/useCreateUserProfile";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
+import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 
 interface SimpleOnboardingFlowProps {
   onComplete: () => void;
@@ -24,6 +26,8 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
   
   const [isCheckingPhone, setIsCheckingPhone] = useState(false);
   const createUserProfile = useCreateUserProfile();
+  const { trackSwipe } = useEngagementTracking();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const proficiencyLevels = [
     { 
@@ -112,6 +116,22 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
       return false;
     }
   };
+
+  // Swipe navigation handler
+  const handleSwipe = (direction: 'left' | 'right') => {
+    trackSwipe(direction, `onboarding-step-${currentStep}`);
+    
+    if (direction === 'left') {
+      // Swipe left = go forward (next step)
+      handleNext();
+    } else if (direction === 'right') {
+      // Swipe right = go back (previous step)
+      handleBack();
+    }
+  };
+
+  // Setup swipe navigation
+  useSwipeNavigation(containerRef, handleSwipe);
 
   const handleNext = async () => {
     if (currentStep === 0 && fullName.trim()) {
@@ -224,11 +244,18 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
                     </div>
                   </Button>
                 </div>
-              </div>
+                </div>
 
                 <div className="text-center mt-6 p-4 bg-white rounded-2xl border-3 border-orange-200 shadow-lg w-full">
                   <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                   <span className="text-orange-700 font-bold">Nice to meet you! 🌟</span>
+                </div>
+
+                {/* Swipe hint for mobile */}
+                <div className="text-center mt-4 px-4">
+                  <div className="flex items-center justify-center space-x-2 text-orange-600/60 text-sm animate-pulse">
+                    <span>👈 Swipe left to continue</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -293,6 +320,14 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
               <div className="text-center p-4 bg-white rounded-2xl border-3 border-blue-200 shadow-lg w-full max-w-md mx-auto">
                 <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-blue-700 font-bold text-sm sm:text-base">We'll call you for fun Hindi lessons! 📞</span>
+              </div>
+
+              {/* Swipe hints for mobile */}
+              <div className="text-center mt-4 px-4">
+                <div className="flex items-center justify-between text-blue-600/60 text-sm">
+                  <span className="animate-pulse">👉 Swipe right to go back</span>
+                  <span className="animate-pulse">👈 Swipe left to continue</span>
+                </div>
               </div>
             </div>
           </div>
@@ -359,6 +394,14 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
                 <BolMascot size="sm" className="w-6 h-6 inline-block mr-2" />
                 <span className="text-purple-700 font-bold text-sm sm:text-base">Your privacy matters to us! 🔒</span>
               </div>
+
+              {/* Swipe hints for mobile */}
+              <div className="text-center mt-4 px-4">
+                <div className="flex items-center justify-between text-purple-600/60 text-sm">
+                  <span className="animate-pulse">👉 Swipe right to go back</span>
+                  <span className="animate-pulse">👈 Swipe left to continue</span>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -417,6 +460,13 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
                   {createUserProfile.isPending ? "Creating your profile..." : "Choose your current level! 🎯"}
                 </span>
               </div>
+
+              {/* Swipe hints for mobile */}
+              <div className="text-center mt-4 px-4">
+                <div className="flex items-center justify-center text-green-600/60 text-sm">
+                  <span className="animate-pulse">👉 Swipe right to go back</span>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -427,7 +477,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
   };
 
   return (
-    <div className="w-full">
+    <div ref={containerRef} className="w-full">
       {renderStep()}
     </div>
   );
