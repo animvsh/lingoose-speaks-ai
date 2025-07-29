@@ -46,7 +46,23 @@ serve(async (req) => {
       throw new Error("User profile found but no phone number");
     }
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
+    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const stripePublishableKey = Deno.env.get("STRIPE_PUBLISHABLE_KEY");
+    
+    console.log('Stripe keys check:', { 
+      hasSecretKey: !!stripeSecretKey, 
+      hasPublishableKey: !!stripePublishableKey 
+    });
+    
+    if (!stripeSecretKey) {
+      throw new Error("STRIPE_SECRET_KEY environment variable is not set");
+    }
+    
+    if (!stripePublishableKey) {
+      throw new Error("STRIPE_PUBLISHABLE_KEY environment variable is not set");
+    }
+
+    const stripe = new Stripe(stripeSecretKey, { 
       apiVersion: "2023-10-16" 
     });
     
@@ -63,8 +79,10 @@ serve(async (req) => {
     
     if (existingCustomer) {
       customerId = existingCustomer.id;
+      console.log('Using existing customer:', customerId);
     } else {
       // Create new customer with phone number as metadata
+      console.log('Creating new customer for:', profile.full_name);
       const customer = await stripe.customers.create({
         name: profile.full_name,
         metadata: {
@@ -73,8 +91,10 @@ serve(async (req) => {
         }
       });
       customerId = customer.id;
+      console.log('Created new customer:', customerId);
     }
 
+    console.log('Creating Stripe checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [
@@ -96,11 +116,25 @@ serve(async (req) => {
       redirect_on_completion: "never",
       return_url: `${req.headers.get("origin")}/`,
     });
+    
+    console.log('Stripe session created:', { 
+      sessionId: session.id, 
+      hasClientSecret: !!session.client_secret,
+      mode: session.mode,
+      uiMode: session.ui_mode 
+    });
 
-    return new Response(JSON.stringify({ 
+    const responseData = { 
       clientSecret: session.client_secret,
-      publishableKey: Deno.env.get("STRIPE_PUBLISHABLE_KEY")
-    }), {
+      publishableKey: stripePublishableKey
+    };
+    
+    console.log('Sending response:', { 
+      hasClientSecret: !!responseData.clientSecret, 
+      hasPublishableKey: !!responseData.publishableKey 
+    });
+
+    return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
