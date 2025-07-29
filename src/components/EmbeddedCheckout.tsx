@@ -15,10 +15,11 @@ export const EmbeddedCheckout = ({
   onError 
 }: EmbeddedCheckoutProps) => {
   const checkoutRef = useRef<HTMLDivElement>(null);
+  const checkoutInstanceRef = useRef<any>(null);
+  const stripeInstanceRef = useRef<any>(null);
+  const currentClientSecretRef = useRef<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const stripeRef = useRef<any>(null);
 
   const handleError = useCallback((errorMsg: string) => {
     console.error('EmbeddedCheckout Error:', errorMsg);
@@ -27,30 +28,53 @@ export const EmbeddedCheckout = ({
     onError?.(errorMsg);
   }, [onError]);
 
+  const destroyExistingCheckout = useCallback(() => {
+    if (checkoutInstanceRef.current) {
+      try {
+        console.log('EmbeddedCheckout: Destroying existing checkout instance');
+        checkoutInstanceRef.current.unmount();
+        checkoutInstanceRef.current = null;
+      } catch (e) {
+        console.log('EmbeddedCheckout: Error destroying checkout:', e);
+      }
+    }
+  }, []);
+
   useEffect(() => {
-    // Prevent multiple initializations
-    if (isInitialized || !clientSecret || !publishableKey) {
+    // If clientSecret hasn't changed and we already have a checkout, don't reinitialize
+    if (currentClientSecretRef.current === clientSecret && checkoutInstanceRef.current) {
+      console.log('EmbeddedCheckout: Using existing checkout instance');
+      return;
+    }
+
+    // If clientSecret changed, destroy existing checkout
+    if (currentClientSecretRef.current !== clientSecret) {
+      destroyExistingCheckout();
+      currentClientSecretRef.current = clientSecret;
+    }
+
+    if (!clientSecret || !publishableKey) {
       return;
     }
 
     let isMounted = true;
-    let checkout: any = null;
-
+    
     const initializeCheckout = async () => {
       try {
-        console.log('EmbeddedCheckout: Initializing once with:', { 
-          hasClientSecret: !!clientSecret, 
-          hasPublishableKey: !!publishableKey 
+        console.log('EmbeddedCheckout: Starting fresh initialization', { 
+          clientSecret: clientSecret.substring(0, 20) + '...', 
+          publishableKey: publishableKey.substring(0, 20) + '...' 
         });
 
-        setIsInitialized(true);
+        setError(null);
+        setIsLoading(true);
 
-        // Load Stripe only once
-        if (!stripeRef.current) {
+        // Load Stripe instance if not already loaded
+        if (!stripeInstanceRef.current) {
           console.log('EmbeddedCheckout: Loading Stripe...');
-          stripeRef.current = await loadStripe(publishableKey);
+          stripeInstanceRef.current = await loadStripe(publishableKey);
           
-          if (!stripeRef.current) {
+          if (!stripeInstanceRef.current) {
             handleError('Failed to load Stripe');
             return;
           }
@@ -58,9 +82,10 @@ export const EmbeddedCheckout = ({
 
         if (!isMounted) return;
 
-        console.log('EmbeddedCheckout: Creating embedded checkout...');
+        console.log('EmbeddedCheckout: Creating new embedded checkout...');
         
-        checkout = await stripeRef.current.initEmbeddedCheckout({
+        // Create new checkout instance
+        const newCheckout = await stripeInstanceRef.current.initEmbeddedCheckout({
           clientSecret,
           onComplete: () => {
             console.log('Stripe checkout completed successfully');
@@ -70,20 +95,23 @@ export const EmbeddedCheckout = ({
 
         if (!isMounted) return;
 
-        // Wait for DOM element to be ready
-        const mountCheckout = () => {
-          if (checkoutRef.current && checkout) {
+        // Store the new checkout instance
+        checkoutInstanceRef.current = newCheckout;
+
+        // Mount to DOM
+        const mountToDOM = () => {
+          if (checkoutRef.current && checkoutInstanceRef.current && isMounted) {
             console.log('EmbeddedCheckout: Mounting to DOM...');
-            checkout.mount(checkoutRef.current);
+            checkoutInstanceRef.current.mount(checkoutRef.current);
             setIsLoading(false);
             console.log('EmbeddedCheckout: Successfully mounted');
           } else if (isMounted) {
-            // Retry after a short delay
-            setTimeout(mountCheckout, 50);
+            // Retry after a short delay if DOM not ready
+            setTimeout(mountToDOM, 100);
           }
         };
 
-        mountCheckout();
+        mountToDOM();
 
       } catch (error) {
         console.error('EmbeddedCheckout initialization error:', error);
@@ -97,21 +125,32 @@ export const EmbeddedCheckout = ({
 
     return () => {
       isMounted = false;
-      if (checkout) {
-        try {
-          checkout.unmount();
-        } catch (e) {
-          console.log('Cleanup error:', e);
-        }
-      }
     };
-  }, [clientSecret, publishableKey, isInitialized, onComplete, handleError]);
+  }, [clientSecret, publishableKey, onComplete, handleError, destroyExistingCheckout]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      destroyExistingCheckout();
+    };
+  }, [destroyExistingCheckout]);
 
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <div className="text-red-500 mb-2">⚠️ Checkout Error</div>
         <div className="text-sm text-muted-foreground">{error}</div>
+        <button 
+          onClick={() => {
+            setError(null);
+            setIsLoading(true);
+            destroyExistingCheckout();
+            currentClientSecretRef.current = '';
+          }}
+          className="mt-2 px-4 py-2 bg-primary text-white rounded text-sm"
+        >
+          Retry
+        </button>
       </div>
     );
   }
