@@ -60,7 +60,7 @@ export const usePhoneAuth = () => {
         throw new Error('Please enter a valid phone number with country code (e.g., +1234567890)');
       }
       
-      console.log('Sending OTP via Twilio to:', formattedPhone);
+      console.log('Sending OTP via Supabase to:', formattedPhone);
       await logSecurityEvent('otp_send_attempted', formattedPhone);
       
       setTimeout(() => {
@@ -73,16 +73,13 @@ export const usePhoneAuth = () => {
         });
       }, 100);
 
-      // Use Twilio Verify service instead of Supabase Auth
-      const { data, error } = await supabase.functions.invoke('twilio-verify', {
-        body: {
-          action: 'send',
-          phoneNumber: formattedPhone
-        }
+      // Use Supabase Auth SMS OTP
+      const { data, error } = await supabase.auth.signInWithOtp({
+        phone: formattedPhone,
       });
 
       if (error) {
-        console.error('Twilio Verify error:', error);
+        console.error('Supabase OTP error:', error);
         await logSecurityEvent('otp_send_failed', formattedPhone, { error: error.message });
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
@@ -97,14 +94,7 @@ export const usePhoneAuth = () => {
         throw new Error(error.message || 'Failed to send verification code');
       }
 
-      if (!data?.success) {
-        const errorMessage = data?.error || 'Failed to send verification code';
-        console.error('Twilio Verify failed:', errorMessage);
-        await logSecurityEvent('otp_send_failed', formattedPhone, { error: errorMessage });
-        throw new Error(errorMessage);
-      }
-
-      console.log('OTP sent successfully via Twilio');
+      console.log('OTP sent successfully via Supabase');
       await logSecurityEvent('otp_send_success', formattedPhone);
       setTimeout(() => {
         import('@/services/posthog').then(({ posthogService }) => {
@@ -136,7 +126,7 @@ export const usePhoneAuth = () => {
         throw new Error('Please enter a valid phone number with country code');
       }
       
-      console.log('Verifying OTP via Twilio for:', formattedPhone);
+      console.log('Verifying OTP via Supabase for:', formattedPhone);
       await logSecurityEvent('otp_verify_attempted', formattedPhone);
       
       setTimeout(() => {
@@ -149,17 +139,18 @@ export const usePhoneAuth = () => {
         });
       }, 100);
 
-      // Verify OTP using Twilio Verify service
-      const { data, error } = await supabase.functions.invoke('twilio-verify', {
-        body: {
-          action: 'verify',
-          phoneNumber: formattedPhone,
-          code: code
-        }
+      // Verify OTP using Supabase Auth
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.verifyOtp({
+        phone: formattedPhone,
+        token: code,
+        type: 'sms',
       });
 
       if (error) {
-        console.error('Twilio Verify error:', error);
+        console.error('Supabase OTP verification error:', error);
         await logSecurityEvent('otp_verify_failed', formattedPhone, { error: error.message });
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
@@ -174,14 +165,14 @@ export const usePhoneAuth = () => {
         throw new Error(error.message || 'Failed to verify code');
       }
 
-      if (!data?.success || !data?.verified) {
-        const errorMessage = data?.error || 'Invalid verification code';
-        console.error('Twilio Verify failed:', errorMessage);
+      if (!session?.user) {
+        const errorMessage = 'Invalid verification code';
+        console.error('Supabase OTP verification failed: No session created');
         await logSecurityEvent('otp_verify_failed', formattedPhone, { error: errorMessage });
         throw new Error(errorMessage);
       }
 
-      console.log('OTP verified successfully via Twilio');
+      console.log('OTP verified successfully via Supabase');
 
       // After successful verification, create or find user profile
       const { data: existingProfile, error: findError } = await supabase
@@ -217,25 +208,34 @@ export const usePhoneAuth = () => {
           });
         }, 500);
         
-        // Don't set auth state yet - wait for user confirmation
-        profile = existingProfile;
+        // Update the existing profile with auth_user_id if not already set
+        if (!existingProfile.auth_user_id) {
+          await supabase
+            .from('user_profiles')
+            .update({ auth_user_id: session.user.id })
+            .eq('id', existingProfile.id);
+        }
+        
+        profile = { ...existingProfile, auth_user_id: session.user.id };
       } else {
         // For new users, just set a flag that they need onboarding
         // Don't create a profile yet - let the onboarding flow handle this
         isNewUser = true;
         await logSecurityEvent('otp_verify_success_new_user', formattedPhone);
         
-        // Store minimal auth state for new users
+        // Store minimal auth state for new users with Supabase session
         localStorage.setItem('phone_authenticated', 'true');
         localStorage.setItem('phone_number', formattedPhone);
         localStorage.setItem('needs_onboarding', 'true');
+        localStorage.setItem('supabase_user_id', session.user.id);
         
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
             if (posthogService) {
               posthogService.capture('phone_verified_new_user', formattedPhone, {
                 phone_number: formattedPhone,
-                is_new_user: true
+                is_new_user: true,
+                user_id: session.user.id
               });
             }
           });

@@ -86,8 +86,11 @@ export const useCreateUserProfile = () => {
         original_phone: profileData.phone_number
       });
 
+      // Get auth user ID from localStorage if available
+      const supabaseUserId = localStorage.getItem('supabase_user_id');
+      
       // Create a new profile
-      console.log('Creating new profile');
+      console.log('Creating new profile with auth user ID:', supabaseUserId);
       
       const { data: newProfile, error: insertError } = await supabase
         .from('user_profiles')
@@ -95,7 +98,8 @@ export const useCreateUserProfile = () => {
           phone_number: formattedPhone,
           full_name: profileData.full_name,
           proficiency_level: profileData.proficiency_level,
-          language: profileData.language || 'hindi'
+          language: profileData.language || 'hindi',
+          auth_user_id: supabaseUserId || null
         })
         .select('*')
         .single();
