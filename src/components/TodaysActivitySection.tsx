@@ -6,6 +6,7 @@ import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import { useLearningAnalytics } from "@/hooks/useLearningAnalytics";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { useCallCompletionTracker } from "@/hooks/useCallCompletionTracker";
+import { useToast } from "@/hooks/use-toast";
 
 interface TodaysActivitySectionProps {
   currentActivity: any;
@@ -27,6 +28,7 @@ const TodaysActivitySection = ({
   const { trackLearningSessionStart } = useLearningAnalytics();
   const { data: subscriptionStatus } = useSubscriptionStatus();
   const { markExerciseCompleted } = useCallCompletionTracker();
+  const { toast } = useToast();
 
   const getRatingColor = (rating: number) => {
     if (rating < 40) return "text-red-600";
@@ -50,6 +52,12 @@ const TodaysActivitySection = ({
   };
 
   const handleStartPractice = () => {
+    // Show immediate feedback to user
+    toast({
+      title: "Hey, we're calling! 📞",
+      description: "Get ready to answer your phone shortly...",
+    });
+
     trackTap('start_practice', 'todays_activity', {
       activity_id: currentActivity.id,
       activity_name: currentActivity.name,
