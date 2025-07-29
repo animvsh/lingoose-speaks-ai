@@ -85,30 +85,6 @@ export const useCreateUserProfile = () => {
         language: profileData.language || 'hindi',
         original_phone: profileData.phone_number
       });
-      
-      // Check if a profile with this phone number already exists
-      const { data: existingProfile, error: fetchError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('phone_number', formattedPhone)
-        .maybeSingle();
-
-      if (fetchError) {
-        console.error('Error checking for existing profile:', fetchError);
-        await logSecurityEvent('profile_lookup_failed', formattedPhone, {
-          error: fetchError.message
-        });
-        throw fetchError;
-      }
-
-      if (existingProfile) {
-        console.log('Phone number already exists:', formattedPhone);
-        await logSecurityEvent('profile_creation_duplicate_phone', formattedPhone, {
-          existing_user_id: existingProfile.id,
-          attempted_name: profileData.full_name
-        });
-        throw new Error('PHONE_EXISTS');
-      }
 
       // Create a new profile
       console.log('Creating new profile');

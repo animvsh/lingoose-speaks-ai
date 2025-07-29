@@ -22,6 +22,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
   const [hasConsented, setHasConsented] = useState(false);
   const [proficiencyLevel, setProficiencyLevel] = useState<number | null>(null);
   
+  const [isCheckingPhone, setIsCheckingPhone] = useState(false);
   const createUserProfile = useCreateUserProfile();
 
   const proficiencyLevels = [
@@ -62,11 +63,65 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
     }
   ];
 
-  const handleNext = () => {
+  const checkPhoneNumber = async (phoneNumber: string) => {
+    setIsCheckingPhone(true);
+    
+    try {
+      // Format phone number
+      const cleaned = phoneNumber.replace(/\D/g, '');
+      const formattedPhone = !phoneNumber.startsWith('+') 
+        ? (cleaned.length === 10 ? `+1${cleaned}` : `+${cleaned}`)
+        : phoneNumber;
+
+      // Check if phone number already exists
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: existingProfile, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('phone_number', formattedPhone)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error checking phone number:', error);
+        setIsCheckingPhone(false);
+        return false;
+      }
+
+      if (existingProfile) {
+        // Phone number already exists - show notification and redirect to auth
+        const { toast } = await import('sonner');
+        toast.error("Account Already Exists", {
+          description: "This phone number already has an account. Redirecting to sign in...",
+          duration: 3000,
+        });
+        
+        setTimeout(() => {
+          // Redirect to auth page with the phone number pre-filled
+          window.location.href = `/auth?phone=${encodeURIComponent(formattedPhone)}`;
+        }, 2000);
+        
+        setIsCheckingPhone(false);
+        return false;
+      }
+      
+      setIsCheckingPhone(false);
+      return true;
+    } catch (error) {
+      console.error('Error checking phone number:', error);
+      setIsCheckingPhone(false);
+      return false;
+    }
+  };
+
+  const handleNext = async () => {
     if (currentStep === 0 && fullName.trim()) {
       setCurrentStep(1);
     } else if (currentStep === 1 && userPhoneNumber.trim()) {
-      setCurrentStep(2);
+      // Check if phone number already exists before proceeding
+      const canProceed = await checkPhoneNumber(userPhoneNumber.trim());
+      if (canProceed) {
+        setCurrentStep(2);
+      }
     } else if (currentStep === 2 && hasConsented) {
       setCurrentStep(3);
     } else if (currentStep === 3 && proficiencyLevel !== null) {
@@ -80,37 +135,13 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
         language: 'hindi'
       });
 
-      // Create user profile
+      // Create user profile (no longer need to check for duplicates here)
       createUserProfile.mutate({
         phone_number: validPhoneNumber,
         full_name: fullName.trim(),
         proficiency_level: proficiencyLevel,
         language: 'hindi'
       }, {
-        onError: (error) => {
-          console.error('❌ Profile creation error:', error);
-          
-          // Check if it's a duplicate phone number error
-          if (error instanceof Error && error.message === 'PHONE_EXISTS') {
-            // Import and use toast directly since we can't use the hook in a callback
-            import('@/components/ui/sonner').then(async ({ toast }) => {
-              // Show notification about existing account
-              toast.error("Account Already Exists", {
-                description: "This phone number already has an account. Redirecting to sign in...",
-                duration: 3000,
-              });
-            });
-            
-            // Redirect to sign in page after a brief delay
-            setTimeout(() => {
-              window.location.href = '/auth';
-            }, 2000);
-            
-            return;
-          }
-          
-          // Handle other errors normally (the mutation's onError will handle toast)
-        },
         onSuccess: () => {
           console.log('🎉 Profile creation successful - calling callbacks');
           
@@ -239,12 +270,21 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
 
                   <Button
                     onClick={handleNext}
-                    disabled={!userPhoneNumber.trim()}
+                    disabled={!userPhoneNumber.trim() || isCheckingPhone}
                     className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-black py-6 text-lg sm:text-xl rounded-2xl border-3 border-blue-400 shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:scale-100"
                   >
                     <div className="flex items-center justify-center">
-                      Continue
-                      <ChevronRight className="w-6 h-6 ml-2" />
+                      {isCheckingPhone ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                          Checking...
+                        </>
+                      ) : (
+                        <>
+                          Continue
+                          <ChevronRight className="w-6 h-6 ml-2" />
+                        </>
+                      )}
                     </div>
                   </Button>
                 </div>

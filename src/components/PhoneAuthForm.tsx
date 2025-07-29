@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,9 +11,14 @@ import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import ExistingAccountModal from "./ExistingAccountModal";
 
-const PhoneAuthForm = ({ onBack }: { onBack: () => void }) => {
+interface PhoneAuthFormProps {
+  onBack: () => void;
+  prefilledPhone?: string;
+}
+
+const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(prefilledPhone || "");
   const [otpCode, setOtpCode] = useState("");
   const [showExistingAccountModal, setShowExistingAccountModal] = useState(false);
   const [existingProfile, setExistingProfile] = useState<any>(null);

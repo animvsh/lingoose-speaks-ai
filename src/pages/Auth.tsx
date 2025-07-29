@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +12,7 @@ import AppBar from "@/components/AppBar";
 
 const Auth = () => {
   const [authMethod, setAuthMethod] = useState<"phone">("phone");
+  const [prefilledPhone, setPrefilledPhone] = useState<string>("");
   const { toast } = useToast();
   const { trackSwipe } = useEngagementTracking();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,6 +31,15 @@ const Auth = () => {
   // Setup swipe navigation
   useSwipeNavigation(containerRef, handleSwipe);
 
+  // Read phone number from URL parameters if provided
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const phoneParam = urlParams.get('phone');
+    if (phoneParam) {
+      setPrefilledPhone(decodeURIComponent(phoneParam));
+    }
+  }, []);
+
   return (
     <div ref={containerRef} className="min-h-screen w-full bg-background">
       <AppBar title="Sign In" showBackButton={false} />
@@ -44,7 +54,7 @@ const Auth = () => {
           </div>
           
           <div className="warm-card p-6 soft-shadow w-full">
-            <PhoneAuthForm onBack={() => {}} />
+            <PhoneAuthForm onBack={() => {}} prefilledPhone={prefilledPhone} />
           </div>
         </div>
       </div>
