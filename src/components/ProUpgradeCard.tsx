@@ -11,6 +11,13 @@ const ProUpgradeCard = () => {
   const { createCheckoutSession, openCustomerPortal, isLoading, checkoutData, closeCheckout } = useStripeCheckout();
   const { data: subscription, refetch } = useSubscriptionCheck();
 
+  console.log('🔧 ProUpgradeCard render:', {
+    isLoading,
+    hasCheckoutData: !!(checkoutData.clientSecret && checkoutData.publishableKey),
+    subscription,
+    drawerOpen: !!checkoutData.clientSecret
+  });
+
   const isPro = subscription?.subscribed && subscription?.subscription_tier === 'pro';
 
   if (isPro) {

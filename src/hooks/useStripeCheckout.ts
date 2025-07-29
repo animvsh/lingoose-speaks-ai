@@ -12,6 +12,13 @@ export const useStripeCheckout = () => {
   const { toast } = useToast();
   const isCreatingRef = useRef(false);
 
+  console.log('🔧 useStripeCheckout state:', {
+    isLoading,
+    hasClientSecret: !!checkoutData.clientSecret,
+    hasPublishableKey: !!checkoutData.publishableKey,
+    isCreating: isCreatingRef.current
+  });
+
   const createCheckoutSession = async () => {
     // Prevent multiple simultaneous requests with ref
     if (isLoading || isCreatingRef.current) {

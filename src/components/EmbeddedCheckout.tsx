@@ -27,18 +27,38 @@ export const EmbeddedCheckout = ({
   const [error, setError] = useState<string | null>(null);
   const isMountedRef = useRef(false);
 
+  // Create a wrapped setIsLoading to track state changes
+  const setIsLoadingWithLogging = useCallback((newValue: boolean) => {
+    console.log('🔧 setIsLoading called:', {
+      currentValue: isLoading,
+      newValue,
+      stackTrace: new Error().stack?.split('\n').slice(1, 4).join('\n')
+    });
+    setIsLoading(newValue);
+  }, [isLoading]);
+
+  console.log('🔧 EmbeddedCheckout RENDER:', {
+    clientSecret: clientSecret?.substring(0, 20) + '...',
+    publishableKey: publishableKey?.substring(0, 20) + '...',
+    isLoading,
+    error,
+    isMountedRef: isMountedRef.current,
+    checkoutRefCurrent: !!checkoutRef.current,
+    renderTime: new Date().toISOString()
+  });
+
   const handleError = useCallback((errorMsg: string) => {
     console.error('EmbeddedCheckout Error:', errorMsg);
     setError(errorMsg);
-    setIsLoading(false);
+    setIsLoadingWithLogging(false);
     setInitializing(false);
     onError?.(errorMsg);
-  }, [onError]);
+  }, [onError, setIsLoadingWithLogging]);
 
   const handleRetry = useCallback(async () => {
     console.log('🔄 Retrying checkout initialization');
     setError(null);
-    setIsLoading(true);
+    setIsLoadingWithLogging(true);
     isMountedRef.current = false;
     
     // Force destroy and wait
@@ -48,7 +68,7 @@ export const EmbeddedCheckout = ({
     setTimeout(() => {
       // Effect will re-run
     }, 200);
-  }, []);
+  }, [setIsLoadingWithLogging]);
 
   useEffect(() => {
     // Exit early if no data or already mounted
@@ -65,7 +85,7 @@ export const EmbeddedCheckout = ({
       try {
         existingCheckout.mount(checkoutRef.current);
         isMountedRef.current = true;
-        setIsLoading(false);
+        setIsLoadingWithLogging(false);
         return;
       } catch (e) {
         console.log('Failed to reuse existing checkout, creating new one');
@@ -132,29 +152,65 @@ export const EmbeddedCheckout = ({
         const maxMountAttempts = 20;
         
         const attemptMount = () => {
-          if (!isMounted || isMountedRef.current) return;
+          console.log('🔧 attemptMount called:', {
+            isMounted,
+            isMountedRefCurrent: isMountedRef.current,
+            checkoutRefExists: !!checkoutRef.current,
+            mountAttempts,
+            maxMountAttempts
+          });
+
+          if (!isMounted || isMountedRef.current) {
+            console.log('🚫 Skipping mount - not mounted or already mounted');
+            return;
+          }
           
           if (checkoutRef.current) {
             try {
               console.log('🎯 Mounting checkout to DOM (attempt', mountAttempts + 1, ')');
+              console.log('🔧 DOM element details:', {
+                tagName: checkoutRef.current.tagName,
+                className: checkoutRef.current.className,
+                clientHeight: checkoutRef.current.clientHeight,
+                clientWidth: checkoutRef.current.clientWidth,
+                children: checkoutRef.current.children.length
+              });
+              
               checkout.mount(checkoutRef.current);
               isMountedRef.current = true;
-              setIsLoading(false);
-              console.log('✅ Checkout mounted successfully');
+              setIsLoadingWithLogging(false);
+              console.log('✅ Checkout mounted successfully - isLoading set to false');
+              console.log('🔧 Final state check:', {
+                isLoading: false,
+                isMountedRef: isMountedRef.current,
+                domElement: checkoutRef.current.innerHTML?.substring(0, 100)
+              });
             } catch (mountError) {
-              console.error('Mount error:', mountError);
+              console.error('❌ Mount error details:', {
+                error: mountError,
+                errorMessage: mountError instanceof Error ? mountError.message : String(mountError),
+                errorStack: mountError instanceof Error ? mountError.stack : undefined,
+                attempt: mountAttempts + 1
+              });
               if (mountAttempts < maxMountAttempts) {
                 mountAttempts++;
+                console.log(`🔄 Retrying mount in 200ms (attempt ${mountAttempts}/${maxMountAttempts})`);
                 setTimeout(attemptMount, 200);
               } else {
+                console.error('❌ All mount attempts failed');
                 handleError('Failed to mount checkout after multiple attempts');
               }
             }
-          } else if (mountAttempts < maxMountAttempts) {
-            mountAttempts++;
-            setTimeout(attemptMount, 200);
           } else {
-            handleError('DOM element not found after waiting');
+            console.log('🚫 No DOM element available for mounting');
+            if (mountAttempts < maxMountAttempts) {
+              mountAttempts++;
+              console.log(`🔄 Waiting for DOM element (attempt ${mountAttempts}/${maxMountAttempts})`);
+              setTimeout(attemptMount, 200);
+            } else {
+              console.error('❌ DOM element never became available');
+              handleError('DOM element not found after waiting');
+            }
           }
         };
 
@@ -207,6 +263,13 @@ export const EmbeddedCheckout = ({
   }
 
   if (isLoading) {
+    console.log('🔧 Rendering loading state:', {
+      isLoading,
+      error,
+      isMountedRef: isMountedRef.current,
+      hasClientSecret: !!clientSecret,
+      hasPublishableKey: !!publishableKey
+    });
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
