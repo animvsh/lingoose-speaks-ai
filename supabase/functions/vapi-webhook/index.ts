@@ -41,11 +41,30 @@ serve(async (req) => {
         return new Response('Missing required call data', { status: 400 })
       }
 
-      // Handle missed calls or failed calls
-      if (status === 'no-answer' || status === 'failed' || status === 'busy' || (duration && duration < 10)) {
-        console.log('Call was not answered or failed, sending follow-up SMS')
+      // Handle missed calls or failed calls - IMMEDIATE RESPONSE
+      if (status === 'no-answer' || status === 'failed' || status === 'busy' || status === 'voicemail' || (duration && duration < 10)) {
+        console.log(`Call ${status} - sending immediate follow-up SMS`)
         
-        // Send "didn't pick up" SMS and start conversation
+        // Determine message based on call status
+        let followUpMessage = '';
+        switch (status) {
+          case 'no-answer':
+            followUpMessage = 'Hi! I just tried calling for your language practice but you didn\'t pick up. When would be a good time to reschedule? Just reply with your preferred time! 📞';
+            break;
+          case 'busy':
+            followUpMessage = 'Hi! Your line was busy when I called for practice. When would be a better time to call you? Reply with a time that works! 📱';
+            break;
+          case 'voicemail':
+            followUpMessage = 'Hi! I left a voicemail about your language practice session. Would you like to reschedule? Just text me back with a good time! 💬';
+            break;
+          case 'failed':
+            followUpMessage = 'Hi! There was an issue with your practice call. Let\'s reschedule - when would be convenient for you? 🔄';
+            break;
+          default:
+            followUpMessage = 'Hi! We missed connecting for your language practice. When would you like to reschedule? Just reply with your preferred time! ⏰';
+        }
+        
+        // Send immediate follow-up SMS
         const smsResponse = await fetch(`${supabaseUrl}/functions/v1/send-sms`, {
           method: 'POST',
           headers: {
@@ -54,8 +73,8 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             phoneNumber: phoneNumber,
-            message: "Hey, we called but you didn't pick up! When would be a good time to call you for your language practice session?",
-            messageType: 'notification'
+            message: followUpMessage,
+            messageType: 'missed_call_followup'
           }),
         });
 
@@ -102,10 +121,19 @@ serve(async (req) => {
               .insert({
                 conversation_id: conversationId,
                 phone_number: phoneNumber,
-                message_text: "Hey, we called but you didn't pick up! When would be a good time to call you for your language practice session?",
+                message_text: followUpMessage,
                 direction: 'outbound',
               });
           }
+          
+          // Mark this call as having follow-up sent immediately
+          await supabase
+            .from('vapi_call_analysis')
+            .update({ 
+              follow_up_sent: true,
+              follow_up_sent_at: new Date().toISOString()
+            })
+            .eq('vapi_call_id', vapiCallId);
         } else {
           console.error('Failed to send follow-up SMS:', await smsResponse.text());
         }
