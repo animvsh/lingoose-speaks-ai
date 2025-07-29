@@ -247,43 +247,37 @@ export const EmbeddedCheckout = ({
     };
   }, [clientSecret]);
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 text-center">
-        <div className="text-red-500 mb-2">⚠️ Checkout Error</div>
-        <div className="text-sm text-muted-foreground mb-4">{error}</div>
-        <button 
-          onClick={handleRetry}
-          className="px-4 py-2 bg-primary text-white rounded text-sm hover:bg-primary/90"
-        >
-          Retry Checkout
-        </button>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    console.log('🔧 Rendering loading state:', {
-      isLoading,
-      error,
-      isMountedRef: isMountedRef.current,
-      hasClientSecret: !!clientSecret,
-      hasPublishableKey: !!publishableKey
-    });
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="ml-2">Loading secure checkout...</span>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full">
+    <div className="w-full relative">
+      {/* Always render the checkout container for Stripe to mount to */}
       <div 
         ref={checkoutRef} 
         className="min-h-[500px] w-full rounded-lg"
       />
+      
+      {/* Overlay loading state */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
+            <span className="text-sm text-muted-foreground">Loading secure checkout...</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Overlay error state */}
+      {error && (
+        <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center rounded-lg">
+          <div className="text-red-500 mb-2">⚠️ Checkout Error</div>
+          <div className="text-sm text-muted-foreground mb-4">{error}</div>
+          <button 
+            onClick={handleRetry}
+            className="px-4 py-2 bg-primary text-white rounded text-sm hover:bg-primary/90"
+          >
+            Retry Checkout
+          </button>
+        </div>
+      )}
     </div>
   );
 };
