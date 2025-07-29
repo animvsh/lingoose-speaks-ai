@@ -21,20 +21,36 @@ export const EmbeddedCheckout = ({
   useEffect(() => {
     const initializeStripe = async () => {
       try {
+        console.log('EmbeddedCheckout: Starting initialization with:', { 
+          hasClientSecret: !!clientSecret, 
+          hasPublishableKey: !!publishableKey 
+        });
+
         if (!publishableKey) {
+          console.error('EmbeddedCheckout: No publishable key provided');
           onError?.('Stripe publishable key not found');
           return;
         }
 
+        if (!clientSecret) {
+          console.error('EmbeddedCheckout: No client secret provided');
+          onError?.('Client secret not found');
+          return;
+        }
+
+        console.log('EmbeddedCheckout: Loading Stripe...');
         const stripeInstance = await loadStripe(publishableKey);
         if (!stripeInstance) {
+          console.error('EmbeddedCheckout: Failed to load Stripe instance');
           onError?.('Failed to load Stripe');
           return;
         }
 
+        console.log('EmbeddedCheckout: Stripe loaded successfully');
         setStripe(stripeInstance);
 
-        if (clientSecret && checkoutRef.current) {
+        if (checkoutRef.current) {
+          console.log('EmbeddedCheckout: Initializing embedded checkout...');
           const checkout = await stripeInstance.initEmbeddedCheckout({
             clientSecret,
             onComplete: () => {
@@ -43,8 +59,13 @@ export const EmbeddedCheckout = ({
             }
           });
 
+          console.log('EmbeddedCheckout: Mounting checkout to DOM element');
           checkout.mount(checkoutRef.current);
+          console.log('EmbeddedCheckout: Checkout mounted successfully');
           setIsLoading(false);
+        } else {
+          console.error('EmbeddedCheckout: Checkout ref not available');
+          onError?.('Checkout container not ready');
         }
       } catch (error) {
         console.error('Error initializing Stripe checkout:', error);
@@ -53,7 +74,9 @@ export const EmbeddedCheckout = ({
       }
     };
 
-    initializeStripe();
+    if (clientSecret && publishableKey) {
+      initializeStripe();
+    }
   }, [clientSecret, publishableKey, onComplete, onError]);
 
   if (isLoading) {
@@ -66,8 +89,8 @@ export const EmbeddedCheckout = ({
   }
 
   return (
-    <div className="w-full">
-      <div ref={checkoutRef} className="min-h-[400px]" />
+    <div className="w-full bg-background">
+      <div ref={checkoutRef} className="min-h-[500px] w-full overflow-hidden" />
     </div>
   );
 };
