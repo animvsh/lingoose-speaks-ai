@@ -101,71 +101,42 @@ export const useCreateUserProfile = () => {
         throw fetchError;
       }
 
-      let profile;
-
       if (existingProfile) {
-        console.log('Profile already exists, updating:', existingProfile.id);
-        
-        await logSecurityEvent('profile_update_attempted', formattedPhone, {
-          user_id: existingProfile.id,
-          update_fields: ['full_name', 'proficiency_level', 'language']
+        console.log('Phone number already exists:', formattedPhone);
+        await logSecurityEvent('profile_creation_duplicate_phone', formattedPhone, {
+          existing_user_id: existingProfile.id,
+          attempted_name: profileData.full_name
         });
-        
-        // Update the existing profile
-        const { data: updatedProfile, error: updateError } = await supabase
-          .from('user_profiles')
-          .update({
-            full_name: profileData.full_name,
-            proficiency_level: profileData.proficiency_level,
-            language: profileData.language || 'hindi'
-          })
-          .eq('id', existingProfile.id)
-          .select('*')
-          .single();
-
-        if (updateError) {
-          console.error('Error updating profile:', updateError);
-          await logSecurityEvent('profile_update_failed', formattedPhone, {
-            user_id: existingProfile.id,
-            error: updateError.message
-          });
-          throw updateError;
-        }
-
-        profile = updatedProfile;
-        
-        await logSecurityEvent('profile_update_success', formattedPhone, {
-          user_id: profile.id
-        });
-      } else {
-        console.log('Creating new profile');
-        
-        // Create a new profile
-        const { data: newProfile, error: insertError } = await supabase
-          .from('user_profiles')
-          .insert({
-            phone_number: formattedPhone,
-            full_name: profileData.full_name,
-            proficiency_level: profileData.proficiency_level,
-            language: profileData.language || 'hindi'
-          })
-          .select('*')
-          .single();
-
-        if (insertError) {
-          console.error('Error creating profile:', insertError);
-          await logSecurityEvent('profile_creation_failed', formattedPhone, {
-            error: insertError.message
-          });
-          throw insertError;
-        }
-
-        profile = newProfile;
-        
-        await logSecurityEvent('profile_creation_success', formattedPhone, {
-          user_id: profile.id
-        });
+        throw new Error('PHONE_EXISTS');
       }
+
+      // Create a new profile
+      console.log('Creating new profile');
+      
+      const { data: newProfile, error: insertError } = await supabase
+        .from('user_profiles')
+        .insert({
+          phone_number: formattedPhone,
+          full_name: profileData.full_name,
+          proficiency_level: profileData.proficiency_level,
+          language: profileData.language || 'hindi'
+        })
+        .select('*')
+        .single();
+
+      if (insertError) {
+        console.error('Error creating profile:', insertError);
+        await logSecurityEvent('profile_creation_failed', formattedPhone, {
+          error: insertError.message
+        });
+        throw insertError;
+      }
+
+      const profile = newProfile;
+      
+      await logSecurityEvent('profile_creation_success', formattedPhone, {
+        user_id: profile.id
+      });
 
       // Store user profile in localStorage for authentication
       localStorage.setItem('current_user_profile', JSON.stringify(profile));

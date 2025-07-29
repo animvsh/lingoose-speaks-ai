@@ -87,6 +87,30 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
         proficiency_level: proficiencyLevel,
         language: 'hindi'
       }, {
+        onError: (error) => {
+          console.error('❌ Profile creation error:', error);
+          
+          // Check if it's a duplicate phone number error
+          if (error instanceof Error && error.message === 'PHONE_EXISTS') {
+            // Import and use toast directly since we can't use the hook in a callback
+            import('@/components/ui/sonner').then(async ({ toast }) => {
+              // Show notification about existing account
+              toast.error("Account Already Exists", {
+                description: "This phone number already has an account. Redirecting to sign in...",
+                duration: 3000,
+              });
+            });
+            
+            // Redirect to sign in page after a brief delay
+            setTimeout(() => {
+              window.location.href = '/auth';
+            }, 2000);
+            
+            return;
+          }
+          
+          // Handle other errors normally (the mutation's onError will handle toast)
+        },
         onSuccess: () => {
           console.log('🎉 Profile creation successful - calling callbacks');
           
