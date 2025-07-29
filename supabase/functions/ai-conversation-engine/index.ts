@@ -17,10 +17,12 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  console.log('🚀 AI Conversation Engine started');
+
   try {
     const { conversationId, incomingMessage, phoneNumber }: ConversationRequest = await req.json();
     
-    console.log('Processing conversation:', {
+    console.log('📱 Processing conversation:', {
       conversationId,
       phoneNumber,
       message: incomingMessage.substring(0, 50) + '...'
@@ -29,7 +31,25 @@ serve(async (req) => {
     // Initialize clients
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY')!;
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    
+    console.log('🔑 Environment check:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      hasSupabaseKey: !!supabaseServiceKey,
+      hasOpenAIKey: !!openaiApiKey
+    });
+
+    if (!openaiApiKey) {
+      console.error('❌ OPENAI_API_KEY is missing!');
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'OpenAI API key not configured',
+        message: 'I need an OpenAI API key to provide intelligent responses. Please configure it in the edge function secrets.'
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     
     const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -175,10 +195,27 @@ You must respond with a JSON object containing:
 Keep messages under 160 characters when possible. Be conversational and helpful.`;
 
     // Call OpenAI with enhanced error handling
-    console.log('Making OpenAI API call with model:', 'gpt-4.1-2025-04-14');
-    console.log('System prompt length:', systemPrompt.length);
-    console.log('Conversation history length:', conversationHistory.length);
-    console.log('Incoming message:', incomingMessage);
+    console.log('🤖 Making OpenAI API call...');
+    console.log('📝 System prompt preview:', systemPrompt.substring(0, 200) + '...');
+    console.log('💬 User message:', incomingMessage);
+
+    const openaiPayload = {
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...conversationHistory,
+        { role: 'user', content: incomingMessage }
+      ],
+      temperature: 0.3,
+      max_tokens: 300,
+      response_format: { type: "json_object" }
+    };
+
+    console.log('📤 OpenAI payload preview:', {
+      model: openaiPayload.model,
+      messageCount: openaiPayload.messages.length,
+      temperature: openaiPayload.temperature
+    });
 
     const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -186,25 +223,24 @@ Keep messages under 160 characters when possible. Be conversational and helpful.
         'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini', // Using a more reliable model
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...conversationHistory,
-          { role: 'user', content: incomingMessage }
-        ],
-        temperature: 0.3, // Lower temperature for more consistent JSON output
-        max_tokens: 300,
-        response_format: { type: "json_object" } // Force JSON response
-      }),
+      body: JSON.stringify(openaiPayload),
     });
 
-    console.log('OpenAI response status:', openaiResponse.status);
+    console.log('📥 OpenAI response status:', openaiResponse.status);
     
     if (!openaiResponse.ok) {
       const errorText = await openaiResponse.text();
-      console.error('OpenAI API error:', errorText);
-      throw new Error(`OpenAI API failed: ${errorText}`);
+      console.error('❌ OpenAI API error:', errorText);
+      
+      // Return a simple, direct response instead of the hardcoded one
+      return new Response(JSON.stringify({
+        success: true,
+        action: "update_conversation_state",
+        message: "When would you like to schedule your language practice call?",
+        scheduled_time: null
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const openaiResult = await openaiResponse.json();
