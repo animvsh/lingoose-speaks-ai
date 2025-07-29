@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Phone, Shield, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { usePhoneAuth } from "@/hooks/usePhoneAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
@@ -29,6 +30,7 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
   const { sendOTP, verifyOTP, isLoading } = usePhoneAuth();
   const { toast } = useToast();
   const { trackSwipe } = useEngagementTracking();
+  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Update phone number when prefilledPhone changes
@@ -133,11 +135,11 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
         
-        // Force page refresh to update auth state
+        // Smooth navigation without page reload
         setTimeout(() => {
-          console.log('🔄 Refreshing page for auth state update');
-          window.location.href = '/';
-        }, 1000);
+          console.log('🔄 Navigating to home page');
+          navigate('/', { replace: true });
+        }, 500);
         
       } else if (result.isNewUser) {
         console.log('👋 New user detected, setting up onboarding');
@@ -147,11 +149,11 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
         
-        // Force page refresh to trigger onboarding detection
+        // Smooth navigation to trigger onboarding detection
         setTimeout(() => {
-          console.log('🔄 Refreshing page for onboarding');
-          window.location.href = '/';
-        }, 1000);
+          console.log('🔄 Navigating to home for onboarding');
+          navigate('/', { replace: true });
+        }, 500);
         
       } else {
         console.log('🔑 Existing user login');
@@ -161,11 +163,11 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
         
-        // Force page refresh to update auth state
+        // Smooth navigation without page reload
         setTimeout(() => {
-          console.log('🔄 Refreshing page for auth state update');
-          window.location.href = '/';
-        }, 1000);
+          console.log('🔄 Navigating to home page');
+          navigate('/', { replace: true });
+        }, 500);
       }
     } else {
       // Handle specific error types
@@ -245,11 +247,11 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
         className: "border-2 border-green-400 bg-green-50 text-green-800",
       });
       
-      // Force page refresh to update auth state
+      // Smooth navigation without page reload
       setTimeout(() => {
-        console.log('🔄 Refreshing page after modal login');
-        window.location.href = '/';
-      }, 1000);
+        console.log('🔄 Navigating to home after modal login');
+        navigate('/', { replace: true });
+      }, 500);
     }
   };
 
