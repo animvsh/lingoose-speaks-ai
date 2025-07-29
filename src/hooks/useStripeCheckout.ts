@@ -5,11 +5,6 @@ import { useToast } from "@/hooks/use-toast";
 
 export const useStripeCheckout = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [modalData, setModalData] = useState<{ isOpen: boolean; url: string | null; title: string }>({
-    isOpen: false,
-    url: null,
-    title: ""
-  });
   const { toast } = useToast();
 
   const createCheckoutSession = async () => {
@@ -33,16 +28,12 @@ export const useStripeCheckout = () => {
 
       if (data?.url) {
         console.log('✅ Checkout URL received:', data.url);
-        // Open Stripe checkout in modal
-        setModalData({
-          isOpen: true,
-          url: data.url,
-          title: "Stripe Checkout"
-        });
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
         
         toast({
-          title: "Checkout Created! 💳",
-          description: "Stripe checkout opened...",
+          title: "Redirecting to Stripe! 💳",
+          description: "Taking you to secure checkout...",
         });
       } else {
         console.error('❌ No checkout URL returned:', data);
@@ -81,16 +72,12 @@ export const useStripeCheckout = () => {
 
       if (data?.url) {
         console.log('✅ Customer portal URL received:', data.url);
-        // Open customer portal in modal
-        setModalData({
-          isOpen: true,
-          url: data.url,
-          title: "Stripe Customer Portal"
-        });
+        // Redirect to customer portal
+        window.location.href = data.url;
         
         toast({
-          title: "Portal Opened! 🏪",
-          description: "Stripe customer portal opened...",
+          title: "Redirecting to Portal! 🏪",
+          description: "Taking you to customer portal...",
         });
       } else {
         console.error('❌ No portal URL returned:', data);
@@ -108,15 +95,9 @@ export const useStripeCheckout = () => {
     }
   };
 
-  const closeModal = () => {
-    setModalData({ isOpen: false, url: null, title: "" });
-  };
-
   return {
     createCheckoutSession,
     openCustomerPortal,
     isLoading,
-    modalData,
-    closeModal,
   };
 };
