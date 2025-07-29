@@ -49,12 +49,22 @@ export const EmbeddedCheckout = ({
         console.log('EmbeddedCheckout: Stripe loaded successfully');
         setStripe(stripeInstance);
 
-        // Use requestAnimationFrame to ensure DOM is ready
+        // Wait for Drawer animation to complete before mounting
         const mountCheckout = () => {
-          requestAnimationFrame(async () => {
+          let retryCount = 0;
+          const maxRetries = 100; // Maximum 5 seconds of retries
+
+          const attemptMount = async () => {
             if (!checkoutRef.current) {
-              console.log('EmbeddedCheckout: DOM element not ready, retrying...');
-              setTimeout(mountCheckout, 50);
+              retryCount++;
+              if (retryCount >= maxRetries) {
+                console.error('EmbeddedCheckout: Max retries reached, DOM element never became available');
+                onError?.('Failed to initialize checkout - DOM element not available');
+                setIsLoading(false);
+                return;
+              }
+              console.log(`EmbeddedCheckout: DOM element not ready, retrying... (${retryCount}/${maxRetries})`);
+              setTimeout(attemptMount, 50);
               return;
             }
 
@@ -77,7 +87,10 @@ export const EmbeddedCheckout = ({
               onError?.(mountError instanceof Error ? mountError.message : 'Failed to mount checkout');
               setIsLoading(false);
             }
-          });
+          };
+
+          // Give the Drawer time to fully open and render its content
+          setTimeout(attemptMount, 300);
         };
 
         mountCheckout();
