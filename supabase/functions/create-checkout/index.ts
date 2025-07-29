@@ -24,16 +24,26 @@ serve(async (req) => {
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.id) throw new Error("User not authenticated");
+    console.log('User authenticated:', { userId: user.id, phone: user.phone });
 
     // Get user profile to find phone number
+    console.log('Looking up user profile for user:', user.id);
     const { data: profile, error: profileError } = await supabaseClient
       .from('user_profiles')
       .select('phone_number, full_name')
       .eq('auth_user_id', user.id)
       .single();
 
-    if (profileError || !profile?.phone_number) {
-      throw new Error("User profile not found");
+    console.log('Profile lookup result:', { profile, profileError });
+    
+    if (profileError) {
+      console.error('Profile error:', profileError);
+      throw new Error(`Profile lookup failed: ${profileError.message}`);
+    }
+    
+    if (!profile?.phone_number) {
+      console.error('No phone number in profile:', profile);
+      throw new Error("User profile found but no phone number");
     }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 

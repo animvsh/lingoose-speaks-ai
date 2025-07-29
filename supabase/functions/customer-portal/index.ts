@@ -42,14 +42,23 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, phone: user.phone });
 
     // Get user profile to find phone number
+    logStep("Looking up user profile", { userId: user.id });
     const { data: profile, error: profileError } = await supabaseClient
       .from('user_profiles')
       .select('phone_number')
       .eq('auth_user_id', user.id)
       .single();
 
-    if (profileError || !profile?.phone_number) {
-      throw new Error("User profile not found");
+    logStep("Profile lookup result", { profile, profileError });
+    
+    if (profileError) {
+      logStep("Profile error details", { error: profileError });
+      throw new Error(`Profile lookup failed: ${profileError.message}`);
+    }
+    
+    if (!profile?.phone_number) {
+      logStep("No phone number found in profile", { profile });
+      throw new Error("User profile found but no phone number");
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
