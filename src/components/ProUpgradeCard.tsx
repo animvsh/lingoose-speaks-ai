@@ -5,7 +5,7 @@ import { Crown, Star, Zap, Clock, CheckCircle, X } from "lucide-react";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { useSubscriptionCheck } from "@/hooks/useSubscriptionCheck";
 import { EmbeddedCheckout } from "@/components/EmbeddedCheckout";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer";
 
 const ProUpgradeCard = () => {
   const { createCheckoutSession, openCustomerPortal, isLoading, checkoutData, closeCheckout } = useStripeCheckout();
@@ -118,21 +118,23 @@ const ProUpgradeCard = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={!!checkoutData.clientSecret} onOpenChange={() => closeCheckout()}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
+      <Drawer open={!!checkoutData.clientSecret} onOpenChange={() => closeCheckout()}>
+        <DrawerContent className="max-h-[90vh] overflow-auto">
+          <DrawerHeader>
+            <DrawerTitle className="flex items-center justify-between">
               <span>Complete Your Subscription</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={closeCheckout}
-                className="h-6 w-6 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </DialogTitle>
-          </DialogHeader>
+              <DrawerClose asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={closeCheckout}
+                  className="h-6 w-6 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </DrawerClose>
+            </DrawerTitle>
+          </DrawerHeader>
           
           {(() => {
             console.log('ProUpgradeCard: Dialog state:', { 
@@ -163,8 +165,8 @@ const ProUpgradeCard = () => {
               Loading checkout data... {JSON.stringify({ hasClientSecret: !!checkoutData.clientSecret, hasPublishableKey: !!checkoutData.publishableKey })}
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 };

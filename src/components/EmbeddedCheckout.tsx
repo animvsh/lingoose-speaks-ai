@@ -49,31 +49,38 @@ export const EmbeddedCheckout = ({
         console.log('EmbeddedCheckout: Stripe loaded successfully');
         setStripe(stripeInstance);
 
-        // Wait for the DOM element to be available
-        const mountCheckout = async () => {
-          if (!checkoutRef.current) {
-            console.log('EmbeddedCheckout: Waiting for DOM element...');
-            // Wait a bit and try again
-            setTimeout(mountCheckout, 100);
-            return;
-          }
+        // Use requestAnimationFrame to ensure DOM is ready
+        const mountCheckout = () => {
+          requestAnimationFrame(async () => {
+            if (!checkoutRef.current) {
+              console.log('EmbeddedCheckout: DOM element not ready, retrying...');
+              setTimeout(mountCheckout, 50);
+              return;
+            }
 
-          console.log('EmbeddedCheckout: DOM element ready, initializing embedded checkout...');
-          const checkout = await stripeInstance.initEmbeddedCheckout({
-            clientSecret,
-            onComplete: () => {
-              console.log('Stripe checkout completed successfully');
-              onComplete?.();
+            try {
+              console.log('EmbeddedCheckout: DOM element ready, initializing embedded checkout...');
+              const checkout = await stripeInstance.initEmbeddedCheckout({
+                clientSecret,
+                onComplete: () => {
+                  console.log('Stripe checkout completed successfully');
+                  onComplete?.();
+                }
+              });
+
+              console.log('EmbeddedCheckout: Mounting checkout to DOM element');
+              checkout.mount(checkoutRef.current);
+              console.log('EmbeddedCheckout: Checkout mounted successfully');
+              setIsLoading(false);
+            } catch (mountError) {
+              console.error('EmbeddedCheckout: Error mounting checkout:', mountError);
+              onError?.(mountError instanceof Error ? mountError.message : 'Failed to mount checkout');
+              setIsLoading(false);
             }
           });
-
-          console.log('EmbeddedCheckout: Mounting checkout to DOM element');
-          checkout.mount(checkoutRef.current);
-          console.log('EmbeddedCheckout: Checkout mounted successfully');
-          setIsLoading(false);
         };
 
-        await mountCheckout();
+        mountCheckout();
       } catch (error) {
         console.error('Error initializing Stripe checkout:', error);
         onError?.(error instanceof Error ? error.message : 'Failed to initialize checkout');
