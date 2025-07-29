@@ -29,10 +29,6 @@ export const useStripeCheckout = () => {
     // If we already have valid checkout data, don't create a new session
     if (checkoutData.clientSecret && checkoutData.publishableKey) {
       console.log('✅ Using existing checkout session');
-      toast({
-        title: "Checkout Ready! 💳",
-        description: "Secure payment form loaded...",
-      });
       return;
     }
 
@@ -66,10 +62,6 @@ export const useStripeCheckout = () => {
           publishableKey: data.publishableKey
         });
         
-        toast({
-          title: "Checkout Ready! 💳",
-          description: "Secure payment form loaded...",
-        });
       } else {
         console.error('❌ No client secret returned:', data);
         throw new Error('No checkout session data returned from server');
