@@ -22,7 +22,8 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
   const [otpCode, setOtpCode] = useState("");
   const [showExistingAccountModal, setShowExistingAccountModal] = useState(false);
   const [existingProfile, setExistingProfile] = useState<any>(null);
-  const [isSignInMode, setIsSignInMode] = useState(false);
+  // Auto-detect sign-in mode if phone is pre-filled (user was redirected)
+  const [isSignInMode, setIsSignInMode] = useState(!!prefilledPhone);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [otpSentAt, setOtpSentAt] = useState<Date | null>(null);
   const { sendOTP, verifyOTP, isLoading } = usePhoneAuth();
@@ -34,7 +35,8 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
   useEffect(() => {
     if (prefilledPhone) {
       setPhoneNumber(prefilledPhone);
-      console.log('PhoneAuthForm: Pre-filled phone number:', prefilledPhone);
+      setIsSignInMode(true); // Auto-enable sign-in mode for pre-filled numbers
+      console.log('PhoneAuthForm: Pre-filled phone number:', prefilledPhone, '- Sign-in mode enabled');
     }
   }, [prefilledPhone]);
 
@@ -357,7 +359,7 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
             Enter Phone Number
           </CardTitle>
           <CardDescription className="text-slate-600 font-bold">
-            We'll send you a verification code via SMS
+            {isSignInMode ? "Sign in to your existing account" : "We'll send you a verification code via SMS"}
           </CardDescription>
         </CardHeader>
         
@@ -380,7 +382,7 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
               disabled={isLoading}
               className="w-full bg-orange-400 hover:bg-orange-500 border-4 border-orange-600 text-white font-black py-3 px-6 rounded-xl text-lg transition-all duration-200 hover:scale-105 transform hover:-rotate-1"
             >
-              {isLoading ? "Sending Code..." : "Send Verification Code"}
+              {isLoading ? "Sending Code..." : isSignInMode ? "Send Sign-in Code" : "Send Verification Code"}
             </Button>
           </form>
         </CardContent>
