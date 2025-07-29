@@ -93,26 +93,17 @@ const Index = () => {
           trackScreenView("onboarding");
           trackPageView("onboarding");
         }
-      } else if (isAuthenticated === 'true' && needsOnboarding === 'true') {
-        // New user who is authenticated but needs onboarding
-        identify({
-          user_type: 'new_authenticated',
-          onboarding_completed: false
-        });
-        
-        setCurrentView("onboarding");
-        trackScreenView("onboarding");
-        trackPageView("onboarding");
       } else if (isAuthenticated === 'true') {
-        // Authenticated user but no profile yet - stay in the app and show onboarding
+        // Authenticated user - go directly to home
         identify({
-          user_type: 'authenticated_no_profile',
-          onboarding_completed: false
+          user_type: 'authenticated',
+          onboarding_completed: true
         });
         
-        setCurrentView("onboarding");
-        trackScreenView("onboarding");
-        trackPageView("onboarding");
+        setIsOnboarded(true);
+        setCurrentView("home");
+        trackScreenView("dashboard");
+        trackPageView("dashboard");
       } else {
         // Only redirect to auth if loading is complete and user is definitively null
         // Add a small delay to prevent blank screens during auth state changes
