@@ -97,9 +97,22 @@ export const EmbeddedCheckout = ({
     );
   }
 
+  console.log('EmbeddedCheckout: Rendering with ref:', { 
+    hasRef: !!checkoutRef.current,
+    isLoading,
+    hasStripe: !!stripe 
+  });
+
   return (
     <div className="w-full">
-      <div ref={checkoutRef} className="min-h-[400px] w-full" />
+      <div 
+        ref={checkoutRef} 
+        className="min-h-[400px] w-full"
+        style={{ border: '2px solid red' }} // Temporary debug border
+      />
+      <div className="text-xs text-gray-500 mt-2">
+        Debug: Ref exists: {checkoutRef.current ? 'YES' : 'NO'}
+      </div>
     </div>
   );
 };

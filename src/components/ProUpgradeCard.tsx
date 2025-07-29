@@ -140,16 +140,23 @@ const ProUpgradeCard = () => {
           </DrawerHeader>
           
           <div className="flex-1 overflow-auto p-6">
+            <div className="mb-4 p-2 bg-gray-100 text-xs">
+              Debug Info: 
+              clientSecret: {checkoutData.clientSecret ? 'EXISTS' : 'MISSING'}, 
+              publishableKey: {checkoutData.publishableKey ? 'EXISTS' : 'MISSING'}
+            </div>
+            
             {checkoutData.clientSecret && checkoutData.publishableKey ? (
               <EmbeddedCheckout
                 clientSecret={checkoutData.clientSecret}
                 publishableKey={checkoutData.publishableKey}
                 onComplete={() => {
+                  console.log('Checkout completed, closing drawer');
                   closeCheckout();
                   refetch();
                 }}
                 onError={(error) => {
-                  console.error('Checkout error:', error);
+                  console.error('Checkout error, closing drawer:', error);
                   closeCheckout();
                 }}
               />
