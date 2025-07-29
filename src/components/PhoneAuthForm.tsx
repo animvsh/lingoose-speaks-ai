@@ -137,14 +137,27 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
         // No redirect needed - smooth state transition
       }
     } else {
-      // Handle specific expiration error
-      if (result.error?.includes('expired') || result.error?.includes('invalid')) {
+      // Handle specific error types
+      if (result.error?.includes('expired') || result.error?.includes('already used')) {
         toast({
-          title: "⏰ Code Expired",
-          description: "Your verification code has expired. Please request a new one.",
+          title: "⏰ Code Expired or Used",
+          description: "This code has expired or was already used. Please get a new code.",
           variant: "destructive",
         });
-        setOtpCode(""); // Clear the expired code
+        setOtpCode(""); // Clear the expired/used code
+        // Auto-focus on resend button after showing error
+        setTimeout(() => {
+          const resendButton = document.querySelector('[data-resend-button]') as HTMLButtonElement;
+          if (resendButton && !resendButton.disabled) {
+            resendButton.focus();
+          }
+        }, 100);
+      } else if (result.error?.includes('invalid')) {
+        toast({
+          title: "❌ Invalid Code",
+          description: "Please check your code and try again.",
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "❌ Verification Failed",
@@ -276,6 +289,7 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
                   variant="outline"
                   onClick={handleResendOTP}
                   disabled={resendCooldown > 0 || isLoading}
+                  data-resend-button
                   className="flex-1 border-2 border-slate-300 text-slate-600 font-bold"
                 >
                   {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend Code"}

@@ -152,6 +152,17 @@ export const usePhoneAuth = () => {
       if (error) {
         console.error('Supabase OTP verification error:', error);
         await logSecurityEvent('otp_verify_failed', formattedPhone, { error: error.message });
+        
+        // Provide more specific error messages
+        let errorMessage = error.message || 'Failed to verify code';
+        if (error.message?.includes('expired') || error.message?.includes('invalid')) {
+          if (error.message?.includes('expired')) {
+            errorMessage = 'This verification code has expired or was already used. Please request a new code.';
+          } else {
+            errorMessage = 'Invalid verification code. Please check your code and try again.';
+          }
+        }
+        
         setTimeout(() => {
           import('@/services/posthog').then(({ posthogService }) => {
             if (posthogService) {
@@ -162,7 +173,7 @@ export const usePhoneAuth = () => {
             }
           });
         }, 100);
-        throw new Error(error.message || 'Failed to verify code');
+        throw new Error(errorMessage);
       }
 
       if (!session?.user) {
