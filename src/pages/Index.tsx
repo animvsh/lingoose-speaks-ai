@@ -90,15 +90,26 @@ const Index = () => {
 
          const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.phone_number}`);
          console.log('🔍 Checking onboarding completion for:', user.phone_number, 'result:', onboardingComplete);
-         if (onboardingComplete) {
+         
+         // If user has a profile (meaning they've completed basic setup), they should skip onboarding
+         // Only send to onboarding if they explicitly need it (new user flow)
+         const needsOnboarding = localStorage.getItem('needs_onboarding');
+         
+         if (needsOnboarding === 'true') {
+           // This is a new user who just verified their phone and needs onboarding
+           setCurrentView("onboarding");
+           trackScreenView("onboarding");
+           trackPageView("onboarding");
+         } else {
+           // This is an existing user - go to home even if onboarding flag isn't set
+           // Set the onboarding flag for future logins if it's not already set
+           if (!onboardingComplete) {
+             localStorage.setItem(`onboarding_complete_${user.phone_number}`, "true");
+           }
            setIsOnboarded(true);
            setCurrentView("home");
            trackScreenView("dashboard");
            trackPageView("dashboard");
-         } else {
-           setCurrentView("onboarding");
-           trackScreenView("onboarding");
-           trackPageView("onboarding");
          }
       } else if (isAuthenticated === 'true') {
         // Authenticated user - go directly to home
