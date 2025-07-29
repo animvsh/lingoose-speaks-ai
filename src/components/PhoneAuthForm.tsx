@@ -23,6 +23,8 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
   const [showExistingAccountModal, setShowExistingAccountModal] = useState(false);
   const [existingProfile, setExistingProfile] = useState<any>(null);
   const [isSignInMode, setIsSignInMode] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [otpSentAt, setOtpSentAt] = useState<Date | null>(null);
   const { sendOTP, verifyOTP, isLoading } = usePhoneAuth();
   const { toast } = useToast();
   const { trackSwipe } = useEngagementTracking();
@@ -35,6 +37,14 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
       console.log('PhoneAuthForm: Pre-filled phone number:', prefilledPhone);
     }
   }, [prefilledPhone]);
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
 
   const handleSwipe = (direction: 'left' | 'right') => {
     trackSwipe(direction, `auth-${step}`);
@@ -62,9 +72,11 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
 
     const result = await sendOTP(phoneNumber);
     if (result.success) {
+      setOtpSentAt(new Date());
+      setResendCooldown(60); // 60-second cooldown
       toast({
         title: "📱 Code Sent!",
-        description: "Check your phone for the verification code.",
+        description: "Check your phone for the verification code. It expires in 10 minutes.",
         className: "border-2 border-green-400 bg-green-50 text-green-800",
       });
       setStep('otp');
@@ -125,17 +137,51 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
         // No redirect needed - smooth state transition
       }
     } else {
-      toast({
-        title: "❌ Verification Failed",
-        description: result.error || "Invalid verification code.",
-        variant: "destructive",
-      });
+      // Handle specific expiration error
+      if (result.error?.includes('expired') || result.error?.includes('invalid')) {
+        toast({
+          title: "⏰ Code Expired",
+          description: "Your verification code has expired. Please request a new one.",
+          variant: "destructive",
+        });
+        setOtpCode(""); // Clear the expired code
+      } else {
+        toast({
+          title: "❌ Verification Failed",
+          description: result.error || "Invalid verification code.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const handleBackToPhone = () => {
     setStep('phone');
     setOtpCode("");
+    setResendCooldown(0);
+    setOtpSentAt(null);
+  };
+
+  const handleResendOTP = async () => {
+    if (resendCooldown > 0) return;
+    
+    const result = await sendOTP(phoneNumber);
+    if (result.success) {
+      setOtpSentAt(new Date());
+      setResendCooldown(60); // Reset cooldown
+      setOtpCode(""); // Clear current code
+      toast({
+        title: "📱 New Code Sent!",
+        description: "A new verification code has been sent to your phone.",
+        className: "border-2 border-green-400 bg-green-50 text-green-800",
+      });
+    } else {
+      toast({
+        title: "❌ Resend Failed",
+        description: result.error || "Failed to resend verification code.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleLoginFromModal = async () => {
@@ -185,6 +231,11 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
             </CardTitle>
             <CardDescription className="text-slate-600 font-bold">
               We sent a 6-digit code to {phoneNumber}
+              {otpSentAt && (
+                <div className="text-xs text-slate-500 mt-1">
+                  Code expires in 10 minutes • Sent {new Date(otpSentAt).toLocaleTimeString()}
+                </div>
+              )}
             </CardDescription>
             <p className="text-xs text-slate-500 mt-2">
               💡 Swipe right to go back to phone entry
@@ -219,15 +270,27 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
                 {isLoading ? "Verifying..." : "Verify Code"}
               </Button>
 
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={handleBackToPhone}
-                className="w-full text-slate-600 font-bold"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Phone Number
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleResendOTP}
+                  disabled={resendCooldown > 0 || isLoading}
+                  className="flex-1 border-2 border-slate-300 text-slate-600 font-bold"
+                >
+                  {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend Code"}
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleBackToPhone}
+                  className="flex-1 text-slate-600 font-bold"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>
