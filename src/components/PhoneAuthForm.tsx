@@ -114,7 +114,9 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
         accountDetected: result.accountDetected, 
         isNewUser: result.isNewUser,
         profile: result.profile,
-        isSignInMode 
+        isSignInMode,
+        prefilledPhone,
+        phoneNumber
       });
       
       if (result.accountDetected && result.profile && !isSignInMode) {
