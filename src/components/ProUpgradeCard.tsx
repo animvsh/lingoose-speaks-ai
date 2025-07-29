@@ -119,7 +119,7 @@ const ProUpgradeCard = () => {
       </Card>
 
       <Dialog open={!!checkoutData.clientSecret} onOpenChange={() => closeCheckout()}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>Complete Your Subscription</span>
@@ -134,7 +134,17 @@ const ProUpgradeCard = () => {
             </DialogTitle>
           </DialogHeader>
           
-          {checkoutData.clientSecret && checkoutData.publishableKey && (
+          {(() => {
+            console.log('ProUpgradeCard: Dialog state:', { 
+              isOpen: !!checkoutData.clientSecret,
+              hasClientSecret: !!checkoutData.clientSecret,
+              hasPublishableKey: !!checkoutData.publishableKey,
+              checkoutData 
+            });
+            return null;
+          })()}
+          
+          {checkoutData.clientSecret && checkoutData.publishableKey ? (
             <EmbeddedCheckout
               clientSecret={checkoutData.clientSecret}
               publishableKey={checkoutData.publishableKey}
@@ -148,6 +158,10 @@ const ProUpgradeCard = () => {
                 closeCheckout();
               }}
             />
+          ) : (
+            <div className="p-4 text-center text-gray-500">
+              Loading checkout data... {JSON.stringify({ hasClientSecret: !!checkoutData.clientSecret, hasPublishableKey: !!checkoutData.publishableKey })}
+            </div>
           )}
         </DialogContent>
       </Dialog>
