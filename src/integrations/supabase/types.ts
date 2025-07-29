@@ -69,10 +69,12 @@ export type Database = {
           activity_type: string
           adaptation_reason: string | null
           completed_at: string | null
+          content_summary: string | null
           conversation_prompts: string[] | null
           created_at: string
           description: string
           difficulty_level: number
+          embedding: string | null
           estimated_duration_minutes: number | null
           focus_areas: Json
           id: string
@@ -93,10 +95,12 @@ export type Database = {
           activity_type: string
           adaptation_reason?: string | null
           completed_at?: string | null
+          content_summary?: string | null
           conversation_prompts?: string[] | null
           created_at?: string
           description: string
           difficulty_level?: number
+          embedding?: string | null
           estimated_duration_minutes?: number | null
           focus_areas?: Json
           id?: string
@@ -117,10 +121,12 @@ export type Database = {
           activity_type?: string
           adaptation_reason?: string | null
           completed_at?: string | null
+          content_summary?: string | null
           conversation_prompts?: string[] | null
           created_at?: string
           description?: string
           difficulty_level?: number
+          embedding?: string | null
           estimated_duration_minutes?: number | null
           focus_areas?: Json
           id?: string
@@ -136,6 +142,27 @@ export type Database = {
           updated_at?: string
           user_id?: string
           weakness_areas?: string[] | null
+        }
+        Relationships: []
+      }
+      admin_verifications: {
+        Row: {
+          admin_email: string
+          created_at: string
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          admin_email: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          admin_email?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
         }
         Relationships: []
       }
@@ -179,8 +206,10 @@ export type Database = {
           analysis_details: Json | null
           call_date: string
           callback_usage: number | null
+          content_summary: string | null
           continuity_score: number | null
           created_at: string
+          embedding: string | null
           followup_quality: number | null
           id: string
           improvement_suggestions: string[] | null
@@ -200,8 +229,10 @@ export type Database = {
           analysis_details?: Json | null
           call_date?: string
           callback_usage?: number | null
+          content_summary?: string | null
           continuity_score?: number | null
           created_at?: string
+          embedding?: string | null
           followup_quality?: number | null
           id?: string
           improvement_suggestions?: string[] | null
@@ -221,8 +252,10 @@ export type Database = {
           analysis_details?: Json | null
           call_date?: string
           callback_usage?: number | null
+          content_summary?: string | null
           continuity_score?: number | null
           created_at?: string
+          embedding?: string | null
           followup_quality?: number | null
           id?: string
           improvement_suggestions?: string[] | null
@@ -239,6 +272,121 @@ export type Database = {
           vapi_call_analysis_id?: string
         }
         Relationships: []
+      }
+      call_analytics: {
+        Row: {
+          answer_rate: number | null
+          avg_call_duration_seconds: number | null
+          avg_ring_duration_seconds: number | null
+          calls_answered: number | null
+          calls_busy: number | null
+          calls_failed: number | null
+          calls_no_answer: number | null
+          calls_voicemail: number | null
+          completion_rate: number | null
+          created_at: string | null
+          date: string
+          id: string
+          phone_number: string | null
+          total_call_time_seconds: number | null
+          total_calls_initiated: number | null
+          total_ring_time_seconds: number | null
+          total_talk_time_seconds: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          answer_rate?: number | null
+          avg_call_duration_seconds?: number | null
+          avg_ring_duration_seconds?: number | null
+          calls_answered?: number | null
+          calls_busy?: number | null
+          calls_failed?: number | null
+          calls_no_answer?: number | null
+          calls_voicemail?: number | null
+          completion_rate?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          phone_number?: string | null
+          total_call_time_seconds?: number | null
+          total_calls_initiated?: number | null
+          total_ring_time_seconds?: number | null
+          total_talk_time_seconds?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          answer_rate?: number | null
+          avg_call_duration_seconds?: number | null
+          avg_ring_duration_seconds?: number | null
+          calls_answered?: number | null
+          calls_busy?: number | null
+          calls_failed?: number | null
+          calls_no_answer?: number | null
+          calls_voicemail?: number | null
+          completion_rate?: number | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          phone_number?: string | null
+          total_call_time_seconds?: number | null
+          total_calls_initiated?: number | null
+          total_ring_time_seconds?: number | null
+          total_talk_time_seconds?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_analytics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      call_events: {
+        Row: {
+          call_id: string
+          created_at: string | null
+          event_data: Json | null
+          event_timestamp: string
+          event_type: string
+          id: string
+          phone_number: string
+          user_id: string | null
+        }
+        Insert: {
+          call_id: string
+          created_at?: string | null
+          event_data?: Json | null
+          event_timestamp?: string
+          event_type: string
+          id?: string
+          phone_number: string
+          user_id?: string | null
+        }
+        Update: {
+          call_id?: string
+          created_at?: string | null
+          event_data?: Json | null
+          event_timestamp?: string
+          event_type?: string
+          id?: string
+          phone_number?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       call_logs: {
         Row: {
@@ -280,6 +428,98 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "call_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      call_sessions: {
+        Row: {
+          answered_at: string | null
+          audio_quality_score: number | null
+          call_id: string
+          call_metadata: Json | null
+          call_status: string
+          call_type: string | null
+          connection_quality: string | null
+          created_at: string | null
+          end_reason: string | null
+          ended_at: string | null
+          id: string
+          initiated_at: string | null
+          initiated_by: string | null
+          phone_number: string
+          provider_data: Json | null
+          recording_duration_seconds: number | null
+          recording_url: string | null
+          ring_duration_seconds: number | null
+          ringing_started_at: string | null
+          talk_duration_seconds: number | null
+          total_duration_seconds: number | null
+          transcript: string | null
+          transcript_confidence: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          answered_at?: string | null
+          audio_quality_score?: number | null
+          call_id: string
+          call_metadata?: Json | null
+          call_status?: string
+          call_type?: string | null
+          connection_quality?: string | null
+          created_at?: string | null
+          end_reason?: string | null
+          ended_at?: string | null
+          id?: string
+          initiated_at?: string | null
+          initiated_by?: string | null
+          phone_number: string
+          provider_data?: Json | null
+          recording_duration_seconds?: number | null
+          recording_url?: string | null
+          ring_duration_seconds?: number | null
+          ringing_started_at?: string | null
+          talk_duration_seconds?: number | null
+          total_duration_seconds?: number | null
+          transcript?: string | null
+          transcript_confidence?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          answered_at?: string | null
+          audio_quality_score?: number | null
+          call_id?: string
+          call_metadata?: Json | null
+          call_status?: string
+          call_type?: string | null
+          connection_quality?: string | null
+          created_at?: string | null
+          end_reason?: string | null
+          ended_at?: string | null
+          id?: string
+          initiated_at?: string | null
+          initiated_by?: string | null
+          phone_number?: string
+          provider_data?: Json | null
+          recording_duration_seconds?: number | null
+          recording_url?: string | null
+          ring_duration_seconds?: number | null
+          ringing_started_at?: string | null
+          talk_duration_seconds?: number | null
+          total_duration_seconds?: number | null
+          transcript?: string | null
+          transcript_confidence?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_sessions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
@@ -375,8 +615,10 @@ export type Database = {
           average_response_delay_seconds: number | null
           call_date: string
           composite_score: number | null
+          content_summary: string | null
           correction_count: number | null
           created_at: string
+          embedding: string | null
           filler_words_detected: string[] | null
           filler_words_per_minute: number | null
           fluency_progress_delta: number | null
@@ -411,8 +653,10 @@ export type Database = {
           average_response_delay_seconds?: number | null
           call_date?: string
           composite_score?: number | null
+          content_summary?: string | null
           correction_count?: number | null
           created_at?: string
+          embedding?: string | null
           filler_words_detected?: string[] | null
           filler_words_per_minute?: number | null
           fluency_progress_delta?: number | null
@@ -447,8 +691,10 @@ export type Database = {
           average_response_delay_seconds?: number | null
           call_date?: string
           composite_score?: number | null
+          content_summary?: string | null
           correction_count?: number | null
           created_at?: string
+          embedding?: string | null
           filler_words_detected?: string[] | null
           filler_words_per_minute?: number | null
           fluency_progress_delta?: number | null
@@ -565,7 +811,9 @@ export type Database = {
         Row: {
           comparison_analysis: Json
           confidence_score: number | null
+          content_summary: string | null
           created_at: string
+          embedding: string | null
           id: string
           insights: Json
           learning_recommendations: Json
@@ -576,7 +824,9 @@ export type Database = {
         Insert: {
           comparison_analysis: Json
           confidence_score?: number | null
+          content_summary?: string | null
           created_at?: string
+          embedding?: string | null
           id?: string
           insights: Json
           learning_recommendations: Json
@@ -587,7 +837,9 @@ export type Database = {
         Update: {
           comparison_analysis?: Json
           confidence_score?: number | null
+          content_summary?: string | null
           created_at?: string
+          embedding?: string | null
           id?: string
           insights?: Json
           learning_recommendations?: Json
@@ -638,6 +890,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      dashboard_metrics: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          query_config: Json | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+          value: string
+          variant: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          query_config?: Json | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+          value: string
+          variant?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          query_config?: Json | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+          value?: string
+          variant?: string | null
+        }
+        Relationships: []
       }
       fluency_levels: {
         Row: {
@@ -898,6 +1195,111 @@ export type Database = {
           text_content?: string | null
           user_id?: string | null
           word_scores?: Json | null
+        }
+        Relationships: []
+      }
+      retention_metrics: {
+        Row: {
+          active_days_last_30: number | null
+          avg_sentiment_score: number | null
+          avg_session_duration_minutes: number | null
+          created_at: string
+          current_fluency_score: number | null
+          current_streak_days: number | null
+          engagement_slope: number | null
+          exit_risk_score: number | null
+          first_session_date: string | null
+          fluency_progression_slope: number | null
+          fluency_scores: Json | null
+          id: string
+          is_7_day_retained: boolean | null
+          is_at_risk: boolean | null
+          longest_streak_days: number | null
+          metric_date: string
+          phone_number: string
+          recent_session_pattern: Json | null
+          return_frequency_score: number | null
+          sentiment_scores: Json | null
+          sentiment_trend_slope: number | null
+          topic_reengagement_score: number | null
+          topics_covered: Json | null
+          topics_revisited: number | null
+          total_session_minutes: number | null
+          total_sessions: number | null
+          updated_at: string
+          user_id: string
+          vocabulary_retention_rate: number | null
+          weekly_session_counts: Json | null
+          words_learned_total: number | null
+          words_retained: number | null
+        }
+        Insert: {
+          active_days_last_30?: number | null
+          avg_sentiment_score?: number | null
+          avg_session_duration_minutes?: number | null
+          created_at?: string
+          current_fluency_score?: number | null
+          current_streak_days?: number | null
+          engagement_slope?: number | null
+          exit_risk_score?: number | null
+          first_session_date?: string | null
+          fluency_progression_slope?: number | null
+          fluency_scores?: Json | null
+          id?: string
+          is_7_day_retained?: boolean | null
+          is_at_risk?: boolean | null
+          longest_streak_days?: number | null
+          metric_date?: string
+          phone_number: string
+          recent_session_pattern?: Json | null
+          return_frequency_score?: number | null
+          sentiment_scores?: Json | null
+          sentiment_trend_slope?: number | null
+          topic_reengagement_score?: number | null
+          topics_covered?: Json | null
+          topics_revisited?: number | null
+          total_session_minutes?: number | null
+          total_sessions?: number | null
+          updated_at?: string
+          user_id: string
+          vocabulary_retention_rate?: number | null
+          weekly_session_counts?: Json | null
+          words_learned_total?: number | null
+          words_retained?: number | null
+        }
+        Update: {
+          active_days_last_30?: number | null
+          avg_sentiment_score?: number | null
+          avg_session_duration_minutes?: number | null
+          created_at?: string
+          current_fluency_score?: number | null
+          current_streak_days?: number | null
+          engagement_slope?: number | null
+          exit_risk_score?: number | null
+          first_session_date?: string | null
+          fluency_progression_slope?: number | null
+          fluency_scores?: Json | null
+          id?: string
+          is_7_day_retained?: boolean | null
+          is_at_risk?: boolean | null
+          longest_streak_days?: number | null
+          metric_date?: string
+          phone_number?: string
+          recent_session_pattern?: Json | null
+          return_frequency_score?: number | null
+          sentiment_scores?: Json | null
+          sentiment_trend_slope?: number | null
+          topic_reengagement_score?: number | null
+          topics_covered?: Json | null
+          topics_revisited?: number | null
+          total_session_minutes?: number | null
+          total_sessions?: number | null
+          updated_at?: string
+          user_id?: string
+          vocabulary_retention_rate?: number | null
+          weekly_session_counts?: Json | null
+          words_learned_total?: number | null
+          words_retained?: number | null
         }
         Relationships: []
       }
@@ -1258,6 +1660,114 @@ export type Database = {
           },
         ]
       }
+      user_comprehensive_metrics: {
+        Row: {
+          average_response_delay_seconds: number | null
+          composite_fluency_score: number | null
+          content_summary: string | null
+          created_at: string
+          current_skill_level: string | null
+          detected_issues: Json | null
+          embedding: string | null
+          filler_word_count: number | null
+          filler_words_per_minute: number | null
+          fluency_progress_delta: number | null
+          id: string
+          improvement_areas: Json | null
+          lesson_topic: string | null
+          level_advancement_eligible: boolean | null
+          long_pause_count: number | null
+          next_level_progress_percent: number | null
+          pauses_per_minute: number | null
+          phone_number: string
+          self_correction_count: number | null
+          self_correction_rate: number | null
+          session_date: string
+          session_duration_minutes: number | null
+          speech_clarity_percent: number | null
+          strengths: Json | null
+          target_vocabulary: Json | null
+          target_vocabulary_usage_percent: number | null
+          total_words_spoken: number | null
+          turn_count: number | null
+          unique_vocabulary_count: number | null
+          updated_at: string
+          user_id: string
+          user_speaking_time_seconds: number | null
+          words_per_minute: number | null
+        }
+        Insert: {
+          average_response_delay_seconds?: number | null
+          composite_fluency_score?: number | null
+          content_summary?: string | null
+          created_at?: string
+          current_skill_level?: string | null
+          detected_issues?: Json | null
+          embedding?: string | null
+          filler_word_count?: number | null
+          filler_words_per_minute?: number | null
+          fluency_progress_delta?: number | null
+          id?: string
+          improvement_areas?: Json | null
+          lesson_topic?: string | null
+          level_advancement_eligible?: boolean | null
+          long_pause_count?: number | null
+          next_level_progress_percent?: number | null
+          pauses_per_minute?: number | null
+          phone_number: string
+          self_correction_count?: number | null
+          self_correction_rate?: number | null
+          session_date?: string
+          session_duration_minutes?: number | null
+          speech_clarity_percent?: number | null
+          strengths?: Json | null
+          target_vocabulary?: Json | null
+          target_vocabulary_usage_percent?: number | null
+          total_words_spoken?: number | null
+          turn_count?: number | null
+          unique_vocabulary_count?: number | null
+          updated_at?: string
+          user_id: string
+          user_speaking_time_seconds?: number | null
+          words_per_minute?: number | null
+        }
+        Update: {
+          average_response_delay_seconds?: number | null
+          composite_fluency_score?: number | null
+          content_summary?: string | null
+          created_at?: string
+          current_skill_level?: string | null
+          detected_issues?: Json | null
+          embedding?: string | null
+          filler_word_count?: number | null
+          filler_words_per_minute?: number | null
+          fluency_progress_delta?: number | null
+          id?: string
+          improvement_areas?: Json | null
+          lesson_topic?: string | null
+          level_advancement_eligible?: boolean | null
+          long_pause_count?: number | null
+          next_level_progress_percent?: number | null
+          pauses_per_minute?: number | null
+          phone_number?: string
+          self_correction_count?: number | null
+          self_correction_rate?: number | null
+          session_date?: string
+          session_duration_minutes?: number | null
+          speech_clarity_percent?: number | null
+          strengths?: Json | null
+          target_vocabulary?: Json | null
+          target_vocabulary_usage_percent?: number | null
+          total_words_spoken?: number | null
+          turn_count?: number | null
+          unique_vocabulary_count?: number | null
+          updated_at?: string
+          user_id?: string
+          user_speaking_time_seconds?: number | null
+          words_per_minute?: number | null
+        }
+        Relationships: []
+      }
       user_course_progress: {
         Row: {
           completed_nodes: number | null
@@ -1305,10 +1815,12 @@ export type Database = {
       }
       user_fluency_progress: {
         Row: {
+          content_summary: string | null
           created_at: string
           current_level_id: string
           current_skill_id: string | null
           current_streak_days: number | null
+          embedding: string | null
           fluency_composite_score: number | null
           id: string
           last_practice_date: string | null
@@ -1320,10 +1832,12 @@ export type Database = {
           vocabulary_learned_count: number | null
         }
         Insert: {
+          content_summary?: string | null
           created_at?: string
           current_level_id: string
           current_skill_id?: string | null
           current_streak_days?: number | null
+          embedding?: string | null
           fluency_composite_score?: number | null
           id?: string
           last_practice_date?: string | null
@@ -1335,10 +1849,12 @@ export type Database = {
           vocabulary_learned_count?: number | null
         }
         Update: {
+          content_summary?: string | null
           created_at?: string
           current_level_id?: string
           current_skill_id?: string | null
           current_streak_days?: number | null
+          embedding?: string | null
           fluency_composite_score?: number | null
           id?: string
           last_practice_date?: string | null
@@ -1582,41 +2098,56 @@ export type Database = {
         Row: {
           auth_user_id: string | null
           created_at: string | null
+          email: string | null
           fcm_token: string | null
           full_name: string
           id: string
+          is_verified: boolean | null
           language: string | null
           last_conversation_summary: string | null
           phone_number: string
           preferred_call_time: string | null
           proficiency_level: number | null
+          role: Database["public"]["Enums"]["user_role"] | null
           updated_at: string | null
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           auth_user_id?: string | null
           created_at?: string | null
+          email?: string | null
           fcm_token?: string | null
           full_name: string
           id?: string
+          is_verified?: boolean | null
           language?: string | null
           last_conversation_summary?: string | null
           phone_number: string
           preferred_call_time?: string | null
           proficiency_level?: number | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           auth_user_id?: string | null
           created_at?: string | null
+          email?: string | null
           fcm_token?: string | null
           full_name?: string
           id?: string
+          is_verified?: boolean | null
           language?: string | null
           last_conversation_summary?: string | null
           phone_number?: string
           preferred_call_time?: string | null
           proficiency_level?: number | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }
@@ -1665,6 +2196,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_verification_requests: {
+        Row: {
+          created_at: string
+          id: string
+          rejection_reason: string | null
+          requester_email: string
+          requester_user_id: string | null
+          status: string
+          verified_at: string | null
+          verified_by_email: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rejection_reason?: string | null
+          requester_email: string
+          requester_user_id?: string | null
+          status?: string
+          verified_at?: string | null
+          verified_by_email?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rejection_reason?: string | null
+          requester_email?: string
+          requester_user_id?: string | null
+          status?: string
+          verified_at?: string | null
+          verified_by_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_verification_requests_verified_by_email_fkey"
+            columns: ["verified_by_email"]
+            isOneToOne: false
+            referencedRelation: "admin_verifications"
+            referencedColumns: ["admin_email"]
+          },
+        ]
+      }
       vapi_call_analysis: {
         Row: {
           call_data: Json
@@ -1672,8 +2244,10 @@ export type Database = {
           call_ended_at: string | null
           call_started_at: string | null
           call_status: string | null
+          content_summary: string | null
           conversation_id: string | null
           created_at: string
+          embedding: string | null
           extracted_insights: Json | null
           id: string
           performance_metrics: Json | null
@@ -1690,8 +2264,10 @@ export type Database = {
           call_ended_at?: string | null
           call_started_at?: string | null
           call_status?: string | null
+          content_summary?: string | null
           conversation_id?: string | null
           created_at?: string
+          embedding?: string | null
           extracted_insights?: Json | null
           id?: string
           performance_metrics?: Json | null
@@ -1708,8 +2284,10 @@ export type Database = {
           call_ended_at?: string | null
           call_started_at?: string | null
           call_status?: string | null
+          content_summary?: string | null
           conversation_id?: string | null
           created_at?: string
+          embedding?: string | null
           extracted_insights?: Json | null
           id?: string
           performance_metrics?: Json | null
@@ -1735,6 +2313,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      analyze_data_readonly: {
+        Args: { query_text: string; max_results?: number }
+        Returns: {
+          summary: string
+          total_records: number
+          avg_metric: number
+          trend_direction: string
+        }[]
+      }
+      approve_user_verification: {
+        Args: { request_id: string; admin_email: string }
+        Returns: boolean
+      }
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
+      bulk_vectorize_missing_data: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       calculate_composite_score: {
         Args: {
           p_wpm: number
@@ -1749,6 +2348,25 @@ export type Database = {
           p_progress_delta: number
         }
         Returns: number
+      }
+      calculate_comprehensive_score: {
+        Args: {
+          p_wpm: number
+          p_unique_words: number
+          p_target_vocab_percent: number
+          p_filler_rate: number
+          p_pause_rate: number
+          p_turn_count: number
+          p_clarity_percent: number
+          p_response_delay: number
+          p_self_correction_rate: number
+          p_progress_delta: number
+        }
+        Returns: number
+      }
+      calculate_retention_metrics: {
+        Args: { p_user_id: string; p_phone_number: string }
+        Returns: Json
       }
       calculate_skill_progress: {
         Args: { p_user_id: string; p_skill_id: string }
@@ -1785,6 +2403,42 @@ export type Database = {
         Args: { p_phone_number: string; p_language?: string }
         Returns: string
       }
+      get_aggregate_retention_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
       is_skill_unlocked: {
         Args: { p_user_id: string; p_skill_id: string }
         Returns: boolean
@@ -1793,13 +2447,101 @@ export type Database = {
         Args: { p_user_id: string; p_unit_id: string }
         Returns: boolean
       }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      log_call_event: {
+        Args: {
+          p_call_id: string
+          p_user_id: string
+          p_phone_number: string
+          p_event_type: string
+          p_event_data?: Json
+        }
+        Returns: string
+      }
+      reject_user_verification: {
+        Args: { request_id: string; admin_email: string; reason?: string }
+        Returns: boolean
+      }
+      search_similar_data: {
+        Args: {
+          query_embedding: string
+          similarity_threshold?: number
+          max_results?: number
+        }
+        Returns: {
+          table_name: string
+          record_id: string
+          content_summary: string
+          similarity_score: number
+          metadata: Json
+        }[]
+      }
       setLanguage: {
         Args: { p_language: string; p_phone_number: string }
         Returns: undefined
       }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
       update_last_convo: {
         Args: { p_phone_number: string; p_summary: string }
         Returns: undefined
+      }
+      update_user_retention_metrics: {
+        Args: { p_user_id: string; p_phone_number: string }
+        Returns: undefined
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
       }
     }
     Enums: {
@@ -1825,6 +2567,7 @@ export type Database = {
         | "goose_chaotic"
         | "goose_supportive"
       proficiency_level: "beginner" | "intermediate" | "advanced"
+      user_role: "admin" | "verified_user" | "pending_user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1977,6 +2720,7 @@ export const Constants = {
         "goose_supportive",
       ],
       proficiency_level: ["beginner", "intermediate", "advanced"],
+      user_role: ["admin", "verified_user", "pending_user"],
     },
   },
 } as const
