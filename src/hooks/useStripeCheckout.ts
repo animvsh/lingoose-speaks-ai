@@ -28,12 +28,21 @@ export const useStripeCheckout = () => {
 
       if (data?.url) {
         console.log('✅ Checkout URL received:', data.url);
-        // Open Stripe checkout in a new tab
-        window.open(data.url, '_blank');
+        // Open Stripe checkout in a popup window
+        const popup = window.open(
+          data.url, 
+          'stripe-checkout',
+          'width=600,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,directories=no,status=no'
+        );
+        
+        // Focus the popup if it was successfully opened
+        if (popup) {
+          popup.focus();
+        }
         
         toast({
           title: "Checkout Created! 💳",
-          description: "Redirecting to Stripe checkout in a new tab...",
+          description: "Stripe checkout opened in popup window...",
         });
       } else {
         console.error('❌ No checkout URL returned:', data);
@@ -72,12 +81,21 @@ export const useStripeCheckout = () => {
 
       if (data?.url) {
         console.log('✅ Customer portal URL received:', data.url);
-        // Open customer portal in a new tab
-        window.open(data.url, '_blank');
+        // Open customer portal in a popup window
+        const popup = window.open(
+          data.url, 
+          'stripe-portal',
+          'width=800,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,directories=no,status=no'
+        );
+        
+        // Focus the popup if it was successfully opened
+        if (popup) {
+          popup.focus();
+        }
         
         toast({
           title: "Portal Opened! 🏪",
-          description: "Opening Stripe customer portal in a new tab...",
+          description: "Stripe customer portal opened in popup window...",
         });
       } else {
         console.error('❌ No portal URL returned:', data);
