@@ -41,6 +41,76 @@ serve(async (req) => {
         return new Response('Missing required call data', { status: 400 })
       }
 
+      // Handle missed calls or failed calls
+      if (status === 'no-answer' || status === 'failed' || status === 'busy' || (duration && duration < 10)) {
+        console.log('Call was not answered or failed, sending follow-up SMS')
+        
+        // Send "didn't pick up" SMS and start conversation
+        const smsResponse = await fetch(`${supabaseUrl}/functions/v1/send-sms`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phoneNumber: phoneNumber,
+            message: "Hey, we called but you didn't pick up! When would be a good time to call you for your language practice session?",
+            messageType: 'notification'
+          }),
+        });
+
+        if (smsResponse.ok) {
+          console.log('Follow-up SMS sent successfully');
+          
+          // Create or update SMS conversation
+          const { data: existingConv } = await supabase
+            .from('sms_conversations')
+            .select('id')
+            .eq('phone_number', phoneNumber)
+            .single();
+
+          let conversationId;
+          if (existingConv) {
+            // Update existing conversation
+            const { data: updatedConv } = await supabase
+              .from('sms_conversations')
+              .update({
+                conversation_state: { stage: 'missed_call_followup', missed_call_id: vapiCallId },
+                last_message_at: new Date().toISOString()
+              })
+              .eq('id', existingConv.id)
+              .select()
+              .single();
+            conversationId = updatedConv?.id;
+          } else {
+            // Create new conversation
+            const { data: newConv } = await supabase
+              .from('sms_conversations')
+              .insert({
+                phone_number: phoneNumber,
+                conversation_state: { stage: 'missed_call_followup', missed_call_id: vapiCallId }
+              })
+              .select()
+              .single();
+            conversationId = newConv?.id;
+          }
+
+          // Store the outbound message
+          if (conversationId) {
+            await supabase
+              .from('sms_messages')
+              .insert({
+                conversation_id: conversationId,
+                phone_number: phoneNumber,
+                message_text: "Hey, we called but you didn't pick up! When would be a good time to call you for your language practice session?",
+                direction: 'outbound',
+              });
+          }
+        } else {
+          console.error('Failed to send follow-up SMS:', await smsResponse.text());
+        }
+      }
+
       // Find the user based on phone number
       const { data: userProfile, error: userError } = await supabase
         .from('user_profiles')
