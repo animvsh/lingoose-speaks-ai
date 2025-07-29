@@ -106,7 +106,7 @@ export const FluencyRoadmapView = () => {
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Progress</span>
-                  <span>{userProgress?.skills_mastered || 0} / {userProgress?.total_skills_in_level || 5} skills</span>
+                  <span>{userProgress?.skills_mastered || 0} / {userProgress?.total_skills_in_level || 3} skills</span>
                 </div>
                 <Progress 
                   value={userProgress?.level_progress_percentage || 0} 

@@ -108,7 +108,7 @@ export const useFluencyRoadmap = () => {
         current_level_id: firstLevel.id,
         level_progress_percentage: 0,
         skills_mastered: 0,
-        total_skills_in_level: 5, // Each level has 5 skills
+        total_skills_in_level: 3, // Each level has 3 skills
         fluency_composite_score: 0,
         vocabulary_learned_count: 0,
         current_streak_days: 0,

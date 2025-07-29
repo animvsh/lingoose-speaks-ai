@@ -93,7 +93,7 @@ export const EnhancedProgressView = ({ onNavigate }: EnhancedProgressViewProps) 
           
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="text-center p-3 bg-green-50 rounded-2xl border-2 border-green-200">
-              <div className="font-black text-xl text-green-700">{fluencyRoadmap.userProgress?.skills_mastered || 0}/{fluencyRoadmap.userProgress?.total_skills_in_level || 5}</div>
+              <div className="font-black text-xl text-green-700">{fluencyRoadmap.userProgress?.skills_mastered || 0}/{fluencyRoadmap.userProgress?.total_skills_in_level || 3}</div>
               <div className="text-green-600 font-bold text-sm">Skills Mastered</div>
             </div>
             <div className="text-center p-3 bg-blue-50 rounded-2xl border-2 border-blue-200">

@@ -146,14 +146,14 @@ export const useEnhancedProgress = () => {
     const nextMilestones = [];
     
     if (currentLevel && fluencyData.userProgress) {
-      const skillsToMaster = (fluencyData.userProgress.total_skills_in_level || 5) - (fluencyData.userProgress.skills_mastered || 0);
+      const skillsToMaster = (fluencyData.userProgress.total_skills_in_level || 3) - (fluencyData.userProgress.skills_mastered || 0);
       const nextLevel = fluencyData.levels.find(l => l.level_number === currentLevel.level_number + 1);
       
       if (skillsToMaster > 0) {
         nextMilestones.push({
           type: 'skills',
           description: `Master ${skillsToMaster} more skills to complete ${currentLevel.name}`,
-          progress: (fluencyData.userProgress.skills_mastered || 0) / (fluencyData.userProgress.total_skills_in_level || 5) * 100
+          progress: (fluencyData.userProgress.skills_mastered || 0) / (fluencyData.userProgress.total_skills_in_level || 3) * 100
         });
       }
       

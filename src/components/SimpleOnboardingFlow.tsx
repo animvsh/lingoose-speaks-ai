@@ -27,38 +27,24 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
   const proficiencyLevels = [
     { 
       level: 1, 
-      title: "Complete Beginner", 
-      desc: "I know no Hindi at all", 
+      title: "Basic", 
+      desc: "I know a few words and phrases", 
       emoji: "🌱",
       color: "from-green-400 to-emerald-500"
     },
     { 
       level: 2, 
-      title: "Basic", 
-      desc: "I know a few words and phrases", 
-      emoji: "🌿",
-      color: "from-blue-400 to-cyan-500"
-    },
-    { 
-      level: 3, 
       title: "Intermediate", 
       desc: "I can have simple conversations", 
       emoji: "🌳",
       color: "from-orange-400 to-yellow-500"
     },
     { 
-      level: 4, 
+      level: 3, 
       title: "Advanced", 
-      desc: "I'm quite fluent but want to improve", 
+      desc: "I can hold a conversation and want to improve", 
       emoji: "🎯",
       color: "from-purple-400 to-pink-500"
-    },
-    { 
-      level: 5, 
-      title: "Expert", 
-      desc: "I'm fluent and want to perfect my skills", 
-      emoji: "⭐",
-      color: "from-red-400 to-rose-500"
     }
   ];
 
