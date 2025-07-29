@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus, UserPlus, Bug, Activity, Brain } from "lucide-react";
+import { Settings, User, Bell, HelpCircle, LogOut, ChevronRight, Home, Phone, CheckCircle, ArrowLeft, Shield, Globe, Volume2, Moon, Smartphone, Star, Plus, UserPlus, Bug, Activity, Brain, CreditCard } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
@@ -7,6 +7,7 @@ import { posthogService } from "@/services/posthog";
 import { useNavigate } from "react-router-dom";
 import AppBar from "./AppBar";
 import ProUpgradeCard from "./ProUpgradeCard";
+import StripeTestingPanel from "./StripeTestingPanel";
 import { useSubscriptionCheck } from "@/hooks/useSubscriptionCheck";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 
@@ -345,6 +346,16 @@ const SettingsCard = ({
                 </ul>
               </div>
             </div>
+          </div>
+
+          {/* Stripe Testing Section */}
+          <div className="w-full rounded-3xl border-2 border-handdrawn bg-white/90 p-6 shadow-lg">
+            <h3 className="text-xl font-black text-brown-900 mb-6 uppercase tracking-wide flex items-center">
+              <CreditCard className="w-6 h-6 mr-3 text-blue-500" />
+              Stripe Testing 💳
+            </h3>
+            
+            <StripeTestingPanel />
           </div>
 
           {/* App Settings */}
