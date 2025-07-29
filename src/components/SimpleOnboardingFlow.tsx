@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronRight, ArrowLeft, Sparkles, Heart, Star } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import BolMascot from "./BolMascot";
 import AppBar from "./AppBar";
 import { useCreateUserProfile } from "@/hooks/useCreateUserProfile";
@@ -29,6 +29,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
   const createUserProfile = useCreateUserProfile();
   const { trackSwipe } = useEngagementTracking();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const proficiencyLevels = [
@@ -115,8 +116,8 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
         setTimeout(() => {
           // Redirect to auth page with the phone number pre-filled
           console.log('Redirecting to auth with phone:', formattedPhone);
-          window.location.href = `/auth?phone=${encodeURIComponent(formattedPhone)}`;
-        }, 1500);
+          navigate(`/auth?phone=${encodeURIComponent(formattedPhone)}`);
+        }, 800);
         
         setIsCheckingPhone(false);
         return false;
@@ -221,6 +222,20 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
     // Immediately proceed to create profile without timeout
     handleNext();
   };
+
+  // Show loading overlay when checking phone or redirecting
+  if (isCheckingPhone) {
+    return (
+      <div className="w-full min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-indigo-50 flex items-center justify-center">
+        <div className="bg-white rounded-3xl p-8 border-4 border-blue-200 shadow-2xl w-full max-w-md mx-auto text-center">
+          <BolMascot className="w-16 h-16 mx-auto mb-4 animate-pulse" />
+          <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-black text-blue-600 mb-2">Checking your number...</h2>
+          <p className="text-slate-600 font-semibold">This will just take a moment!</p>
+        </div>
+      </div>
+    );
+  }
 
   const renderStep = () => {
     switch (currentStep) {
