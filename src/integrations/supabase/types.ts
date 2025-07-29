@@ -1303,6 +1303,67 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_calls: {
+        Row: {
+          activity_id: string | null
+          call_attempts: number | null
+          conversation_id: string | null
+          created_at: string | null
+          id: string
+          phone_number: string
+          scheduled_time: string
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          activity_id?: string | null
+          call_attempts?: number | null
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          phone_number: string
+          scheduled_time: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          activity_id?: string | null
+          call_attempts?: number | null
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          phone_number?: string
+          scheduled_time?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_calls_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_calls_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "sms_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_calls_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_audit_logs: {
         Row: {
           action: string | null
@@ -1470,6 +1531,88 @@ export type Database = {
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "learning_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sms_conversations: {
+        Row: {
+          call_confirmed: boolean | null
+          conversation_state: Json | null
+          created_at: string | null
+          id: string
+          last_message_at: string | null
+          phone_number: string
+          scheduled_call_time: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          call_confirmed?: boolean | null
+          conversation_state?: Json | null
+          created_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          phone_number: string
+          scheduled_call_time?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          call_confirmed?: boolean | null
+          conversation_state?: Json | null
+          created_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          phone_number?: string
+          scheduled_call_time?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sms_messages: {
+        Row: {
+          conversation_id: string | null
+          created_at: string | null
+          direction: string
+          id: string
+          message_sid: string | null
+          message_text: string
+          phone_number: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string | null
+          direction: string
+          id?: string
+          message_sid?: string | null
+          message_text: string
+          phone_number: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string | null
+          direction?: string
+          id?: string
+          message_sid?: string | null
+          message_text?: string
+          phone_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "sms_conversations"
             referencedColumns: ["id"]
           },
         ]
