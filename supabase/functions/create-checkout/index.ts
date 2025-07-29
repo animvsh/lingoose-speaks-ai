@@ -50,15 +50,19 @@ serve(async (req) => {
       apiVersion: "2023-10-16" 
     });
     
-    // Check if customer exists by phone number metadata
+    // Search for existing customer by phone number in metadata
     const customers = await stripe.customers.list({ 
-      metadata: { phone_number: profile.phone_number },
-      limit: 1 
+      limit: 100 
     });
     
     let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    const existingCustomer = customers.data.find(customer => 
+      customer.metadata?.phone_number === profile.phone_number ||
+      customer.metadata?.user_id === user.id
+    );
+    
+    if (existingCustomer) {
+      customerId = existingCustomer.id;
     } else {
       // Create new customer with phone number as metadata
       const customer = await stripe.customers.create({

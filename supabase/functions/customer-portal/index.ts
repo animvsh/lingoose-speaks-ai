@@ -63,16 +63,20 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
-    // Look for Stripe customer by phone number metadata
+    // Search for existing customer by phone number in metadata
     const customers = await stripe.customers.list({ 
-      metadata: { phone_number: profile.phone_number },
-      limit: 1 
+      limit: 100 
     });
     
-    if (customers.data.length === 0) {
+    const existingCustomer = customers.data.find(customer => 
+      customer.metadata?.phone_number === profile.phone_number ||
+      customer.metadata?.user_id === user.id
+    );
+    
+    if (!existingCustomer) {
       throw new Error("No Stripe customer found for this user");
     }
-    const customerId = customers.data[0].id;
+    const customerId = existingCustomer.id;
     logStep("Found Stripe customer", { customerId });
 
     const origin = req.headers.get("origin") || "http://localhost:3000";
