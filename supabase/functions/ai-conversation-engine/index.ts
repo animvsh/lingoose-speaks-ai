@@ -13,7 +13,14 @@ interface ConversationRequest {
 }
 
 serve(async (req) => {
+  console.log('🚀 AI Conversation Engine - Request received:', {
+    method: req.method,
+    url: req.url,
+    headers: Object.fromEntries(req.headers.entries())
+  });
+
   if (req.method === 'OPTIONS') {
+    console.log('📋 Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
   }
 
