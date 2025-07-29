@@ -23,15 +23,26 @@ serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
+    if (!user?.id) throw new Error("User not authenticated");
+
+    // Get user profile to find phone number
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('user_profiles')
+      .select('phone_number, full_name')
+      .eq('auth_user_id', user.id)
+      .single();
+
+    if (profileError || !profile?.phone_number) {
+      throw new Error("User profile not found");
+    }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
       apiVersion: "2023-10-16" 
     });
     
-    // Check if customer exists by email (standard Supabase auth approach)
+    // Check if customer exists by phone number metadata
     const customers = await stripe.customers.list({ 
-      email: user.email,
+      metadata: { phone_number: profile.phone_number },
       limit: 1 
     });
     
@@ -39,10 +50,11 @@ serve(async (req) => {
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
     } else {
-      // Create new customer with email
+      // Create new customer with phone number as metadata
       const customer = await stripe.customers.create({
-        email: user.email,
+        name: profile.full_name,
         metadata: {
+          phone_number: profile.phone_number,
           user_id: user.id
         }
       });

@@ -40,14 +40,25 @@ serve(async (req) => {
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
     const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    if (!user?.id) throw new Error("User not authenticated");
+    logStep("User authenticated", { userId: user.id, phone: user.phone });
+
+    // Get user profile to find phone number for Stripe customer lookup
+    const { data: profile, error: profileError } = await supabaseClient
+      .from('user_profiles')
+      .select('phone_number, full_name')
+      .eq('auth_user_id', user.id)
+      .single();
+
+    if (profileError || !profile?.phone_number) {
+      throw new Error("User profile not found");
+    }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
-    // Look for Stripe customer by email (standard Supabase auth approach)
+    // Look for Stripe customer by phone number metadata
     const customers = await stripe.customers.list({ 
-      email: user.email,
+      metadata: { phone_number: profile.phone_number },
       limit: 1 
     });
     
