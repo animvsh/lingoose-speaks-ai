@@ -1,8 +1,10 @@
 import { loadStripe } from '@stripe/stripe-js';
 
-// Global Stripe instance to prevent multiple initializations
+// Global state to prevent multiple instances
 let stripePromise: Promise<any> | null = null;
 let currentCheckout: any = null;
+let isInitializing = false;
+let currentClientSecret = '';
 
 export const getStripe = (publishableKey: string) => {
   if (!stripePromise) {
@@ -12,22 +14,38 @@ export const getStripe = (publishableKey: string) => {
   return stripePromise;
 };
 
-export const destroyCurrentCheckout = () => {
+export const destroyCurrentCheckout = async () => {
   if (currentCheckout) {
     try {
       console.log('🧹 Destroying current checkout instance');
-      currentCheckout.destroy(); // Use destroy() instead of unmount() for full cleanup
+      await currentCheckout.destroy();
     } catch (e) {
-      console.log('Cleanup error:', e);
+      console.log('Cleanup error (ignoring):', e);
     }
     currentCheckout = null;
+    currentClientSecret = '';
   }
+  isInitializing = false;
 };
 
-export const setCurrentCheckout = (checkout: any) => {
+export const setCurrentCheckout = (checkout: any, clientSecret: string) => {
   currentCheckout = checkout;
+  currentClientSecret = clientSecret;
+  isInitializing = false;
 };
 
 export const getCurrentCheckout = () => {
   return currentCheckout;
+};
+
+export const isCheckoutInitializing = () => {
+  return isInitializing;
+};
+
+export const setInitializing = (value: boolean) => {
+  isInitializing = value;
+};
+
+export const getCurrentClientSecret = () => {
+  return currentClientSecret;
 };

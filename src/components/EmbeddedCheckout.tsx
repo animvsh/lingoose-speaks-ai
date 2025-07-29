@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { getStripe, destroyCurrentCheckout, setCurrentCheckout } from '@/lib/stripe';
+import { 
+  getStripe, 
+  destroyCurrentCheckout, 
+  setCurrentCheckout, 
+  getCurrentCheckout,
+  isCheckoutInitializing,
+  setInitializing,
+  getCurrentClientSecret
+} from '@/lib/stripe';
 
 interface EmbeddedCheckoutProps {
   clientSecret: string;
@@ -17,31 +25,57 @@ export const EmbeddedCheckout = ({
   const checkoutRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const mountedRef = useRef(false);
+  const isMountedRef = useRef(false);
 
   const handleError = useCallback((errorMsg: string) => {
     console.error('EmbeddedCheckout Error:', errorMsg);
     setError(errorMsg);
     setIsLoading(false);
+    setInitializing(false);
     onError?.(errorMsg);
   }, [onError]);
 
-  const handleRetry = useCallback(() => {
+  const handleRetry = useCallback(async () => {
     console.log('🔄 Retrying checkout initialization');
     setError(null);
     setIsLoading(true);
-    mountedRef.current = false;
-    // Destroy any existing checkout before retry
-    destroyCurrentCheckout();
+    isMountedRef.current = false;
     
-    // Force a small delay to ensure cleanup is complete
+    // Force destroy and wait
+    await destroyCurrentCheckout();
+    
+    // Small delay to ensure cleanup
     setTimeout(() => {
-      // The effect will re-run and create a new checkout
-    }, 100);
+      // Effect will re-run
+    }, 200);
   }, []);
 
   useEffect(() => {
-    if (!clientSecret || !publishableKey || mountedRef.current) {
+    // Exit early if no data or already mounted
+    if (!clientSecret || !publishableKey || isMountedRef.current) {
+      return;
+    }
+
+    // If we already have a checkout with the same client secret, reuse it
+    const existingCheckout = getCurrentCheckout();
+    const existingClientSecret = getCurrentClientSecret();
+    
+    if (existingCheckout && existingClientSecret === clientSecret && checkoutRef.current) {
+      console.log('✅ Reusing existing checkout instance');
+      try {
+        existingCheckout.mount(checkoutRef.current);
+        isMountedRef.current = true;
+        setIsLoading(false);
+        return;
+      } catch (e) {
+        console.log('Failed to reuse existing checkout, creating new one');
+        // Continue to create new checkout
+      }
+    }
+
+    // Prevent multiple simultaneous initializations
+    if (isCheckoutInitializing()) {
+      console.log('🚫 Checkout already initializing, skipping...');
       return;
     }
 
@@ -49,10 +83,14 @@ export const EmbeddedCheckout = ({
     
     const initializeCheckout = async () => {
       try {
-        console.log('🔄 EmbeddedCheckout: Starting initialization');
+        setInitializing(true);
+        console.log('🔄 EmbeddedCheckout: Starting initialization for:', clientSecret.substring(0, 20) + '...');
         
-        // CRITICAL: Always destroy any existing checkout first
-        destroyCurrentCheckout();
+        // CRITICAL: Always destroy any existing checkout first and wait
+        await destroyCurrentCheckout();
+        
+        // Additional safety delay
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         const stripe = await getStripe(publishableKey);
         if (!stripe) {
@@ -60,9 +98,12 @@ export const EmbeddedCheckout = ({
           return;
         }
 
-        if (!isMounted) return;
+        if (!isMounted) {
+          setInitializing(false);
+          return;
+        }
 
-        console.log('🔄 Creating embedded checkout with clientSecret:', clientSecret.substring(0, 20) + '...');
+        console.log('🔄 Creating embedded checkout...');
         
         const checkout = await stripe.initEmbeddedCheckout({
           clientSecret,
@@ -72,25 +113,52 @@ export const EmbeddedCheckout = ({
           }
         });
 
-        if (!isMounted) return;
+        if (!isMounted) {
+          // Cleanup if component unmounted during creation
+          try {
+            await checkout.destroy();
+          } catch (e) {
+            console.log('Cleanup during unmount error:', e);
+          }
+          setInitializing(false);
+          return;
+        }
 
         // Store the checkout instance globally
-        setCurrentCheckout(checkout);
+        setCurrentCheckout(checkout, clientSecret);
 
-        // Wait for DOM to be ready and mount
-        const mountToDOM = () => {
-          if (checkoutRef.current && isMounted && !mountedRef.current) {
-            console.log('🎯 Mounting checkout to DOM');
-            checkout.mount(checkoutRef.current);
-            mountedRef.current = true;
-            setIsLoading(false);
-            console.log('✅ Checkout mounted successfully');
-          } else if (isMounted && !mountedRef.current) {
-            setTimeout(mountToDOM, 100);
+        // Mount to DOM with retries
+        let mountAttempts = 0;
+        const maxMountAttempts = 20;
+        
+        const attemptMount = () => {
+          if (!isMounted || isMountedRef.current) return;
+          
+          if (checkoutRef.current) {
+            try {
+              console.log('🎯 Mounting checkout to DOM (attempt', mountAttempts + 1, ')');
+              checkout.mount(checkoutRef.current);
+              isMountedRef.current = true;
+              setIsLoading(false);
+              console.log('✅ Checkout mounted successfully');
+            } catch (mountError) {
+              console.error('Mount error:', mountError);
+              if (mountAttempts < maxMountAttempts) {
+                mountAttempts++;
+                setTimeout(attemptMount, 200);
+              } else {
+                handleError('Failed to mount checkout after multiple attempts');
+              }
+            }
+          } else if (mountAttempts < maxMountAttempts) {
+            mountAttempts++;
+            setTimeout(attemptMount, 200);
+          } else {
+            handleError('DOM element not found after waiting');
           }
         };
 
-        mountToDOM();
+        attemptMount();
 
       } catch (error) {
         console.error('❌ EmbeddedCheckout initialization error:', error);
@@ -104,17 +172,24 @@ export const EmbeddedCheckout = ({
 
     return () => {
       isMounted = false;
+      setInitializing(false);
     };
   }, [clientSecret, publishableKey, onComplete, handleError]);
 
-  // Cleanup on unmount - CRITICAL for preventing multiple instances
+  // Global cleanup on unmount
   useEffect(() => {
     return () => {
-      console.log('🧹 Component unmounting - destroying checkout');
-      destroyCurrentCheckout();
-      mountedRef.current = false;
+      console.log('🧹 Component unmounting - cleaning up');
+      isMountedRef.current = false;
+      setInitializing(false);
+      
+      // Don't destroy global checkout on unmount unless this component owns it
+      const existingClientSecret = getCurrentClientSecret();
+      if (existingClientSecret === clientSecret) {
+        destroyCurrentCheckout();
+      }
     };
-  }, []);
+  }, [clientSecret]);
 
   if (error) {
     return (

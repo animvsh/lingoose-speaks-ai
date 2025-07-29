@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -10,11 +10,12 @@ export const useStripeCheckout = () => {
     publishableKey: string | null;
   }>({ clientSecret: null, publishableKey: null });
   const { toast } = useToast();
+  const isCreatingRef = useRef(false);
 
   const createCheckoutSession = async () => {
-    // Prevent multiple simultaneous requests
-    if (isLoading) {
-      console.log('🚫 Checkout already in progress, skipping...');
+    // Prevent multiple simultaneous requests with ref
+    if (isLoading || isCreatingRef.current) {
+      console.log('🚫 Checkout creation already in progress, skipping...');
       return;
     }
 
@@ -29,6 +30,7 @@ export const useStripeCheckout = () => {
     }
 
     try {
+      isCreatingRef.current = true;
       setIsLoading(true);
       console.log('🔄 Starting checkout session creation...');
       
@@ -74,6 +76,7 @@ export const useStripeCheckout = () => {
       });
     } finally {
       setIsLoading(false);
+      isCreatingRef.current = false;
     }
   };
 
