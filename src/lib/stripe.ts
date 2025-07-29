@@ -16,7 +16,7 @@ export const destroyCurrentCheckout = () => {
   if (currentCheckout) {
     try {
       console.log('🧹 Destroying current checkout instance');
-      currentCheckout.unmount();
+      currentCheckout.destroy(); // Use destroy() instead of unmount() for full cleanup
     } catch (e) {
       console.log('Cleanup error:', e);
     }

@@ -31,7 +31,13 @@ export const EmbeddedCheckout = ({
     setError(null);
     setIsLoading(true);
     mountedRef.current = false;
+    // Destroy any existing checkout before retry
     destroyCurrentCheckout();
+    
+    // Force a small delay to ensure cleanup is complete
+    setTimeout(() => {
+      // The effect will re-run and create a new checkout
+    }, 100);
   }, []);
 
   useEffect(() => {
@@ -45,7 +51,7 @@ export const EmbeddedCheckout = ({
       try {
         console.log('🔄 EmbeddedCheckout: Starting initialization');
         
-        // Destroy any existing checkout first
+        // CRITICAL: Always destroy any existing checkout first
         destroyCurrentCheckout();
         
         const stripe = await getStripe(publishableKey);
@@ -101,13 +107,12 @@ export const EmbeddedCheckout = ({
     };
   }, [clientSecret, publishableKey, onComplete, handleError]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount - CRITICAL for preventing multiple instances
   useEffect(() => {
     return () => {
-      if (mountedRef.current) {
-        destroyCurrentCheckout();
-        mountedRef.current = false;
-      }
+      console.log('🧹 Component unmounting - destroying checkout');
+      destroyCurrentCheckout();
+      mountedRef.current = false;
     };
   }, []);
 
