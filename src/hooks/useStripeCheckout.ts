@@ -12,6 +12,22 @@ export const useStripeCheckout = () => {
   const { toast } = useToast();
 
   const createCheckoutSession = async () => {
+    // Prevent multiple simultaneous requests
+    if (isLoading) {
+      console.log('🚫 Checkout already in progress, skipping...');
+      return;
+    }
+
+    // If we already have valid checkout data, don't create a new session
+    if (checkoutData.clientSecret && checkoutData.publishableKey) {
+      console.log('✅ Using existing checkout session');
+      toast({
+        title: "Checkout Ready! 💳",
+        description: "Secure payment form loaded...",
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
       console.log('🔄 Starting checkout session creation...');
@@ -33,8 +49,8 @@ export const useStripeCheckout = () => {
       if (data?.clientSecret && data?.publishableKey) {
         console.log('✅ Checkout session created successfully');
         console.log('🔍 Setting checkout data:', {
-          clientSecret: data.clientSecret,
-          publishableKey: data.publishableKey
+          clientSecret: data.clientSecret.substring(0, 20) + '...',
+          publishableKey: data.publishableKey.substring(0, 20) + '...'
         });
         setCheckoutData({
           clientSecret: data.clientSecret,
@@ -47,13 +63,6 @@ export const useStripeCheckout = () => {
         });
       } else {
         console.error('❌ No client secret returned:', data);
-        console.log('🔍 Detailed data inspection:', {
-          hasData: !!data,
-          dataKeys: data ? Object.keys(data) : 'no data',
-          clientSecret: data?.clientSecret,
-          publishableKey: data?.publishableKey,
-          fullData: data
-        });
         throw new Error('No checkout session data returned from server');
       }
     } catch (error) {
@@ -113,7 +122,7 @@ export const useStripeCheckout = () => {
   };
 
   const closeCheckout = () => {
-    console.log('🔄 closeCheckout called');
+    console.log('🔄 closeCheckout called - clearing checkout data');
     console.trace('Checkout close stack trace');
     setCheckoutData({ clientSecret: null, publishableKey: null });
   };

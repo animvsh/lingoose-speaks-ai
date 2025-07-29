@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+import { getStripe, destroyCurrentCheckout, setCurrentCheckout } from '@/lib/stripe';
 
 interface EmbeddedCheckoutProps {
   clientSecret: string;
@@ -15,11 +15,9 @@ export const EmbeddedCheckout = ({
   onError 
 }: EmbeddedCheckoutProps) => {
   const checkoutRef = useRef<HTMLDivElement>(null);
-  const checkoutInstanceRef = useRef<any>(null);
-  const stripeInstanceRef = useRef<any>(null);
-  const currentClientSecretRef = useRef<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const mountedRef = useRef(false);
 
   const handleError = useCallback((errorMsg: string) => {
     console.error('EmbeddedCheckout Error:', errorMsg);
@@ -28,32 +26,16 @@ export const EmbeddedCheckout = ({
     onError?.(errorMsg);
   }, [onError]);
 
-  const destroyExistingCheckout = useCallback(() => {
-    if (checkoutInstanceRef.current) {
-      try {
-        console.log('EmbeddedCheckout: Destroying existing checkout instance');
-        checkoutInstanceRef.current.unmount();
-        checkoutInstanceRef.current = null;
-      } catch (e) {
-        console.log('EmbeddedCheckout: Error destroying checkout:', e);
-      }
-    }
+  const handleRetry = useCallback(() => {
+    console.log('🔄 Retrying checkout initialization');
+    setError(null);
+    setIsLoading(true);
+    mountedRef.current = false;
+    destroyCurrentCheckout();
   }, []);
 
   useEffect(() => {
-    // If clientSecret hasn't changed and we already have a checkout, don't reinitialize
-    if (currentClientSecretRef.current === clientSecret && checkoutInstanceRef.current) {
-      console.log('EmbeddedCheckout: Using existing checkout instance');
-      return;
-    }
-
-    // If clientSecret changed, destroy existing checkout
-    if (currentClientSecretRef.current !== clientSecret) {
-      destroyExistingCheckout();
-      currentClientSecretRef.current = clientSecret;
-    }
-
-    if (!clientSecret || !publishableKey) {
+    if (!clientSecret || !publishableKey || mountedRef.current) {
       return;
     }
 
@@ -61,52 +43,43 @@ export const EmbeddedCheckout = ({
     
     const initializeCheckout = async () => {
       try {
-        console.log('EmbeddedCheckout: Starting fresh initialization', { 
-          clientSecret: clientSecret.substring(0, 20) + '...', 
-          publishableKey: publishableKey.substring(0, 20) + '...' 
-        });
-
-        setError(null);
-        setIsLoading(true);
-
-        // Load Stripe instance if not already loaded
-        if (!stripeInstanceRef.current) {
-          console.log('EmbeddedCheckout: Loading Stripe...');
-          stripeInstanceRef.current = await loadStripe(publishableKey);
-          
-          if (!stripeInstanceRef.current) {
-            handleError('Failed to load Stripe');
-            return;
-          }
+        console.log('🔄 EmbeddedCheckout: Starting initialization');
+        
+        // Destroy any existing checkout first
+        destroyCurrentCheckout();
+        
+        const stripe = await getStripe(publishableKey);
+        if (!stripe) {
+          handleError('Failed to load Stripe');
+          return;
         }
 
         if (!isMounted) return;
 
-        console.log('EmbeddedCheckout: Creating new embedded checkout...');
+        console.log('🔄 Creating embedded checkout with clientSecret:', clientSecret.substring(0, 20) + '...');
         
-        // Create new checkout instance
-        const newCheckout = await stripeInstanceRef.current.initEmbeddedCheckout({
+        const checkout = await stripe.initEmbeddedCheckout({
           clientSecret,
           onComplete: () => {
-            console.log('Stripe checkout completed successfully');
+            console.log('✅ Stripe checkout completed successfully');
             onComplete?.();
           }
         });
 
         if (!isMounted) return;
 
-        // Store the new checkout instance
-        checkoutInstanceRef.current = newCheckout;
+        // Store the checkout instance globally
+        setCurrentCheckout(checkout);
 
-        // Mount to DOM
+        // Wait for DOM to be ready and mount
         const mountToDOM = () => {
-          if (checkoutRef.current && checkoutInstanceRef.current && isMounted) {
-            console.log('EmbeddedCheckout: Mounting to DOM...');
-            checkoutInstanceRef.current.mount(checkoutRef.current);
+          if (checkoutRef.current && isMounted && !mountedRef.current) {
+            console.log('🎯 Mounting checkout to DOM');
+            checkout.mount(checkoutRef.current);
+            mountedRef.current = true;
             setIsLoading(false);
-            console.log('EmbeddedCheckout: Successfully mounted');
-          } else if (isMounted) {
-            // Retry after a short delay if DOM not ready
+            console.log('✅ Checkout mounted successfully');
+          } else if (isMounted && !mountedRef.current) {
             setTimeout(mountToDOM, 100);
           }
         };
@@ -114,7 +87,7 @@ export const EmbeddedCheckout = ({
         mountToDOM();
 
       } catch (error) {
-        console.error('EmbeddedCheckout initialization error:', error);
+        console.error('❌ EmbeddedCheckout initialization error:', error);
         if (isMounted) {
           handleError(error instanceof Error ? error.message : 'Failed to initialize checkout');
         }
@@ -126,30 +99,28 @@ export const EmbeddedCheckout = ({
     return () => {
       isMounted = false;
     };
-  }, [clientSecret, publishableKey, onComplete, handleError, destroyExistingCheckout]);
+  }, [clientSecret, publishableKey, onComplete, handleError]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      destroyExistingCheckout();
+      if (mountedRef.current) {
+        destroyCurrentCheckout();
+        mountedRef.current = false;
+      }
     };
-  }, [destroyExistingCheckout]);
+  }, []);
 
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <div className="text-red-500 mb-2">⚠️ Checkout Error</div>
-        <div className="text-sm text-muted-foreground">{error}</div>
+        <div className="text-sm text-muted-foreground mb-4">{error}</div>
         <button 
-          onClick={() => {
-            setError(null);
-            setIsLoading(true);
-            destroyExistingCheckout();
-            currentClientSecretRef.current = '';
-          }}
-          className="mt-2 px-4 py-2 bg-primary text-white rounded text-sm"
+          onClick={handleRetry}
+          className="px-4 py-2 bg-primary text-white rounded text-sm hover:bg-primary/90"
         >
-          Retry
+          Retry Checkout
         </button>
       </div>
     );
