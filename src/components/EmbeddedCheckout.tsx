@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 
 interface EmbeddedCheckoutProps {
@@ -17,80 +17,50 @@ export const EmbeddedCheckout = ({
   const checkoutRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const stripeRef = useRef<any>(null);
+
+  const handleError = useCallback((errorMsg: string) => {
+    console.error('EmbeddedCheckout Error:', errorMsg);
+    setError(errorMsg);
+    setIsLoading(false);
+    onError?.(errorMsg);
+  }, [onError]);
 
   useEffect(() => {
+    // Prevent multiple initializations
+    if (isInitialized || !clientSecret || !publishableKey) {
+      return;
+    }
+
     let isMounted = true;
     let checkout: any = null;
 
-    const initializeStripe = async () => {
+    const initializeCheckout = async () => {
       try {
-        console.log('EmbeddedCheckout: Starting initialization', { clientSecret: !!clientSecret, publishableKey: !!publishableKey });
+        console.log('EmbeddedCheckout: Initializing once with:', { 
+          hasClientSecret: !!clientSecret, 
+          hasPublishableKey: !!publishableKey 
+        });
 
-        if (!publishableKey) {
-          const errorMsg = 'Stripe publishable key not found';
-          setError(errorMsg);
-          onError?.(errorMsg);
-          return;
-        }
+        setIsInitialized(true);
 
-        if (!clientSecret) {
-          const errorMsg = 'Client secret not found';
-          setError(errorMsg);
-          onError?.(errorMsg);
-          return;
-        }
-
-        console.log('EmbeddedCheckout: Loading Stripe...');
-        const stripeInstance = await loadStripe(publishableKey);
-        if (!stripeInstance) {
-          const errorMsg = 'Failed to load Stripe';
-          setError(errorMsg);
-          onError?.(errorMsg);
-          return;
+        // Load Stripe only once
+        if (!stripeRef.current) {
+          console.log('EmbeddedCheckout: Loading Stripe...');
+          stripeRef.current = await loadStripe(publishableKey);
+          
+          if (!stripeRef.current) {
+            handleError('Failed to load Stripe');
+            return;
+          }
         }
 
         if (!isMounted) return;
 
-        console.log('EmbeddedCheckout: Stripe loaded, waiting for DOM...');
-        
-        // Wait for DOM element to be available
-        let attempts = 0;
-        const maxAttempts = 50;
-        const waitForElement = () => {
-          if (!isMounted) return;
-          
-          if (checkoutRef.current) {
-            console.log('EmbeddedCheckout: DOM element found, initializing checkout...');
-            initializeCheckout(stripeInstance);
-          } else if (attempts < maxAttempts) {
-            attempts++;
-            setTimeout(waitForElement, 100);
-          } else {
-            const errorMsg = 'DOM element not found after waiting';
-            console.error('EmbeddedCheckout:', errorMsg);
-            setError(errorMsg);
-            onError?.(errorMsg);
-            setIsLoading(false);
-          }
-        };
-
-        waitForElement();
-
-      } catch (error) {
-        console.error('Error in initializeStripe:', error);
-        if (isMounted) {
-          const errorMsg = error instanceof Error ? error.message : 'Failed to initialize checkout';
-          setError(errorMsg);
-          onError?.(errorMsg);
-          setIsLoading(false);
-        }
-      }
-    };
-
-    const initializeCheckout = async (stripeInstance: any) => {
-      try {
         console.log('EmbeddedCheckout: Creating embedded checkout...');
-        checkout = await stripeInstance.initEmbeddedCheckout({
+        
+        checkout = await stripeRef.current.initEmbeddedCheckout({
           clientSecret,
           onComplete: () => {
             console.log('Stripe checkout completed successfully');
@@ -100,26 +70,30 @@ export const EmbeddedCheckout = ({
 
         if (!isMounted) return;
 
-        console.log('EmbeddedCheckout: Mounting checkout to DOM...');
-        if (checkoutRef.current) {
-          checkout.mount(checkoutRef.current);
-          console.log('EmbeddedCheckout: Checkout mounted successfully');
-          setIsLoading(false);
-        }
+        // Wait for DOM element to be ready
+        const mountCheckout = () => {
+          if (checkoutRef.current && checkout) {
+            console.log('EmbeddedCheckout: Mounting to DOM...');
+            checkout.mount(checkoutRef.current);
+            setIsLoading(false);
+            console.log('EmbeddedCheckout: Successfully mounted');
+          } else if (isMounted) {
+            // Retry after a short delay
+            setTimeout(mountCheckout, 50);
+          }
+        };
+
+        mountCheckout();
+
       } catch (error) {
-        console.error('Error in initializeCheckout:', error);
+        console.error('EmbeddedCheckout initialization error:', error);
         if (isMounted) {
-          const errorMsg = error instanceof Error ? error.message : 'Failed to mount checkout';
-          setError(errorMsg);
-          onError?.(errorMsg);
-          setIsLoading(false);
+          handleError(error instanceof Error ? error.message : 'Failed to initialize checkout');
         }
       }
     };
 
-    if (clientSecret && publishableKey) {
-      initializeStripe();
-    }
+    initializeCheckout();
 
     return () => {
       isMounted = false;
@@ -131,7 +105,7 @@ export const EmbeddedCheckout = ({
         }
       }
     };
-  }, [clientSecret, publishableKey, onComplete, onError]);
+  }, [clientSecret, publishableKey, isInitialized, onComplete, handleError]);
 
   if (error) {
     return (
