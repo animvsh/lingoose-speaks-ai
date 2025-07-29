@@ -114,7 +114,6 @@ serve(async (req) => {
       mode: "subscription",
       ui_mode: "embedded",
       redirect_on_completion: "never",
-      return_url: `${req.headers.get("origin")}/`,
     });
     
     console.log('Stripe session created:', { 
