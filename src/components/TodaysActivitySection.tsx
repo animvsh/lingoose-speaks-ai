@@ -6,7 +6,8 @@ import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import { useLearningAnalytics } from "@/hooks/useLearningAnalytics";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { useCallCompletionTracker } from "@/hooks/useCallCompletionTracker";
-import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface TodaysActivitySectionProps {
   currentActivity: any;
@@ -28,7 +29,7 @@ const TodaysActivitySection = ({
   const { trackLearningSessionStart } = useLearningAnalytics();
   const { data: subscriptionStatus } = useSubscriptionStatus();
   const { markExerciseCompleted } = useCallCompletionTracker();
-  const { toast } = useToast();
+  const { user } = useAuth();
 
   const getRatingColor = (rating: number) => {
     if (rating < 40) return "text-red-600";
@@ -51,12 +52,29 @@ const TodaysActivitySection = ({
     onRegenerateActivity();
   };
 
-  const handleStartPractice = () => {
-    // Show immediate feedback to user
-    toast({
-      title: "Hey, we're calling! 📞",
-      description: "Get ready to answer your phone shortly...",
-    });
+  const handleStartPractice = async () => {
+    // Send SMS notification
+    if (user) {
+      try {
+        const { data: userProfile } = await supabase
+          .from('user_profiles')
+          .select('phone_number')
+          .eq('id', user.id)
+          .single();
+
+        if (userProfile?.phone_number) {
+          await supabase.functions.invoke('send-sms', {
+            body: {
+              phoneNumber: userProfile.phone_number,
+              otp: "Hey, we're calling! Get ready to answer your phone shortly... 📞"
+            }
+          });
+          console.log('SMS sent successfully');
+        }
+      } catch (error) {
+        console.error('Failed to send SMS:', error);
+      }
+    }
 
     trackTap('start_practice', 'todays_activity', {
       activity_id: currentActivity.id,
