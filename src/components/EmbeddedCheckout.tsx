@@ -19,21 +19,18 @@ export const EmbeddedCheckout = ({
   const [stripe, setStripe] = useState<any>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const initializeStripe = async () => {
       try {
-        console.log('EmbeddedCheckout: Starting initialization with:', { 
-          hasClientSecret: !!clientSecret, 
-          hasPublishableKey: !!publishableKey 
-        });
+        console.log('EmbeddedCheckout: Starting initialization');
 
         if (!publishableKey) {
-          console.error('EmbeddedCheckout: No publishable key provided');
           onError?.('Stripe publishable key not found');
           return;
         }
 
         if (!clientSecret) {
-          console.error('EmbeddedCheckout: No client secret provided');
           onError?.('Client secret not found');
           return;
         }
@@ -41,53 +38,54 @@ export const EmbeddedCheckout = ({
         console.log('EmbeddedCheckout: Loading Stripe...');
         const stripeInstance = await loadStripe(publishableKey);
         if (!stripeInstance) {
-          console.error('EmbeddedCheckout: Failed to load Stripe instance');
           onError?.('Failed to load Stripe');
           return;
         }
 
-        console.log('EmbeddedCheckout: Stripe loaded successfully');
+        if (!isMounted) return;
+
+        console.log('EmbeddedCheckout: Stripe loaded, initializing checkout...');
         setStripe(stripeInstance);
 
-        // Simple timeout to ensure DOM is ready after Drawer animation
-        setTimeout(async () => {
-          if (!checkoutRef.current) {
-            console.error('EmbeddedCheckout: DOM element not available after timeout');
-            onError?.('Failed to initialize checkout - DOM element not available');
-            setIsLoading(false);
-            return;
+        const checkout = await stripeInstance.initEmbeddedCheckout({
+          clientSecret,
+          onComplete: () => {
+            console.log('Stripe checkout completed successfully');
+            onComplete?.();
           }
+        });
 
-          try {
-            console.log('EmbeddedCheckout: DOM element ready, initializing embedded checkout...');
-            const checkout = await stripeInstance.initEmbeddedCheckout({
-              clientSecret,
-              onComplete: () => {
-                console.log('Stripe checkout completed successfully');
-                onComplete?.();
-              }
-            });
+        if (!isMounted) return;
 
-            console.log('EmbeddedCheckout: Mounting checkout to DOM element');
-            checkout.mount(checkoutRef.current);
-            console.log('EmbeddedCheckout: Checkout mounted successfully');
-            setIsLoading(false);
-          } catch (mountError) {
-            console.error('EmbeddedCheckout: Error mounting checkout:', mountError);
-            onError?.(mountError instanceof Error ? mountError.message : 'Failed to mount checkout');
-            setIsLoading(false);
-          }
-        }, 500); // Increased timeout for Drawer animation
+        console.log('EmbeddedCheckout: Mounting checkout...');
+        if (checkoutRef.current) {
+          checkout.mount(checkoutRef.current);
+          console.log('EmbeddedCheckout: Checkout mounted successfully');
+          setIsLoading(false);
+        } else {
+          console.error('EmbeddedCheckout: DOM element not found');
+          onError?.('Failed to mount checkout');
+        }
       } catch (error) {
         console.error('Error initializing Stripe checkout:', error);
-        onError?.(error instanceof Error ? error.message : 'Failed to initialize checkout');
-        setIsLoading(false);
+        if (isMounted) {
+          onError?.(error instanceof Error ? error.message : 'Failed to initialize checkout');
+          setIsLoading(false);
+        }
       }
     };
 
-    if (clientSecret && publishableKey) {
-      initializeStripe();
-    }
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      if (isMounted && clientSecret && publishableKey) {
+        initializeStripe();
+      }
+    }, 100);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
   }, [clientSecret, publishableKey, onComplete, onError]);
 
   if (isLoading) {
