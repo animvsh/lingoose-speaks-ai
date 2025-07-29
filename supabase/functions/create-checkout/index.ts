@@ -92,11 +92,15 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/`,
-      cancel_url: `${req.headers.get("origin")}/`,
+      ui_mode: "embedded",
+      redirect_on_completion: "never",
+      return_url: `${req.headers.get("origin")}/`,
     });
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    return new Response(JSON.stringify({ 
+      clientSecret: session.client_secret,
+      publishableKey: Deno.env.get("STRIPE_PUBLISHABLE_KEY")
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

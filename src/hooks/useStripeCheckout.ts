@@ -5,6 +5,10 @@ import { useToast } from "@/hooks/use-toast";
 
 export const useStripeCheckout = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [checkoutData, setCheckoutData] = useState<{
+    clientSecret: string | null;
+    publishableKey: string | null;
+  }>({ clientSecret: null, publishableKey: null });
   const { toast } = useToast();
 
   const createCheckoutSession = async () => {
@@ -26,18 +30,20 @@ export const useStripeCheckout = () => {
         return;
       }
 
-      if (data?.url) {
-        console.log('✅ Checkout URL received:', data.url);
-        // Redirect to Stripe checkout
-        window.location.href = data.url;
+      if (data?.clientSecret && data?.publishableKey) {
+        console.log('✅ Checkout session created successfully');
+        setCheckoutData({
+          clientSecret: data.clientSecret,
+          publishableKey: data.publishableKey
+        });
         
         toast({
-          title: "Redirecting to Stripe! 💳",
-          description: "Taking you to secure checkout...",
+          title: "Checkout Ready! 💳",
+          description: "Secure payment form loaded...",
         });
       } else {
-        console.error('❌ No checkout URL returned:', data);
-        throw new Error('No checkout URL returned from server');
+        console.error('❌ No client secret returned:', data);
+        throw new Error('No checkout session data returned from server');
       }
     } catch (error) {
       console.error('❌ Checkout error:', error);
@@ -95,9 +101,15 @@ export const useStripeCheckout = () => {
     }
   };
 
+  const closeCheckout = () => {
+    setCheckoutData({ clientSecret: null, publishableKey: null });
+  };
+
   return {
     createCheckoutSession,
     openCustomerPortal,
     isLoading,
+    checkoutData,
+    closeCheckout,
   };
 };

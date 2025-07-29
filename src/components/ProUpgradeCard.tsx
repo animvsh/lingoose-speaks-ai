@@ -1,12 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Crown, Star, Zap, Clock, CheckCircle } from "lucide-react";
+import { Crown, Star, Zap, Clock, CheckCircle, X } from "lucide-react";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { useSubscriptionCheck } from "@/hooks/useSubscriptionCheck";
+import { EmbeddedCheckout } from "@/components/EmbeddedCheckout";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const ProUpgradeCard = () => {
-  const { createCheckoutSession, openCustomerPortal, isLoading } = useStripeCheckout();
+  const { createCheckoutSession, openCustomerPortal, isLoading, checkoutData, closeCheckout } = useStripeCheckout();
   const { data: subscription, refetch } = useSubscriptionCheck();
 
   const isPro = subscription?.subscribed && subscription?.subscription_tier === 'pro';
@@ -58,62 +60,98 @@ const ProUpgradeCard = () => {
   }
 
   return (
-    <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between text-lg">
-          <div className="flex items-center gap-2">
-            <Crown className="w-5 h-5 text-primary" />
-            Upgrade to Pro
+    <>
+      <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center justify-between text-lg">
+            <div className="flex items-center gap-2">
+              <Crown className="w-5 h-5 text-primary" />
+              Upgrade to Pro
+            </div>
+            <Badge variant="secondary">
+              $4/week
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <Zap className="w-4 h-4 text-primary" />
+              <span>Unlimited practice calls</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Star className="w-4 h-4 text-primary" />
+              <span>Advanced analytics & insights</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <CheckCircle className="w-4 h-4 text-primary" />
+              <span>Priority support</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Crown className="w-4 h-4 text-primary" />
+              <span>Exclusive premium content</span>
+            </div>
           </div>
-          <Badge variant="secondary">
-            $4/week
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <Zap className="w-4 h-4 text-primary" />
-            <span>Unlimited practice calls</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Star className="w-4 h-4 text-primary" />
-            <span>Advanced analytics & insights</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <CheckCircle className="w-4 h-4 text-primary" />
-            <span>Priority support</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Crown className="w-4 h-4 text-primary" />
-            <span>Exclusive premium content</span>
-          </div>
-        </div>
 
-        <div className="bg-white/50 rounded-lg p-3 text-center">
-          <div className="text-sm text-gray-600 mb-1">Start your pro journey</div>
-          <div className="text-xl font-bold text-primary">$4 per week</div>
-          <div className="text-xs text-gray-500">Cancel anytime</div>
-        </div>
-        
-        <Button 
-          onClick={createCheckoutSession}
-          disabled={isLoading}
-          className="w-full bg-primary hover:bg-primary/90"
-        >
-          {isLoading ? "Loading..." : "Upgrade to Pro"}
-        </Button>
+          <div className="bg-white/50 rounded-lg p-3 text-center">
+            <div className="text-sm text-gray-600 mb-1">Start your pro journey</div>
+            <div className="text-xl font-bold text-primary">$4 per week</div>
+            <div className="text-xs text-gray-500">Cancel anytime</div>
+          </div>
+          
+          <Button 
+            onClick={createCheckoutSession}
+            disabled={isLoading}
+            className="w-full bg-primary hover:bg-primary/90"
+          >
+            {isLoading ? "Loading..." : "Upgrade to Pro"}
+          </Button>
 
-        <Button 
-          onClick={() => refetch()}
-          variant="ghost"
-          size="sm"
-          className="w-full text-xs"
-        >
-          Refresh Status
-        </Button>
-      </CardContent>
-    </Card>
+          <Button 
+            onClick={() => refetch()}
+            variant="ghost"
+            size="sm"
+            className="w-full text-xs"
+          >
+            Refresh Status
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Dialog open={!!checkoutData.clientSecret} onOpenChange={() => closeCheckout()}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Complete Your Subscription</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={closeCheckout}
+                className="h-6 w-6 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {checkoutData.clientSecret && checkoutData.publishableKey && (
+            <EmbeddedCheckout
+              clientSecret={checkoutData.clientSecret}
+              publishableKey={checkoutData.publishableKey}
+              onComplete={() => {
+                closeCheckout();
+                refetch(); // Refresh subscription status
+                refetch(); // Double refresh to ensure UI updates
+              }}
+              onError={(error) => {
+                console.error('Checkout error:', error);
+                closeCheckout();
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
