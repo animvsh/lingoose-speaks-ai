@@ -49,8 +49,16 @@ export const EmbeddedCheckout = ({
         console.log('EmbeddedCheckout: Stripe loaded successfully');
         setStripe(stripeInstance);
 
-        if (checkoutRef.current) {
-          console.log('EmbeddedCheckout: Initializing embedded checkout...');
+        // Wait for the DOM element to be available
+        const mountCheckout = async () => {
+          if (!checkoutRef.current) {
+            console.log('EmbeddedCheckout: Waiting for DOM element...');
+            // Wait a bit and try again
+            setTimeout(mountCheckout, 100);
+            return;
+          }
+
+          console.log('EmbeddedCheckout: DOM element ready, initializing embedded checkout...');
           const checkout = await stripeInstance.initEmbeddedCheckout({
             clientSecret,
             onComplete: () => {
@@ -63,10 +71,9 @@ export const EmbeddedCheckout = ({
           checkout.mount(checkoutRef.current);
           console.log('EmbeddedCheckout: Checkout mounted successfully');
           setIsLoading(false);
-        } else {
-          console.error('EmbeddedCheckout: Checkout ref not available');
-          onError?.('Checkout container not ready');
-        }
+        };
+
+        await mountCheckout();
       } catch (error) {
         console.error('Error initializing Stripe checkout:', error);
         onError?.(error instanceof Error ? error.message : 'Failed to initialize checkout');
