@@ -151,7 +151,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (isAuthenticated === 'true' && userProfile && needsOnboarding !== 'true') {
         try {
           const profile = JSON.parse(userProfile);
-          if (!user || user.id !== profile.id) {
+          if (!user || user.phone_number !== profile.phone_number) {
             setUser(profile);
             console.log('✅ Auth state updated from localStorage change:', profile.phone_number);
           }
@@ -164,8 +164,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    // Check for changes every 500ms to catch localStorage updates instantly
-    const authCheckInterval = setInterval(checkForAuthChanges, 500);
+    // Check for changes less frequently to avoid infinite loops
+    const authCheckInterval = setInterval(checkForAuthChanges, 2000);
     
     return () => clearInterval(authCheckInterval);
   }, []);

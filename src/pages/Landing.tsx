@@ -112,7 +112,7 @@ const Landing = () => {
   // Check if user has completed onboarding
   useEffect(() => {
     if (user) {
-      const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.id}`);
+      const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.phone_number}`);
       if (onboardingComplete) {
         setIsOnboarded(true);
       } else {
@@ -161,14 +161,14 @@ const Landing = () => {
     if (userProfile) {
       try {
         const profile = JSON.parse(userProfile);
-        localStorage.setItem(`onboarding_complete_${profile.id}`, "true");
+        localStorage.setItem(`onboarding_complete_${profile.phone_number}`, "true");
         setIsOnboarded(true);
         setCurrentView("home");
       } catch (error) {
         console.error('Error parsing user profile after onboarding:', error);
       }
     } else if (user) {
-      localStorage.setItem(`onboarding_complete_${user.id}`, "true");
+      localStorage.setItem(`onboarding_complete_${user.phone_number}`, "true");
       setIsOnboarded(true);
       setCurrentView("home");
     }

@@ -78,21 +78,21 @@ const Index = () => {
         // Existing user with complete profile
         identify({
           user_type: 'authenticated',
-          onboarding_completed: localStorage.getItem(`onboarding_complete_${user.id}`) ? true : false
-        });
+           onboarding_completed: localStorage.getItem(`onboarding_complete_${user.phone_number}`) ? true : false
+         });
 
-        // Check if user has completed onboarding
-        const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.id}`);
-        if (onboardingComplete) {
-          setIsOnboarded(true);
-          setCurrentView("home");
-          trackScreenView("dashboard");
-          trackPageView("dashboard");
-        } else {
-          setCurrentView("onboarding");
-          trackScreenView("onboarding");
-          trackPageView("onboarding");
-        }
+         // Check if user has completed onboarding
+         const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.phone_number}`);
+         if (onboardingComplete) {
+           setIsOnboarded(true);
+           setCurrentView("home");
+           trackScreenView("dashboard");
+           trackPageView("dashboard");
+         } else {
+           setCurrentView("onboarding");
+           trackScreenView("onboarding");
+           trackPageView("onboarding");
+         }
       } else if (isAuthenticated === 'true') {
         // Authenticated user - go directly to home
         identify({
@@ -130,7 +130,7 @@ const Index = () => {
     if (userProfile) {
       try {
         const profile = JSON.parse(userProfile);
-        localStorage.setItem(`onboarding_complete_${profile.id}`, "true");
+        localStorage.setItem(`onboarding_complete_${profile.phone_number}`, "true");
         setIsOnboarded(true);
         setCurrentView("home");
         trackOnboardingComplete();
@@ -141,7 +141,7 @@ const Index = () => {
         console.error('❌ Error parsing user profile after onboarding:', error);
       }
     } else if (user) {
-      localStorage.setItem(`onboarding_complete_${user.id}`, "true");
+      localStorage.setItem(`onboarding_complete_${user.phone_number}`, "true");
       setIsOnboarded(true);
       setCurrentView("home");
       trackOnboardingComplete();
