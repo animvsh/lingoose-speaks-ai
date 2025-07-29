@@ -2392,6 +2392,8 @@ export type Database = {
           created_at: string
           embedding: string | null
           extracted_insights: Json | null
+          follow_up_sent: boolean | null
+          follow_up_sent_at: string | null
           id: string
           performance_metrics: Json | null
           phone_number: string
@@ -2412,6 +2414,8 @@ export type Database = {
           created_at?: string
           embedding?: string | null
           extracted_insights?: Json | null
+          follow_up_sent?: boolean | null
+          follow_up_sent_at?: string | null
           id?: string
           performance_metrics?: Json | null
           phone_number: string
@@ -2432,6 +2436,8 @@ export type Database = {
           created_at?: string
           embedding?: string | null
           extracted_insights?: Json | null
+          follow_up_sent?: boolean | null
+          follow_up_sent_at?: string | null
           id?: string
           performance_metrics?: Json | null
           phone_number?: string
