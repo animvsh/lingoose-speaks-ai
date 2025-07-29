@@ -28,6 +28,14 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
   const { trackSwipe } = useEngagementTracking();
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Update phone number when prefilledPhone changes
+  useEffect(() => {
+    if (prefilledPhone) {
+      setPhoneNumber(prefilledPhone);
+      console.log('PhoneAuthForm: Pre-filled phone number:', prefilledPhone);
+    }
+  }, [prefilledPhone]);
+
   const handleSwipe = (direction: 'left' | 'right') => {
     trackSwipe(direction, `auth-${step}`);
     

@@ -10,6 +10,7 @@ import AppBar from "./AppBar";
 import { useCreateUserProfile } from "@/hooks/useCreateUserProfile";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
+import { useToast } from "@/hooks/use-toast";
 
 interface SimpleOnboardingFlowProps {
   onComplete: () => void;
@@ -27,6 +28,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
   const [isCheckingPhone, setIsCheckingPhone] = useState(false);
   const createUserProfile = useCreateUserProfile();
   const { trackSwipe } = useEngagementTracking();
+  const { toast } = useToast();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const proficiencyLevels = [
@@ -68,7 +70,13 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
   ];
 
   const checkPhoneNumber = async (phoneNumber: string) => {
+    if (isCheckingPhone) {
+      console.log('Already checking phone number, skipping...');
+      return false;
+    }
+    
     setIsCheckingPhone(true);
+    console.log('Starting phone number check for:', phoneNumber);
     
     try {
       // Format phone number
@@ -76,6 +84,8 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
       const formattedPhone = !phoneNumber.startsWith('+') 
         ? (cleaned.length === 10 ? `+1${cleaned}` : `+${cleaned}`)
         : phoneNumber;
+
+      console.log('Formatted phone number:', formattedPhone);
 
       // Check if phone number already exists
       const { supabase } = await import('@/integrations/supabase/client');
@@ -85,6 +95,8 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
         .eq('phone_number', formattedPhone)
         .maybeSingle();
 
+      console.log('Database check result:', { existingProfile, error });
+
       if (error) {
         console.error('Error checking phone number:', error);
         setIsCheckingPhone(false);
@@ -92,26 +104,34 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
       }
 
       if (existingProfile) {
+        console.log('Phone number already exists, showing toast and redirecting...');
         // Phone number already exists - show notification and redirect to auth
-        const { toast } = await import('sonner');
-        toast.error("Account Already Exists", {
+        toast({
+          title: "Account Already Exists",
           description: "This phone number already has an account. Redirecting to sign in...",
-          duration: 3000,
+          variant: "destructive",
         });
         
         setTimeout(() => {
           // Redirect to auth page with the phone number pre-filled
+          console.log('Redirecting to auth with phone:', formattedPhone);
           window.location.href = `/auth?phone=${encodeURIComponent(formattedPhone)}`;
-        }, 2000);
+        }, 1500);
         
         setIsCheckingPhone(false);
         return false;
       }
       
+      console.log('Phone number is available, proceeding...');
       setIsCheckingPhone(false);
       return true;
     } catch (error) {
       console.error('Error checking phone number:', error);
+      toast({
+        title: "Check Failed",
+        description: "Unable to verify phone number. Please try again.",
+        variant: "destructive",
+      });
       setIsCheckingPhone(false);
       return false;
     }
@@ -134,6 +154,11 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
   useSwipeNavigation(containerRef, handleSwipe);
 
   const handleNext = async () => {
+    // Prevent multiple clicks during async operations
+    if (isCheckingPhone || createUserProfile.isPending) {
+      return;
+    }
+
     if (currentStep === 0 && fullName.trim()) {
       setCurrentStep(1);
     } else if (currentStep === 1 && userPhoneNumber.trim()) {
@@ -142,6 +167,7 @@ const SimpleOnboardingFlow = ({ onComplete, phoneNumber, onProfileCreated }: Sim
       if (canProceed) {
         setCurrentStep(2);
       }
+      // If canProceed is false, the user will be redirected by checkPhoneNumber
     } else if (currentStep === 2 && hasConsented) {
       setCurrentStep(3);
     } else if (currentStep === 3 && proficiencyLevel !== null) {
