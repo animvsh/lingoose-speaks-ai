@@ -32,6 +32,10 @@ export const useStripeCheckout = () => {
 
       if (data?.clientSecret && data?.publishableKey) {
         console.log('✅ Checkout session created successfully');
+        console.log('🔍 Setting checkout data:', {
+          clientSecret: data.clientSecret,
+          publishableKey: data.publishableKey
+        });
         setCheckoutData({
           clientSecret: data.clientSecret,
           publishableKey: data.publishableKey
@@ -43,6 +47,13 @@ export const useStripeCheckout = () => {
         });
       } else {
         console.error('❌ No client secret returned:', data);
+        console.log('🔍 Detailed data inspection:', {
+          hasData: !!data,
+          dataKeys: data ? Object.keys(data) : 'no data',
+          clientSecret: data?.clientSecret,
+          publishableKey: data?.publishableKey,
+          fullData: data
+        });
         throw new Error('No checkout session data returned from server');
       }
     } catch (error) {
