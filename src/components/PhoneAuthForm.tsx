@@ -120,16 +120,31 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
       });
       
       if (result.accountDetected && result.profile && !isSignInMode) {
-        // Show modal for existing account (only in signup flow)
-        console.log('📋 Showing existing account modal');
-        setExistingProfile(result.profile);
-        setShowExistingAccountModal(true);
+        // For existing users, auto-login instead of showing modal
+        // This happens when user manually enters their phone (not pre-filled)
+        console.log('🔑 Auto-login for existing user (manual entry)');
+        localStorage.setItem('current_user_profile', JSON.stringify(result.profile));
+        localStorage.setItem('phone_authenticated', 'true');
+        localStorage.setItem('phone_number', result.profile.phone_number || phoneNumber);
+        
+        toast({
+          title: "🎉 Welcome back!",
+          description: "You've been signed in successfully.",
+          className: "border-2 border-green-400 bg-green-50 text-green-800",
+        });
+        
+        // Smooth navigation without page reload
+        setTimeout(() => {
+          console.log('🔄 Navigating to home page');
+          navigate('/', { replace: true });
+        }, 500);
+        
       } else if (result.accountDetected && result.profile && isSignInMode) {
-        // Auto-login for sign-in mode
+        // Auto-login for sign-in mode (pre-filled phone)
         console.log('🔑 Auto-login for existing user in sign-in mode');
         localStorage.setItem('current_user_profile', JSON.stringify(result.profile));
         localStorage.setItem('phone_authenticated', 'true');
-        localStorage.setItem('phone_number', phoneNumber);
+        localStorage.setItem('phone_number', result.profile.phone_number || phoneNumber);
         
         toast({
           title: "🎉 Welcome back!",
