@@ -74,6 +74,13 @@ const Index = () => {
       const isAuthenticated = localStorage.getItem('phone_authenticated');
       const needsOnboarding = localStorage.getItem('needs_onboarding');
       
+      console.log('🔍 Index useEffect - Authentication check:', {
+        user: user ? user.phone_number : 'NULL',
+        isAuthenticated,
+        needsOnboarding,
+        currentView
+      });
+      
       if (user) {
         // Existing user with complete profile
         identify({
@@ -81,8 +88,8 @@ const Index = () => {
            onboarding_completed: localStorage.getItem(`onboarding_complete_${user.phone_number}`) ? true : false
          });
 
-         // Check if user has completed onboarding
          const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.phone_number}`);
+         console.log('🔍 Checking onboarding completion for:', user.phone_number, 'result:', onboardingComplete);
          if (onboardingComplete) {
            setIsOnboarded(true);
            setCurrentView("home");
@@ -130,18 +137,25 @@ const Index = () => {
     if (userProfile) {
       try {
         const profile = JSON.parse(userProfile);
-        localStorage.setItem(`onboarding_complete_${profile.phone_number}`, "true");
+        const onboardingKey = `onboarding_complete_${profile.phone_number}`;
+        console.log('🔑 Setting onboarding completion key:', onboardingKey);
+        localStorage.setItem(onboardingKey, "true");
         setIsOnboarded(true);
         setCurrentView("home");
         trackOnboardingComplete();
         trackScreenView("dashboard");
         trackPageView("dashboard");
         console.log('✅ Onboarding marked complete for user:', profile.phone_number);
+        
+        // Force a refresh of the user context to ensure consistency
+        refreshUser();
       } catch (error) {
         console.error('❌ Error parsing user profile after onboarding:', error);
       }
     } else if (user) {
-      localStorage.setItem(`onboarding_complete_${user.phone_number}`, "true");
+      const onboardingKey = `onboarding_complete_${user.phone_number}`;
+      console.log('🔑 Setting onboarding completion key for existing user:', onboardingKey);
+      localStorage.setItem(onboardingKey, "true");
       setIsOnboarded(true);
       setCurrentView("home");
       trackOnboardingComplete();
@@ -150,6 +164,12 @@ const Index = () => {
       console.log('✅ Onboarding marked complete for existing user:', user.phone_number);
     } else {
       console.log('⚠️ No user found in onboarding complete - this should not happen');
+      
+      // Fallback: force a page refresh to ensure auth state is correct
+      console.log('🔄 Forcing page refresh to sync auth state');
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     }
   };
 
