@@ -101,14 +101,26 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
       return;
     }
 
+    console.log('Starting OTP verification for:', phoneNumber, 'with code:', otpCode);
     const result = await verifyOTP(phoneNumber, otpCode);
+    console.log('OTP verification result:', result);
+    
     if (result.success) {
+      console.log('✅ Verification successful!', { 
+        accountDetected: result.accountDetected, 
+        isNewUser: result.isNewUser,
+        profile: result.profile,
+        isSignInMode 
+      });
+      
       if (result.accountDetected && result.profile && !isSignInMode) {
         // Show modal for existing account (only in signup flow)
+        console.log('📋 Showing existing account modal');
         setExistingProfile(result.profile);
         setShowExistingAccountModal(true);
       } else if (result.accountDetected && result.profile && isSignInMode) {
         // Auto-login for sign-in mode
+        console.log('🔑 Auto-login for existing user in sign-in mode');
         localStorage.setItem('current_user_profile', JSON.stringify(result.profile));
         localStorage.setItem('phone_authenticated', 'true');
         localStorage.setItem('phone_number', phoneNumber);
@@ -119,22 +131,39 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
         
-        // Smooth state update without any page reload
-        // The Landing page will detect the authenticated user and show the app
+        // Force page refresh to update auth state
+        setTimeout(() => {
+          console.log('🔄 Refreshing page for auth state update');
+          window.location.href = '/';
+        }, 1000);
+        
       } else if (result.isNewUser) {
+        console.log('👋 New user detected, setting up onboarding');
         toast({
           title: "🎉 Welcome to Bol!",
           description: "Let's set up your profile!",
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
-        // No redirect needed - the Landing page will detect new user state and show onboarding
+        
+        // Force page refresh to trigger onboarding detection
+        setTimeout(() => {
+          console.log('🔄 Refreshing page for onboarding');
+          window.location.href = '/';
+        }, 1000);
+        
       } else {
+        console.log('🔑 Existing user login');
         toast({
           title: "🎉 Welcome Back!",
           description: "Successfully signed in!",
           className: "border-2 border-green-400 bg-green-50 text-green-800",
         });
-        // No redirect needed - smooth state transition
+        
+        // Force page refresh to update auth state
+        setTimeout(() => {
+          console.log('🔄 Refreshing page for auth state update');
+          window.location.href = '/';
+        }, 1000);
       }
     } else {
       // Handle specific error types
@@ -198,6 +227,7 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
   };
 
   const handleLoginFromModal = async () => {
+    console.log('🔑 Handling login from modal for existing user');
     setShowExistingAccountModal(false);
     setIsSignInMode(true);
     
@@ -213,7 +243,11 @@ const PhoneAuthForm = ({ onBack, prefilledPhone }: PhoneAuthFormProps) => {
         className: "border-2 border-green-400 bg-green-50 text-green-800",
       });
       
-      // No reload needed - Landing page will detect the authenticated state automatically
+      // Force page refresh to update auth state
+      setTimeout(() => {
+        console.log('🔄 Refreshing page after modal login');
+        window.location.href = '/';
+      }, 1000);
     }
   };
 
