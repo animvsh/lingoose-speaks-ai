@@ -118,7 +118,13 @@ const ProUpgradeCard = () => {
         </CardContent>
       </Card>
 
-      <Drawer open={!!checkoutData.clientSecret} onOpenChange={() => closeCheckout()}>
+      <Drawer open={!!checkoutData.clientSecret} onOpenChange={(open) => {
+        console.log('Drawer onOpenChange:', open, 'clientSecret exists:', !!checkoutData.clientSecret);
+        if (!open) {
+          console.log('Drawer closing via onOpenChange');
+          closeCheckout();
+        }
+      }}>
         <DrawerContent className="max-h-[85vh] bg-background border-border">
           <DrawerHeader className="border-b border-border/40">
             <DrawerTitle className="flex items-center justify-between text-foreground">
@@ -130,7 +136,10 @@ const ProUpgradeCard = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={closeCheckout}
+                  onClick={() => {
+                    console.log('Close button clicked');
+                    closeCheckout();
+                  }}
                   className="h-8 w-8 p-0 hover:bg-muted"
                 >
                   <X className="h-4 w-4" />
@@ -145,13 +154,13 @@ const ProUpgradeCard = () => {
                 clientSecret={checkoutData.clientSecret}
                 publishableKey={checkoutData.publishableKey}
                 onComplete={() => {
-                  console.log('Checkout completed, closing drawer');
+                  console.log('Checkout completed successfully');
                   closeCheckout();
                   refetch();
                 }}
                 onError={(error) => {
-                  console.error('Checkout error, closing drawer:', error);
-                  closeCheckout();
+                  console.error('Checkout error occurred:', error);
+                  // Don't auto-close on error, let user see the error
                 }}
               />
             ) : (

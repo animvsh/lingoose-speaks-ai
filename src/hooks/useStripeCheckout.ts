@@ -113,6 +113,8 @@ export const useStripeCheckout = () => {
   };
 
   const closeCheckout = () => {
+    console.log('🔄 closeCheckout called');
+    console.trace('Checkout close stack trace');
     setCheckoutData({ clientSecret: null, publishableKey: null });
   };
 
