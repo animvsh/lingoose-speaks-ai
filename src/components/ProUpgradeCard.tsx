@@ -119,16 +119,19 @@ const ProUpgradeCard = () => {
       </Card>
 
       <Drawer open={!!checkoutData.clientSecret} onOpenChange={() => closeCheckout()}>
-        <DrawerContent className="max-h-[90vh] overflow-auto">
-          <DrawerHeader>
-            <DrawerTitle className="flex items-center justify-between">
-              <span>Complete Your Subscription</span>
+        <DrawerContent className="max-h-[85vh] bg-background border-border">
+          <DrawerHeader className="border-b border-border/40">
+            <DrawerTitle className="flex items-center justify-between text-foreground">
+              <div className="flex items-center gap-2">
+                <Crown className="w-5 h-5 text-primary" />
+                <span>Complete Your Pro Subscription</span>
+              </div>
               <DrawerClose asChild>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={closeCheckout}
-                  className="h-6 w-6 p-0"
+                  className="h-8 w-8 p-0 hover:bg-muted"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -136,35 +139,27 @@ const ProUpgradeCard = () => {
             </DrawerTitle>
           </DrawerHeader>
           
-          {(() => {
-            console.log('ProUpgradeCard: Dialog state:', { 
-              isOpen: !!checkoutData.clientSecret,
-              hasClientSecret: !!checkoutData.clientSecret,
-              hasPublishableKey: !!checkoutData.publishableKey,
-              checkoutData 
-            });
-            return null;
-          })()}
-          
-          {checkoutData.clientSecret && checkoutData.publishableKey ? (
-            <EmbeddedCheckout
-              clientSecret={checkoutData.clientSecret}
-              publishableKey={checkoutData.publishableKey}
-              onComplete={() => {
-                closeCheckout();
-                refetch(); // Refresh subscription status
-                refetch(); // Double refresh to ensure UI updates
-              }}
-              onError={(error) => {
-                console.error('Checkout error:', error);
-                closeCheckout();
-              }}
-            />
-          ) : (
-            <div className="p-4 text-center text-gray-500">
-              Loading checkout data... {JSON.stringify({ hasClientSecret: !!checkoutData.clientSecret, hasPublishableKey: !!checkoutData.publishableKey })}
-            </div>
-          )}
+          <div className="flex-1 overflow-auto p-6">
+            {checkoutData.clientSecret && checkoutData.publishableKey ? (
+              <EmbeddedCheckout
+                clientSecret={checkoutData.clientSecret}
+                publishableKey={checkoutData.publishableKey}
+                onComplete={() => {
+                  closeCheckout();
+                  refetch();
+                }}
+                onError={(error) => {
+                  console.error('Checkout error:', error);
+                  closeCheckout();
+                }}
+              />
+            ) : (
+              <div className="flex items-center justify-center p-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <span className="ml-3 text-muted-foreground">Setting up secure checkout...</span>
+              </div>
+            )}
+          </div>
         </DrawerContent>
       </Drawer>
     </>
