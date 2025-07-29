@@ -7,10 +7,11 @@ import { useSubscriptionCheck } from "@/hooks/useSubscriptionCheck";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { CheckCircle, XCircle, AlertCircle, RefreshCw } from "lucide-react";
+import { StripeModal } from "@/components/StripeModal";
 
 const StripeTestingPanel = () => {
   const { user } = useAuth();
-  const { createCheckoutSession, openCustomerPortal, isLoading } = useStripeCheckout();
+  const { createCheckoutSession, openCustomerPortal, isLoading, modalData, closeModal } = useStripeCheckout();
   const { data: subscription, refetch, isLoading: isCheckingSubscription } = useSubscriptionCheck();
   const [testResults, setTestResults] = useState<any[]>([]);
 
@@ -199,6 +200,12 @@ const StripeTestingPanel = () => {
           </pre>
         </details>
       </CardContent>
+      <StripeModal
+        isOpen={modalData.isOpen}
+        onClose={closeModal}
+        url={modalData.url}
+        title={modalData.title}
+      />
     </Card>
   );
 };
