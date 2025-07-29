@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
@@ -24,26 +23,15 @@ serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
-    if (!user?.id) throw new Error("User not authenticated");
-
-    // Get user profile to find phone number
-    const { data: profile, error: profileError } = await supabaseClient
-      .from('user_profiles')
-      .select('phone_number, full_name')
-      .eq('auth_user_id', user.id)
-      .single();
-
-    if (profileError || !profile?.phone_number) {
-      throw new Error("User profile not found");
-    }
+    if (!user?.email) throw new Error("User not authenticated or email not available");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
       apiVersion: "2023-10-16" 
     });
     
-    // Check if customer exists by phone number metadata
+    // Check if customer exists by email (standard Supabase auth approach)
     const customers = await stripe.customers.list({ 
-      metadata: { phone_number: profile.phone_number },
+      email: user.email,
       limit: 1 
     });
     
@@ -51,11 +39,10 @@ serve(async (req) => {
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
     } else {
-      // Create new customer with phone number as metadata
+      // Create new customer with email
       const customer = await stripe.customers.create({
-        name: profile.full_name,
+        email: user.email,
         metadata: {
-          phone_number: profile.phone_number,
           user_id: user.id
         }
       });

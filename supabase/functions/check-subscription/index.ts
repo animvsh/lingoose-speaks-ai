@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
@@ -8,7 +7,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Helper logging function for enhanced debugging
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
@@ -19,7 +17,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Use the service role key to perform writes (upsert) in Supabase
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -43,54 +40,21 @@ serve(async (req) => {
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
     const user = userData.user;
-    if (!user?.id) throw new Error("User not authenticated");
-    logStep("User authenticated", { userId: user.id });
-
-    // Get user profile to find phone number
-    const { data: profile, error: profileError } = await supabaseClient
-      .from('user_profiles')
-      .select('phone_number, id')
-      .eq('auth_user_id', user.id)
-      .single();
-
-    if (profileError || !profile?.phone_number) {
-      logStep("No user profile found, returning unsubscribed state");
-      return new Response(JSON.stringify({ 
-        subscribed: false,
-        subscription_tier: 'free_trial',
-        subscription_end: null,
-        trial_start_date: null
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
-    }
-
-    logStep("User profile found", { phoneNumber: profile.phone_number });
-
-    // Fetch trial_start_date from user_subscriptions
-    let trialStartDate = null;
-    const { data: userSub, error: userSubError } = await supabaseClient
-      .from('user_subscriptions')
-      .select('trial_start_date')
-      .eq('user_id', profile.id)
-      .maybeSingle();
-    if (userSub && userSub.trial_start_date) {
-      trialStartDate = userSub.trial_start_date;
-    }
+    if (!user?.email) throw new Error("User not authenticated or email not available");
+    logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
-    // Use phone number as customer identifier since we don't have email
+    // Look for Stripe customer by email (standard Supabase auth approach)
     const customers = await stripe.customers.list({ 
-      metadata: { phone_number: profile.phone_number },
+      email: user.email,
       limit: 1 
     });
     
     if (customers.data.length === 0) {
       logStep("No customer found, updating unsubscribed state");
       await supabaseClient.from("subscriptions").upsert({
-        user_id: profile.id,
+        user_id: user.id,
         stripe_customer_id: null,
         subscribed: false,
         subscription_tier: 'free_trial',
@@ -101,8 +65,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ 
         subscribed: false,
         subscription_tier: 'free_trial',
-        subscription_end: null,
-        trial_start_date: trialStartDate
+        subscription_end: null
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -117,6 +80,7 @@ serve(async (req) => {
       status: "active",
       limit: 1,
     });
+    
     const hasActiveSub = subscriptions.data.length > 0;
     let subscriptionTier = 'free_trial';
     let subscriptionEnd = null;
@@ -132,7 +96,7 @@ serve(async (req) => {
       const amount = price.unit_amount || 0;
       
       if (amount >= 400) { // $4 or more (in cents)
-        subscriptionTier = "pro";
+        subscriptionTier = 'pro';
       }
       logStep("Determined subscription tier", { priceId, amount, subscriptionTier });
     } else {
@@ -140,21 +104,20 @@ serve(async (req) => {
     }
 
     await supabaseClient.from("subscriptions").upsert({
-      user_id: profile.id,
+      user_id: user.id,
       stripe_customer_id: customerId,
       subscribed: hasActiveSub,
       subscription_tier: subscriptionTier,
       subscription_end: subscriptionEnd,
-      subscription_status: hasActiveSub ? 'active' : 'inactive',
       updated_at: new Date().toISOString(),
     }, { onConflict: 'user_id' });
 
     logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTier });
+    
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd,
-      trial_start_date: trialStartDate
+      subscription_end: subscriptionEnd
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
