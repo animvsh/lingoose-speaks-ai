@@ -43,18 +43,21 @@ const PhoneAuthForm = ({ onBack, prefilledPhone = "" }: PhoneAuthFormProps) => {
     const formattedPhone = formatPhoneNumber(phoneNumber);
     console.log('Starting phone number check for:', formattedPhone);
     
+    let existingProfile = null;
+    
     // Check if phone number already exists
     try {
       const { supabase } = await import('@/integrations/supabase/client');
       
       console.log('Formatted phone number:', formattedPhone);
       
-      const { data: existingProfile, error } = await supabase
+      const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('phone_number', formattedPhone)
         .maybeSingle();
 
+      existingProfile = data;
       console.log('Database check result:', { existingProfile, error });
 
       if (existingProfile && !isSignInMode) {
@@ -74,19 +77,6 @@ const PhoneAuthForm = ({ onBack, prefilledPhone = "" }: PhoneAuthFormProps) => {
       }
     } catch (error) {
       console.error('Error checking existing phone:', error);
-    }
-
-    if (existingAccountData || isSignInMode) {
-      console.log('Phone number already exists, showing toast and redirecting...');
-      toast({
-        title: "📱 Account Found!",
-        description: "We found your account. Redirecting you to sign in...",
-      });
-      
-      console.log('Redirecting to auth with phone:', formattedPhone);
-      // Redirect to auth page with phone number pre-filled
-      navigate(`/auth?phone=${encodeURIComponent(formattedPhone)}`);
-      return;
     }
 
     const result = await sendOTP(formattedPhone);
