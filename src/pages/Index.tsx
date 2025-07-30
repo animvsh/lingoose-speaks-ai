@@ -74,13 +74,22 @@ const Index = () => {
     if (!loading) {
       const isAuthenticated = localStorage.getItem('phone_authenticated');
       const needsOnboarding = localStorage.getItem('needs_onboarding');
+      const userProfile = localStorage.getItem('current_user_profile');
       
       console.log('🔍 Index useEffect - Authentication check:', {
         user: user ? user.phone_number : 'NULL',
         isAuthenticated,
         needsOnboarding,
+        userProfile: userProfile ? 'EXISTS' : 'NULL',
         currentView
       });
+      
+      // If we have authentication and profile in localStorage but user is still null,
+      // give auth context time to catch up
+      if (isAuthenticated === 'true' && userProfile && !needsOnboarding && !user) {
+        console.log('⏳ Auth state syncing - waiting for user context to update');
+        return;
+      }
       
       if (user) {
         // User has a complete profile - they're logged in

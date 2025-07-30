@@ -148,8 +148,11 @@ const PhoneAuthForm = ({ onBack, prefilledPhone = "" }: PhoneAuthFormProps) => {
           description: "You've been signed in successfully.",
         });
         
-        console.log('🔄 Navigating to home page');
-        navigate('/app');
+        console.log('🔄 Navigating to home page with small delay for state sync');
+        // Small delay to ensure auth state has time to update
+        setTimeout(() => {
+          navigate('/app');
+        }, 200);
         return;
       } else if (result.isNewUser) {
         // New user - they need onboarding
