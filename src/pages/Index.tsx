@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePostHog } from "@/hooks/usePostHog";
@@ -82,49 +83,43 @@ const Index = () => {
       });
       
       if (user) {
-        // Existing user with complete profile
-        identify({
-          user_type: 'authenticated',
-           onboarding_completed: localStorage.getItem(`onboarding_complete_${user.phone_number}`) ? true : false
-         });
-
-         const onboardingComplete = localStorage.getItem(`onboarding_complete_${user.phone_number}`);
-         console.log('🔍 Checking onboarding completion for:', user.phone_number, 'result:', onboardingComplete);
-         
-         // If user has a profile (meaning they've completed basic setup), they should skip onboarding
-         // Only send to onboarding if they explicitly need it (new user flow)
-         const needsOnboarding = localStorage.getItem('needs_onboarding');
-         
-         if (needsOnboarding === 'true') {
-           // This is a new user who just verified their phone and needs onboarding
-           setCurrentView("onboarding");
-           trackScreenView("onboarding");
-           trackPageView("onboarding");
-         } else {
-           // This is an existing user - go to home even if onboarding flag isn't set
-           // Set the onboarding flag for future logins if it's not already set
-           if (!onboardingComplete) {
-             localStorage.setItem(`onboarding_complete_${user.phone_number}`, "true");
-           }
-           setIsOnboarded(true);
-           setCurrentView("home");
-           trackScreenView("dashboard");
-           trackPageView("dashboard");
-         }
-      } else if (isAuthenticated === 'true') {
-        // Authenticated user - go directly to home
+        // User has a complete profile - they're logged in
         identify({
           user_type: 'authenticated',
           onboarding_completed: true
         });
+
+        console.log('✅ User is authenticated with complete profile:', user.phone_number);
+        
+        // Set onboarding as complete since they have a profile
+        const onboardingKey = `onboarding_complete_${user.phone_number}`;
+        if (!localStorage.getItem(onboardingKey)) {
+          localStorage.setItem(onboardingKey, "true");
+        }
+        
+        // Remove any stale onboarding flags
+        localStorage.removeItem('needs_onboarding');
         
         setIsOnboarded(true);
         setCurrentView("home");
         trackScreenView("dashboard");
         trackPageView("dashboard");
+        
+      } else if (isAuthenticated === 'true' && needsOnboarding === 'true') {
+        // Authenticated but needs onboarding (new user)
+        console.log('📝 Authenticated user needs onboarding');
+        identify({
+          user_type: 'authenticated',
+          onboarding_completed: false
+        });
+        
+        setCurrentView("onboarding");
+        trackScreenView("onboarding");
+        trackPageView("onboarding");
+        
       } else {
-        // Only redirect to auth if loading is complete and user is definitively null
-        // Add a small delay to prevent blank screens during auth state changes
+        // Not authenticated - redirect to landing
+        console.log('🚪 User not authenticated - redirecting to landing');
         setTimeout(() => {
           if (!user && !loading && isAuthenticated !== 'true') {
             navigate('/');
@@ -186,7 +181,6 @@ const Index = () => {
 
   const handleNavigate = (view: string, data?: any) => {
     console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView);
-    console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView);
     const previousView = currentView;
     setIsTransitioning(true);
     
@@ -212,7 +206,6 @@ const Index = () => {
       trackPageView(view, data ? { activity_id: data.id } : {});
     }, 150);
   };
-
 
   // Show desktop message if user is authenticated, onboarded, and on desktop
   if (user && isOnboarded && isDesktop) {
