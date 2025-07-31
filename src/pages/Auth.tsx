@@ -41,19 +41,21 @@ const Auth = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="min-h-screen w-full bg-background">
+    <div ref={containerRef} className="min-h-screen w-full bg-background clean-grid">
       <AppBar title="Sign In" showBackButton={false} />
-      <div className="flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <BolMascot className="mx-auto mb-4 hover:scale-110 transition-transform duration-300 animate-gentle-float" />
-            <h1 className="text-4xl font-black text-primary mb-2 uppercase tracking-wider transform -rotate-1">
-              BOL
-            </h1>
-            <p className="text-muted-foreground font-semibold">Your AI Hindi Learning Companion</p>
+      <div className="flex items-center justify-center p-6 slide-up">
+        <div className="w-full max-w-md space-y-clean">
+          <div className="text-center space-y-4">
+            <BolMascot className="mx-auto hover-lift animate-gentle-float" />
+            <div className="space-y-2">
+              <h1 className="hero-text text-primary transform -rotate-1">
+                BOL
+              </h1>
+              <p className="subtext">Your AI Hindi Learning Companion</p>
+            </div>
           </div>
           
-          <div className="warm-card p-6 soft-shadow w-full">
+          <div className="warm-card clean-surface animate-soft-pulse">
             <PhoneAuthForm onBack={() => {}} prefilledPhone={prefilledPhone} />
           </div>
         </div>
