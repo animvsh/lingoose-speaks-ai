@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { EnhancedOnboardingFlow } from './EnhancedOnboardingFlow';
+import { PostOnboardingPaywall } from './PostOnboardingPaywall';
 import { useEnhancedCreateUserProfile } from '@/hooks/useEnhancedCreateUserProfile';
 import LoadingOverlay from './LoadingOverlay';
 
@@ -24,11 +25,14 @@ export const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({
   phoneNumber,
   onProfileCreated
 }) => {
-  const [isCreatingProfile, setIsCreatingProfile] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState<'onboarding' | 'creating-profile' | 'paywall'>('onboarding');
+  const [profileData, setProfileData] = useState<OnboardingData | null>(null);
+
   const createProfile = useEnhancedCreateUserProfile();
 
   const handleOnboardingComplete = async (data: OnboardingData) => {
-    setIsCreatingProfile(true);
+    setProfileData(data);
+    setCurrentPhase('creating-profile');
     
     try {
       await createProfile.mutateAsync({
@@ -48,17 +52,31 @@ export const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({
         onProfileCreated();
       }
 
-      // Complete the onboarding
-      onComplete();
+      // Move to paywall phase
+      setCurrentPhase('paywall');
     } catch (error) {
       console.error('Profile creation failed:', error);
       // The error toast is handled by the hook
-    } finally {
-      setIsCreatingProfile(false);
     }
   };
 
-  if (isCreatingProfile) {
+  const handlePaywallComplete = () => {
+    // Complete the entire onboarding flow
+    onComplete();
+  };
+
+  // Phase 1: Onboarding Flow
+  if (currentPhase === 'onboarding') {
+    return (
+      <EnhancedOnboardingFlow
+        onComplete={handleOnboardingComplete}
+        phoneNumber={phoneNumber}
+      />
+    );
+  }
+
+  // Phase 2: Creating Profile Loading
+  if (currentPhase === 'creating-profile') {
     return (
       <LoadingOverlay isLoading={true} variant="gentle">
         <div className="min-h-screen bg-background flex items-center justify-center">
@@ -71,10 +89,11 @@ export const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({
     );
   }
 
+  // Phase 3: Paywall
   return (
-    <EnhancedOnboardingFlow
-      onComplete={handleOnboardingComplete}
-      phoneNumber={phoneNumber}
+    <PostOnboardingPaywall
+      onComplete={handlePaywallComplete}
+      userName={profileData?.fullName || 'there'}
     />
   );
 };
