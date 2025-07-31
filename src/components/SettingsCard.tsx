@@ -183,6 +183,8 @@ const SettingsCard = ({
     onNavigate(destination);
   };
 
+  console.log('🔄 SettingsCard render - current props:', { onNavigate: typeof onNavigate });
+
   return <div className="min-h-screen hindi-bg pb-24 font-nunito">
       <AppBar title="Settings" showBackButton={false} />
 

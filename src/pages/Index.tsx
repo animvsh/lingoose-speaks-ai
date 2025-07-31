@@ -110,9 +110,17 @@ const Index = () => {
         localStorage.removeItem('needs_onboarding');
         
         setIsOnboarded(true);
-        setCurrentView("home");
-        trackScreenView("dashboard");
-        trackPageView("dashboard");
+        
+        // Only set to home if we're still on onboarding view (initial load)
+        if (currentView === "onboarding") {
+          console.log('🏠 Setting initial view to home after authentication');
+          setCurrentView("home");
+        } else {
+          console.log('👀 User already navigated to:', currentView, '- keeping current view');
+        }
+        
+        trackScreenView(currentView === "onboarding" ? "dashboard" : currentView);
+        trackPageView(currentView === "onboarding" ? "dashboard" : currentView);
         
       } else if (isAuthenticated === 'true' && needsOnboarding === 'true') {
         // Authenticated but needs onboarding (new user)
@@ -189,7 +197,15 @@ const Index = () => {
   };
 
   const handleNavigate = (view: string, data?: any) => {
-    console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView);
+    console.log('🚀 Index handleNavigate called with view:', view, 'currentView:', currentView, 'data:', data);
+    console.log('🔍 Navigation debug info:', {
+      requestedView: view,
+      currentView,
+      isTransitioning,
+      timestamp: new Date().toISOString(),
+      stackTrace: new Error().stack?.split('\n').slice(0, 5)
+    });
+    
     const previousView = currentView;
     setIsTransitioning(true);
     
@@ -202,12 +218,14 @@ const Index = () => {
       if (view === 'activity-details' && data) {
         setActivityDetailsData(data);
       }
-      console.log('🎯 Setting currentView to:', view);
+      console.log('🎯 Setting currentView from', currentView, 'to:', view);
       setCurrentView(view);
+      console.log('✅ currentView set to:', view);
       
       // Stagger the transition completion for smoother effect
       setTimeout(() => {
         setIsTransitioning(false);
+        console.log('🏁 Transition completed for view:', view);
       }, 50);
       
       // Track screen view and page view
@@ -263,6 +281,7 @@ const Index = () => {
     } else if (currentView === "roadmap") {
       content = <FluencyRoadmapView />;
     } else if (currentView === "settings") {
+      console.log('⚙️ Rendering SettingsCard for settings view');
       content = <SettingsCard onNavigate={handleNavigate} />;
     } else if (currentView === "add-supervisor") {
       content = <AddSupervisorForm onClose={() => handleNavigate("settings")} />;

@@ -19,6 +19,13 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
   ];
 
   const handleNavClick = (view: string, label: string) => {
+    console.log('🎯 AnimatedBottomNav: handleNavClick called', { 
+      view, 
+      label, 
+      currentView,
+      timestamp: new Date().toISOString()
+    });
+    
     // Add haptic feedback for mobile devices
     if ('vibrate' in navigator) {
       navigator.vibrate(50);
@@ -31,7 +38,9 @@ const AnimatedBottomNav = ({ currentView, onNavigate }: AnimatedBottomNavProps) 
       nav_label: label
     });
     
+    console.log('🚀 AnimatedBottomNav: About to call onNavigate with view:', view);
     onNavigate(view);
+    console.log('✅ AnimatedBottomNav: onNavigate called successfully');
   };
 
   return (
