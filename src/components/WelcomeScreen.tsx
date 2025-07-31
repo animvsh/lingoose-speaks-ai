@@ -5,7 +5,7 @@ import { Sparkles, Heart, Star, Zap } from "lucide-react";
 import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 import { useEngagementTracking } from "@/hooks/useEngagementTracking";
 import BolMascot from "./BolMascot";
-import SimpleOnboardingFlow from "./SimpleOnboardingFlow";
+import { NewUserOnboarding } from "./NewUserOnboarding";
 
 interface WelcomeScreenProps {
   onComplete: () => void;
@@ -40,7 +40,7 @@ const WelcomeScreen = ({ onComplete, onProfileCreated }: WelcomeScreenProps) => 
   };
 
   if (showOnboarding) {
-    return <SimpleOnboardingFlow onComplete={onComplete} phoneNumber={phoneNumber} onProfileCreated={onProfileCreated} />;
+    return <NewUserOnboarding onComplete={onComplete} phoneNumber={phoneNumber} onProfileCreated={onProfileCreated} />;
   }
 
   return (

@@ -2239,6 +2239,9 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          account_holder_name: string | null
+          account_type: string | null
+          age: number | null
           auth_user_id: string | null
           created_at: string | null
           email: string | null
@@ -2248,6 +2251,8 @@ export type Database = {
           is_verified: boolean | null
           language: string | null
           last_conversation_summary: string | null
+          location: string | null
+          mother_tongue: string | null
           phone_number: string
           preferred_call_time: string | null
           proficiency_level: number | null
@@ -2257,6 +2262,9 @@ export type Database = {
           verified_by: string | null
         }
         Insert: {
+          account_holder_name?: string | null
+          account_type?: string | null
+          age?: number | null
           auth_user_id?: string | null
           created_at?: string | null
           email?: string | null
@@ -2266,6 +2274,8 @@ export type Database = {
           is_verified?: boolean | null
           language?: string | null
           last_conversation_summary?: string | null
+          location?: string | null
+          mother_tongue?: string | null
           phone_number: string
           preferred_call_time?: string | null
           proficiency_level?: number | null
@@ -2275,6 +2285,9 @@ export type Database = {
           verified_by?: string | null
         }
         Update: {
+          account_holder_name?: string | null
+          account_type?: string | null
+          age?: number | null
           auth_user_id?: string | null
           created_at?: string | null
           email?: string | null
@@ -2284,6 +2297,8 @@ export type Database = {
           is_verified?: boolean | null
           language?: string | null
           last_conversation_summary?: string | null
+          location?: string | null
+          mother_tongue?: string | null
           phone_number?: string
           preferred_call_time?: string | null
           proficiency_level?: number | null
