@@ -87,10 +87,10 @@ export const useEnhancedCreateUserProfile = () => {
       });
 
       try {
-        // Insert new user profile with enhanced data
+        // Use upsert to handle existing profiles
         const { data: newProfile, error } = await supabase
           .from('user_profiles')
-          .insert({
+          .upsert({
             phone_number: formattedPhone,
             full_name: profileData.full_name.trim(),
             proficiency_level: profileData.proficiency_level,
@@ -101,7 +101,10 @@ export const useEnhancedCreateUserProfile = () => {
             account_holder_name: profileData.account_holder_name?.trim(),
             language: 'hindi', // Default learning language
             role: 'pending_user',
-            is_verified: false
+            is_verified: false,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'phone_number'
           })
           .select('*')
           .single();
