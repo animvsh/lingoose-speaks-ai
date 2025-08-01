@@ -72,8 +72,8 @@ export const useEnhancedCreateUserProfile = () => {
       const formattedPhone = formatPhoneNumber(profileData.phone_number);
       
       // Validate inputs
-      if (!validatePhoneNumber(formattedPhone)) {
-        throw new Error('Invalid phone number format');
+      if (!profileData.phone_number || !validatePhoneNumber(formattedPhone)) {
+        throw new Error(`Invalid phone number format. Expected format: +1234567890, received: ${profileData.phone_number}`);
       }
       
       if (!validateUserName(profileData.full_name)) {

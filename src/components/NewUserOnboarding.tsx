@@ -12,6 +12,7 @@ interface NewUserOnboardingProps {
 
 interface OnboardingData {
   fullName: string;
+  phoneNumber: string; // Add phone number
   hindiProficiency: number;
   age: number;
   location: string;
@@ -36,7 +37,7 @@ export const NewUserOnboarding: React.FC<NewUserOnboardingProps> = ({
     
     try {
       await createProfile.mutateAsync({
-        phone_number: phoneNumber,
+        phone_number: data.phoneNumber, // Use the phone number from onboarding data
         full_name: data.fullName,
         proficiency_level: data.hindiProficiency,
         age: data.age,

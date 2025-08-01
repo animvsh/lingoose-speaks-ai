@@ -14,6 +14,7 @@ interface EnhancedOnboardingFlowProps {
 
 interface OnboardingData {
   fullName: string;
+  phoneNumber: string; // Add phone number to the data structure
   hindiProficiency: number;
   age: number;
   location: string;
@@ -72,6 +73,7 @@ export const EnhancedOnboardingFlow: React.FC<EnhancedOnboardingFlowProps> = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [data, setData] = useState<OnboardingData>({
     fullName: '',
+    phoneNumber: phoneNumber || '', // Initialize with prop or empty
     hindiProficiency: 1,
     age: 25,
     location: '',
@@ -82,7 +84,7 @@ export const EnhancedOnboardingFlow: React.FC<EnhancedOnboardingFlowProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const { trackTap } = useEngagementTracking();
 
-  const totalSteps = 6;
+  const totalSteps = 7; // Increase to include phone number step
 
   useEffect(() => {
     // Try to get user location
@@ -151,6 +153,7 @@ export const EnhancedOnboardingFlow: React.FC<EnhancedOnboardingFlowProps> = ({
       case 3: return data.location.trim().length >= 2;
       case 4: return data.motherTongue.length > 0;
       case 5: return data.accountType && (data.accountType === 'self' || data.accountHolderName?.trim());
+      case 6: return data.phoneNumber.trim().length >= 10; // Phone number validation
       default: return false;
     }
   };
@@ -413,6 +416,37 @@ export const EnhancedOnboardingFlow: React.FC<EnhancedOnboardingFlowProps> = ({
                 </Card>
               )}
             </div>
+          </div>
+        );
+
+      case 6: // Phone number step
+        return (
+          <div className="space-y-8 animate-fade-in">
+            <div className="text-center space-y-4">
+              <div className="text-6xl animate-pulse">📱</div>
+              <div className="space-y-2">
+                <h2 className="hero-text text-primary">Phone Number</h2>
+                <p className="subtext">We'll call you for your Hindi lessons!</p>
+              </div>
+            </div>
+            
+            <Card className="warm-card clean-surface p-6 space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground/80">Phone Number</label>
+                <Input
+                  type="tel"
+                  placeholder="+1234567890"
+                  value={data.phoneNumber}
+                  onChange={(e) => setData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                  className="text-lg h-12 border-primary/20 focus:border-primary transition-colors"
+                />
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Heart className="w-4 h-4 text-primary" />
+                <span>We'll use this number to call you for personalized Hindi lessons</span>
+              </div>
+            </Card>
           </div>
         );
 
