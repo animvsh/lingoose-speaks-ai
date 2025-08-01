@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, Phone, CheckCircle, LogIn } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import SimpleOnboardingFlow from "@/components/SimpleOnboardingFlow";
+import { NewUserOnboarding } from "@/components/NewUserOnboarding";
 import PhoneAuthForm from "@/components/PhoneAuthForm";
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardStats from "@/components/DashboardStats";
@@ -245,7 +245,7 @@ const Landing = () => {
 
   if (showOnboarding) {
     const phoneNumber = localStorage.getItem('phone_number') || '';
-    return <SimpleOnboardingFlow onComplete={handleLandingOnboardingComplete} phoneNumber={phoneNumber} onProfileCreated={refreshUser} />;
+    return <NewUserOnboarding onComplete={handleLandingOnboardingComplete} phoneNumber={phoneNumber} onProfileCreated={refreshUser} />;
   }
 
   if (showSignIn) {
